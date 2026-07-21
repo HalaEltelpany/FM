@@ -1,0 +1,22 @@
+{
+  "name": "Ultimate FM Mobile App",
+  "short_name": "Ultimate FM",
+  "description": "Coastal Cities & Commercial Malls Facility Management System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c1024",
+  "theme_color": "#20274f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

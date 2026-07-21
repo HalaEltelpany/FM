@@ -17,54 +17,45 @@
   <!-- PDF.js CDN for Vector PDF Logo Rendering -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
-<body>
+  <!-- Animated App Splash Screen -->
+  <div class="splash-screen-overlay" id="appSplashScreen">
+    <div class="splash-content">
+      <div class="splash-logo-box">
+        <img src="logo.png" alt="Ultimate FM Logo" class="splash-logo">
+      </div>
+      <h1 class="splash-title">Ultimate FM Solutions</h1>
+      <p class="splash-subtitle">إدارة المدن الساحلية والمراكز التجارية</p>
+      <div class="splash-loader">
+        <div class="splash-progress"></div>
+      </div>
+      <span class="splash-footer">Ultimate Code • Out of the Box Solutions</span>
+    </div>
+  </div>
 
   <div class="app-wrapper">
     <!-- Top Global Header -->
     <header class="global-header">
-      <div class="brand-container">
+      <div class="brand-container" onclick="app.showRoleGrid()" style="cursor: pointer;">
         <canvas id="appLogoCanvas" class="brand-logo" width="96" height="96" style="display:none;"></canvas>
         <object data="Ultimate Logo.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" class="brand-logo" id="appLogoObj">
           <img src="logo.png" alt="Ultimate FM Logo" class="brand-logo" id="appLogo">
         </object>
         <div class="brand-text">
           <h1>Ultimate FM Solutions</h1>
-          <p>إدارة المدن الساحلية والمراكز التجارية • المخطط الاستراتيجي</p>
+          <p>إدارة المدن الساحلية والمراكز التجارية</p>
         </div>
       </div>
 
-      <button class="view-mode-toggle" id="toggleViewModeBtn" title="تبديل العرض بين الموبايل والمؤشر الكامل">
-        <i class="fa-solid fa-mobile-screen-button"></i>
-        <span id="viewModeText">عرض الشاشة الكاملة</span>
-      </button>
-    </header>
-
-    <!-- Dedicated Role Selector Bar -->
-    <nav class="role-nav-container">
-      <div class="role-selector" id="roleSelector">
-        <button class="role-btn active" data-role="homeowner" id="btnRoleHomeowner">
-          <i class="fa-solid fa-house-user"></i> المالك
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-primary" id="btnMainHome" onclick="app.showRoleGrid()" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-radius: 20px;">
+          <i class="fa-solid fa-house"></i> الرئيسية
         </button>
-        <button class="role-btn" data-role="engineer" id="btnRoleEngineer">
-          <i class="fa-solid fa-user-gear"></i> المهندس (3 تخصصات)
-        </button>
-        <button class="role-btn" data-role="manager" id="btnRoleManager">
-          <i class="fa-solid fa-user-tie"></i> مدير الصيانة
-        </button>
-        <button class="role-btn" data-role="technician" id="btnRoleTechnician">
-          <i class="fa-solid fa-helmet-safety"></i> الفني الميداني
-        </button>
-        <button class="role-btn" data-role="tenant" id="btnRoleTenant">
-          <i class="fa-solid fa-key"></i> المستأجر السكني
-        </button>
-        <button class="role-btn" data-role="commercial" id="btnRoleCommercial">
-          <i class="fa-solid fa-store"></i> المستأجر التجاري
-        </button>
-        <button class="role-btn" data-role="admin" id="btnRoleAdmin">
-          <i class="fa-solid fa-chart-line"></i> الإدارة (FM)
+        <button class="view-mode-toggle" id="toggleViewModeBtn" title="تبديل العرض بين الموبايل والمؤشر الكامل">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <span id="viewModeText">عرض الشاشة الكاملة</span>
         </button>
       </div>
-    </nav>
+    </header>
 
     <!-- Main Content Area -->
     <main class="main-stage">
@@ -88,9 +79,114 @@
         <div class="phone-screen" id="phoneScreen">
 
           <!-- ========================================== -->
+          <!-- 0. ROLE SELECTION GRID DASHBOARD (شاشة الأدوار الرئيسية) -->
+          <!-- ========================================== -->
+          <div class="view-panel active" id="viewRoleGrid">
+            
+            <div class="card gold-border" style="text-align: center; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+              <span class="badge badge-info" style="margin-bottom: 8px;"><i class="fa-solid fa-shield-halved"></i> بوابة التحكم والأدوار المعتمدة</span>
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: #20274f;">اختر الشاشة/الدور للدخول للتفاصيل</h2>
+              <p style="font-size: 0.75rem; color: #1b8f91; margin-top: 4px;">المخطط التشغيلي المتكامل لإدارة المرافق والمدن الساحلية</p>
+            </div>
+
+            <!-- Role Cards Grid -->
+            <div class="role-grid-container">
+              
+              <!-- 1. Homeowner Card -->
+              <div class="role-card-item" onclick="app.switchRole('homeowner')">
+                <div class="role-icon-box teal">
+                  <i class="fa-solid fa-house-user"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>شاشة المالك</h3>
+                  <p>تنبيهات البلاغات، العدادات الذكية، وتصاريح دخول الوحدة والبحر</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 2. Field Engineer Card -->
+              <div class="role-card-item" onclick="app.switchRole('engineer')">
+                <div class="role-icon-box mauve">
+                  <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>المهندس الميداني (3 تخصصات)</h3>
+                  <p>مراجعة البنية التحتية، محطات التحلية RO، المسابح واللاندسكيب</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 3. Maintenance Manager Card -->
+              <div class="role-card-item" onclick="app.switchRole('manager')">
+                <div class="role-icon-box navy">
+                  <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>شاشة مدير الصيانة</h3>
+                  <p>استقبال طلبات العملاء والمهندسين وتخصيص الفنيين المتاحين</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 4. Field Technician Card -->
+              <div class="role-card-item" onclick="app.switchRole('technician')">
+                <div class="role-icon-box teal">
+                  <i class="fa-solid fa-helmet-safety"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>الفني الميداني المنفذ</h3>
+                  <p>تلقي أمر العمل، اختيار قطع الغيار، والتوقيع والتسليم</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 5. Residential Tenant Card -->
+              <div class="role-card-item" onclick="app.switchRole('tenant')">
+                <div class="role-icon-box mauve">
+                  <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>المستأجر السكني</h3>
+                  <p>تصريح دخول القرية والبحر والعدادات مسبقة الدفع</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 6. Commercial Tenant Card -->
+              <div class="role-card-item" onclick="app.switchRole('commercial')">
+                <div class="role-icon-box navy">
+                  <i class="fa-solid fa-store"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>المستأجر التجاري (المول والمحلات)</h3>
+                  <p>عدادات تجارية، صيانة عاجلة، وتصاريح الموظفين والبضائع</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+              <!-- 7. Admin / Executive Card -->
+              <div class="role-card-item gold-border" onclick="app.switchRole('admin')">
+                <div class="role-icon-box teal">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="role-card-content">
+                  <h3>لوحة الإدارة العليا (FM)</h3>
+                  <p>إشغال 3,000 وحدة، الكثافة السكانية، العمالة و Odoo ERP</p>
+                </div>
+                <i class="fa-solid fa-chevron-left role-arrow"></i>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
           <!-- 1. HOMEOWNER VIEW (تطبيق المالك) -->
           <!-- ========================================== -->
-          <div class="view-panel active" id="viewHomeowner">
+          <div class="view-panel" id="viewHomeowner">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <!-- Welcome Header -->
             <div class="card gold-border">
@@ -259,6 +355,9 @@
           <!-- 2. ENGINEER VIEW (واجهة المهندس - 3 تخصصات) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewEngineer">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -328,6 +427,9 @@
           <!-- 3. MAINTENANCE MANAGER VIEW (شاشة مدير الصيانة) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewManager">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -401,6 +503,9 @@
           <!-- 4. FIELD TECHNICIAN VIEW (شاشة الفني الميداني) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewTechnician">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -449,6 +554,9 @@
           <!-- 3. TENANT VIEW (واجهة المستأجر) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewTenant">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -515,6 +623,9 @@
           <!-- 5. COMMERCIAL TENANT VIEW (شاشة المستأجر التجاري) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewCommercial">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <!-- Commercial Unit Header -->
             <div class="card gold-border">
@@ -619,6 +730,9 @@
           <!-- 6. ADMIN & EXECUTIVE VIEW (لوحة الإدارة العليا) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewAdmin">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
             
             <!-- Daily Occupancy, Access Control & Staffing Decision Matrix -->
             <div class="card gold-border">

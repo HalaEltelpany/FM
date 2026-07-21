@@ -35,6 +35,21 @@ class UltimateFMApp {
       this.renderPdfLogo();
       this.updateClock();
       setInterval(() => this.updateClock(), 1000);
+      this.initSplashScreen();
+    });
+  }
+
+  initSplashScreen() {
+    const splash = document.getElementById('appSplashScreen');
+    if (!splash) return;
+    
+    // Auto hide splash after 2.2s
+    setTimeout(() => {
+      splash.classList.add('hidden');
+    }, 2200);
+
+    splash.addEventListener('click', () => {
+      splash.classList.add('hidden');
     });
   }
 
@@ -201,7 +216,30 @@ class UltimateFMApp {
     }
   }
 
+  showRoleGrid() {
+    this.currentRole = 'grid';
+    document.querySelectorAll('#roleSelector .role-btn').forEach(btn => {
+      if (btn.getAttribute('data-role') === 'grid') {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    const gridPanel = document.getElementById('viewRoleGrid');
+    if (gridPanel) gridPanel.classList.add('active');
+
+    const backBtn = document.getElementById('btnBackToRoleGrid');
+    if (backBtn) backBtn.style.display = 'none';
+  }
+
   switchRole(role) {
+    if (role === 'grid') {
+      this.showRoleGrid();
+      return;
+    }
+
     this.currentRole = role;
     
     // Update role buttons UI
@@ -231,6 +269,9 @@ class UltimateFMApp {
     if (activePanel) {
       activePanel.classList.add('active');
     }
+
+    const backBtn = document.getElementById('btnBackToRoleGrid');
+    if (backBtn) backBtn.style.display = 'inline-flex';
   }
 
   openCommercialMeterModal() {
