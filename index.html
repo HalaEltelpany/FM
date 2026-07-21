@@ -33,30 +33,6 @@
   </div>
 
   <div class="app-wrapper">
-    <!-- Top Global Header -->
-    <header class="global-header">
-      <div class="brand-container" onclick="app.showRoleGrid()" style="cursor: pointer;">
-        <canvas id="appLogoCanvas" class="brand-logo" width="96" height="96" style="display:none;"></canvas>
-        <object data="Ultimate Logo.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" class="brand-logo" id="appLogoObj">
-          <img src="logo.png" alt="Ultimate FM Logo" class="brand-logo" id="appLogo">
-        </object>
-        <div class="brand-text">
-          <h1>Ultimate FM Solutions</h1>
-          <p>إدارة المدن الساحلية والمراكز التجارية</p>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button class="btn btn-primary" id="btnMainHome" onclick="app.showRoleGrid()" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-radius: 20px;">
-          <i class="fa-solid fa-house"></i> الرئيسية
-        </button>
-        <button class="view-mode-toggle" id="toggleViewModeBtn" title="تبديل العرض بين الموبايل والمؤشر الكامل">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-          <span id="viewModeText">عرض الشاشة الكاملة</span>
-        </button>
-      </div>
-    </header>
-
     <!-- Main Content Area -->
     <main class="main-stage">
       <div class="phone-simulator" id="phoneSimulator">
@@ -79,101 +55,92 @@
         <div class="phone-screen" id="phoneScreen">
 
           <!-- ========================================== -->
-          <!-- 0. ROLE SELECTION GRID DASHBOARD (شاشة الأدوار الرئيسية) -->
+          <!-- 0. ROLE SELECTION GRID DASHBOARD (بلوكات الأدوار المربعة) -->
           <!-- ========================================== -->
           <div class="view-panel active" id="viewRoleGrid">
             
-            <div class="card gold-border" style="text-align: center; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
-              <span class="badge badge-info" style="margin-bottom: 8px;"><i class="fa-solid fa-shield-halved"></i> بوابة التحكم والأدوار المعتمدة</span>
-              <h2 style="font-size: 1.15rem; font-weight: 800; color: #20274f;">اختر الشاشة/الدور للدخول للتفاصيل</h2>
-              <p style="font-size: 0.75rem; color: #1b8f91; margin-top: 4px;">المخطط التشغيلي المتكامل لإدارة المرافق والمدن الساحلية</p>
+            <!-- App Main Brand Card -->
+            <div class="brand-hero-card">
+              <img src="logo.png" alt="Ultimate FM Logo" class="hero-brand-logo">
+              <div>
+                <h1 class="hero-brand-title">Ultimate FM Solutions</h1>
+                <p class="hero-brand-sub">إدارة المدن الساحلية والمراكز التجارية</p>
+              </div>
             </div>
 
-            <!-- Role Cards Grid -->
-            <div class="role-grid-container">
+            <div style="text-align: center; margin-bottom: 12px;">
+              <span class="badge badge-info" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px;">
+                <i class="fa-solid fa-shield-halved"></i> اختر الشاشة/الدور للدخول للتفاصيل
+              </span>
+            </div>
+
+            <!-- 2-Column Square Brand Blocks Grid -->
+            <div class="role-square-grid">
               
-              <!-- 1. Homeowner Card -->
-              <div class="role-card-item" onclick="app.switchRole('homeowner')">
-                <div class="role-icon-box teal">
+              <!-- 1. Homeowner Block (Teal) -->
+              <div class="role-block-card teal-block" onclick="app.switchRole('homeowner')">
+                <div class="block-icon">
                   <i class="fa-solid fa-house-user"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>شاشة المالك</h3>
-                  <p>تنبيهات البلاغات، العدادات الذكية، وتصاريح دخول الوحدة والبحر</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">شاشة المالك</h3>
+                <p class="block-desc">البلاغات، العدادات وتصاريح الوحدة</p>
               </div>
 
-              <!-- 2. Field Engineer Card -->
-              <div class="role-card-item" onclick="app.switchRole('engineer')">
-                <div class="role-icon-box mauve">
+              <!-- 2. Field Engineer Block (Mauve) -->
+              <div class="role-block-card mauve-block" onclick="app.switchRole('engineer')">
+                <div class="block-icon">
                   <i class="fa-solid fa-user-gear"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>المهندس الميداني (3 تخصصات)</h3>
-                  <p>مراجعة البنية التحتية، محطات التحلية RO، المسابح واللاندسكيب</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">المهندس الميداني</h3>
+                <p class="block-desc">RO، البحيرات واللاندسكيب</p>
               </div>
 
-              <!-- 3. Maintenance Manager Card -->
-              <div class="role-card-item" onclick="app.switchRole('manager')">
-                <div class="role-icon-box navy">
+              <!-- 3. Maintenance Manager Block (Navy) -->
+              <div class="role-block-card navy-block" onclick="app.switchRole('manager')">
+                <div class="block-icon">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>شاشة مدير الصيانة</h3>
-                  <p>استقبال طلبات العملاء والمهندسين وتخصيص الفنيين المتاحين</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">مدير الصيانة</h3>
+                <p class="block-desc">توزيع وإسناد الفنيين</p>
               </div>
 
-              <!-- 4. Field Technician Card -->
-              <div class="role-card-item" onclick="app.switchRole('technician')">
-                <div class="role-icon-box teal">
+              <!-- 4. Field Technician Block (Teal) -->
+              <div class="role-block-card teal-block" onclick="app.switchRole('technician')">
+                <div class="block-icon">
                   <i class="fa-solid fa-helmet-safety"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>الفني الميداني المنفذ</h3>
-                  <p>تلقي أمر العمل، اختيار قطع الغيار، والتوقيع والتسليم</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">الفني الميداني</h3>
+                <p class="block-desc">أوامر العمل والتوقيع</p>
               </div>
 
-              <!-- 5. Residential Tenant Card -->
-              <div class="role-card-item" onclick="app.switchRole('tenant')">
-                <div class="role-icon-box mauve">
+              <!-- 5. Residential Tenant Block (Mauve) -->
+              <div class="role-block-card mauve-block" onclick="app.switchRole('tenant')">
+                <div class="block-icon">
                   <i class="fa-solid fa-key"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>المستأجر السكني</h3>
-                  <p>تصريح دخول القرية والبحر والعدادات مسبقة الدفع</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">المستأجر السكني</h3>
+                <p class="block-desc">دخول القرية، العدادات والباقات</p>
               </div>
 
-              <!-- 6. Commercial Tenant Card -->
-              <div class="role-card-item" onclick="app.switchRole('commercial')">
-                <div class="role-icon-box navy">
+              <!-- 6. Commercial Tenant Block (Navy) -->
+              <div class="role-block-card navy-block" onclick="app.switchRole('commercial')">
+                <div class="block-icon">
                   <i class="fa-solid fa-store"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>المستأجر التجاري (المول والمحلات)</h3>
-                  <p>عدادات تجارية، صيانة عاجلة، وتصاريح الموظفين والبضائع</p>
-                </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <h3 class="block-title">المستأجر التجاري</h3>
+                <p class="block-desc">عدادات تجارية وتصاريح البضائع</p>
               </div>
 
-              <!-- 7. Admin / Executive Card -->
-              <div class="role-card-item gold-border" onclick="app.switchRole('admin')">
-                <div class="role-icon-box teal">
+              <!-- 7. Admin Executive Block (Full Width Gold/Teal) -->
+              <div class="role-block-card admin-block full-width-block" onclick="app.switchRole('admin')">
+                <div class="block-icon">
                   <i class="fa-solid fa-chart-line"></i>
                 </div>
-                <div class="role-card-content">
-                  <h3>لوحة الإدارة العليا (FM)</h3>
-                  <p>إشغال 3,000 وحدة، الكثافة السكانية، العمالة و Odoo ERP</p>
+                <div style="text-align: right; flex: 1;">
+                  <h3 class="block-title">لوحة الإدارة العليا (FM Governance)</h3>
+                  <p class="block-desc">إشغال 3,000 وحدة، الكثافة السكانية (12.7K) ومصفوفة التعيين</p>
                 </div>
-                <i class="fa-solid fa-chevron-left role-arrow"></i>
+                <i class="fa-solid fa-chevron-left" style="font-size: 0.9rem; opacity: 0.7;"></i>
               </div>
 
             </div>
@@ -551,69 +518,129 @@
           </div>
 
           <!-- ========================================== -->
-          <!-- 3. TENANT VIEW (واجهة المستأجر) -->
+          <!-- 3. TENANT VIEW (واجهة المستأجر السكني المتكاملة) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewTenant">
             <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
               <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
             </button>
             
+            <!-- Tenant Welcome Header -->
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                  <span style="font-size: 0.75rem; color: var(--text-muted);">حساب مستأجر مؤقت</span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800;">السيد / أحمد زاهر</h2>
-                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">شاليه 402 • صلاحية الإقامة حتى 25 يوليو</p>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">حساب مستأجر مكنون</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #20274f;">السيد / أحمد زاهر</h2>
+                  <p style="font-size: 0.75rem; color: #1b8f91;">شاليه 402 • زون البحيرات • صلاحية حتى 25 يوليو</p>
                 </div>
-                <span class="badge badge-info"><i class="fa-solid fa-clock"></i> مؤقت</span>
+                <span class="badge badge-info"><i class="fa-solid fa-clock"></i> إقامة سارية</span>
               </div>
             </div>
 
-            <!-- Temporary Tenant QR -->
+            <!-- Dynamic Security Access QR for Gates, Beach & Pools -->
             <div class="qr-container">
-              <span style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan);">
-                <i class="fa-solid fa-qrcode"></i> كود دخلات المستأجر التنازلي
+              <span style="font-size: 0.82rem; font-weight: 800; color: #1b8f91;">
+                <i class="fa-solid fa-qrcode"></i> كود دخلات المستأجر التنازلي (البوابات والمسابح)
               </span>
               <div class="qr-box">
                 <svg width="140" height="140" viewBox="0 0 100 100">
                   <rect width="100" height="100" fill="#ffffff"/>
-                  <rect x="10" y="10" width="30" height="30" fill="#0077b6"/>
-                  <rect x="60" y="10" width="30" height="30" fill="#0077b6"/>
-                  <rect x="10" y="60" width="30" height="30" fill="#0077b6"/>
-                  <rect x="40" y="40" width="20" height="20" fill="#e6c667"/>
+                  <rect x="10" y="10" width="30" height="30" fill="#1b8f91"/>
+                  <rect x="60" y="10" width="30" height="30" fill="#1b8f91"/>
+                  <rect x="10" y="60" width="30" height="30" fill="#1b8f91"/>
+                  <rect x="45" y="45" width="20" height="20" fill="#995789"/>
                 </svg>
               </div>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">المتبقي: <strong style="color: var(--primary-gold);">8 دخلات متبقية</strong></p>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">
+                المتبقي: <strong style="color: #1b8f91;">8 دخلات متبقية لـ 4 أفراد</strong>
+              </p>
             </div>
 
-            <!-- Service Recharge Hub -->
+            <!-- Chalet Prepaid Smart Utility Meters -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-bolt"></i> عدادات الشاليه الذكية مسبقة الدفع</span>
+                <span class="badge badge-cyan"><i class="fa-solid fa-wifi"></i> IoT Connected</span>
+              </div>
+              
+              <div class="grid-2" style="margin-bottom: 10px;">
+                <div class="stat-box" style="border-color: rgba(245, 158, 11, 0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="stat-label" style="color: #fcd34d;"><i class="fa-solid fa-bolt"></i> كهرباء الشاليه</span>
+                    <span style="font-size: 0.65rem;">#EL-402</span>
+                  </div>
+                  <div class="stat-value gold" id="tenantElecText">210.00 ج.م</div>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="stat-label" style="color: #67e8f9;"><i class="fa-solid fa-droplet"></i> مياه الشاليه</span>
+                    <span style="font-size: 0.65rem;">#WT-402</span>
+                  </div>
+                  <div class="stat-value cyan" id="tenantWaterText">120.00 ج.م</div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" onclick="app.openModal('modalMeterRecharge')">
+                <i class="fa-solid fa-charging-station"></i> شحن العدادات المباشر للشاليه
+              </button>
+            </div>
+
+            <!-- Service Recharge Hub & Packages -->
             <div class="card">
               <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-bolt"></i> شحن باقات الخدمات والرفاهية</span>
+                <span class="card-title"><i class="fa-solid fa-umbrella-beach"></i> شراء باقات الخدمات والرفاهية</span>
+                <span class="badge badge-purple">باقات القرية</span>
               </div>
-              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px;">
                 الإيجار للمبنى فقط، والخدمات والرفاهية تُشحن وتباع عبر التطبيق لصالح تشغيل القرية.
               </p>
 
               <div class="list-group">
                 <div class="ticket-item">
                   <div>
-                    <h4>باقة استخدام المسابح والشاطئ الخاص</h4>
-                    <p>صلاحية 3 أيام • لـ 4 أفراد</p>
+                    <h4 style="font-size: 0.85rem; font-weight: 700;">باقة استخدام المسابح والشاطئ الخاص</h4>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">صلاحية 3 أيام • لـ 4 أفراد</p>
                   </div>
-                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px;" onclick="app.chargeService('باقة المسابح', 1200)">
+                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="app.chargeService('باقة المسابح والشاطئ', 1200)">
                     شحن 1200 ج.م
                   </button>
                 </div>
+
                 <div class="ticket-item">
                   <div>
-                    <h4>تصريح دخول سيارات إضافية (Parking)</h4>
-                    <p>صلاحية 5 أيام</p>
+                    <h4 style="font-size: 0.85rem; font-weight: 700;">تصريح دخول سيارات إضافية (Parking)</h4>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">صلاحية 5 أيام بالباركينج المغطى</p>
                   </div>
-                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px;" onclick="app.chargeService('تصريح الباركينج', 500)">
+                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="app.chargeService('تصريح الباركينج', 500)">
                     شحن 500 ج.م
                   </button>
                 </div>
+
+                <div class="ticket-item">
+                  <div>
+                    <h4 style="font-size: 0.85rem; font-weight: 700;">خدمة النظافة الفندقية للشاليه</h4>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">تنظيف شامل وتغيير المفرشات</p>
+                  </div>
+                  <button class="btn btn-cyan" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="app.chargeService('نظافة الشاليه', 350)">
+                    طلب بـ 350 ج.م
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Maintenance Request & Check-Out Clearance -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-headset"></i> بلاغات صيانة الشاليه وإخلاء الطرف</span>
+              </div>
+              <div class="grid-2">
+                <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
+                  <i class="fa-solid fa-plus-circle"></i> طلب صيانة عاجلة للشاليه
+                </button>
+                <button class="btn btn-cyan" onclick="app.showToast('✅ تم تسجيل طلب إخلاء الطرف وإعادة المفتاح بنجاح! جاري معاينة الشاليه قبل المغادرة.')">
+                  <i class="fa-solid fa-key-skeleton"></i> إخلاء الطرف وإعادة المفتاح
+                </button>
               </div>
             </div>
 
@@ -791,42 +818,8 @@
 
             <div class="card gold-border">
               <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-chart-pie"></i> لوحة التحكم التنفيذية (Executive FM)</span>
-                <span class="badge badge-success">Odoo Fully Integrated</span>
-              </div>
-
-              <!-- Odoo EDU Live Connection Settings -->
-              <div style="background: #f8fafc; border: 1px solid rgba(27, 143, 145, 0.3); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <span style="font-weight: 700; color: #20274f; font-size: 0.85rem;"><i class="fa-solid fa-database"></i> إعدادات الربط المباشر مع Odoo EDU (*.odoo.com)</span>
-                  <span class="badge badge-success" id="odooStatusBadge"><i class="fa-solid fa-link"></i> جاهز للربط</span>
-                </div>
-
-                <div class="grid-2">
-                  <div class="form-group">
-                    <label class="form-label">رابط سيرفر Odoo EDU URL:</label>
-                    <input type="text" id="odooUrlInput" class="form-control" value="https://facility-management.odoo.com" placeholder="https://your-db.odoo.com">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">اسم قاعدة البيانات (DB Name):</label>
-                    <input type="text" id="odooDbInput" class="form-control" value="facility-management-edu" placeholder="facility-management">
-                  </div>
-                </div>
-
-                <div class="grid-2">
-                  <div class="form-group">
-                    <label class="form-label">البريد الإلكتروني (User Email):</label>
-                    <input type="text" id="odooUserInput" class="form-control" value="admin@facility-edu.org" placeholder="admin@domain.com">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">مفتاح API Key / Password:</label>
-                    <input type="password" id="odooKeyInput" class="form-control" value="••••••••••••" placeholder="API Key">
-                  </div>
-                </div>
-
-                <button class="btn btn-primary" style="margin-top: 4px;" onclick="app.testOdooEduConnection()">
-                  <i class="fa-solid fa-arrows-rotate"></i> اختبار المزامنة المباشرة مع Odoo EDU Database
-                </button>
+                <span class="card-title"><i class="fa-solid fa-chart-pie"></i> مؤشرات التشغيل والبنية التحتية (IoT Operational Control)</span>
+                <span class="badge badge-success">Live Stream</span>
               </div>
 
               <!-- IoT Indicators -->
