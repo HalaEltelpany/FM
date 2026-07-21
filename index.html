@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ultimate FM">
+  <meta name="theme-color" content="#20274f">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="logo.png">
+  <title>Ultimate FM - إدارة المدن الساحلية والمراكز التجارية</title>
+  <meta name="description" content="تطبيق إدارة المرافق والمدن الساحلية والمراكز التجارية - المخطط الاستراتيجي المتكامل للتشغيل الهندسي، الحوكمة المالية، وتجربة الملاك.">
+  <link rel="stylesheet" href="index.css">
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- PDF.js CDN for Vector PDF Logo Rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <!-- Top Global Header -->
+    <header class="global-header">
+      <div class="brand-container">
+        <canvas id="appLogoCanvas" class="brand-logo" width="96" height="96" style="display:none;"></canvas>
+        <object data="Ultimate Logo.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" class="brand-logo" id="appLogoObj">
+          <img src="logo.png" alt="Ultimate FM Logo" class="brand-logo" id="appLogo">
+        </object>
+        <div class="brand-text">
+          <h1>Ultimate FM Solutions</h1>
+          <p>إدارة المدن الساحلية والمراكز التجارية • المخطط الاستراتيجي</p>
+        </div>
+      </div>
+
+      <button class="view-mode-toggle" id="toggleViewModeBtn" title="تبديل العرض بين الموبايل والمؤشر الكامل">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span id="viewModeText">عرض الشاشة الكاملة</span>
+      </button>
+    </header>
+
+    <!-- Dedicated Role Selector Bar -->
+    <nav class="role-nav-container">
+      <div class="role-selector" id="roleSelector">
+        <button class="role-btn active" data-role="homeowner" id="btnRoleHomeowner">
+          <i class="fa-solid fa-house-user"></i> المالك
+        </button>
+        <button class="role-btn" data-role="engineer" id="btnRoleEngineer">
+          <i class="fa-solid fa-user-gear"></i> المهندس (3 تخصصات)
+        </button>
+        <button class="role-btn" data-role="manager" id="btnRoleManager">
+          <i class="fa-solid fa-user-tie"></i> مدير الصيانة
+        </button>
+        <button class="role-btn" data-role="technician" id="btnRoleTechnician">
+          <i class="fa-solid fa-helmet-safety"></i> الفني الميداني
+        </button>
+        <button class="role-btn" data-role="tenant" id="btnRoleTenant">
+          <i class="fa-solid fa-key"></i> المستأجر السكني
+        </button>
+        <button class="role-btn" data-role="commercial" id="btnRoleCommercial">
+          <i class="fa-solid fa-store"></i> المستأجر التجاري
+        </button>
+        <button class="role-btn" data-role="admin" id="btnRoleAdmin">
+          <i class="fa-solid fa-chart-line"></i> الإدارة (FM)
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-stage">
+      <div class="phone-simulator" id="phoneSimulator">
+        
+        <!-- Phone Notch / Camera -->
+        <div class="phone-notch">
+          <div class="camera-lens"></div>
+        </div>
+
+        <!-- Phone Status Bar -->
+        <div class="phone-status-bar">
+          <span id="liveTime">14:05</span>
+          <div style="display: flex; gap: 6px;">
+            <i class="fa-solid fa-wifi"></i>
+            <i class="fa-solid fa-battery-full"></i>
+          </div>
+        </div>
+
+        <!-- Phone Screen Content -->
+        <div class="phone-screen" id="phoneScreen">
+
+          <!-- ========================================== -->
+          <!-- 1. HOMEOWNER VIEW (تطبيق المالك) -->
+          <!-- ========================================== -->
+          <div class="view-panel active" id="viewHomeowner">
+            
+            <!-- Welcome Header -->
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">أهلاً بك، المالك الرئيسي</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">د. أسامة المنشاوي</h2>
+                  <p style="font-size: 0.75rem; color: var(--primary-gold);">فيلا 104 - زون الساحل الشمالي</p>
+                </div>
+                <span class="badge badge-success"><i class="fa-solid fa-check"></i> حساب مؤكد</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Security QR Code -->
+            <div class="qr-container" id="qrSecurityCard">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-gold);">
+                  <i class="fa-solid fa-qrcode"></i> Dynamic QR Access Code
+                </span>
+                <span class="badge badge-info" id="qrCountdownText">60 ثانية</span>
+              </div>
+
+              <div class="qr-box" id="qrBoxContainer">
+                <!-- SVG Dynamic QR Code Placeholder -->
+                <svg id="qrSvg" width="140" height="140" viewBox="0 0 100 100">
+                  <rect width="100" height="100" fill="#ffffff"/>
+                  <!-- QR Patterns -->
+                  <rect x="10" y="10" width="30" height="30" fill="#0b1320"/>
+                  <rect x="15" y="15" width="20" height="20" fill="#ffffff"/>
+                  <rect x="20" y="20" width="10" height="10" fill="#0b1320"/>
+                  <rect x="60" y="10" width="30" height="30" fill="#0b1320"/>
+                  <rect x="65" y="15" width="20" height="20" fill="#ffffff"/>
+                  <rect x="70" y="20" width="10" height="10" fill="#0b1320"/>
+                  <rect x="10" y="60" width="30" height="30" fill="#0b1320"/>
+                  <rect x="15" y="65" width="20" height="20" fill="#ffffff"/>
+                  <rect x="20" y="70" width="10" height="10" fill="#0b1320"/>
+                  <!-- Dynamic Random Blocks -->
+                  <rect x="50" y="50" width="15" height="15" fill="#d4af37" id="qrDyn1"/>
+                  <rect x="70" y="70" width="15" height="15" fill="#0b1320" id="qrDyn2"/>
+                  <rect x="45" y="75" width="10" height="10" fill="#00e5ff" id="qrDyn3"/>
+                </svg>
+              </div>
+
+              <div class="qr-timer-bar">
+                <div class="qr-timer-progress" id="qrProgressBar"></div>
+              </div>
+              
+              <div class="sec-badge">
+                <i class="fa-solid fa-shield-halved"></i> كود يتغير تلقائياً • حظر الـ Screenshot
+              </div>
+            </div>
+
+            <!-- Maintenance Request Button -->
+            <button class="btn btn-primary" id="btnNewMaintenanceTicket">
+              <i class="fa-solid fa-wrench"></i> طلب صيانة جديدة للوحدة
+            </button>
+
+            <!-- Active Maintenance Tickets -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-list-check"></i> طلبات الصيانة الحالية</span>
+                <span class="badge badge-warning" id="ticketCountBadge">2 نشطة</span>
+              </div>
+              <div class="list-group" id="homeownerTicketsList">
+                <div class="ticket-item">
+                  <div class="ticket-info">
+                    <h4>صيانة تكييف الماستر</h4>
+                    <p>التخصص: كهروميكانيك • كود: #TK-8041</p>
+                  </div>
+                  <span class="badge badge-warning">قيد الفحص الميداني</span>
+                </div>
+                <div class="ticket-item">
+                  <div class="ticket-info">
+                    <h4>تسريب في محبس السباكة</h4>
+                    <p>التخصص: سباكة • كود: #TK-7930</p>
+                  </div>
+                  <span class="badge badge-info">تم إسناد الفني</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Wallet & Maintenance Variance -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-wallet"></i> البيانات المالية ووديعة الصيانة</span>
+                <span class="badge badge-success">المالك الرئيسي</span>
+              </div>
+
+              <div class="grid-2">
+                <div class="stat-box">
+                  <div class="stat-label">رصيد الوديعة الأصلية</div>
+                  <div class="stat-value gold">150,000 ج.م</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">عوائد الاستثمار السنوية</div>
+                  <div class="stat-value green">+18,500 ج.م</div>
+                </div>
+              </div>
+
+              <div style="margin-top: 12px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;">
+                  <span style="color: var(--text-muted);">حصة الوحدة من مصاريف التشغيل:</span>
+                  <span style="font-weight: 700; color: var(--text-main);">22,400 ج.م</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">
+                  <span style="color: var(--primary-gold);">صافي فروق الصيانة المطلوبة:</span>
+                  <span style="color: var(--accent-cyan);">3,900 ج.م</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Smart Utility Meters (Electricity & Water Prepaid Recharging) -->
+            <div class="card gold-border" id="utilityMetersCard">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)</span>
+                <span class="badge badge-cyan"><i class="fa-solid fa-wifi"></i> IoT Connected</span>
+              </div>
+
+              <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="stat-box" style="border-color: rgba(245, 158, 11, 0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="stat-label" style="color: #fcd34d;"><i class="fa-solid fa-bolt"></i> عداد الكهرباء</span>
+                    <span style="font-size: 0.68rem; color: var(--text-muted);">رقم #EL-104</span>
+                  </div>
+                  <div class="stat-value gold" id="elecBalanceText">342.50 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ 124 KWh</p>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.3);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="stat-label" style="color: #67e8f9;"><i class="fa-solid fa-droplet"></i> عداد المياه</span>
+                    <span style="font-size: 0.68rem; color: var(--text-muted);">رقم #WT-104</span>
+                  </div>
+                  <div class="stat-value cyan" id="waterBalanceText">185.00 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ 38 م³</p>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="btnOpenMeterRechargeModal">
+                <i class="fa-solid fa-charging-station"></i> شحن العدادات الفوري (كهرباء / مياه)
+              </button>
+            </div>
+
+            <!-- Access Permits: Unit Entry & Beach / Lakes / Swimming Pools -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-key"></i> تصاريح الدخول المعتمدة</span>
+                <span class="badge badge-success">Dynamic QR</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                إصدار تصاريح دخول مشروطة ومؤقتة بدقة لمتابعة الأمان والتحكم بالبوابات.
+              </p>
+              <div class="grid-2">
+                <button class="btn btn-cyan" id="btnUnitEntryPermit">
+                  <i class="fa-solid fa-door-open"></i> تصريح دخول الوحدة
+                </button>
+                <button class="btn btn-primary" id="btnBeachPoolsPermit">
+                  <i class="fa-solid fa-umbrella-beach"></i> دخول البحر والبحيرات والمسابح
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 2. ENGINEER VIEW (واجهة المهندس - 3 تخصصات) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewEngineer">
+            
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">المهندس الميداني المشرف</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800;" id="engineerNameText">م. محمود عبد الفتاح</h2>
+                  <p style="font-size: 0.75rem; color: var(--accent-cyan);" id="engineerSpecialtySub">مرافق البنية التحتية الأساسية</p>
+                </div>
+                <span class="badge badge-info"><i class="fa-solid fa-circle-check"></i> شفت النهار</span>
+              </div>
+
+              <!-- Engineer Specialty Switcher Dropdown -->
+              <div style="margin-top: 12px; border-top: 1px solid var(--border-glass); padding-top: 10px;">
+                <label class="form-label">اختر التخصص الهندسي لمراجعة المرافق:</label>
+                <select class="form-control" id="engineerSpecialtySelect">
+                  <option value="infra">💧 مهندس المرافق الأساسية (RO / STP / المحولات / البيلارات)</option>
+                  <option value="pools">🏊 مهندس البحيرات وحمامات السباحة والأنظمة المائية</option>
+                  <option value="landscape">🌿 مهندس اللاندسكيب والحدائق والشبكات العامة</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Specialty Dynamic Inspection Checklists -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-clipboard-check"></i> التفتيش الرقمي اليومي للأصول</span>
+                <span class="badge badge-warning" id="inspectionBadgeText">إجباري</span>
+              </div>
+
+              <div class="list-group" id="engineerChecklistsList">
+                <div class="ticket-item">
+                  <div>
+                    <h4 style="font-size: 0.85rem;">محطة التحلية الرئيسية (RO Plant)</h4>
+                    <p style="font-size: 0.72rem; color: var(--text-muted);">فحص ضغط الأغشية والكلور والملوحة</p>
+                  </div>
+                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" id="btnOpenRoChecklist">
+                    فتح التفتيش
+                  </button>
+                </div>
+
+                <div class="ticket-item">
+                  <div>
+                    <h4 style="font-size: 0.85rem;">محول الكهرباء الرئيسي 04 والبيلارات</h4>
+                    <p style="font-size: 0.72rem; color: var(--text-muted);">اختبار حرارة الزيت والعزل واللوحات</p>
+                  </div>
+                  <span class="badge badge-success">مكتمل اليوم</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Order to Maintenance Manager -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-paper-plane"></i> رفع بلاغ صيانة لمدير الصيانة</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                عند رصد أي عطل في المرافق أثناء التفتيش، قم بإرسال أمر صيانة لمدير الصيانة لتكليف فني مختص.
+              </p>
+              <button class="btn btn-primary" id="btnEngineerSubmitToManager">
+                <i class="fa-solid fa-wrench"></i> إرسال أمر عمل لمدير الصيانة
+              </button>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 3. MAINTENANCE MANAGER VIEW (شاشة مدير الصيانة) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewManager">
+            
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">قسم إدارة وتوزيع الصيانة</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800;">المهندس / أيمن السعيد (مدير الصيانة)</h2>
+                  <p style="font-size: 0.75rem; color: var(--primary-gold);">استقبال وتخصيص البلاغات للفنيين المتاحين</p>
+                </div>
+                <span class="badge badge-success"><i class="fa-solid fa-signal"></i> متصل الأن</span>
+              </div>
+            </div>
+
+            <!-- Incoming Orders Stream (From Engineers + Customers) -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-inbox"></i> طلبات الصيانة الواردة</span>
+                <span class="badge badge-warning" id="managerInboxBadge">3 بلاغات بانتظار التخصيص</span>
+              </div>
+
+              <div class="list-group" id="managerOrdersList">
+                
+                <!-- Order 1: From Engineer -->
+                <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-danger"><i class="fa-solid fa-user-gear"></i> طلب هندسي عاجل</span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">من: م. محمود (المرافق)</span>
+                  </div>
+                  <h4 style="font-size: 0.88rem;">صيانة بلاور طلمبة محطة التحلية RO</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">الوصف: ارتفاع في درجة حرارة المحرك وزيادة الضوضاء</p>
+                  
+                  <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">إسناد للفني المتاح:</span>
+                    <select class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" id="assignTechSelect1">
+                      <option value="كريم">كريم حسن (فني كهروميكانيك - متاح)</option>
+                      <option value="مينا">مينا جرجس (فني سباكة)</option>
+                      <option value="أحمد">أحمد علي (فني كهرباء)</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="app.dispatchOrderToTech('طلب طلمبة التحلية RO', 'assignTechSelect1')">
+                    <i class="fa-solid fa-paper-plane"></i> إرسال الطلب لشاشة الفني
+                  </button>
+                </div>
+
+                <!-- Order 2: From Homeowner -->
+                <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-info"><i class="fa-solid fa-house-user"></i> طلب عميل/مالك</span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">فيلا 104</span>
+                  </div>
+                  <h4 style="font-size: 0.88rem;">صيانة تكييف الماستر وتبريد الفنل</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">الوصف: صوت ضوضاء وانخفاض التبريد في الغرفة</p>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">إسناد للفني المتاح:</span>
+                    <select class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" id="assignTechSelect2">
+                      <option value="كريم">كريم حسن (فني تكييف - متاح)</option>
+                      <option value="أحمد">أحمد علي (فني كهرباء)</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="app.dispatchOrderToTech('تكييف فيلا 104', 'assignTechSelect2')">
+                    <i class="fa-solid fa-paper-plane"></i> إرسال الطلب لشاشة الفني
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 4. FIELD TECHNICIAN VIEW (شاشة الفني الميداني) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewTechnician">
+            
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">الفني الميداني المنفذ</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800;">الفني / كريم حسن</h2>
+                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">تخصص: تكييف وكهروميكانيك • حالة: متاح</p>
+                </div>
+                <span class="badge badge-success"><i class="fa-solid fa-wrench"></i> جاهز للمهام</span>
+              </div>
+            </div>
+
+            <!-- Assigned Tasks from Maintenance Manager -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-list-check"></i> المهمة الحالية الموجهة من مدير الصيانة</span>
+                <span class="badge badge-warning" id="techAssignedBadge">1 مهمة نشطة</span>
+              </div>
+
+              <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;" id="techActiveTaskCard">
+                <div style="display: flex; justify-content: space-between;">
+                  <h4>فيلا 104 - صيانة تكييف الماستر</h4>
+                  <span class="badge badge-warning">#TK-8041</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">ملاحظات المدير: الفحص الميداني وتحديد قطع الغيار المطلوبة</p>
+
+                <!-- AMC Contract Status Check -->
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #6ee7b7;">
+                  <i class="fa-solid fa-file-contract"></i> حالة العقد: العطل مغطى بعقد صيانة شركة Carrier
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 4px;">
+                  <button class="btn btn-cyan" style="padding: 8px;" id="btnSearchInventoryPart">
+                    <i class="fa-solid fa-boxes-stacked"></i> بحث المخزن وسعر القطعة
+                  </button>
+                  <button class="btn btn-primary" style="padding: 8px;" id="btnGetCustomerSignature">
+                    <i class="fa-solid fa-signature"></i> توقيع وتأكيد الصرف
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 3. TENANT VIEW (واجهة المستأجر) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewTenant">
+            
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">حساب مستأجر مؤقت</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800;">السيد / أحمد زاهر</h2>
+                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">شاليه 402 • صلاحية الإقامة حتى 25 يوليو</p>
+                </div>
+                <span class="badge badge-info"><i class="fa-solid fa-clock"></i> مؤقت</span>
+              </div>
+            </div>
+
+            <!-- Temporary Tenant QR -->
+            <div class="qr-container">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan);">
+                <i class="fa-solid fa-qrcode"></i> كود دخلات المستأجر التنازلي
+              </span>
+              <div class="qr-box">
+                <svg width="140" height="140" viewBox="0 0 100 100">
+                  <rect width="100" height="100" fill="#ffffff"/>
+                  <rect x="10" y="10" width="30" height="30" fill="#0077b6"/>
+                  <rect x="60" y="10" width="30" height="30" fill="#0077b6"/>
+                  <rect x="10" y="60" width="30" height="30" fill="#0077b6"/>
+                  <rect x="40" y="40" width="20" height="20" fill="#e6c667"/>
+                </svg>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">المتبقي: <strong style="color: var(--primary-gold);">8 دخلات متبقية</strong></p>
+            </div>
+
+            <!-- Service Recharge Hub -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-bolt"></i> شحن باقات الخدمات والرفاهية</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+                الإيجار للمبنى فقط، والخدمات والرفاهية تُشحن وتباع عبر التطبيق لصالح تشغيل القرية.
+              </p>
+
+              <div class="list-group">
+                <div class="ticket-item">
+                  <div>
+                    <h4>باقة استخدام المسابح والشاطئ الخاص</h4>
+                    <p>صلاحية 3 أيام • لـ 4 أفراد</p>
+                  </div>
+                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px;" onclick="app.chargeService('باقة المسابح', 1200)">
+                    شحن 1200 ج.م
+                  </button>
+                </div>
+                <div class="ticket-item">
+                  <div>
+                    <h4>تصريح دخول سيارات إضافية (Parking)</h4>
+                    <p>صلاحية 5 أيام</p>
+                  </div>
+                  <button class="btn btn-primary" style="width: auto; padding: 6px 12px;" onclick="app.chargeService('تصريح الباركينج', 500)">
+                    شحن 500 ج.م
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 5. COMMERCIAL TENANT VIEW (شاشة المستأجر التجاري) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewCommercial">
+            
+            <!-- Commercial Unit Header -->
+            <div class="card gold-border">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">حساب مستأجر وحدة تجارية</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--primary-gold);">مطعم وكافيه Blue Wave</h2>
+                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">محل 12 • المول التجاري وزون البحيرات والبحر</p>
+                </div>
+                <span class="badge badge-success"><i class="fa-solid fa-store"></i> نشاط تجاري</span>
+              </div>
+            </div>
+
+            <!-- Commercial Prepaid Smart Utility Meters -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-plug-circle-bolt"></i> عدادات الكهرباء والمياه التجارية (التسعيرة التجارية)</span>
+                <span class="badge badge-warning">تجارية مخصصة</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                العدادات الذكية للأنشطة التجارية تعمل بنظام الشحن المسبق للتسعيرة التجارية المعتمدة.
+              </p>
+
+              <div class="grid-2" style="margin-bottom: 10px;">
+                <div class="stat-box" style="border-color: rgba(245, 158, 11, 0.4);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="stat-label" style="color: #fcd34d;"><i class="fa-solid fa-bolt"></i> كهرباء تجارية</span>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">#EL-COMM-12</span>
+                  </div>
+                  <div class="stat-value gold" id="commElecText">1,450.00 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">شريحة تجارية سياحية</p>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.4);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="stat-label" style="color: #67e8f9;"><i class="fa-solid fa-droplet"></i> مياه تجارية</span>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">#WT-COMM-12</span>
+                  </div>
+                  <div class="stat-value cyan" id="commWaterText">820.00 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">مستثمر تجاري</p>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" onclick="app.openCommercialMeterModal()">
+                <i class="fa-solid fa-charging-station"></i> شحن العداد التجاري (كهرباء / مياه)
+              </button>
+            </div>
+
+            <!-- Staff Work Permits & State Insurance -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-id-card-clip"></i> تصاريح عمل الموظفين والتأمينات</span>
+                <span class="badge badge-info">12 موظف موثق</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+                إصدار وتوثيق كروت تصاريح عمل العمالة وتوثيق رقم الملف التأميني للدولة.
+              </p>
+              
+              <div class="list-group" style="margin-bottom: 10px;">
+                <div class="ticket-item">
+                  <div>
+                    <h4 style="font-size: 0.85rem;">تصريح عمل: شيف رئيسي (أحمد السيد)</h4>
+                    <p style="font-size: 0.72rem; color: var(--text-muted);">تأمينات رقم: #INS-90412 • كود الدخول: active</p>
+                  </div>
+                  <span class="badge badge-success">ساري</span>
+                </div>
+              </div>
+
+              <button class="btn btn-cyan" id="btnIssueStaffPermit">
+                <i class="fa-solid fa-user-plus"></i> إصدار تصريح عمل موظف جديد
+              </button>
+            </div>
+
+            <!-- Logistics & Operations Permits -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-truck-ramp-box"></i> الخدمات والتصاريح اللوجستية</span>
+              </div>
+
+              <div class="grid-2">
+                <button class="btn" id="btnCargoEntryPermit">
+                  <i class="fa-solid fa-truck"></i> تصريح سيارات بضائع
+                </button>
+                <button class="btn" id="btnGoodsRemovalPermit">
+                  <i class="fa-solid fa-box-open"></i> تصريح خروج منقولات
+                </button>
+              </div>
+
+              <div class="grid-2" style="margin-top: 8px;">
+                <button class="btn btn-primary" id="btnCommercialInternalMaintenance">
+                  <i class="fa-solid fa-wrench"></i> طلب صيانة داخلية للمحل
+                </button>
+                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4);" onclick="app.openSecurityComplaints()">
+                  <i class="fa-solid fa-shield-cat"></i> شكاوى الأمن والملاك
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 6. ADMIN & EXECUTIVE VIEW (لوحة الإدارة العليا) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewAdmin">
+            
+            <!-- Daily Occupancy, Access Control & Staffing Decision Matrix -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-users-viewfinder"></i> حوكمة إشغال 3,000 وحدة مسلمة وتدفق الأفراد</span>
+                <span class="badge badge-success"><i class="fa-solid fa-tower-observation"></i> Access Control Live</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+                ربط لحظي مع سيستم Access Control البوابات وشحن الخدمات لحساب الكثافة وحجم الصيانة اليومية.
+              </p>
+
+              <!-- 4 Side-by-Side Metric Boxes Grid -->
+              <div class="grid-4" style="margin-bottom: 10px;">
+                <div class="stat-box" style="border-color: rgba(37, 99, 235, 0.4);">
+                  <div class="stat-label" style="color: #93c5fd;"><i class="fa-solid fa-house-user"></i> وحدات ملاك متواجدون</div>
+                  <div class="stat-value gold">1,500 وحدة</div>
+                  <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">رصد آلي عبر بوابات القرية</p>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(16, 185, 129, 0.4);">
+                  <div class="stat-label" style="color: #6ee7b7;"><i class="fa-solid fa-key"></i> وحدات مستأجرة</div>
+                  <div class="stat-value green">1,000 وحدة</div>
+                  <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">(4-6 أفراد حسب الشحن)</p>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(148, 163, 184, 0.3);">
+                  <div class="stat-label" style="color: #cbd5e1;"><i class="fa-solid fa-house"></i> وحدات فارغة اليوم</div>
+                  <div class="stat-value" style="color: var(--text-dim);">500 وحدة</div>
+                  <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">من إجمالي 3,000 مسلمة</p>
+                </div>
+
+                <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.05);">
+                  <div class="stat-label" style="color: #67e8f9;"><i class="fa-solid fa-people-group"></i> الكثافة السكانية الحالية</div>
+                  <div class="stat-value cyan">12,700 فرد</div>
+                  <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">7.5K ملاك + 5.2K مستأجرين</p>
+                </div>
+              </div>
+
+              <!-- Maintenance Demand & Staffing Decision Matrix -->
+              <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-weight: 700; color: #fcd34d; font-size: 0.85rem;"><i class="fa-solid fa-chart-line"></i> مؤشر حجم الصيانة وحاجة التعيين/العمالة:</span>
+                  <span class="badge badge-warning">طلب مرتفع</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px; color: var(--text-main);">
+                  <span>إجمالي الطلبات اليومية: <strong>60 بلاغ</strong> (48 صيانة داخلية + 12 صيانة عامة)</span>
+                  <span>الطاقة الحالية: <strong>24 فني</strong></span>
+                </div>
+
+                <div style="font-size: 0.75rem; color: #fef08a; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border-right: 3px solid #f59e0b;">
+                  <i class="fa-solid fa-circle-exclamation"></i> <strong>قرار الإدارة الاستراتيجي:</strong> يوصى بطلب/استدعاء <strong>6 فنيين إضافيين</strong> لتغطية ضغط الشفت الحالي والالتزام بـ SLA.
+                </div>
+              </div>
+            </div>
+
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-chart-pie"></i> لوحة التحكم التنفيذية (Executive FM)</span>
+                <span class="badge badge-success">Odoo Fully Integrated</span>
+              </div>
+
+              <!-- Odoo EDU Live Connection Settings -->
+              <div style="background: #f8fafc; border: 1px solid rgba(27, 143, 145, 0.3); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span style="font-weight: 700; color: #20274f; font-size: 0.85rem;"><i class="fa-solid fa-database"></i> إعدادات الربط المباشر مع Odoo EDU (*.odoo.com)</span>
+                  <span class="badge badge-success" id="odooStatusBadge"><i class="fa-solid fa-link"></i> جاهز للربط</span>
+                </div>
+
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label class="form-label">رابط سيرفر Odoo EDU URL:</label>
+                    <input type="text" id="odooUrlInput" class="form-control" value="https://facility-management.odoo.com" placeholder="https://your-db.odoo.com">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">اسم قاعدة البيانات (DB Name):</label>
+                    <input type="text" id="odooDbInput" class="form-control" value="facility-management-edu" placeholder="facility-management">
+                  </div>
+                </div>
+
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني (User Email):</label>
+                    <input type="text" id="odooUserInput" class="form-control" value="admin@facility-edu.org" placeholder="admin@domain.com">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">مفتاح API Key / Password:</label>
+                    <input type="password" id="odooKeyInput" class="form-control" value="••••••••••••" placeholder="API Key">
+                  </div>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top: 4px;" onclick="app.testOdooEduConnection()">
+                  <i class="fa-solid fa-arrows-rotate"></i> اختبار المزامنة المباشرة مع Odoo EDU Database
+                </button>
+              </div>
+
+              <!-- IoT Indicators -->
+              <div class="grid-2">
+                <div class="stat-box">
+                  <div class="stat-label">محطة التحلية RO</div>
+                  <div class="stat-value green"><i class="fa-solid fa-circle" style="font-size: 0.8rem;"></i> 98% جاهزية</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">شبكة الحريق والسلامة</div>
+                  <div class="stat-value green"><i class="fa-solid fa-circle" style="font-size: 0.8rem;"></i> 100% ضغط</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">محطة المعالجة STP</div>
+                  <div class="stat-value green"><i class="fa-solid fa-circle" style="font-size: 0.8rem;"></i> المطابقة البيئية</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">معدل الالتزام بـ SLA</div>
+                  <div class="stat-value gold">96.4%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Maintenance Variance Calculator Output -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-calculator"></i> حوكمة سعر المتر التشغيلي للمشروع</span>
+              </div>
+
+              <div style="background: rgba(10, 18, 30, 0.7); padding: 12px; border-radius: 8px; font-size: 0.8rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span>إجمالي المصاريف التشغيلية السنوية:</span>
+                  <strong style="color: var(--primary-gold);" id="totalAnnualCostText">14,800,000 ج.م</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span>إجمالي مساحة المشروع المغطاة:</span>
+                  <strong style="color: var(--text-main);">185,000 م²</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: 800; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
+                  <span style="color: var(--accent-cyan);">سعر المتر التشغيلي المحسوب:</span>
+                  <span style="color: var(--status-success); font-size: 1rem;" id="meterCostText">80.00 ج.م / م²</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Push Notification Emergency Broadcast -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-bullhorn"></i> مركز الإخطارات الذكية للطوارئ</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">نص التنبيه الفوري لجميع الملاك (Push Notification)</label>
+                <input type="text" class="form-control" id="broadcastMsgInput" value="تنبيه: صيانة مجدولة لمحطة المياه الفرعية زون 2 من 2:00 م إلى 4:00 م.">
+              </div>
+              <button class="btn btn-primary" id="btnSendBroadcast">
+                <i class="fa-solid fa-paper-plane"></i> إرسال التنبيه الفوري لحظياً
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Phone Bottom Navigation Bar -->
+        <nav class="phone-navbar" id="phoneNavbar">
+          <button class="nav-item active" data-tab="home" id="navHome">
+            <i class="fa-solid fa-house"></i>
+            <span>الرئيسية</span>
+          </button>
+          <button class="nav-item" data-tab="tickets" id="navTickets">
+            <i class="fa-solid fa-ticket"></i>
+            <span>البلاغات</span>
+          </button>
+          <button class="nav-item" data-tab="wallet" id="navWallet">
+            <i class="fa-solid fa-wallet"></i>
+            <span>المالية</span>
+          </button>
+          <button class="nav-item" data-tab="settings" id="navSettings">
+            <i class="fa-solid fa-gear"></i>
+            <span>الإعدادات</span>
+          </button>
+        </nav>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL POPUPS -->
+
+  <!-- 1. New Ticket Modal -->
+  <div class="modal-overlay" id="modalNewTicket">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalNewTicket')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 16px; color: var(--primary-gold);"><i class="fa-solid fa-wrench"></i> تقديم طلب صيانة جديدة</h3>
+      
+      <div class="form-group">
+        <label class="form-label">نوع الخدمة / التخصص</label>
+        <select class="form-control" id="ticketCategorySelect">
+          <option value="سباكة">سباكة (Plumbing)</option>
+          <option value="كهرباء">كهرباء (Electrical)</option>
+          <option value="كهروميكانيك">تكييف وكهروميكانيك (HVAC)</option>
+          <option value="نجارة">نجارة وديكور (Carpentry)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">وصف العطل بالتفصيل</label>
+        <textarea class="form-control" rows="3" id="ticketDescInput" placeholder="اكتب تفاصيل المشكلة ومكانها بالوحدة..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">إرفاق صورة العطل (اختياري)</label>
+        <input type="file" class="form-control" accept="image/*" id="ticketPhotoInput">
+      </div>
+
+      <button class="btn btn-primary" id="btnSubmitTicket">إرسال التذكرة لفريق خدمة العملاء</button>
+    </div>
+  </div>
+
+  <!-- 2. Inventory Spare Parts Search Modal -->
+  <div class="modal-overlay" id="modalInventory">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalInventory')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 16px; color: var(--accent-cyan);"><i class="fa-solid fa-boxes-stacked"></i> المخزن الذكي لقطع الغيار</h3>
+      
+      <div class="form-group">
+        <input type="text" class="form-control" id="inventorySearchInput" placeholder="ابحث باسم القطعة (مثال: خلاط، فتر، محبس...)...">
+      </div>
+
+      <div class="list-group" id="inventoryResultsList">
+        <div class="ticket-item">
+          <div>
+            <h4>كارتدج تكييف شارب 2.25 حصان</h4>
+            <p>المخزن الرئيسي • المتوفر: 14 قطعة</p>
+          </div>
+          <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.8rem;" onclick="app.selectInventoryItem('كارتدج تكييف', 850)">
+            اختيار (850 ج.م)
+          </button>
+        </div>
+        <div class="ticket-item">
+          <div>
+            <h4>خلاط مياه إيطالي 3/4 بوصة</h4>
+            <p>المخزن الفرعي • المتوفر: 8 قطع</p>
+          </div>
+          <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.8rem;" onclick="app.selectInventoryItem('خلاط مياه إيطالي', 520)">
+            اختيار (520 ج.م)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Customer Digital Signature & Instant Payment Modal -->
+  <div class="modal-overlay" id="modalSignature">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalSignature')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 12px; color: var(--primary-gold);"><i class="fa-solid fa-signature"></i> التوقيع الرقمي والموافقة على الصرف</h3>
+      
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+        تم تحديد القطعة: <strong style="color: var(--text-main);" id="sigItemName">كارتدج تكييف شارب</strong> بسعر: <strong style="color: var(--primary-gold);" id="sigItemPrice">850 ج.م</strong>.
+      </p>
+
+      <label class="form-label">توقيع المالك الإلكتروني على شاشة الفني</label>
+      <canvas class="signature-box" id="sigCanvas"></canvas>
+      
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button class="btn" style="padding: 8px;" onclick="app.clearCanvas()"><i class="fa-solid fa-eraser"></i> مسح التوقيع</button>
+        <button class="btn btn-primary" style="padding: 8px;" id="btnApproveAndPay"><i class="fa-solid fa-credit-card"></i> موافقة ودفع آلي (850 ج.م)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. RO Inspection Checklist Modal -->
+  <div class="modal-overlay" id="modalRoChecklist">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalRoChecklist')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-check"></i> قائمة فحص محطة التحلية RO</h3>
+      
+      <div class="form-group">
+        <label class="form-label">ضغط فلاتر الأغشية (Membranes Pressure)</label>
+        <input type="text" class="form-control" value="62 PSI - طبيعي">
+      </div>
+      <div class="form-group">
+        <label class="form-label">نسبة الملوحة المتبقية (TDS Level)</label>
+        <input type="text" class="form-control" value="120 PPM - مطابق للمواصفات">
+      </div>
+      <div class="form-group">
+        <label class="form-label">مستوى الكلور المستثمر</label>
+        <input type="text" class="form-control" value="0.8 mg/L">
+      </div>
+
+      <button class="btn btn-primary" id="btnSaveRoChecklist">اعتماد وحفظ تقرير الفحص اليومي</button>
+    </div>
+  </div>
+
+  <!-- 5. Prepaid Smart Utility Meters Recharge Modal -->
+  <div class="modal-overlay" id="modalMeterRecharge">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalMeterRecharge')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--primary-gold);"><i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية</h3>
+      
+      <div class="form-group">
+        <label class="form-label">اختر العداد المراد شحنه</label>
+        <select class="form-control" id="meterTypeSelect">
+          <option value="electricity">⚡ عداد الكهرباء الذكي (#EL-104)</option>
+          <option value="water">💧 عداد المياه الذكي (#WT-104)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">اختر أو اكتب قيمة الشحن (بالجنيه المصري)</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+          <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 100">100 ج.م</button>
+          <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 300">300 ج.م</button>
+          <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 500">500 ج.م</button>
+          <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 1000">1000 ج.م</button>
+        </div>
+        <input type="number" class="form-control" id="meterAmountInput" value="300" placeholder="أدخل المبلغ...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">طريقة الدفع</label>
+        <select class="form-control">
+          <option value="card">💳 بطاقة ائتمان / ميزة / كارت بنكي</option>
+          <option value="wallet">👛 محفظة المالك الإلكترونية</option>
+          <option value="fawry">⚡ فورى / InstaPay</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" id="btnConfirmMeterRecharge">
+        <i class="fa-solid fa-bolt"></i> تأكيد الشحن الفوري ونقل الرصيد للعداد
+      </button>
+    </div>
+  </div>
+
+  <!-- 6. Beach, Lakes & Swimming Pools Entry Permit Modal -->
+  <div class="modal-overlay" id="modalBeachPoolsPermit">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalBeachPoolsPermit')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-umbrella-beach"></i> تصريح دخول البحر والبحيرات والمسابح</h3>
+      
+      <div class="form-group">
+        <label class="form-label">الجهة المطلوبة</label>
+        <select class="form-control">
+          <option value="all">🌊 الشاطئ الخاص والبحيرات وحمامات السباحة</option>
+          <option value="beach">🏖 الشاطئ الرئيسي فقط</option>
+          <option value="pools">🏊 حمامات السباحة والبحيرات فقط</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">عدد الأفراد المسموح لهم بالدخول</label>
+        <input type="number" class="form-control" value="4" min="1" max="10">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تاريخ الصلاحية</label>
+        <input type="date" class="form-control" value="2026-07-21">
+      </div>
+
+      <button class="btn btn-primary" onclick="app.issueBeachPermit()">
+        <i class="fa-solid fa-qrcode"></i> إصدار Dynamic QR دخول البحر والمسابح
+      </button>
+    </div>
+  </div>
+
+  <!-- 7. Commercial Staff Work & Insurance Permit Modal -->
+  <div class="modal-overlay" id="modalStaffPermit">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalStaffPermit')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-id-card-clip"></i> تصريح عمل وتأمينات موظف تجاري</h3>
+      
+      <div class="form-group">
+        <label class="form-label">اسم الموظف الثلاثي</label>
+        <input type="text" class="form-control" placeholder="اسم الموظف..." id="staffNameInput">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الوظيفة داخل النشاط</label>
+        <input type="text" class="form-control" placeholder="مثال: شيف / كاشير / ويتر / صيانة..." id="staffJobInput">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الملف التأميني بالدولة</label>
+        <input type="text" class="form-control" placeholder="مثال: #INS-80412" id="staffInsuranceInput">
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitStaffPermit()">
+        <i class="fa-solid fa-check"></i> توثيق وإصدار كارت دخول الموظف
+      </button>
+    </div>
+  </div>
+
+  <!-- 8. Commercial Cargo Entry & Goods Removal Permit Modal -->
+  <div class="modal-overlay" id="modalCargoPermit">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalCargoPermit')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--primary-gold);" id="cargoModalTitle"><i class="fa-solid fa-truck"></i> تصريح سيارات بضائع وتوريد</h3>
+      
+      <div class="form-group">
+        <label class="form-label">نوع الشحنة / المنقولات</label>
+        <input type="text" class="form-control" placeholder="مثال: شحنة أغذية ومشروبات / معدات مطبخ..." id="cargoDescInput">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">بيانات السيارة والسائق (رقم اللوحة والموبايل)</label>
+        <input type="text" class="form-control" placeholder="رقم اللوحة واسم السائق..." id="cargoDriverInput">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">موعد ومخرج الدخول / الخروج</label>
+        <select class="form-control" id="cargoGateSelect">
+          <option value="gate1">🚛 بوابة البضائع الرئيسية (06:00 ص - 10:00 ص)</option>
+          <option value="gate2">🚚 بوابة المول والخدمات خلفية</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitCargoPermit()">
+        <i class="fa-solid fa-qrcode"></i> إصدار تصريح الأمان الإلكتروني للبوابة
+      </button>
+    </div>
+  </div>
+
+  <!-- Core JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
