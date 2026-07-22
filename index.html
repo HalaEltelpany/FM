@@ -133,16 +133,22 @@
                 <p class="block-desc">عدادات تجارية وتصاريح البضائع</p>
               </div>
 
-              <!-- 7. Admin Executive Block (Full Width Gold/Teal) -->
-              <div class="role-block-card admin-block full-width-block" onclick="app.switchRole('admin')">
-                <div class="block-icon">
+              <!-- 7. Security Gates Officer Block -->
+              <div class="role-block-card navy-block" onclick="app.switchRole('security')">
+                <div class="block-icon" style="color: #ffffff;">
+                  <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="block-title">أمن وبوابات القرية</h3>
+                <p class="block-desc">إشراف بوابات الأمن والشكاوى</p>
+              </div>
+
+              <!-- 8. Admin Executive Block -->
+              <div class="role-block-card admin-block" onclick="app.switchRole('admin')">
+                <div class="block-icon" style="color: #d4af37;">
                   <i class="fa-solid fa-chart-line"></i>
                 </div>
-                <div style="text-align: right; flex: 1;">
-                  <h3 class="block-title">لوحة الإدارة العليا (FM Governance)</h3>
-                  <p class="block-desc">إشغال 3,000 وحدة، الكثافة السكانية (12.7K) ومصفوفة التعيين</p>
-                </div>
-                <i class="fa-solid fa-chevron-left" style="font-size: 0.9rem; opacity: 0.7;"></i>
+                <h3 class="block-title">الإدارة العليا</h3>
+                <p class="block-desc">مؤشرات الأداء ومركز التحكم</p>
               </div>
 
             </div>
@@ -162,7 +168,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <span style="font-size: 0.75rem; color: var(--text-muted);">أهلاً بك، المالك الرئيسي</span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">د. أسامة المنشاوي</h2>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);" id="homeownerNameText">جاري التحميل...</h2>
                   <p style="font-size: 0.75rem; color: var(--primary-gold);">فيلا 104 - زون الساحل الشمالي</p>
                 </div>
                 <span class="badge badge-success"><i class="fa-solid fa-check"></i> حساب مؤكد</span>
@@ -309,12 +315,38 @@
                 إصدار تصاريح دخول مشروطة ومؤقتة بدقة لمتابعة الأمان والتحكم بالبوابات.
               </p>
               <div class="grid-2">
-                <button class="btn btn-cyan" id="btnUnitEntryPermit">
+                <button class="btn btn-cyan" onclick="app.requestPermit('homeowner', 'تصريح دخول الوحدة')">
                   <i class="fa-solid fa-door-open"></i> تصريح دخول الوحدة
                 </button>
-                <button class="btn btn-primary" id="btnBeachPoolsPermit">
+                <button class="btn btn-primary" onclick="app.requestPermit('homeowner', 'تصريح دخول البحر والبحيرات')">
                   <i class="fa-solid fa-umbrella-beach"></i> دخول البحر والبحيرات والمسابح
                 </button>
+              </div>
+
+              <!-- Homeowner Requested Permits List -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-solid fa-stamp"></i> حالة التصاريح المطلوبة:</span>
+                <div class="list-group" id="homeownerPermitsList" style="margin-top: 6px;">
+                  <!-- Dynamic Renders -->
+                </div>
+              </div>
+
+              <!-- Security Complaints Trigger -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
+                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444; width: 100%;" onclick="app.openSecurityComplaintModal()">
+                  <i class="fa-solid fa-shield-halved"></i> بلاغات وشكاوى الأمن الطارئة
+                </button>
+              </div>
+
+              <!-- Homeowner Complaints List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة:</span>
+                  <span class="badge" style="background: #ef4444; color: #ffffff !important;" id="homeownerComplaintsBadge">0 نشطة</span>
+                </div>
+                <div class="list-group" id="homeownerComplaintsList">
+                  <!-- Renders Dynamically -->
+                </div>
               </div>
             </div>
 
@@ -486,6 +518,47 @@
                   <p style="font-size: 0.75rem; color: #1b8f91;">شاليه 402 • زون البحيرات • صلاحية حتى 25 يوليو</p>
                 </div>
                 <span class="badge badge-info"><i class="fa-solid fa-clock"></i> إقامة سارية</span>
+              </div>
+            </div>
+
+            <!-- Tenant Access Permits Request Card -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-passport"></i> طلب تصاريح دخول المستأجر والضيوف</span>
+              </div>
+              <div class="grid-2">
+                <button class="btn btn-cyan" onclick="app.requestPermit('tenant', 'تصريح ضيف شاليه 402')">
+                  <i class="fa-solid fa-user-lock"></i> تصريح ضيف شاليه
+                </button>
+                <button class="btn btn-primary" onclick="app.requestPermit('tenant', 'تصريح دخول سيارات زائر')">
+                  <i class="fa-solid fa-car"></i> تصريح دخول سيارة
+                </button>
+              </div>
+
+              <!-- Tenant Requested Permits List -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-solid fa-stamp"></i> حالة التصاريح المطلوبة:</span>
+                <div class="list-group" id="tenantPermitsList" style="margin-top: 6px;">
+                  <!-- Dynamic Renders -->
+                </div>
+              </div>
+
+              <!-- Security Complaints Trigger -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
+                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444; width: 100%;" onclick="app.openSecurityComplaintModal()">
+                  <i class="fa-solid fa-shield-halved"></i> بلاغات وشكاوى الأمن الطارئة
+                </button>
+              </div>
+
+              <!-- Tenant Complaints List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة:</span>
+                  <span class="badge" style="background: #ef4444; color: #ffffff !important;" id="tenantComplaintsBadge">0 نشطة</span>
+                </div>
+                <div class="list-group" id="tenantComplaintsList">
+                  <!-- Renders Dynamically -->
+                </div>
               </div>
             </div>
 
@@ -686,7 +759,7 @@
                 </div>
               </div>
 
-              <button class="btn btn-cyan" id="btnIssueStaffPermit">
+              <button class="btn btn-cyan" onclick="app.requestPermit('commercial', 'تصريح عمل موظف')">
                 <i class="fa-solid fa-user-plus"></i> إصدار تصريح عمل موظف جديد
               </button>
             </div>
@@ -698,21 +771,40 @@
               </div>
 
               <div class="grid-2">
-                <button class="btn" id="btnCargoEntryPermit">
+                <button class="btn" onclick="app.requestPermit('commercial', 'تصريح دخول سيارات بضائع')">
                   <i class="fa-solid fa-truck"></i> تصريح سيارات بضائع
                 </button>
-                <button class="btn" id="btnGoodsRemovalPermit">
+                <button class="btn" onclick="app.requestPermit('commercial', 'تصريح خروج منقولات')">
                   <i class="fa-solid fa-box-open"></i> تصريح خروج منقولات
                 </button>
+              </div>
+
+              <!-- Commercial Requested Permits List -->
+              <div style="margin-top: 12px; border-bottom: 1px dashed rgba(32,39,79,0.15); padding-bottom: 12px; margin-bottom: 12px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-stamp"></i> حالة التصاريح المطلوبة للمحل:</span>
+                <div class="list-group" id="commercialPermitsList" style="margin-top: 6px;">
+                  <!-- Dynamic Renders -->
+                </div>
               </div>
 
               <div class="grid-2" style="margin-top: 8px;">
                 <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
                   <i class="fa-solid fa-wrench"></i> طلب صيانة داخلية للمحل
                 </button>
-                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4);" onclick="app.openSecurityComplaints()">
-                  <i class="fa-solid fa-shield-cat"></i> شكاوى الأمن والملاك
+                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4);" onclick="app.openSecurityComplaintModal()">
+                  <i class="fa-solid fa-shield-cat"></i> شكاوى الأمن
                 </button>
+              </div>
+
+              <!-- Commercial Complaints List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة للمحل:</span>
+                  <span class="badge" style="background: #ef4444; color: #ffffff !important;" id="commercialComplaintsBadge">0 نشطة</span>
+                </div>
+                <div class="list-group" id="commercialComplaintsList">
+                  <!-- Renders Dynamically -->
+                </div>
               </div>
 
               <!-- Commercial Tickets List Card -->
@@ -858,6 +950,48 @@
 
           </div>
 
+          <!-- ========================================== -->
+          <!-- 8. SECURITY & GATES VIEW (شاشة ضابط الأمن والسلامة) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewSecurity">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
+            
+            <div class="card gold-border" style="background: #0f172a; color: #ffffff;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: #94a3b8;">غرفة عمليات الأمن والسلامة</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #ffffff;">ملازم أول / عمرو خالد (مشرف بوابات الأمن)</h2>
+                  <p style="font-size: 0.75rem; color: #ef4444;">متابعة بوابات الدخول والشكاوى العاجلة لحظياً</p>
+                </div>
+                <span class="badge badge-danger"><i class="fa-solid fa-shield-halved"></i> الدوريات نشطة</span>
+              </div>
+            </div>
+
+            <!-- Pending Logistics/Access Permits Card -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-stamp"></i> طلبات التصاريح وبوابات الأمن المعلقة</span>
+                <span class="badge badge-info" id="securityPermitsInboxBadge">0 تصاريح</span>
+              </div>
+              <div class="list-group" id="securityPermitsList">
+                <!-- Renders Dynamically -->
+              </div>
+            </div>
+
+            <!-- Incoming Security Complaints Card -->
+            <div class="card gold-border">
+              <div class="card-header">
+                <span class="card-title" style="color: #ef4444;"><i class="fa-solid fa-bell"></i> البلاغات والشكاوى الأمنية الطارئة</span>
+                <span class="badge" style="background: #ef4444; color: #ffffff !important;" id="securityComplaintsInboxBadge">0 بلاغات</span>
+              </div>
+              <div class="list-group" id="securityComplaintsList">
+                <!-- Renders Dynamically -->
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Phone Bottom Navigation Bar -->
@@ -885,7 +1019,35 @@
 
   </div>
 
-  <!-- MODAL POPUPS -->
+  <!-- Security Complaint Modal -->
+  <div class="modal-overlay" id="modalSecurityComplaint">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalSecurityComplaint')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-shield-halved"></i> تقديم بلاغ أو شكوى أمنية طارئة</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        يرجى كتابة تفاصيل الشكوى بدقة ليقوم مشرف الأمن بالتحرك فوراً للموقع.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل لمقدم الشكوى:</label>
+        <input type="text" id="complaintNameInput" class="form-control" placeholder="اسم مقدم الطلب">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الهاتف للتواصل والمتابعة:</label>
+        <input type="tel" id="complaintPhoneInput" class="form-control" placeholder="رقم الموبايل">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تفاصيل المشكلة الأمنية أو البلاغ:</label>
+        <textarea id="complaintDetailsInput" class="form-control" rows="3" placeholder="اكتب ما حدث بدقة (مثال: إزعاج عند المسبح، ركن سيارة مخالف، إلخ)"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitSecurityComplaint()" style="width: 100%; margin-top: 10px;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال البلاغ لغرفة عمليات الأمن
+      </button>
+    </div>
+  </div>
 
   <!-- 0. Odoo Database Settings Modal -->
   <div class="modal-overlay" id="modalOdooSettings">
@@ -906,9 +1068,14 @@
         <input type="text" id="odooDbInput" class="form-control" placeholder="my-odoo-db">
       </div>
 
-      <div class="form-group">
+       <div class="form-group">
         <label class="form-label">البريد الإلكتروني (User Email):</label>
         <input type="text" id="odooUserInput" class="form-control" placeholder="admin@example.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">اسم مالك الوحدة السكنية (اختياري/تلقائي):</label>
+        <input type="text" id="odooOwnerNameInput" class="form-control" placeholder="مثال: د. أسامة المنشاوي">
       </div>
 
       <div class="form-group">

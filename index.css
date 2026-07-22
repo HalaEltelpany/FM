@@ -663,10 +663,10 @@ header.global-header {
   gap: 4px;
 }
 
-.badge-success { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-.badge-warning { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-.badge-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-.badge-info { background: #f0fdf4; color: #1b8f91; border: 1px solid rgba(27, 143, 145, 0.3); }
+.badge-success { background: #10b981; color: #ffffff !important; border: 1px solid #059669; }
+.badge-warning { background: #ffe066; color: #20274f !important; border: 1px solid #fab005; }
+.badge-danger { background: #ef4444; color: #ffffff !important; border: 1px solid #dc2626; }
+.badge-info { background: #3b82f6; color: #ffffff !important; border: 1px solid #2563eb; }
 
 /* Interactive Buttons */
 .btn {
@@ -728,6 +728,15 @@ header.global-header {
   justify-content: space-between;
   align-items: center;
   transition: border-color 0.2s;
+  color: #20274f !important;
+}
+
+.ticket-item h4 {
+  color: #20274f !important;
+}
+
+.ticket-item p {
+  color: #64748b !important;
 }
 
 .ticket-item:hover {

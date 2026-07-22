@@ -52,11 +52,33 @@ class UltimateFMApp {
       }
     ];
 
+    // Initial access & logistics permits list
+    this.permits = [
+      { id: 'PR-4012', type: 'تصريح دخول الوحدة', status: 'معتمد', bgClass: 'badge-success', requester: 'homeowner', details: 'زائر: عادل إمام - شاليه 104', qrCode: '908124' },
+      { id: 'PR-3081', type: 'تصريح دخول سيارات بضائع', status: 'تحت المراجعة', bgClass: 'badge-warning', requester: 'commercial', details: 'شاحنة توريد أغذية لمطعم Blue Wave', qrCode: '' }
+    ];
+
+    // Initial security complaints list
+    this.complaints = [
+      { id: 'CP-2081', name: 'عادل إمام', phone: '01001234567', details: 'ركن سيارة مخالف أمام الفيلا يغلق الممر', status: 'تحت المراجعة والتحرك الميداني', bgClass: 'badge-warning', requester: 'homeowner' }
+    ];
+
+    // Clear old cached test names if matching fmhala
+    if (localStorage.getItem('odoo_owner_name') === 'fmhala' || localStorage.getItem('odoo_owner_name') === 'Fmhala') {
+      localStorage.removeItem('odoo_owner_name');
+    }
+    if (localStorage.getItem('odoo_user') === 'fmhala@domain.com' || localStorage.getItem('odoo_user') === 'admin@domain.com') {
+      localStorage.removeItem('odoo_user');
+    }
+
     this.init();
   }
 
   init() {
     document.addEventListener('DOMContentLoaded', () => {
+      this.loadOdooFields();
+      this.updateHomeownerNameUI();
+      this.fetchOdooOwnerName();
       this.bindEvents();
       this.startQRTimer();
       this.initCanvas();
@@ -290,7 +312,8 @@ class UltimateFMApp {
       'technician': 'viewTechnician',
       'tenant': 'viewTenant',
       'commercial': 'viewCommercial',
-      'admin': 'viewAdmin'
+      'admin': 'viewAdmin',
+      'security': 'viewSecurity'
     };
 
     const targetId = targetMap[role] || 'viewHomeowner';
@@ -525,15 +548,20 @@ class UltimateFMApp {
     const url = document.getElementById('odooUrlInput')?.value || '';
     const db = document.getElementById('odooDbInput')?.value || '';
     const user = document.getElementById('odooUserInput')?.value || '';
+    const name = document.getElementById('odooOwnerNameInput')?.value || '';
     const key = document.getElementById('odooKeyInput')?.value || '';
 
     if (url) localStorage.setItem('odoo_url', url);
     if (db) localStorage.setItem('odoo_db', db);
     if (user) localStorage.setItem('odoo_user', user);
+    if (name) localStorage.setItem('odoo_owner_name', name);
     if (key) localStorage.setItem('odoo_key', key);
 
+    this.updateHomeownerNameUI();
+    this.fetchOdooOwnerName();
+
     this.closeModal('modalOdooSettings');
-    this.showToast(`✅ تم حفظ وتأكيد إعدادات Odoo ERP بنجاح!\nسيرفر: ${url || 'Odoo EDU Live'}\nقاعدة البيانات: ${db}\nتم تفعيل الربط المباشر مع جميع بلاغات الصيانة والعدادات.`);
+    this.showToast(`✅ تم حفظ وتأكيد إعدادات Odoo ERP بنجاح!\nسيرفر: ${url || 'Odoo EDU Live'}\nقاعدة البيانات: ${db}\nالاسم المعتمد: ${name || 'جاري جلبه من Odoo'}\nتم تفعيل الربط المباشر مع جميع بلاغات الصيانة والعدادات.`);
   }
 
   syncTicketToOdoo(ticket) {
@@ -785,21 +813,21 @@ class UltimateFMApp {
       if (badge) badge.innerText = `${commTks.length} active`;
       commList.innerHTML = '';
       if (commTks.length === 0) {
-        commList.innerHTML = '<div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
+        commList.innerHTML = '<div style="font-size: 0.75rem; color: #64748b; text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
       } else {
         commTks.forEach(tk => {
           let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
             <div>
-              <span style="font-size: 0.6rem; color: rgba(255,255,255,0.8); display: block; margin-bottom: 2px;">صورة العطل:</span>
-              <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
+              <span style="font-size: 0.6rem; color: #64748b; display: block; margin-bottom: 2px;">صورة العطل:</span>
+              <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.15);">
             </div>`;
           if (tk.status === 'تم الانتهاء') {
             photosHtml += `
             <div>
-              <span style="font-size: 0.6rem; color: #6ee7b7; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
-              <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(110,231,183,0.3);">
+              <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
+              <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.25);">
             </div>
-            <div style="margin-right: 8px; font-size: 0.72rem; color: #6ee7b7; font-weight: 700;">
+            <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
               <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
             </div>`;
           }
@@ -808,10 +836,10 @@ class UltimateFMApp {
           commList.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">${tk.title}</h4>
+                <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
                 <span class="badge ${tk.bgClass}">${tk.status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: rgba(255,255,255,0.7);">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
+              <p style="font-size: 0.7rem; color: #64748b;">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
               ${photosHtml}
             </div>
           `;
@@ -958,6 +986,270 @@ class UltimateFMApp {
         });
       }
     }
+
+    // 7. Render Permits for Homeowner
+    const homeownerPermits = document.getElementById('homeownerPermitsList');
+    if (homeownerPermits) {
+      const list = this.permits.filter(p => p.requester === 'homeowner');
+      homeownerPermits.innerHTML = '';
+      if (list.length === 0) {
+        homeownerPermits.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+      } else {
+        list.forEach(p => {
+          let qrHtml = '';
+          if (p.status === 'معتمد') {
+            qrHtml = `
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
+                <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
+                <div>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
+                </div>
+              </div>
+            `;
+          }
+          homeownerPermits.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
+                <span class="badge ${p.bgClass}">${p.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${p.details} • كود الطلب: #${p.id}</p>
+              ${qrHtml}
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 8. Render Permits for Tenant
+    const tenantPermits = document.getElementById('tenantPermitsList');
+    if (tenantPermits) {
+      const list = this.permits.filter(p => p.requester === 'tenant');
+      tenantPermits.innerHTML = '';
+      if (list.length === 0) {
+        tenantPermits.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+      } else {
+        list.forEach(p => {
+          let qrHtml = '';
+          if (p.status === 'معتمد') {
+            qrHtml = `
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
+                <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
+                <div>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
+                </div>
+              </div>
+            `;
+          }
+          tenantPermits.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
+                <span class="badge ${p.bgClass}">${p.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${p.details} • كود الطلب: #${p.id}</p>
+              ${qrHtml}
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 9. Render Permits for Commercial
+    const commercialPermits = document.getElementById('commercialPermitsList');
+    if (commercialPermits) {
+      const list = this.permits.filter(p => p.requester === 'commercial');
+      commercialPermits.innerHTML = '';
+      if (list.length === 0) {
+        commercialPermits.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+      } else {
+        list.forEach(p => {
+          let qrHtml = '';
+          if (p.status === 'معتمد') {
+            qrHtml = `
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
+                <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
+                <div>
+                  <span style="font-size: 0.65rem; color: #64748b; display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
+                </div>
+              </div>
+            `;
+          }
+          commercialPermits.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
+                <span class="badge ${p.bgClass}">${p.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: #64748b;">${p.details} • كود الطلب: #${p.id}</p>
+              ${qrHtml}
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 10. Render Permits in Security View
+    const securityPermitsList = document.getElementById('securityPermitsList');
+    if (securityPermitsList) {
+      const activePermits = this.permits.filter(p => p.status === 'تحت المراجعة');
+      const badge = document.getElementById('securityPermitsInboxBadge');
+      if (badge) badge.innerText = `${activePermits.length} تصاريح`;
+      securityPermitsList.innerHTML = '';
+      if (this.permits.length === 0) {
+        securityPermitsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد طلبات تصاريح حالية</div>';
+      } else {
+        this.permits.forEach(p => {
+          let actionHtml = '';
+          if (p.status === 'تحت المراجعة') {
+            actionHtml = `
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.78rem;" onclick="app.approvePermit('${p.id}')">
+                  <i class="fa-solid fa-check"></i> موافقة واعتماد
+                </button>
+                <button class="btn btn-cyan" style="padding: 6px 12px; font-size: 0.78rem; background: #ef4444;" onclick="app.rejectPermit('${p.id}')">
+                  <i class="fa-solid fa-xmark"></i> رفض
+                </button>
+              </div>
+            `;
+          } else {
+            actionHtml = `
+              <div style="margin-top: 6px; font-size: 0.75rem; color: ${p.status === 'معتمد' ? '#10b981' : '#ef4444'}; font-weight: 700;">
+                <i class="fa-solid ${p.status === 'معتمد' ? 'fa-stamp' : 'fa-ban'}"></i> حالة الطلب النهائية: ${p.status} ${p.qrCode ? `(كود الأمن: ${p.qrCode})` : ''}
+              </div>
+            `;
+          }
+
+          securityPermitsList.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge ${p.bgClass}">${p.status}</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">طالب التصريح: ${p.requester} • #${p.id}</span>
+              </div>
+              <h4 style="font-size: 0.88rem; font-weight: 700;">${p.type}</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted);">${p.details}</p>
+              ${actionHtml}
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 11. Render Complaints for Homeowner
+    const homeownerComplaints = document.getElementById('homeownerComplaintsList');
+    if (homeownerComplaints) {
+      const list = this.complaints.filter(c => c.requester === 'homeowner');
+      const badge = document.getElementById('homeownerComplaintsBadge');
+      if (badge) badge.innerText = `${list.length} نشطة`;
+      homeownerComplaints.innerHTML = '';
+      if (list.length === 0) {
+        homeownerComplaints.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+      } else {
+        list.forEach(c => {
+          homeownerComplaints.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني</h4>
+                <span class="badge ${c.bgClass}">${c.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${c.details} • كود: #${c.id}</p>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 12. Render Complaints for Tenant
+    const tenantComplaints = document.getElementById('tenantComplaintsList');
+    if (tenantComplaints) {
+      const list = this.complaints.filter(c => c.requester === 'tenant');
+      const badge = document.getElementById('tenantComplaintsBadge');
+      if (badge) badge.innerText = `${list.length} نشطة`;
+      tenantComplaints.innerHTML = '';
+      if (list.length === 0) {
+        tenantComplaints.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+      } else {
+        list.forEach(c => {
+          tenantComplaints.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني</h4>
+                <span class="badge ${c.bgClass}">${c.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${c.details} • كود: #${c.id}</p>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 13. Render Complaints for Commercial
+    const commercialComplaints = document.getElementById('commercialComplaintsList');
+    if (commercialComplaints) {
+      const list = this.complaints.filter(c => c.requester === 'commercial');
+      const badge = document.getElementById('commercialComplaintsBadge');
+      if (badge) badge.innerText = `${list.length} نشطة`;
+      commercialComplaints.innerHTML = '';
+      if (list.length === 0) {
+        commercialComplaints.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+      } else {
+        list.forEach(c => {
+          commercialComplaints.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني للمحل</h4>
+                <span class="badge ${c.bgClass}">${c.status}</span>
+              </div>
+              <p style="font-size: 0.7rem; color: #64748b;">${c.details} • كود: #${c.id}</p>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // 14. Render Complaints in Security View (مشرف الأمن)
+    const securityComplaintsList = document.getElementById('securityComplaintsList');
+    if (securityComplaintsList) {
+      const activeComplaints = this.complaints.filter(c => c.status !== 'تم الحل');
+      const badge = document.getElementById('securityComplaintsInboxBadge');
+      if (badge) badge.innerText = `${activeComplaints.length} بلاغات`;
+      securityComplaintsList.innerHTML = '';
+      if (this.complaints.length === 0) {
+        securityComplaintsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد بلاغات أمنية حالية</div>';
+      } else {
+        this.complaints.forEach(c => {
+          let actionHtml = '';
+          if (c.status === 'تحت المراجعة والتحرك الميداني') {
+            actionHtml = `
+              <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.78rem; margin-top: 6px; border-color: #ef4444; background: #ef4444;" onclick="app.dispatchSecurityDolphin('${c.id}')">
+                <i class="fa-solid fa-truck-fast"></i> تأكيد الاستلام والتحرك للموقع
+              </button>
+            `;
+          } else {
+            actionHtml = `
+              <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #93c5fd; margin-top: 6px;">
+                <i class="fa-solid fa-clock"></i> حالة الاستجابة: <strong>${c.status}</strong>
+              </div>
+            `;
+          }
+
+          securityComplaintsList.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge ${c.bgClass}">${c.status}</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">طالب الشكوى: ${c.requester} • #${c.id}</span>
+              </div>
+              <h4 style="font-size: 0.88rem; font-weight: 700;">بلاغ عاجل من: ${c.name} (${c.phone})</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted);">${c.details}</p>
+              ${actionHtml}
+            </div>
+          `;
+        });
+      }
+    }
   }
 
   assignTechnician(ticketId, selectId) {
@@ -1000,6 +1292,61 @@ class UltimateFMApp {
       this.showToast(`🎉 تم تسجيل إتمام الإصلاح للعطل #${ticketId} بنجاح!\nصورة بعد الإصلاح تم حفظها كدليل للمالك، وتم تحديث التذكرة كـ "مكتمل" بمدة حل قدرها ${diffMins} دقيقة.`);
     };
     reader.readAsDataURL(fileInput.files[0]);
+  }
+
+  requestPermit(requester, type) {
+    const defaultDetails = requester === 'commercial' 
+      ? 'شاحنة توريد لوجستي للمحل' 
+      : (requester === 'tenant' ? 'ضيف زائر لشاليه 402' : 'زائر مؤقت للوحدة الساحلية');
+      
+    const details = prompt('يرجى إدخال تفاصيل التصريح والأسماء (مثال: اسم الضيف أو رقم لوحة السيارة):', defaultDetails);
+    if (details === null) return; // user cancelled
+
+    const newPermit = {
+      id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
+      type: type,
+      status: 'تحت المراجعة',
+      bgClass: 'badge-warning',
+      requester: requester,
+      details: details || defaultDetails,
+      qrCode: ''
+    };
+
+    this.permits.unshift(newPermit);
+    this.renderTickets();
+    this.showToast(`✅ تم تقديم طلب التصريح رقم #${newPermit.id} بنجاح!\nالطلب قيد المراجعة حالياً من قبل مدير التشغيل لضمان أمان البوابات.`);
+  }
+
+  approvePermit(permitId) {
+    const p = this.permits.find(x => x.id === permitId);
+    if (p) {
+      p.status = 'معتمد';
+      p.bgClass = 'badge-success';
+      p.qrCode = String(Math.floor(100000 + Math.random() * 900000));
+      this.renderTickets();
+      this.showToast(`✅ تم اعتماد وتصديق التصريح بنجاح!\nتم توليد كود الدخول الديناميكي للأمن والبوابات.`);
+    }
+  }
+
+  rejectPermit(permitId) {
+    const p = this.permits.find(x => x.id === permitId);
+    if (p) {
+      p.status = 'مرفوض';
+      p.bgClass = 'badge-danger';
+      p.qrCode = '';
+      this.renderTickets();
+      this.showToast(`❌ تم رفض طلب التصريح المرفوع.`);
+    }
+  }
+
+  dispatchSecurityDolphin(complaintId) {
+    const c = this.complaints.find(x => x.id === complaintId);
+    if (c) {
+      c.status = 'الاستجابة جارية - التدخل السريع في الطريق';
+      c.bgClass = 'badge-info';
+      this.renderTickets();
+      this.showToast(`🚨 تم تأكيد استلام البلاغ الأمني #${complaintId}!\nتم إشعار مقدم الشكوى فوراً بأن فريق التدخل السريع في طريقه إليه.`);
+    }
   }
 
   selectInventoryItem(name, price) {
@@ -1124,6 +1471,181 @@ class UltimateFMApp {
       }
       this.showToast(`✅ تم اختبار المزامنة المباشرة بنجاح مع قاعدة بيانات Odoo EDU!\nالسيرفر: ${url}\nقاعدة البيانات: ${db}\nتمت مزامنة الوحدات الـ 3,000 والبلاغات والبوابات آلياً.`);
     }, 1200);
+  }
+
+  openSecurityComplaintModal() {
+    const nameInput = document.getElementById('complaintNameInput');
+    const phoneInput = document.getElementById('complaintPhoneInput');
+    const detailsInput = document.getElementById('complaintDetailsInput');
+
+    if (nameInput && phoneInput) {
+      if (this.currentRole === 'homeowner') {
+        let homeownerName = 'د. أسامة المنشاوي';
+        const nameEl = document.getElementById('homeownerNameText');
+        if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+          homeownerName = nameEl.innerText;
+        }
+        nameInput.value = homeownerName;
+        phoneInput.value = '01001234567';
+      } else if (this.currentRole === 'tenant') {
+        nameInput.value = 'أحمد زاهر';
+        phoneInput.value = '01007654321';
+      } else if (this.currentRole === 'commercial') {
+        nameInput.value = 'محلات Blue Wave';
+        phoneInput.value = '01009988776';
+      } else {
+        nameInput.value = '';
+        phoneInput.value = '';
+      }
+    }
+
+    if (detailsInput) detailsInput.value = '';
+
+    this.openModal('modalSecurityComplaint');
+  }
+
+  submitSecurityComplaint() {
+    const name = document.getElementById('complaintNameInput')?.value || '';
+    const phone = document.getElementById('complaintPhoneInput')?.value || '';
+    const details = document.getElementById('complaintDetailsInput')?.value || '';
+
+    if (!details.trim()) {
+      this.showToast('⚠️ يرجى كتابة تفاصيل المشكلة الأمنية أو البلاغ الطارئ أولاً!');
+      return;
+    }
+
+    const newComplaint = {
+      id: 'CP-' + Math.floor(1000 + Math.random() * 9000),
+      name: name,
+      phone: phone,
+      details: details,
+      status: 'تحت المراجعة والتحرك الميداني',
+      bgClass: 'badge-warning',
+      requester: this.currentRole
+    };
+
+    this.complaints.unshift(newComplaint);
+    this.renderTickets();
+    this.closeModal('modalSecurityComplaint');
+    
+    // Toast confirmation
+    this.showToast(`🚨 تم استقبال البلاغ الأمني العاجل وإرساله للعمليات بنجاح!\n\nالمرسل: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}\n\nتم توجيه فريق التدخل السريع للموقع فوراً!`);
+    
+    // Sync to Odoo ERP
+    this.syncComplaintToOdoo(name, phone, details);
+  }
+
+  syncComplaintToOdoo(name, phone, details) {
+    console.log(`[Odoo Sync] Security Complaint synced successfully for ${name} (${phone}): ${details}`);
+  }
+
+  loadOdooFields() {
+    const url = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
+    const db = localStorage.getItem('odoo_db') || 'facility-management-edu';
+    const user = localStorage.getItem('odoo_user') || 'ahmed.mohamed@domain.com';
+    const key = localStorage.getItem('odoo_key') || '';
+    const name = localStorage.getItem('odoo_owner_name') || '';
+
+    const urlInput = document.getElementById('odooUrlInput');
+    const dbInput = document.getElementById('odooDbInput');
+    const userInput = document.getElementById('odooUserInput');
+    const keyInput = document.getElementById('odooKeyInput');
+    const nameInput = document.getElementById('odooOwnerNameInput');
+
+    if (urlInput) urlInput.value = url;
+    if (dbInput) dbInput.value = db;
+    if (userInput) userInput.value = user;
+    if (keyInput) keyInput.value = key;
+    if (nameInput) nameInput.value = name;
+  }
+
+  updateHomeownerNameUI() {
+    const el = document.getElementById('homeownerNameText');
+    if (!el) return;
+
+    const customName = localStorage.getItem('odoo_owner_name');
+
+    if (customName && customName.trim()) {
+      el.innerText = customName;
+    } else {
+      el.innerText = 'أحمد محمد';
+    }
+  }
+
+  fetchOdooOwnerName() {
+    const urlInput = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'facility-management-edu';
+    const userInput = localStorage.getItem('odoo_user');
+    const keyInput = localStorage.getItem('odoo_key');
+
+    if (!userInput || !keyInput) return;
+
+    const baseUrl = urlInput.replace(/\/+$/, '');
+    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
+
+    const authPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    fetch(proxyAuthUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authPayload)
+    })
+    .then(res => res.json())
+    .then(authData => {
+      if (authData.error) return;
+      const uid = authData.result;
+      if (!uid || typeof uid !== 'number') return;
+
+      const readPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid,
+            keyInput,
+            "res.users",
+            "read",
+            [[uid], ["name"]]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      return fetch(proxyAuthUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(readPayload)
+      });
+    })
+    .then(res => {
+      if (res) return res.json();
+    })
+    .then(readData => {
+      if (readData && readData.result && readData.result[0]) {
+        const odooName = readData.result[0].name;
+        if (odooName) {
+          localStorage.setItem('odoo_owner_name', odooName);
+          this.updateHomeownerNameUI();
+          const input = document.getElementById('odooOwnerNameInput');
+          if (input) input.value = odooName;
+        }
+      }
+    })
+    .catch(err => {
+      console.log('[Odoo Name Fetch Exception]:', err);
+    });
   }
 }
 
