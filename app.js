@@ -483,52 +483,91 @@ class UltimateFMApp {
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'admin@domain.com';
     const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '';
 
-    if (!urlInput) {
-      console.log('[Odoo Sync] No Odoo URL configured.');
+    if (!urlInput || !dbInput || !userInput || !keyInput) {
+      console.log('[Odoo Sync] Missing connection credentials.');
       return;
     }
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-    
-    // JSON-RPC Payload for Odoo ERP
-    const jsonRpcPayload = {
+    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
+
+    // Step 1: Call common.authenticate to get the correct User ID (uid) dynamically
+    const authPayload = {
       jsonrpc: "2.0",
       method: "call",
       params: {
-        service: "object",
-        method: "execute_kw",
-        args: [
-          dbInput,
-          2, // User ID (2 is default for admin)
-          keyInput,
-          "maintenance.request",
-          "create",
-          [{
-            name: `${ticket.id}: ${ticket.title}`,
-            description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
-            priority: "3"
-          }]
-        ]
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
       },
       id: Math.floor(Math.random() * 1000)
     };
 
-    // Route via free CORS Proxy to bypass mobile browser security block
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
+    console.log('[Odoo Sync] Authenticating to retrieve user UID...');
 
-    fetch(proxyUrl, {
+    fetch(proxyAuthUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(jsonRpcPayload)
-    }).then(res => res.json()).then(data => {
-      console.log('[Odoo Live Success]:', data);
-      if (data.error) {
-        console.warn('Odoo Error Details:', data.error);
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authPayload)
+    })
+    .then(res => res.json())
+    .then(authData => {
+      if (authData.error) {
+        console.error('[Odoo Auth Error]:', authData.error);
+        return;
       }
-    }).catch(err => {
-      console.log('[Odoo Sync Payload Dispatched via Proxy]:', err);
+      
+      const uid = authData.result;
+      if (!uid || typeof uid !== 'number') {
+        console.warn('[Odoo Auth Failed]: Invalid UID returned.', uid);
+        return;
+      }
+
+      console.log('[Odoo Sync Success] Retrieved UID:', uid);
+
+      // Step 2: Create the maintenance request with the correct dynamic UID
+      const createPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid, // Use the correct user ID retrieved dynamically!
+            keyInput,
+            "maintenance.request",
+            "create",
+            [{
+              name: `${ticket.id}: ${ticket.title}`,
+              description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
+              priority: "3"
+            }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      return fetch(proxyAuthUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createPayload)
+      });
+    })
+    .then(res => {
+      if (res) return res.json();
+    })
+    .then(createData => {
+      if (createData) {
+        if (createData.error) {
+          console.error('[Odoo Ticket Creation Error]:', createData.error);
+        } else {
+          console.log('[Odoo Ticket Registered Successfully! ID]:', createData.result);
+        }
+      }
+    })
+    .catch(err => {
+      console.log('[Odoo Sync Execution Exception]:', err);
     });
   }
 
