@@ -284,7 +284,7 @@
                     <span style="font-size: 0.68rem; color: var(--text-muted);">رقم #EL-104</span>
                   </div>
                   <div class="stat-value gold" id="elecBalanceText">342.50 ج.م</div>
-                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ 124 KWh</p>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="elecRemainingText">124</span> KWh</p>
                 </div>
 
                 <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.3);">
@@ -293,7 +293,7 @@
                     <span style="font-size: 0.68rem; color: var(--text-muted);">رقم #WT-104</span>
                   </div>
                   <div class="stat-value cyan" id="waterBalanceText">185.00 ج.م</div>
-                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ 38 م³</p>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="waterRemainingText">38</span> م³</p>
                 </div>
               </div>
 
@@ -388,9 +388,20 @@
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
                 عند رصد أي عطل في المرافق أثناء التفتيش، قم بإرسال أمر صيانة لمدير الصيانة لتكليف فني مختص.
               </p>
-              <button class="btn btn-primary" id="btnEngineerSubmitToManager">
+              <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
                 <i class="fa-solid fa-wrench"></i> إرسال أمر عمل لمدير الصيانة
               </button>
+
+              <!-- Engineer Tickets List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-solid fa-list-check"></i> بلاغات المرافق الهندسية:</span>
+                  <span class="badge badge-info" id="engineerTicketCountBadge">0 نشطة</span>
+                </div>
+                <div class="list-group" id="engineerTicketsList">
+                  <!-- Renders Dynamically -->
+                </div>
+              </div>
             </div>
 
           </div>
@@ -418,54 +429,11 @@
             <div class="card">
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-inbox"></i> طلبات الصيانة الواردة</span>
-                <span class="badge badge-warning" id="managerInboxBadge">3 بلاغات بانتظار التخصيص</span>
+                <span class="badge badge-warning" id="managerInboxBadge">0 بلاغات بانتظار التخصيص</span>
               </div>
 
               <div class="list-group" id="managerOrdersList">
-                
-                <!-- Order 1: From Engineer -->
-                <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="badge badge-danger"><i class="fa-solid fa-user-gear"></i> طلب هندسي عاجل</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">من: م. محمود (المرافق)</span>
-                  </div>
-                  <h4 style="font-size: 0.88rem;">صيانة بلاور طلمبة محطة التحلية RO</h4>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">الوصف: ارتفاع في درجة حرارة المحرك وزيادة الضوضاء</p>
-                  
-                  <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px;">
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">إسناد للفني المتاح:</span>
-                    <select class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" id="assignTechSelect1">
-                      <option value="كريم">كريم حسن (فني كهروميكانيك - متاح)</option>
-                      <option value="مينا">مينا جرجس (فني سباكة)</option>
-                      <option value="أحمد">أحمد علي (فني كهرباء)</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="app.dispatchOrderToTech('طلب طلمبة التحلية RO', 'assignTechSelect1')">
-                    <i class="fa-solid fa-paper-plane"></i> إرسال الطلب لشاشة الفني
-                  </button>
-                </div>
-
-                <!-- Order 2: From Homeowner -->
-                <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="badge badge-info"><i class="fa-solid fa-house-user"></i> طلب عميل/مالك</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">فيلا 104</span>
-                  </div>
-                  <h4 style="font-size: 0.88rem;">صيانة تكييف الماستر وتبريد الفنل</h4>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">الوصف: صوت ضوضاء وانخفاض التبريد في الغرفة</p>
-
-                  <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px;">
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">إسناد للفني المتاح:</span>
-                    <select class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" id="assignTechSelect2">
-                      <option value="كريم">كريم حسن (فني تكييف - متاح)</option>
-                      <option value="أحمد">أحمد علي (فني كهرباء)</option>
-                    </select>
-                  </div>
-                  <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="app.dispatchOrderToTech('تكييف فيلا 104', 'assignTechSelect2')">
-                    <i class="fa-solid fa-paper-plane"></i> إرسال الطلب لشاشة الفني
-                  </button>
-                </div>
-
+                <!-- Renders Dynamically -->
               </div>
             </div>
 
@@ -494,29 +462,11 @@
             <div class="card">
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-list-check"></i> المهمة الحالية الموجهة من مدير الصيانة</span>
-                <span class="badge badge-warning" id="techAssignedBadge">1 مهمة نشطة</span>
+                <span class="badge badge-warning" id="techAssignedBadge">0 مهمة نشطة</span>
               </div>
 
-              <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;" id="techActiveTaskCard">
-                <div style="display: flex; justify-content: space-between;">
-                  <h4>فيلا 104 - صيانة تكييف الماستر</h4>
-                  <span class="badge badge-warning">#TK-8041</span>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">ملاحظات المدير: الفحص الميداني وتحديد قطع الغيار المطلوبة</p>
-
-                <!-- AMC Contract Status Check -->
-                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #6ee7b7;">
-                  <i class="fa-solid fa-file-contract"></i> حالة العقد: العطل مغطى بعقد صيانة شركة Carrier
-                </div>
-
-                <div style="display: flex; gap: 8px; margin-top: 4px;">
-                  <button class="btn btn-cyan" style="padding: 8px;" id="btnSearchInventoryPart">
-                    <i class="fa-solid fa-boxes-stacked"></i> بحث المخزن وسعر القطعة
-                  </button>
-                  <button class="btn btn-primary" style="padding: 8px;" id="btnGetCustomerSignature">
-                    <i class="fa-solid fa-signature"></i> توقيع وتأكيد الصرف
-                  </button>
-                </div>
+              <div class="list-group" id="techTasksContainer">
+                <!-- Renders Dynamically -->
               </div>
             </div>
 
@@ -575,6 +525,7 @@
                     <span style="font-size: 0.65rem;">#EL-402</span>
                   </div>
                   <div class="stat-value gold" id="tenantElecText">210.00 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="tenantElecRemainingText">76</span> KWh</p>
                 </div>
 
                 <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.3);">
@@ -583,6 +534,7 @@
                     <span style="font-size: 0.65rem;">#WT-402</span>
                   </div>
                   <div class="stat-value cyan" id="tenantWaterText">120.00 ج.م</div>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="tenantWaterRemainingText">24</span> م³</p>
                 </div>
               </div>
 
@@ -639,13 +591,24 @@
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-headset"></i> بلاغات صيانة الشاليه وإخلاء الطرف</span>
               </div>
-              <div class="grid-2">
+              <div class="grid-2" style="margin-bottom: 10px;">
                 <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
                   <i class="fa-solid fa-plus-circle"></i> طلب صيانة عاجلة للشاليه
                 </button>
                 <button class="btn btn-cyan" onclick="app.showToast('✅ تم تسجيل طلب إخلاء الطرف وإعادة المفتاح بنجاح! جاري معاينة الشاليه قبل المغادرة.')">
                   <i class="fa-solid fa-key-skeleton"></i> إخلاء الطرف وإعادة المفتاح
                 </button>
+              </div>
+
+              <!-- Tenant Tickets List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-solid fa-list-check"></i> بلاغات الصيانة للشاليه:</span>
+                  <span class="badge badge-info" id="tenantTicketCountBadge">0 نشطة</span>
+                </div>
+                <div class="list-group" id="tenantTicketsList">
+                  <!-- Renders Dynamically -->
+                </div>
               </div>
             </div>
 
@@ -688,7 +651,7 @@
                     <span style="font-size: 0.65rem; color: var(--text-muted);">#EL-COMM-12</span>
                   </div>
                   <div class="stat-value gold" id="commElecText">1,450.00 ج.م</div>
-                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">شريحة تجارية سياحية</p>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="commElecRemainingText">414</span> KWh</p>
                 </div>
 
                 <div class="stat-box" style="border-color: rgba(0, 229, 255, 0.4);">
@@ -697,7 +660,7 @@
                     <span style="font-size: 0.65rem; color: var(--text-muted);">#WT-COMM-12</span>
                   </div>
                   <div class="stat-value cyan" id="commWaterText">820.00 ج.م</div>
-                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">مستثمر تجاري</p>
+                  <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">المتبقي: ~ <span id="commWaterRemainingText">136</span> م³</p>
                 </div>
               </div>
 
@@ -747,12 +710,23 @@
               </div>
 
               <div class="grid-2" style="margin-top: 8px;">
-                <button class="btn btn-primary" id="btnCommercialInternalMaintenance">
+                <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
                   <i class="fa-solid fa-wrench"></i> طلب صيانة داخلية للمحل
                 </button>
                 <button class="btn" style="border-color: rgba(239, 68, 68, 0.4);" onclick="app.openSecurityComplaints()">
                   <i class="fa-solid fa-shield-cat"></i> شكاوى الأمن والملاك
                 </button>
+              </div>
+
+              <!-- Commercial Tickets List Card -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-list-check"></i> بلاغات الصيانة للمحل:</span>
+                  <span class="badge badge-info" id="commercialTicketCountBadge">0 active</span>
+                </div>
+                <div class="list-group" id="commercialTicketsList">
+                  <!-- Renders Dynamically -->
+                </div>
               </div>
             </div>
 
