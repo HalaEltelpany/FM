@@ -54,10 +54,16 @@
         <!-- Phone Screen Content -->
         <div class="phone-screen" id="phoneScreen">
 
-          <!-- Floating Logout Button (Visible only when logged in) -->
-          <button class="btn btn-sm" onclick="app.logout()" style="position: absolute; left: 15px; top: 48px; z-index: 10000; display: none; padding: 4px 10px; border-radius: 12px; font-size: 0.68rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444;" id="btnLogout">
-            <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-          </button>
+          <!-- Sticky App Navigation Bar (Visible only when logged in) -->
+          <div id="appNavBar" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-bottom: 1px solid rgba(32, 39, 79, 0.08); position: sticky; top: 0; z-index: 9999; box-shadow: var(--shadow-sm); width: 100%;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="logo.png" style="width: 24px; height: 24px;">
+              <span style="font-size: 0.85rem; font-weight: 800; color: #20274f;">Ultimate FM</span>
+            </div>
+            <button class="btn btn-sm" onclick="app.logout()" style="padding: 4px 10px; border-radius: 10px; font-size: 0.68rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700;">
+              <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+            </button>
+          </div>
 
           <!-- ========================================== -->
           <!-- 0. LOGIN VIEW (شاشة تسجيل الدخول الموحدة) -->
@@ -90,7 +96,7 @@
 
               <div style="margin-top: 16px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
                 <label class="form-label" style="color: var(--primary-gold); font-weight: 700; text-align: center; display: block; margin-bottom: 8px;">
-                  ⚡ تسجيل دخول سريع للعرض (Demo Login):
+                  ⚡ تسجيل دخول سريع للعرض والتجربة:
                 </label>
                 <div class="grid-2" style="gap: 8px;">
                   <button class="btn btn-sm" onclick="app.quickLogin('owner')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">👤 مالك وحدة</button>
