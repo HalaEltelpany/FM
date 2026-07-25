@@ -50,14 +50,24 @@
             <i class="fa-solid fa-battery-full"></i>
           </div>
         </div>
-
         <!-- Phone Screen Content -->
         <div class="phone-screen" id="phoneScreen">
 
+          <!-- Sticky App Navigation Bar (Visible only when logged in) -->
+          <div id="appNavBar" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-bottom: 1px solid rgba(32, 39, 79, 0.08); position: sticky; top: 0; z-index: 9999; box-shadow: var(--shadow-sm); width: 100%;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="logo.png" style="width: 24px; height: 24px;">
+              <span style="font-size: 0.85rem; font-weight: 800; color: #20274f;">Ultimate FM</span>
+            </div>
+            <button class="btn btn-sm" onclick="app.logout()" style="padding: 4px 10px; border-radius: 10px; font-size: 0.68rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700;">
+              <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+            </button>
+          </div>
+
           <!-- ========================================== -->
-          <!-- 0. ROLE SELECTION GRID DASHBOARD (بلوكات الأدوار المربعة) -->
+          <!-- 0. LOGIN VIEW (شاشة تسجيل الدخول الموحدة) -->
           <!-- ========================================== -->
-          <div class="view-panel active" id="viewRoleGrid">
+          <div class="view-panel active" id="viewLogin">
             
             <!-- App Main Brand Card -->
             <div class="brand-hero-card">
@@ -70,17 +80,38 @@
               </div>
             </div>
 
-            <div style="text-align: center; margin-bottom: 12px;">
+            <!-- Login Input Card -->
+            <div class="card gold-border" style="max-width: 280px; margin: 0 auto; width: 100%;">
+              <span class="card-title" style="margin-bottom: 14px; display: block; font-size: 0.9rem; text-align: center; color: #20274f;">
+                <i class="fa-solid fa-lock"></i> تسجيل الدخول الآمن للنظام
+              </span>
+
+              <div class="form-group">
+                <label class="form-label">اسم المستخدم / البريد الإلكتروني:</label>
+                <input type="text" id="loginEmailInput" class="form-control" placeholder="example@domain.com">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">كلمة المرور:</label>
+                <input type="password" id="loginPasswordInput" class="form-control" placeholder="••••••••" value="123456">
+              </div>
+
+              <button class="btn btn-primary" onclick="app.handleLogin()" style="width: 100%; margin-top: 8px;">
+                <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول
+              </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 8px; margin-bottom: 4px;">
               <span class="badge badge-info" style="font-size: 0.78rem; padding: 6px 14px; border-radius: 20px;">
-                <i class="fa-solid fa-shield-halved"></i> اختر الشاشة/الدور للدخول للتفاصيل
+                <i class="fa-solid fa-shield-halved"></i> أو الدخول السريع للعرض والتجربة
               </span>
             </div>
 
-            <!-- 2-Column Square Brand Blocks Grid -->
+            <!-- 2-Column Square Brand Blocks Grid (Original Design) -->
             <div class="role-square-grid">
               
               <!-- 1. Homeowner Block (Teal) -->
-              <div class="role-block-card teal-block" onclick="app.switchRole('homeowner')">
+              <div class="role-block-card teal-block" onclick="app.quickLogin('owner')">
                 <div class="block-icon">
                   <i class="fa-solid fa-house-user"></i>
                 </div>
@@ -89,7 +120,7 @@
               </div>
 
               <!-- 2. Field Engineer Block (Mauve) -->
-              <div class="role-block-card mauve-block" onclick="app.switchRole('engineer')">
+              <div class="role-block-card mauve-block" onclick="app.quickLogin('engineer')">
                 <div class="block-icon">
                   <i class="fa-solid fa-user-gear"></i>
                 </div>
@@ -98,7 +129,7 @@
               </div>
 
               <!-- 3. Maintenance Manager Block (Navy) -->
-              <div class="role-block-card navy-block" onclick="app.switchRole('manager')">
+              <div class="role-block-card navy-block" onclick="app.quickLogin('manager')">
                 <div class="block-icon">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
@@ -107,7 +138,7 @@
               </div>
 
               <!-- 4. Field Technician Block (Teal) -->
-              <div class="role-block-card teal-block" onclick="app.switchRole('technician')">
+              <div class="role-block-card teal-block" onclick="app.quickLogin('technician')">
                 <div class="block-icon">
                   <i class="fa-solid fa-helmet-safety"></i>
                 </div>
@@ -116,7 +147,7 @@
               </div>
 
               <!-- 5. Residential Tenant Block (Mauve) -->
-              <div class="role-block-card mauve-block" onclick="app.switchRole('tenant')">
+              <div class="role-block-card mauve-block" onclick="app.quickLogin('tenant')">
                 <div class="block-icon">
                   <i class="fa-solid fa-key"></i>
                 </div>
@@ -125,7 +156,7 @@
               </div>
 
               <!-- 6. Commercial Tenant Block (Navy) -->
-              <div class="role-block-card navy-block" onclick="app.switchRole('commercial')">
+              <div class="role-block-card navy-block" onclick="app.quickLogin('commercial')">
                 <div class="block-icon">
                   <i class="fa-solid fa-store"></i>
                 </div>
@@ -134,7 +165,7 @@
               </div>
 
               <!-- 7. Security Gates Officer Block -->
-              <div class="role-block-card navy-block" onclick="app.switchRole('security')">
+              <div class="role-block-card navy-block" onclick="app.quickLogin('security')">
                 <div class="block-icon" style="color: #ffffff;">
                   <i class="fa-solid fa-user-shield"></i>
                 </div>
@@ -143,7 +174,7 @@
               </div>
 
               <!-- 8. Admin Executive Block -->
-              <div class="role-block-card admin-block" onclick="app.switchRole('admin')">
+              <div class="role-block-card admin-block" onclick="app.quickLogin('admin')">
                 <div class="block-icon" style="color: #d4af37;">
                   <i class="fa-solid fa-chart-line"></i>
                 </div>
