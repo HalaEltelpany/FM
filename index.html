@@ -54,68 +54,10 @@
         <!-- Phone Screen Content -->
         <div class="phone-screen" id="phoneScreen">
 
-          <!-- Sticky App Navigation Bar (Visible only when logged in) -->
-          <div id="appNavBar" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-bottom: 1px solid rgba(32, 39, 79, 0.08); position: sticky; top: 0; z-index: 9999; box-shadow: var(--shadow-sm); width: 100%;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="logo.png" style="width: 24px; height: 24px;">
-              <span style="font-size: 0.85rem; font-weight: 800; color: #20274f;">Ultimate FM</span>
-            </div>
-            <button class="btn btn-sm" onclick="app.logout()" style="padding: 4px 10px; border-radius: 10px; font-size: 0.68rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700;">
-              <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-            </button>
-          </div>
-
           <!-- ========================================== -->
-          <!-- 0. LOGIN VIEW (شاشة تسجيل الدخول الموحدة) -->
+          <!-- 0. ROLE SELECTION GRID DASHBOARD (بلوكات الأدوار المربعة) -->
           <!-- ========================================== -->
-          <div class="view-panel active" id="viewLogin">
-            <div style="text-align: center; margin-top: 40px; margin-bottom: 24px;">
-              <img src="logo.png" style="width: 80px; height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); margin-bottom: 12px;">
-              <h2 style="font-size: 1.3rem; font-weight: 800; color: #20274f;">Ultimate FM</h2>
-              <p style="font-size: 0.75rem; color: var(--text-muted);">نظام التشغيل الذكي للمدن الساحلية والمولات</p>
-            </div>
-
-            <div class="card gold-border" style="max-width: 280px; margin: 0 auto; width: 100%;">
-              <span class="card-title" style="margin-bottom: 14px; display: block; font-size: 0.9rem; text-align: center; color: #20274f;">
-                <i class="fa-solid fa-lock"></i> تسجيل الدخول الآمن للنظام
-              </span>
-
-              <div class="form-group">
-                <label class="form-label">اسم المستخدم / البريد الإلكتروني:</label>
-                <input type="text" id="loginEmailInput" class="form-control" placeholder="example@domain.com">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">كلمة المرور:</label>
-                <input type="password" id="loginPasswordInput" class="form-control" placeholder="••••••••" value="123456">
-              </div>
-
-              <button class="btn btn-primary" onclick="app.handleLogin()" style="width: 100%; margin-top: 8px;">
-                <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول
-              </button>
-
-              <div style="margin-top: 16px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 12px;">
-                <label class="form-label" style="color: var(--primary-gold); font-weight: 700; text-align: center; display: block; margin-bottom: 8px;">
-                  ⚡ تسجيل دخول سريع للعرض والتجربة:
-                </label>
-                <div class="grid-2" style="gap: 8px;">
-                  <button class="btn btn-sm" onclick="app.quickLogin('owner')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">👤 مالك وحدة</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('tenant')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">🔑 مستأجر سكني</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('commercial')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">🏬 مستأجر تجاري</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('security')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">🛡️ أمن وبوابات</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('manager')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">👔 مدير الصيانة</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('technician')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">🔧 فني ميداني</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('engineer')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">⚙️ مهندس فني</button>
-                  <button class="btn btn-sm" onclick="app.quickLogin('admin')" style="font-size: 0.68rem; padding: 6px 4px; border-color: rgba(32,39,79,0.15);">📊 الإدارة العليا</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================== -->
-          <!-- ROLE SELECTION GRID DASHBOARD (بلوكات الأدوار المربعة) -->
-          <!-- ========================================== -->
-          <div class="view-panel" id="viewRoleGrid">
+          <div class="view-panel active" id="viewRoleGrid">
             
             <!-- App Main Brand Card -->
             <div class="brand-hero-card">
