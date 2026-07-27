@@ -53,17 +53,6 @@
         <!-- Phone Screen Content -->
         <div class="phone-screen" id="phoneScreen">
 
-          <!-- Sticky App Navigation Bar (Visible only when logged in) -->
-          <div id="appNavBar" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; border-bottom: 1px solid rgba(32, 39, 79, 0.08); position: sticky; top: 0; z-index: 9999; box-shadow: var(--shadow-sm); width: 100%;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="logo.png" style="width: 24px; height: 24px;">
-              <span style="font-size: 0.85rem; font-weight: 800; color: #20274f;">Ultimate FM</span>
-            </div>
-            <button class="btn btn-sm" onclick="app.logout()" style="padding: 4px 10px; border-radius: 10px; font-size: 0.68rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700;">
-              <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-            </button>
-          </div>
-
           <!-- ========================================== -->
           <!-- 0. LOGIN VIEW (شاشة تسجيل الدخول الموحدة) -->
           <!-- ========================================== -->
@@ -380,6 +369,79 @@
                 </div>
               </div>
             </div>
+
+            <!-- 1. LPR Car Plates Card (مقارنة بمراسي) -->
+            <div class="card gold-border" style="margin-top: 16px;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-car"></i> تسجيل لوحات السيارات للبوابات الذكية (LPR)</span>
+                <span class="badge badge-cyan"><i class="fa-solid fa-wifi"></i> بوابات ذكية</span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+                سجل لوحة سيارتك لفتح بوابات القرية الذكية تلقائياً بالكاميرات الرقمية.
+              </p>
+              <div class="form-group" style="margin-bottom: 8px;">
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="lprPlateInput" class="form-control" placeholder="مثال: أ ج 1234" style="text-align: center; font-size: 1rem; font-weight: 700; width: 100%;">
+                  <button class="btn btn-primary" onclick="app.registerLprPlate()" style="white-space: nowrap; font-size: 0.8rem; padding: 0 14px;">
+                    <i class="fa-solid fa-plus"></i> تسجيل
+                  </button>
+                </div>
+              </div>
+              <div id="lprActivePlatesList" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+                <!-- Renders dynamically -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(27, 143, 145, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(27, 143, 145, 0.15);">
+                  <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">أ ج 5022</span>
+                  <span class="badge badge-success" style="font-size: 0.65rem; margin-top:0;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Amenities & Sports Booking Card (مقارنة بمراسي) -->
+            <div class="card gold-border" style="margin-top: 16px;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-tennis-ball"></i> حجز الملاعب والأنشطة الترفيهية</span>
+                <span class="badge badge-warning">حجز فوري</span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">
+                احجز ملاعب البادل تنس أو ملاعب كرة القدم مباشرة من رصيد محفظتك.
+              </p>
+              <div style="font-size: 0.78rem; font-weight: 800; color: #20274f; margin-bottom: 10px; background: rgba(27, 143, 145, 0.08); padding: 6px 12px; border-radius: 6px; display: inline-block;">
+                <i class="fa-solid fa-wallet"></i> رصيد محفظة الدفع المتاحة: <span id="bookingWalletBalanceText">2500</span> ج.م
+              </div>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label">اختر النشاط / الملعب:</label>
+                <select id="bookingAmenitySelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+                  <option value="padel" data-price="250">🎾 ملعب بادل تنس (Padel) - 250 ج.م / ساعة</option>
+                  <option value="football" data-price="150">⚽ ملعب كرة قدم خماسي - 150 ج.م / ساعة</option>
+                </select>
+              </div>
+              <div class="grid-2" style="gap: 8px; margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">التاريخ:</label>
+                  <input type="date" id="bookingDateInput" class="form-control" style="font-size: 0.8rem; height: 38px;" value="2026-07-28">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">الوقت:</label>
+                  <select id="bookingTimeSelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+                    <option value="16:00">04:00 م - 05:00 م</option>
+                    <option value="17:00">05:00 م - 06:00 م</option>
+                    <option value="18:00">06:00 م - 07:00 م</option>
+                    <option value="19:00">07:00 م - 08:00 م</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="app.bookAmenity()" style="width: 100%;">
+                <i class="fa-solid fa-calendar-check"></i> تأكيد الحجز والخصم من المحفظة
+              </button>
+              <div id="bookingListContainer" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+                <!-- Renders dynamically -->
+              </div>
+            </div>
+
+            <!-- 3. Emergency Services & Directory Button -->
+            <button class="btn btn-secondary" onclick="app.openModal('modalVillageDirectory')" style="width: 100%; margin-top: 16px; background: rgba(32, 39, 79, 0.08); border: 1px solid rgba(32, 39, 79, 0.15); color: #20274f; font-weight: 700; height: 42px;">
+              <i class="fa-solid fa-phone-volume"></i> دليل خدمات وطوارئ القرية
+            </button>
 
           </div>
 
@@ -1260,6 +1322,17 @@
         </select>
       </div>
 
+      <!-- Credit Card Inputs Simulation -->
+      <div id="creditCardInputsGroup" class="form-group" style="margin-top: 10px; border-top: 1px dashed rgba(27, 143, 145, 0.15); padding-top: 10px;">
+        <label class="form-label" style="font-weight: 700; color: var(--primary-gold);"><i class="fa-solid fa-credit-card"></i> بيانات الدفع الإلكتروني (بوابة Paymob / Fawry):</label>
+        <input type="text" class="form-control" placeholder="اسم صاحب الكارت" style="margin-bottom: 6px; font-size: 0.8rem;" value="Ahmed Mohamed">
+        <input type="text" class="form-control" placeholder="رقم الكارت (16 رقم)" style="margin-bottom: 6px; font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="5078 1204 8920 4012">
+        <div style="display: flex; gap: 6px;">
+          <input type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="12/29">
+          <input type="text" class="form-control" placeholder="CVV" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="123">
+        </div>
+      </div>
+
       <button class="btn btn-primary" id="btnConfirmMeterRecharge">
         <i class="fa-solid fa-bolt"></i> تأكيد الشحن الفوري ونقل الرصيد للعداد
       </button>
@@ -1351,6 +1424,51 @@
       <button class="btn btn-primary" onclick="app.submitCargoPermit()">
         <i class="fa-solid fa-qrcode"></i> إصدار تصريح الأمان الإلكتروني للبوابة
       </button>
+    </div>
+  </div>
+
+  <!-- 10. Village Services & Emergency Contacts Directory Modal (مقارنة بمراسي) -->
+  <div class="modal-overlay" id="modalVillageDirectory">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalVillageDirectory')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-phone-volume"></i> دليل خدمات وطوارئ القرية</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        دليل أرقام الهواتف والخدمات الهامة داخل القرية والساحل للاتصال المباشر.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(239, 68, 68, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.15);">
+          <div>
+            <span style="font-weight: 700; color: #dc2626; font-size: 0.82rem;"><i class="fa-solid fa-truck-medical"></i> إسعاف وطوارئ المنتجع</span>
+            <p style="font-size: 0.7rem; color: var(--text-muted);">متاح 24 ساعة - فريق طبي ميداني</p>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="app.callDirectory('0100999111')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0;">اتصل الآن</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(32, 39, 79, 0.04); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.08);">
+          <div>
+            <span style="font-weight: 700; color: #20274f; font-size: 0.82rem;"><i class="fa-solid fa-kit-medical"></i> صيدلية الساحل الكبرى</span>
+            <p style="font-size: 0.7rem; color: var(--text-muted);">توصيل للفلل والشاليهات - صيدلية توصيل</p>
+          </div>
+          <button class="btn btn-sm" onclick="app.callDirectory('19999')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0;">اتصل الآن</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(32, 39, 79, 0.04); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.08);">
+          <div>
+            <span style="font-weight: 700; color: #20274f; font-size: 0.82rem;"><i class="fa-solid fa-wrench"></i> خدمة صيانة الأعطال العامة</span>
+            <p style="font-size: 0.7rem; color: var(--text-muted);">أعطال السباكة والكهرباء العامة بالقرية</p>
+          </div>
+          <button class="btn btn-sm" onclick="app.callDirectory('16000')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0;">اتصل الآن</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(32, 39, 79, 0.04); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.08);">
+          <div>
+            <span style="font-weight: 700; color: #20274f; font-size: 0.82rem;"><i class="fa-solid fa-basket-shopping"></i> خدمة توصيل سوبرماركت</span>
+            <p style="font-size: 0.7rem; color: var(--text-muted);">طلب وتوصيل الطلبات والمقاضي للوحدات</p>
+          </div>
+          <button class="btn btn-sm" onclick="app.callDirectory('01011223344')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0;">اتصل الآن</button>
+        </div>
+      </div>
     </div>
   </div>
 

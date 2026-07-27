@@ -63,6 +63,9 @@ class UltimateFMApp {
       { id: 'CP-2081', name: 'عادل إمام', phone: '01001234567', details: 'ركن سيارة مخالف أمام الفيلا يغلق الممر', status: 'تحت المراجعة والتحرك الميداني', bgClass: 'badge-warning', requester: 'homeowner' }
     ];
 
+    // Initialize payment wallet balance
+    this.ownerWalletBalance = 2500;
+
     // Clear old cached test names if matching fmhala
     if (localStorage.getItem('odoo_owner_name') === 'fmhala' || localStorage.getItem('odoo_owner_name') === 'Fmhala') {
       localStorage.removeItem('odoo_owner_name');
@@ -341,6 +344,9 @@ class UltimateFMApp {
 
     const backBtn = document.getElementById('btnBackToRoleGrid');
     if (backBtn) backBtn.style.display = 'inline-flex';
+
+    // Render screen logout header inside active view
+    this.renderLogoutHeader();
   }
 
   openCommercialMeterModal() {
@@ -1748,6 +1754,127 @@ class UltimateFMApp {
     .catch(err => {
       console.log('[Odoo Name Fetch Exception]:', err);
     });
+  }
+
+  renderLogoutHeader() {
+    // Remove old dynamic headers
+    document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
+
+    const activeView = document.querySelector('.view-panel.active');
+    if (!activeView || activeView.id === 'viewLogin') return;
+
+    // Create a sleek top header for this screen
+    const header = document.createElement('div');
+    header.className = 'dynamic-logout-header';
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(32, 39, 79, 0.08); box-shadow: var(--shadow-sm);';
+
+    // Left side: Screen Title
+    const titleSpan = document.createElement('span');
+    titleSpan.style.cssText = 'font-size: 0.78rem; font-weight: 700; color: #20274f; display: flex; align-items: center; gap: 6px;';
+    
+    // Choose appropriate icon based on active role
+    let iconHtml = '<i class="fa-solid fa-desktop"></i>';
+    if (this.currentRole === 'homeowner') iconHtml = '<i class="fa-solid fa-house-user" style="color: var(--primary-gold);"></i>';
+    else if (this.currentRole === 'tenant') iconHtml = '<i class="fa-solid fa-key" style="color: var(--primary-gold);"></i>';
+    else if (this.currentRole === 'commercial') iconHtml = '<i class="fa-solid fa-store" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'security') iconHtml = '<i class="fa-solid fa-user-shield" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'manager') iconHtml = '<i class="fa-solid fa-user-tie" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'technician') iconHtml = '<i class="fa-solid fa-helmet-safety" style="color: var(--accent-cyan);"></i>';
+    else if (this.currentRole === 'engineer') iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-cyan);"></i>';
+    else if (this.currentRole === 'admin') iconHtml = '<i class="fa-solid fa-chart-line" style="color: var(--primary-gold);"></i>';
+
+    titleSpan.innerHTML = `${iconHtml} ${this.getRoleArabicName(this.currentRole)}`;
+
+    // Right side: Logout button
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm';
+    btn.style.cssText = 'padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;';
+    btn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> خروج';
+    btn.onclick = (e) => {
+      e.preventDefault();
+      this.logout();
+    };
+
+    header.appendChild(titleSpan);
+    header.appendChild(btn);
+
+    // Prepend to active view!
+    activeView.insertBefore(header, activeView.firstChild);
+  }
+
+  registerLprPlate() {
+    const input = document.getElementById('lprPlateInput');
+    const plate = input ? input.value.trim() : '';
+    if (!plate) {
+      this.showToast('⚠️ يرجى إدخال رقم لوحة السيارة أولاً!');
+      return;
+    }
+
+    const list = document.getElementById('lprActivePlatesList');
+    if (list) {
+      const item = document.createElement('div');
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(27, 143, 145, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(27, 143, 145, 0.15); margin-top: 6px;';
+      item.innerHTML = `
+        <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">${plate}</span>
+        <span class="badge badge-success" style="font-size: 0.65rem; margin-top:0;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
+      `;
+      list.insertBefore(item, list.firstChild);
+    }
+
+    if (input) input.value = '';
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] في Odoo بنجاح وتفعيلها تلقائياً على البوابات الذكية!`);
+  }
+
+  bookAmenity() {
+    const select = document.getElementById('bookingAmenitySelect');
+    const dateInput = document.getElementById('bookingDateInput');
+    const timeSelect = document.getElementById('bookingTimeSelect');
+
+    if (!select || !dateInput || !timeSelect) return;
+
+    const amenityText = select.options[select.selectedIndex].text.split(' - ')[0];
+    const price = parseInt(select.options[select.selectedIndex].getAttribute('data-price')) || 100;
+    const date = dateInput.value;
+    const time = timeSelect.options[timeSelect.selectedIndex].text;
+
+    if (this.ownerWalletBalance < price) {
+      this.showToast('❌ رصيد المحفظة الإلكترونية غير كافٍ لشراء الحجز! يرجى شحن محفظتك أولاً.');
+      return;
+    }
+
+    // Decrement wallet balance
+    this.ownerWalletBalance -= price;
+    
+    // Update Wallet UI
+    const balanceSpan = document.getElementById('bookingWalletBalanceText');
+    if (balanceSpan) balanceSpan.innerText = this.ownerWalletBalance;
+
+    // Generate random booking code
+    const code = Math.floor(100000 + Math.random() * 900000);
+
+    const list = document.getElementById('bookingListContainer');
+    if (list) {
+      const item = document.createElement('div');
+      item.style.cssText = 'background: rgba(32, 39, 79, 0.04); padding: 10px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.08); margin-top: 6px; display: flex; justify-content: space-between; align-items: center;';
+      item.innerHTML = `
+        <div>
+          <h5 style="margin: 0 0 4px 0; color: #20274f; font-size: 0.8rem; font-weight: 700;">${amenityText}</h5>
+          <p style="margin: 0; font-size: 0.68rem; color: var(--text-muted);">${date} • ${time}</p>
+          <span style="font-size: 0.65rem; color: var(--primary-gold); font-weight: 700;">كود الحجز: #${code}</span>
+        </div>
+        <div style="text-align: center;">
+          <i class="fa-solid fa-qrcode" style="font-size: 1.6rem; color: #20274f; display: block; margin-bottom: 2px;"></i>
+          <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">مسح الدخول</span>
+        </div>
+      `;
+      list.insertBefore(item, list.firstChild);
+    }
+
+    this.showToast(`🎾 تم حجز [${amenityText}] بنجاح!\nالتاريخ: ${date}\nالوقت: ${time}\nتم خصم ${price} ج.م من المحفظة.`);
+  }
+
+  callDirectory(number) {
+    this.showToast(`📞 جاري الاتصال بـ (${number}) من الهاتف الميداني...`);
   }
 }
 
