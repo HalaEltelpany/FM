@@ -88,8 +88,11 @@ class UltimateFMApp {
       this.initSplashScreen();
       this.renderTickets();
 
-
-
+      // Auto login if active session exists
+      const savedRole = localStorage.getItem('active_session_role');
+      if (savedRole) {
+        setTimeout(() => this.executeLogin(savedRole), 100);
+      }
       // Register PWA Service Worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
@@ -1547,9 +1550,78 @@ class UltimateFMApp {
   syncComplaintToOdoo(name, phone, details) {
     console.log(`[Odoo Sync] Security Complaint synced successfully for ${name} (${phone}): ${details}`);
   }
+  handleLogin() {
+    const email = document.getElementById('loginEmailInput')?.value || '';
+    let role = 'owner';
+    const em = email.toLowerCase().trim();
+    if (em.includes('tenant')) role = 'tenant';
+    else if (em.includes('commercial') || em.includes('comm')) role = 'commercial';
+    else if (em.includes('security') || em.includes('sec')) role = 'security';
+    else if (em.includes('manager')) role = 'manager';
+    else if (em.includes('technician') || em.includes('tech')) role = 'technician';
+    else if (em.includes('engineer') || em.includes('eng')) role = 'engineer';
+    else if (em.includes('admin')) role = 'admin';
+    else if (em.includes('owner') || em.includes('ahmed')) role = 'homeowner';
 
+    this.executeLogin(role);
+  }
 
+  quickLogin(role) {
+    this.executeLogin(role === 'owner' ? 'homeowner' : role);
+  }
 
+  executeLogin(role) {
+    this.switchRole(role);
+    
+    // Hide standard back-to-grid buttons for strict separation feel
+    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
+      btn.style.display = 'none';
+    });
+
+    // Show navigation bar header
+    const navBar = document.getElementById('appNavBar');
+    if (navBar) navBar.style.display = 'flex';
+
+    // Save active session
+    localStorage.setItem('active_session_role', role);
+
+    this.showToast(`🔑 تم تسجيل الدخول بنجاح كـ [${this.getRoleArabicName(role)}]!`);
+  }
+
+  logout() {
+    localStorage.removeItem('active_session_role');
+    this.currentRole = 'login';
+    
+    // Hide all views & show login
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    const loginPanel = document.getElementById('viewLogin');
+    if (loginPanel) loginPanel.classList.add('active');
+
+    // Restore standard back-to-grid buttons for dev grid purposes if wanted
+    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
+      btn.style.display = 'inline-flex';
+    });
+
+    // Hide navigation bar header
+    const navBar = document.getElementById('appNavBar');
+    if (navBar) navBar.style.display = 'none';
+
+    this.showToast('🚪 تم تسجيل الخروج من النظام بنجاح.');
+  }
+
+  getRoleArabicName(role) {
+    const map = {
+      'homeowner': 'مالك الوحدة السكنية',
+      'tenant': 'المستأجر السكني',
+      'commercial': 'المستأجر التجاري',
+      'security': 'أمن وبوابات القرية',
+      'manager': 'مدير الصيانة والتشغيل',
+      'technician': 'الفني الميداني',
+      'engineer': 'المهندس المشرف',
+      'admin': 'الإدارة العليا'
+    };
+    return map[role] || role;
+  }
   loadOdooFields() {
     const url = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
     const db = localStorage.getItem('odoo_db') || 'facility-management-edu';
