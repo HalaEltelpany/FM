@@ -290,11 +290,16 @@ class UltimateFMApp {
     });
 
     document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
-    const gridPanel = document.getElementById('viewRoleGrid');
+    
+    const gridPanel = document.getElementById('viewLogin') || document.getElementById('viewRoleGrid');
     if (gridPanel) gridPanel.classList.add('active');
 
     const backBtn = document.getElementById('btnBackToRoleGrid');
     if (backBtn) backBtn.style.display = 'none';
+
+    // Hide navigation bar header
+    const navBar = document.getElementById('appNavBar');
+    if (navBar) navBar.style.display = 'none';
   }
 
   switchRole(role) {
@@ -1582,6 +1587,16 @@ class UltimateFMApp {
     const navBar = document.getElementById('appNavBar');
     if (navBar) navBar.style.display = 'flex';
 
+    // Show phone bottom navbar only if resident role
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) {
+      if (['homeowner', 'tenant', 'commercial'].includes(role)) {
+        phoneNav.style.display = 'flex';
+      } else {
+        phoneNav.style.display = 'none';
+      }
+    }
+
     // Save active session
     localStorage.setItem('active_session_role', role);
 
@@ -1605,6 +1620,10 @@ class UltimateFMApp {
     // Hide navigation bar header
     const navBar = document.getElementById('appNavBar');
     if (navBar) navBar.style.display = 'none';
+
+    // Hide phone bottom navbar
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) phoneNav.style.display = 'none';
 
     this.showToast('🚪 تم تسجيل الخروج من النظام بنجاح.');
   }
