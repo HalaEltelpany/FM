@@ -7,7 +7,7 @@ class UltimateFMApp {
   constructor() {
     this.currentRole = 'homeowner';
     this.isFullWidth = false;
-    this.qrTimer = 60;
+    this.qrTimer = 30;
     this.qrInterval = null;
     this.canvas = null;
     this.ctx = null;
@@ -66,6 +66,20 @@ class UltimateFMApp {
     // Initialize payment wallet balance
     this.ownerWalletBalance = 2500;
 
+    // Hardcoded Odoo Connection Config (Edit these values directly to connect!)
+    this.odooConfig = {
+      url: 'https://facility-management.odoo.com',
+      db: 'facility-management-edu',
+      user: 'ahmed.mohamed@domain.com',
+      key: 'YOUR_API_KEY_HERE' // Replace this with your actual Odoo API Key!
+    };
+
+    // Prepopulate Local Storage silently from configuration values
+    localStorage.setItem('odoo_url', this.odooConfig.url);
+    localStorage.setItem('odoo_db', this.odooConfig.db);
+    localStorage.setItem('odoo_user', this.odooConfig.user);
+    localStorage.setItem('odoo_key', this.odooConfig.key);
+
     // Clear old cached test names if matching fmhala
     if (localStorage.getItem('odoo_owner_name') === 'fmhala' || localStorage.getItem('odoo_owner_name') === 'Fmhala') {
       localStorage.removeItem('odoo_owner_name');
@@ -73,6 +87,26 @@ class UltimateFMApp {
     if (localStorage.getItem('odoo_user') === 'fmhala@domain.com' || localStorage.getItem('odoo_user') === 'admin@domain.com') {
       localStorage.removeItem('odoo_user');
     }
+
+    // 3 Warehouses Inventory List (Residential, Commercial, Assets)
+    this.inventoryItems = [
+      // Warehouse 1: Residential (مخزن الملاك السكني)
+      { id: 1, name: 'خلاط مياه إيطالي 3/4 بوصة', warehouse: 'residential', qty: 15, price: 520, desc: 'سحب للملاك - سباكة' },
+      { id: 2, name: 'كارتدج تكييف شارب 2.25 حصان', warehouse: 'residential', qty: 8, price: 850, desc: 'سحب للملاك - تكييف' },
+      { id: 3, name: 'مفتاح إنارة جلاس تاتش ذكي', warehouse: 'residential', qty: 25, price: 120, desc: 'سحب للملاك - كهرباء' },
+      { id: 4, name: 'لوحة لمبات ليد غاطسة 12 وات', warehouse: 'residential', qty: 40, price: 95, desc: 'سحب للملاك - كهرباء' },
+
+      // Warehouse 2: Commercial (مخزن المستأجرين التجاريين)
+      { id: 10, name: 'مروحة طرد مطابخ تجارية كينج', warehouse: 'commercial', qty: 4, price: 3200, desc: 'سحب للتجاري - تهوية ومطابخ' },
+      { id: 11, name: 'كابل كهرباء مسلح 3 فاز نحاس', warehouse: 'commercial', qty: 150, price: 450, desc: 'سحب للتجاري - كهرباء (سعر المتر)' },
+      { id: 12, name: 'محبس إغلاق غاز صناعي لولبي', warehouse: 'commercial', qty: 6, price: 1800, desc: 'سحب للتجاري - غاز وأمان المحلات' },
+
+      // Warehouse 3: Assets & Utilities (مخزن أصول ومرافق القرية)
+      { id: 20, name: 'أغشية فلاتر تحلية محطة RO ممبرين', warehouse: 'assets', qty: 12, price: 7500, desc: 'أصول - محطة التحلية' },
+      { id: 21, name: 'عداد ضغط شبكة حريق هيدروليكي', warehouse: 'assets', qty: 5, price: 1400, desc: 'أصول - شبكة الحريق والسلامة' },
+      { id: 22, name: 'كلور سائل ومطهرات للبحيرات الكبرى', warehouse: 'assets', qty: 30, price: 650, desc: 'أصول - البحيرات وحمامات السباحة (عبوة 20 لتر)' },
+      { id: 23, name: 'مضخة غاطسة لمطهر الصرف محطة STP', warehouse: 'assets', qty: 3, price: 12500, desc: 'أصول - محطة معالجة الصرف الصحي' }
+    ];
 
     this.init();
   }
@@ -202,7 +236,10 @@ class UltimateFMApp {
 
     const btnSearchInv = document.getElementById('btnSearchInventoryPart');
     if (btnSearchInv) {
-      btnSearchInv.addEventListener('click', () => this.openModal('modalInventory'));
+      btnSearchInv.addEventListener('click', () => {
+        this.openModal('modalInventory');
+        this.filterInventory();
+      });
     }
 
     const btnGetSig = document.getElementById('btnGetCustomerSignature');
@@ -213,6 +250,20 @@ class UltimateFMApp {
     const btnApprovePay = document.getElementById('btnApproveAndPay');
     if (btnApprovePay) {
       btnApprovePay.addEventListener('click', () => this.handleApproveAndPay());
+    }
+
+    // Toggle custom card entry fields in payment modal
+    const radioSaved = document.getElementById('payMethodSavedCard');
+    const radioNew = document.getElementById('payMethodNewCard');
+    if (radioSaved && radioNew) {
+      radioSaved.addEventListener('change', () => {
+        const group = document.getElementById('newCardFieldsGroup');
+        if (group) group.style.display = 'none';
+      });
+      radioNew.addEventListener('change', () => {
+        const group = document.getElementById('newCardFieldsGroup');
+        if (group) group.style.display = 'flex';
+      });
     }
 
     // Admin Emergency Broadcast
@@ -327,6 +378,7 @@ class UltimateFMApp {
     
     const targetMap = {
       'homeowner': 'viewHomeowner',
+      'family': 'viewHomeowner', // Both map to the homeowner view panel
       'engineer': 'viewEngineer',
       'manager': 'viewManager',
       'technician': 'viewTechnician',
@@ -340,6 +392,37 @@ class UltimateFMApp {
     const activePanel = document.getElementById(targetId);
     if (activePanel) {
       activePanel.classList.add('active');
+    }
+
+    // Toggle Owner-Only Financial details visibility dynamically
+    const financialElements = document.querySelectorAll('.owner-only-financial');
+    financialElements.forEach(el => {
+      if (role === 'family') {
+        el.style.setProperty('display', 'none', 'important');
+      } else {
+        el.style.removeProperty('display');
+      }
+    });
+
+    // Update Homeowner screen header texts based on sub-role
+    const ownerTitle = document.getElementById('homeownerNameText');
+    const ownerCardBadge = document.querySelector('#viewHomeowner .card.gold-border .badge');
+    const ownerCardSubtitle = document.querySelector('#viewHomeowner .card.gold-border p');
+
+    if (role === 'family') {
+      if (ownerTitle) ownerTitle.innerText = 'ياسمين أسامة (تابع للمالك)';
+      if (ownerCardBadge) {
+        ownerCardBadge.innerHTML = '<i class="fa-solid fa-user-shield"></i> حساب تابع (محدود)';
+        ownerCardBadge.className = 'badge badge-info';
+      }
+      if (ownerCardSubtitle) ownerCardSubtitle.innerText = 'فيلا 104 - زون الساحل الشمالي • تابع للمالك الأساسي';
+    } else if (role === 'homeowner') {
+      this.updateHomeownerNameUI();
+      if (ownerCardBadge) {
+        ownerCardBadge.innerHTML = '<i class="fa-solid fa-check"></i> حساب مؤكد';
+        ownerCardBadge.className = 'badge badge-success';
+      }
+      if (ownerCardSubtitle) ownerCardSubtitle.innerText = 'فيلا 104 - زون الساحل الشمالي';
     }
 
     const backBtn = document.getElementById('btnBackToRoleGrid');
@@ -493,12 +576,12 @@ class UltimateFMApp {
     this.qrInterval = setInterval(() => {
       this.qrTimer--;
       if (this.qrTimer <= 0) {
-        this.qrTimer = 60;
+        this.qrTimer = 30;
         this.randomizeQR();
       }
       if (countText) countText.innerText = `${this.qrTimer} ثانية`;
       if (progressBar) {
-        const pct = (this.qrTimer / 60) * 100;
+        const pct = (this.qrTimer / 30) * 100;
         progressBar.style.width = `${pct}%`;
       }
     }, 1000);
@@ -635,7 +718,7 @@ class UltimateFMApp {
 
       console.log('[Odoo Sync Success] Retrieved UID:', uid);
 
-      // Step 2: Create the maintenance request with the correct dynamic UID
+      // Step 2: Create the helpdesk ticket with the correct dynamic UID
       const createPayload = {
         jsonrpc: "2.0",
         method: "call",
@@ -646,7 +729,7 @@ class UltimateFMApp {
             dbInput,
             uid, // Use the correct user ID retrieved dynamically!
             keyInput,
-            "maintenance.request",
+            "helpdesk.ticket",
             "create",
             [{
               name: `${ticket.id}: ${ticket.title}`,
@@ -744,7 +827,58 @@ class UltimateFMApp {
   }
 
   renderTickets() {
-    // 1. Homeowner tickets
+    // 1. Homeowner, Tenant, and Commercial unified rendering helper
+    const getTicketHtml = (tk) => {
+      let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+        <div>
+          <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">صورة العطل:</span>
+          <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
+        </div>`;
+      if (tk.status === 'تم الانتهاء') {
+        photosHtml += `
+        <div>
+          <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
+          <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
+        </div>
+        <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
+          <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
+        </div>`;
+      }
+      photosHtml += `</div>`;
+
+      let paymentHtml = '';
+      if (tk.status === 'انتظار دفع المالك') {
+        paymentHtml = `
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <span>⚠️ <strong>يتطلب الإصلاح قطعة غيار:</strong> [${tk.partName}] بسعر <strong>${tk.partPrice} ج.م</strong>.</span>
+            <span>يرجى سداد القيمة إلكترونياً للبدء الفوري في التركيب من قبل الفني.</span>
+            <button class="btn btn-danger btn-sm" onclick="app.openSparePartPaymentModal('${tk.id}')" style="width: 100%; margin-top: 4px; font-size: 0.72rem; padding: 6px; font-weight: 700; height: 32px; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+              <i class="fa-solid fa-credit-card"></i> سداد قيمة قطعة الغيار (${tk.partPrice} ج.م)
+            </button>
+          </div>
+        `;
+      } else if (tk.status === 'تم الدفع - جاري التركيب') {
+        paymentHtml = `
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
+            <i class="fa-solid fa-circle-check"></i> تم سداد <strong>${tk.partPrice} ج.م</strong> بنجاح. جاري إحضار قطعة [${tk.partName}] وتركيبها بواسطة الفني.
+          </div>
+        `;
+      }
+
+      return `
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')};">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
+            <span class="badge ${tk.bgClass}">${tk.status}</span>
+          </div>
+          <p style="font-size: 0.7rem; color: var(--text-muted);">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
+          ${photosHtml}
+          ${paymentHtml}
+        </div>
+      `;
+    };
+
+    // Render Homeowner Tickets list
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
       const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner');
@@ -755,38 +889,12 @@ class UltimateFMApp {
         homeownerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
       } else {
         homeownerTks.forEach(tk => {
-          let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-            <div>
-              <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">صورة العطل:</span>
-              <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
-            </div>`;
-          if (tk.status === 'تم الانتهاء') {
-            photosHtml += `
-            <div>
-              <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
-              <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
-            </div>
-            <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-              <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
-            </div>`;
-          }
-          photosHtml += `</div>`;
-
-          homeownerList.innerHTML += `
-            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
-                <span class="badge ${tk.bgClass}">${tk.status}</span>
-              </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
-              ${photosHtml}
-            </div>
-          `;
+          homeownerList.innerHTML += getTicketHtml(tk);
         });
       }
     }
 
-    // 2. Tenant tickets
+    // Render Tenant Tickets list
     const tenantList = document.getElementById('tenantTicketsList');
     if (tenantList) {
       const tenantTks = this.tickets.filter(tk => tk.requester === 'tenant');
@@ -797,38 +905,12 @@ class UltimateFMApp {
         tenantList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
       } else {
         tenantTks.forEach(tk => {
-          let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-            <div>
-              <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">صورة العطل:</span>
-              <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
-            </div>`;
-          if (tk.status === 'تم الانتهاء') {
-            photosHtml += `
-            <div>
-              <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
-              <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
-            </div>
-            <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-              <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
-            </div>`;
-          }
-          photosHtml += `</div>`;
-
-          tenantList.innerHTML += `
-            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
-                <span class="badge ${tk.bgClass}">${tk.status}</span>
-              </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
-              ${photosHtml}
-            </div>
-          `;
+          tenantList.innerHTML += getTicketHtml(tk);
         });
       }
     }
 
-    // 3. Commercial tickets
+    // Render Commercial Tickets list
     const commList = document.getElementById('commercialTicketsList');
     if (commList) {
       const commTks = this.tickets.filter(tk => tk.requester === 'commercial');
@@ -836,36 +918,10 @@ class UltimateFMApp {
       if (badge) badge.innerText = `${commTks.length} active`;
       commList.innerHTML = '';
       if (commTks.length === 0) {
-        commList.innerHTML = '<div style="font-size: 0.75rem; color: #64748b; text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
+        commList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
       } else {
         commTks.forEach(tk => {
-          let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-            <div>
-              <span style="font-size: 0.6rem; color: #64748b; display: block; margin-bottom: 2px;">صورة العطل:</span>
-              <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.15);">
-            </div>`;
-          if (tk.status === 'تم الانتهاء') {
-            photosHtml += `
-            <div>
-              <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
-              <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.25);">
-            </div>
-            <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-              <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
-            </div>`;
-          }
-          photosHtml += `</div>`;
-
-          commList.innerHTML += `
-            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
-                <span class="badge ${tk.bgClass}">${tk.status}</span>
-              </div>
-              <p style="font-size: 0.7rem; color: #64748b;">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
-              ${photosHtml}
-            </div>
-          `;
+          commList.innerHTML += getTicketHtml(tk);
         });
       }
     }
@@ -966,10 +1022,9 @@ class UltimateFMApp {
       }
     }
 
-    // 6. Technician View - Tasks list for كريم حسن
     const techList = document.getElementById('techTasksContainer');
     if (techList) {
-      const techTks = this.tickets.filter(tk => tk.assignedTech === 'كريم حسن' && tk.status === 'تم التعيين للفني');
+      const techTks = this.tickets.filter(tk => tk.assignedTech === 'كريم حسن' && ['تم التعيين للفني', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب'].includes(tk.status));
       const badge = document.getElementById('techAssignedBadge');
       if (badge) badge.innerText = `${techTks.length} مهمة نشطة`;
       techList.innerHTML = '';
@@ -977,33 +1032,71 @@ class UltimateFMApp {
         techList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد مهام نشطة حالياً للبحث</div>';
       } else {
         techTks.forEach(tk => {
-          techList.innerHTML += `
-            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-              <div style="display: flex; justify-content: space-between;">
-                <h4 style="font-size: 0.88rem; font-weight: 700;">${tk.title}</h4>
-                <span class="badge ${tk.bgClass}">#${tk.id}</span>
-              </div>
-              
+          let innerTechHtml = '';
+
+          if (tk.status === 'تم التعيين للفني') {
+            innerTechHtml = `
+              <!-- Basic Check-in photo -->
               <div style="display: flex; gap: 8px; align-items: center; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 8px;">
                 <img src="${tk.photoBefore}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15);">
                 <div>
-                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">صورة المشكلة المعتمدة:</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">صورة العطل المعتمدة:</span>
                   <span style="font-size: 0.7rem; color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> يمنع عمل أي مهمة جانبية غير الصورة!</span>
                 </div>
               </div>
 
-              <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #6ee7b7;">
-                <i class="fa-solid fa-file-contract"></i> العطل مغطى بالصيانة التشغيلية للوحدة
+              <!-- Option A: Simple Fix -->
+              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; margin-top: 4px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: #10b981; display: block; margin-bottom: 4px;">الخيار الأول: العطل بسيط (تصلح بدون قطع غيار):</span>
+                <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
+                <button class="btn btn-success" style="width: 100%; font-size: 0.78rem; padding: 8px; margin-top:0;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                  <i class="fa-solid fa-circle-check"></i> تم الإصلاح عادي وإغلاق التذكرة
+                </button>
               </div>
 
-              <div style="margin-top: 6px;">
-                <label class="form-label" style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إرفاق صورة الإصلاح (إجباري لإغلاق التذكرة بنظام SLA):</label>
-                <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.75rem; margin-bottom: 8px;">
+              <!-- Option B: Needs Part -->
+              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; margin-top: 6px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: var(--primary-gold); display: block; margin-bottom: 4px;">الخيار الثاني: العطل يتطلب قطعة غيار تالفة:</span>
+                <input type="file" id="techPhotoDamaged_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
+                <button class="btn btn-warning" style="width: 100%; font-size: 0.78rem; padding: 8px; margin-top:0;" onclick="app.technicianRequestPart('${tk.id}', 'techPhotoDamaged_${tk.id}')">
+                  <i class="fa-solid fa-boxes-stacked"></i> تصوير القطعة والبحث بالمخزن
+                </button>
               </div>
-
-              <button class="btn btn-primary" style="padding: 8px; font-size: 0.8rem;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                <i class="fa-solid fa-circle-check"></i> تم الانتهاء من العمل وتأكيد الإصلاح
+            `;
+          } else if (tk.status === 'انتظار دفع المالك') {
+            innerTechHtml = `
+              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #fcd34d;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> <strong>بانتظار إتمام الدفع من شاشة المالك:</strong>
+                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
+                  تم طلب قطعة [<strong>${tk.partName}</strong>] بسعر <strong>${tk.partPrice} ج.م</strong> وتوقيع المالك بالموافقة. يرجى الانتظار حتى سداد القيمة من تطبيق العميل للبدء في التركيب.
+                </p>
+              </div>
+            `;
+          } else if (tk.status === 'تم الدفع - جاري التركيب') {
+            innerTechHtml = `
+              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #6ee7b7; margin-bottom: 8px;">
+                <i class="fa-solid fa-circle-check"></i> <strong>تم الدفع بنجاح!</strong>
+                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
+                  يرجى صرف قطعة [<strong>${tk.partName}</strong>] من المخزن وتركيبها بالوحدة، ثم إرفاق صورة الإصلاح بعد التركيب.
+                </p>
+              </div>
+              <div style="margin-top: 4px;">
+                <label class="form-label" style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إرفاق صورة بعد التركيب والإصلاح:</label>
+                <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
+              </div>
+              <button class="btn btn-success" style="width:100%; padding: 8px; font-size: 0.78rem; margin-top:0;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                <i class="fa-solid fa-check"></i> تم التركيب وإنهاء المهمة بالكامل
               </button>
+            `;
+          }
+
+          techList.innerHTML += `
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#f59e0b' : 'rgba(32,39,79,0.15)')};">
+              <div style="display: flex; justify-content: space-between;">
+                <h4 style="font-size: 0.88rem; font-weight: 700;">${tk.title}</h4>
+                <span class="badge ${tk.bgClass}">#${tk.id}</span>
+              </div>
+              ${innerTechHtml}
             </div>
           `;
         });
@@ -1380,7 +1473,14 @@ class UltimateFMApp {
 
     if (sigName) sigName.innerText = name;
     if (sigPrice) sigPrice.innerText = `${price} ج.م`;
-    if (btnApprove) btnApprove.innerHTML = `<i class="fa-solid fa-credit-card"></i> موافقة ودفع آلي (${price} ج.م)`;
+
+    if (btnApprove) {
+      if (this.activeAuditTicketId) {
+        btnApprove.innerHTML = `<i class="fa-solid fa-pen-nib"></i> موافقة وتوقيع المالك بالموافقة`;
+      } else {
+        btnApprove.innerHTML = `<i class="fa-solid fa-credit-card"></i> موافقة ودفع آلي (${price} ج.م)`;
+      }
+    }
 
     this.closeModal('modalInventory');
     this.openModal('modalSignature');
@@ -1388,7 +1488,160 @@ class UltimateFMApp {
 
   handleApproveAndPay() {
     this.closeModal('modalSignature');
+
+    if (this.activeAuditTicketId) {
+      const ticketId = this.activeAuditTicketId;
+      const tk = this.tickets.find(t => t.id === ticketId);
+      if (tk) {
+        tk.status = 'انتظار دفع المالك';
+        tk.bgClass = 'badge-danger'; // Red badge for payment pending
+        tk.needsPart = true;
+        tk.partName = this.selectedPart.name;
+        tk.partPrice = this.selectedPart.price;
+        tk.photoBefore = this.uploadedDamagedPhoto || tk.photoBefore;
+
+        this.renderTickets();
+        this.showToast(`✅ تم توقيع المالك بنجاح!\nتم تحويل حالة البلاغ لـ "انتظار دفع المالك".\nستظهر التذكرة الآن بانتظار السداد الإلكتروني بقيمة ${this.selectedPart.price} ج.م في شاشة العميل.`);
+      }
+      this.activeAuditTicketId = null;
+      this.uploadedDamagedPhoto = null;
+      return;
+    }
+
     this.showToast(`💳 تم توقيع المالك إلكترونياً والدفع الفوري لمبلغ ${this.selectedPart.price} ج.م!\nتم تسجيل شرط الصرف للمخزن وإرسال التأكيد بالفاتورة.`);
+  }
+
+  technicianRequestPart(ticketId, fileInputId) {
+    const fileInput = document.getElementById(fileInputId);
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+      this.showToast('⚠️ يرجى إرفاق وصورة قطعة الغيار التالفة أولاً!');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.uploadedDamagedPhoto = e.target.result;
+      this.activeAuditTicketId = ticketId;
+      this.openModal('modalInventory');
+      this.filterInventory();
+      this.showToast('🔍 تم تحميل صورة القطعة التالفة! يرجى تحديد قطعة الغيار البديلة من المخزن.');
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  }
+
+  openSparePartPaymentModal(ticketId) {
+    const tk = this.tickets.find(t => t.id === ticketId);
+    if (!tk) return;
+
+    this.activePaymentTicketId = ticketId;
+
+    const partNameEl = document.getElementById('sparePartPayName');
+    const partAmountEl = document.getElementById('sparePartPayAmount');
+    if (partNameEl) partNameEl.innerText = tk.partName || 'قطعة غيار غير محددة';
+    if (partAmountEl) partAmountEl.innerText = `${tk.partPrice || 0} ج.م`;
+
+    // Reset payment radio and inputs
+    const paySaved = document.getElementById('payMethodSavedCard');
+    if (paySaved) paySaved.checked = true;
+    const group = document.getElementById('newCardFieldsGroup');
+    if (group) group.style.display = 'none';
+
+    this.openModal('modalSparePartsPayment');
+  }
+
+  confirmSparePartPayment() {
+    if (!this.activePaymentTicketId) return;
+
+    const selectedMethod = document.querySelector('input[name="sparePartPayMethod"]:checked')?.value || 'saved';
+    
+    // Call the payment deduction logic
+    this.payForSparePart(this.activePaymentTicketId, selectedMethod);
+    this.closeModal('modalSparePartsPayment');
+    this.activePaymentTicketId = null;
+  }
+
+  payForSparePart(ticketId, method) {
+    const tk = this.tickets.find(t => t.id === ticketId);
+    if (!tk) return;
+
+    if (this.ownerWalletBalance < tk.partPrice) {
+      this.showToast('❌ رصيد محفظتك الرقمية غير كافٍ لسداد قطعة الغيار! يرجى إعادة شحن محفظتك أولاً.');
+      return;
+    }
+
+    // Deduct from wallet
+    this.ownerWalletBalance -= tk.partPrice;
+    this.updateWalletUI();
+
+    // Update ticket state
+    tk.status = 'تم الدفع - جاري التركيب';
+    tk.bgClass = 'badge-info';
+
+    this.renderTickets();
+
+    const methodArabic = method === 'saved' ? 'البطاقة المسجلة (تنتهي بـ 4012)' : 'البطاقة الجديدة';
+    this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
+  }
+
+  submitFamilyMember() {
+    const nameInput = document.getElementById('familyMemberNameInput');
+    const relationSelect = document.getElementById('familyMemberRelationSelect');
+    const phoneInput = document.getElementById('familyMemberPhoneInput');
+
+    if (!nameInput || !relationSelect || !phoneInput) return;
+
+    const name = nameInput.value.trim();
+    const relation = relationSelect.value;
+    const phone = phoneInput.value.trim();
+
+    if (!name || !phone) {
+      this.showToast('⚠️ يرجى إدخال اسم فرد العائلة ورقم الموبايل!');
+      return;
+    }
+
+    const relationMap = {
+      'father': 'أب',
+      'mother': 'أم',
+      'brother': 'أخ',
+      'sister': 'أخت',
+      'son': 'ابن',
+      'daughter': 'ابنة'
+    };
+    const relationArabic = relationMap[relation] || relation;
+
+    // Render locally in Owner's family list
+    const list = document.getElementById('ownerFamilyMembersList');
+    const badge = document.getElementById('ownerFamilyCountBadge');
+
+    if (list) {
+      const item = document.createElement('div');
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px; margin-top: 6px;';
+      item.innerHTML = `
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">${name} (${relationArabic})</span>
+          <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">صلاحية دخول البوابات والخدمات فقط • ${phone}</p>
+        </div>
+        <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">نشط</span>
+      `;
+      list.appendChild(item);
+
+      // Update badge count
+      if (badge) {
+        const count = list.children.length;
+        badge.innerText = `${count} أفراد`;
+      }
+    }
+
+    this.closeModal('modalAddFamilyMember');
+    nameInput.value = '';
+    phoneInput.value = '';
+    
+    this.showToast(`👥 تم إضافة [${name}] بنجاح كفرد عائلة تابع!\nتم إنشاء حساب دخول محدود له على هاتفه برقم ${phone}.`);
+  }
+
+  updateWalletUI() {
+    const balanceSpan = document.getElementById('bookingWalletBalanceText');
+    if (balanceSpan) balanceSpan.innerText = this.ownerWalletBalance;
   }
 
   chargeService(serviceName, price) {
@@ -1596,7 +1849,7 @@ class UltimateFMApp {
     // Show phone bottom navbar only if resident role
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
-      if (['homeowner', 'tenant', 'commercial'].includes(role)) {
+      if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
         phoneNav.style.display = 'flex';
       } else {
         phoneNav.style.display = 'none';
@@ -1637,6 +1890,7 @@ class UltimateFMApp {
   getRoleArabicName(role) {
     const map = {
       'homeowner': 'مالك الوحدة السكنية',
+      'family': 'أحد أفراد الأسرة (حساب محدود)',
       'tenant': 'المستأجر السكني',
       'commercial': 'المستأجر التجاري',
       'security': 'أمن وبوابات القرية',
@@ -1875,6 +2129,200 @@ class UltimateFMApp {
 
   callDirectory(number) {
     this.showToast(`📞 جاري الاتصال بـ (${number}) من الهاتف الميداني...`);
+  }
+
+  submitNewUserToOdoo() {
+    const nameInput = document.getElementById('newUserNameInput');
+    const emailInput = document.getElementById('newUserEmailInput');
+    const phoneInput = document.getElementById('newUserPhoneInput');
+    const roleSelect = document.getElementById('newUserRoleSelect');
+
+    if (!nameInput || !emailInput || !phoneInput || !roleSelect) return;
+
+    const userName = nameInput.value.trim();
+    const userEmail = emailInput.value.trim();
+    const userPhone = phoneInput.value.trim();
+    const userRole = roleSelect.value;
+
+    if (!userName || !userEmail) {
+      this.showToast('⚠️ يرجى كتابة الاسم والبريد الإلكتروني على الأقل!');
+      return;
+    }
+
+    const roleMap = {
+      'homeowner': 'مالك وحدة سكنية',
+      'tenant': 'مستأجر سكني',
+      'technician': 'فني صيانة ميداني',
+      'engineer': 'مهندس مشرف'
+    };
+    const roleArabic = roleMap[userRole] || userRole;
+
+    const urlInput = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'facility-management-edu';
+    const userInput = localStorage.getItem('odoo_user') || 'admin@domain.com';
+    const keyInput = localStorage.getItem('odoo_key') || '';
+
+    // Render it locally first for immediate visual success feedback
+    const list = document.getElementById('adminUserList');
+    const badgeCount = document.getElementById('adminUserCountBadge');
+    
+    const addUserToLocalList = () => {
+      if (list) {
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-top: 6px;';
+        item.innerHTML = `
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #ffffff;">${userName}</span>
+            <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">${userEmail} • ${roleArabic}</p>
+          </div>
+          <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">Odoo Synced</span>
+        `;
+        list.insertBefore(item, list.firstChild);
+      }
+      if (badgeCount) {
+        const count = list ? list.children.length : 5;
+        badgeCount.innerText = `${count} مستخدمين`;
+      }
+    };
+
+    if (!keyInput) {
+      // Local fallback if Odoo not connected
+      addUserToLocalList();
+      this.closeModal('modalAddNewUser');
+      nameInput.value = '';
+      emailInput.value = '';
+      phoneInput.value = '';
+      this.showToast(`✅ [وضع المحاكاة] تم إضافة المستخدم [${userName}] بنجاح للمحفظة المحلية!`);
+      return;
+    }
+
+    const baseUrl = urlInput.replace(/\/+$/, '');
+    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
+
+    const authPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    this.showToast(`⏳ جاري الإرسال ومزامنة [${userName}] مع Odoo ERP...`);
+
+    fetch(proxyAuthUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authPayload)
+    })
+    .then(res => res.json())
+    .then(authData => {
+      if (authData.error) {
+        throw new Error(JSON.stringify(authData.error));
+      }
+      const uid = authData.result;
+      if (!uid || typeof uid !== 'number') {
+        throw new Error('فشل تسجيل الدخول للربط بـ Odoo');
+      }
+
+      const createPartnerPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid,
+            keyInput,
+            "res.partner",
+            "create",
+            [{
+              name: userName,
+              email: userEmail,
+              phone: userPhone,
+              comment: `تم رفعه كـ ${roleArabic} من لوحة تحكم تطبيق الموبايل`
+            }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      return fetch(proxyAuthUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createPartnerPayload)
+      });
+    })
+    .then(res => res.json())
+    .then(createData => {
+      if (createData.error) {
+        throw new Error(JSON.stringify(createData.error));
+      }
+      addUserToLocalList();
+      this.closeModal('modalAddNewUser');
+      nameInput.value = '';
+      emailInput.value = '';
+      phoneInput.value = '';
+      this.showToast(`✅ تم بنجاح مزامنة ورفع العميل [${userName}] بداخل جهات اتصال Odoo ERP (ID: ${createData.result})!`);
+    })
+    .catch(err => {
+      console.error('[Odoo Contact Sync Exception]:', err);
+      // Local fallback on error
+      addUserToLocalList();
+      this.closeModal('modalAddNewUser');
+      nameInput.value = '';
+      emailInput.value = '';
+      phoneInput.value = '';
+      this.showToast(`⚠️ تعذر الاتصال بـ Odoo (تم الحفظ محلياً في الموك أب):\n${err.message || err}`);
+    });
+  }
+
+  filterInventory() {
+    const select = document.getElementById('warehouseSelect');
+    const search = document.getElementById('inventorySearchInput');
+    const list = document.getElementById('inventoryResultsList');
+
+    if (!select || !search || !list) return;
+
+    const warehouseFilter = select.value;
+    const searchQuery = search.value.toLowerCase().trim();
+
+    const filtered = this.inventoryItems.filter(item => {
+      const matchWarehouse = (warehouseFilter === 'all' || item.warehouse === warehouseFilter);
+      const matchSearch = (item.name.toLowerCase().includes(searchQuery) || item.desc.toLowerCase().includes(searchQuery));
+      return matchWarehouse && matchSearch;
+    });
+
+    list.innerHTML = '';
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem;">❌ لا توجد قطع غيار مطابقة للبحث في هذا المخزن</div>';
+      return;
+    }
+
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'ticket-item';
+      div.style.cssText = 'margin-top: 6px;';
+      
+      let whName = 'مخزن الملاك';
+      if (item.warehouse === 'commercial') whName = 'مخزن التجاري';
+      else if (item.warehouse === 'assets') whName = 'مخزن أصول ومرافق القرية';
+
+      div.innerHTML = `
+        <div>
+          <h4 style="margin:0 0 4px 0; color:#20274f; font-size:0.82rem; font-weight:700;">${item.name}</h4>
+          <p style="margin:0; font-size:0.68rem; color:var(--text-muted);">${whName} • المتوفر: ${item.qty} وحدة</p>
+          <span style="font-size:0.65rem; color:var(--primary-gold); font-weight:700;">${item.desc}</span>
+        </div>
+        <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.78rem; white-space:nowrap; margin-top:0;" onclick="app.selectInventoryItem('${item.name}', ${item.price})">
+          اختيار (${item.price} ج.م)
+        </button>
+      `;
+      list.appendChild(div);
+    });
   }
 }
 

@@ -144,6 +144,15 @@
                 <p class="block-desc">دخول القرية، العدادات والباقات</p>
               </div>
 
+              <!-- 5b. Family Member Block (Mauve) -->
+              <div class="role-block-card mauve-block" onclick="app.quickLogin('family')">
+                <div class="block-icon">
+                  <i class="fa-solid fa-people-roof"></i>
+                </div>
+                <h3 class="block-title">فرد من أفراد الأسرة</h3>
+                <p class="block-desc">دخول محدود بدون تفاصيل مالية</p>
+              </div>
+
               <!-- 6. Commercial Tenant Block (Navy) -->
               <div class="role-block-card navy-block" onclick="app.quickLogin('commercial')">
                 <div class="block-icon">
@@ -201,7 +210,7 @@
                 <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-gold);">
                   <i class="fa-solid fa-qrcode"></i> Dynamic QR Access Code
                 </span>
-                <span class="badge badge-info" id="qrCountdownText">60 ثانية</span>
+                <span class="badge badge-info" id="qrCountdownText">30 ثانية</span>
               </div>
 
               <div class="qr-box" id="qrBoxContainer">
@@ -264,7 +273,7 @@
             </div>
 
             <!-- Financial Wallet & Maintenance Variance -->
-            <div class="card gold-border">
+            <div class="card gold-border owner-only-financial">
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-wallet"></i> البيانات المالية ووديعة الصيانة</span>
                 <span class="badge badge-success">المالك الرئيسي</span>
@@ -294,7 +303,7 @@
             </div>
 
             <!-- Smart Utility Meters (Electricity & Water Prepaid Recharging) -->
-            <div class="card gold-border" id="utilityMetersCard">
+            <div class="card gold-border owner-only-financial" id="utilityMetersCard">
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)</span>
                 <span class="badge badge-cyan"><i class="fa-solid fa-wifi"></i> IoT Connected</span>
@@ -405,7 +414,7 @@
               <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">
                 احجز ملاعب البادل تنس أو ملاعب كرة القدم مباشرة من رصيد محفظتك.
               </p>
-              <div style="font-size: 0.78rem; font-weight: 800; color: #20274f; margin-bottom: 10px; background: rgba(27, 143, 145, 0.08); padding: 6px 12px; border-radius: 6px; display: inline-block;">
+              <div class="owner-only-financial" style="font-size: 0.78rem; font-weight: 800; color: #20274f; margin-bottom: 10px; background: rgba(27, 143, 145, 0.08); padding: 6px 12px; border-radius: 6px; display: inline-block;">
                 <i class="fa-solid fa-wallet"></i> رصيد محفظة الدفع المتاحة: <span id="bookingWalletBalanceText">2500</span> ج.م
               </div>
               <div class="form-group" style="margin-bottom: 10px;">
@@ -435,6 +444,38 @@
               </button>
               <div id="bookingListContainer" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
                 <!-- Renders dynamically -->
+              </div>
+            </div>
+
+            <!-- 4. Family Members Management Card (إدارة أفراد الأسرة والتابعين) -->
+            <div class="card gold-border" style="margin-top: 16px;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-people-roof"></i> إدارة أفراد الأسرة والتابعين بالوحدة</span>
+                <span class="badge badge-success" id="ownerFamilyCountBadge">2 أفراد</span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+                تحكم في إضافة أفراد عائلتك وإصدار صلاحيات الدخول وبوابات الأمن المحدودة لهم دون صلاحيات مالية.
+              </p>
+              <button class="btn btn-secondary" onclick="app.openModal('modalAddFamilyMember')" style="width: 100%; background: rgba(32, 39, 79, 0.08); border: 1px solid rgba(32, 39, 79, 0.15); color: #20274f; font-weight: 700; margin-bottom: 12px; height: 38px; margin-top: 0;">
+                <i class="fa-solid fa-user-plus"></i> إضافة فرد أسرة جديد للوحدة
+              </button>
+              
+              <div id="ownerFamilyMembersList" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Renders dynamically -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px;">
+                  <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">سارة أحمد (الزوجة)</span>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">صلاحية دخول البوابات والخدمات فقط</p>
+                  </div>
+                  <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">نشط</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px;">
+                  <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">عمر أحمد (الابن)</span>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">صلاحية دخول البوابات والخدمات فقط</p>
+                  </div>
+                  <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">نشط</span>
+                </div>
               </div>
             </div>
 
@@ -1041,6 +1082,37 @@
               </button>
             </div>
 
+            <!-- User Management Card (جديد - لرفع اليوزرات لـ Odoo) -->
+            <div class="card gold-border" style="margin-top: 16px;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والفنيين الميدانيين</span>
+                <span class="badge badge-warning" id="adminUserCountBadge">5 مستخدمين</span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+                رفع ومزامنة الملاك والفنيين بداخل جهات اتصال Odoo ERP لتفعيل دخولهم للتطبيق.
+              </p>
+              <button class="btn btn-secondary" onclick="app.openModal('modalAddNewUser')" style="width: 100%; background: rgba(32, 39, 79, 0.08); border: 1px solid rgba(32, 39, 79, 0.15); color: #20274f; font-weight: 700; margin-bottom: 12px; height: 38px;">
+                <i class="fa-solid fa-user-plus"></i> إضافة مستخدم/فني جديد لـ Odoo
+              </button>
+              <div id="adminUserList" class="list-group" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+                <!-- Renders dynamically -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #ffffff;">أحمد محمد</span>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">ahmed.mohamed@domain.com • مالك</p>
+                  </div>
+                  <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">Odoo Synced</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: #ffffff;">محمود الكهربائي</span>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">tech.electricity@domain.com • فني صيانة</p>
+                  </div>
+                  <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">Odoo Synced</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- ========================================== -->
@@ -1142,46 +1214,6 @@
     </div>
   </div>
 
-  <!-- 0. Odoo Database Settings Modal -->
-  <div class="modal-overlay" id="modalOdooSettings">
-    <div class="modal-card">
-      <button class="modal-close" onclick="app.closeModal('modalOdooSettings')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-database"></i> إعدادات الربط بقاعدة بيانات Odoo ERP</h3>
-      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
-        أدخل بيانات Odoo EDU (*.odoo.com) لربط البلاغات والعدادات آلياً مع قاعدة البيانات:
-      </p>
-
-      <div class="form-group">
-        <label class="form-label">رابط سيرفر Odoo (URL):</label>
-        <input type="text" id="odooUrlInput" class="form-control" placeholder="https://your-db.odoo.com">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">اسم قاعدة البيانات (DB Name):</label>
-        <input type="text" id="odooDbInput" class="form-control" placeholder="my-odoo-db">
-      </div>
-
-       <div class="form-group">
-        <label class="form-label">البريد الإلكتروني (User Email):</label>
-        <input type="text" id="odooUserInput" class="form-control" placeholder="admin@example.com">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">اسم مالك الوحدة السكنية (اختياري/تلقائي):</label>
-        <input type="text" id="odooOwnerNameInput" class="form-control" placeholder="مثال: د. أسامة المنشاوي">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">مفتاح API Key / Password:</label>
-        <input type="password" id="odooKeyInput" class="form-control" placeholder="مفتاح الـ API">
-      </div>
-
-      <button class="btn btn-primary" onclick="app.saveAndTestOdooSettings()">
-        <i class="fa-solid fa-floppy-disk"></i> حفظ واختبار الربط المباشر بـ Odoo ERP
-      </button>
-    </div>
-  </div>
-
   <!-- 1. New Ticket Modal -->
   <div class="modal-overlay" id="modalNewTicket">
     <div class="modal-card">
@@ -1218,29 +1250,23 @@
       <button class="modal-close" onclick="app.closeModal('modalInventory')"><i class="fa-solid fa-xmark"></i></button>
       <h3 style="margin-bottom: 16px; color: var(--accent-cyan);"><i class="fa-solid fa-boxes-stacked"></i> المخزن الذكي لقطع الغيار</h3>
       
-      <div class="form-group">
-        <input type="text" class="form-control" id="inventorySearchInput" placeholder="ابحث باسم القطعة (مثال: خلاط، فتر، محبس...)...">
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label class="form-label">اختر المخزن المستهدف:</label>
+        <select id="warehouseSelect" class="form-control" onchange="app.filterInventory()" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+          <option value="all">🌐 جميع المخازن بالتطبيق</option>
+          <option value="residential">🏡 مخزن الملاك السكني (قطع غيار تُباع وتُركب للملاك)</option>
+          <option value="commercial">🏬 مخزن المستأجرين التجاريين (صيانة المحلات التجارية)</option>
+          <option value="assets">⚙️ مخزن أصول ومرافق القرية (المحطات، المولدات، شبكات الحريق)</option>
+        </select>
       </div>
 
-      <div class="list-group" id="inventoryResultsList">
-        <div class="ticket-item">
-          <div>
-            <h4>كارتدج تكييف شارب 2.25 حصان</h4>
-            <p>المخزن الرئيسي • المتوفر: 14 قطعة</p>
-          </div>
-          <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.8rem;" onclick="app.selectInventoryItem('كارتدج تكييف', 850)">
-            اختيار (850 ج.م)
-          </button>
-        </div>
-        <div class="ticket-item">
-          <div>
-            <h4>خلاط مياه إيطالي 3/4 بوصة</h4>
-            <p>المخزن الفرعي • المتوفر: 8 قطع</p>
-          </div>
-          <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.8rem;" onclick="app.selectInventoryItem('خلاط مياه إيطالي', 520)">
-            اختيار (520 ج.م)
-          </button>
-        </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label">البحث عن قطعة الغيار:</label>
+        <input type="text" class="form-control" id="inventorySearchInput" onkeyup="app.filterInventory()" placeholder="ابحث باسم قطعة الغيار أو تخصصها...">
+      </div>
+
+      <div class="list-group" id="inventoryResultsList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+        <!-- Dynamic content rendered from app.js -->
       </div>
     </div>
   </div>
@@ -1335,6 +1361,65 @@
 
       <button class="btn btn-primary" id="btnConfirmMeterRecharge">
         <i class="fa-solid fa-bolt"></i> تأكيد الشحن الفوري ونقل الرصيد للعداد
+      </button>
+    </div>
+  </div>
+
+  <!-- Spare Parts Payment Modal -->
+  <div class="modal-overlay" id="modalSparePartsPayment">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalSparePartsPayment')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 14px; color: var(--primary-gold);"><i class="fa-solid fa-credit-card"></i> سداد فاتورة قطعة الغيار</h3>
+      
+      <div style="background: rgba(32, 39, 79, 0.04); padding: 10px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.08); margin-bottom: 14px;">
+        <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">القطعة المطلوبة:</span>
+        <span style="font-weight: 700; color: #20274f; font-size: 0.85rem;" id="sparePartPayName">خلاط مياه إيطالي</span>
+        <div style="display: flex; justify-content: space-between; margin-top: 6px; border-top: 1px dashed rgba(32,39,79,0.1); padding-top: 6px;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: #20274f;">المبلغ المطلوب سداده:</span>
+          <span style="font-size: 0.82rem; font-weight: 800; color: #ef4444;" id="sparePartPayAmount">520 ج.م</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700; color: #20274f;">طريقة الدفع بكارت الفيزا / الماستركارد:</label>
+        
+        <!-- Saved Card Option (Best Practice) -->
+        <div style="border: 1px solid var(--primary-gold); background: rgba(212, 175, 55, 0.04); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="radio" name="sparePartPayMethod" id="payMethodSavedCard" value="saved" checked style="accent-color: var(--primary-gold);">
+            <div>
+              <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-brands fa-cc-visa" style="color: #1a1f71;"></i> الفيزا المسجلة (الرئيسية)</span>
+              <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">تنتهي بـ **** 4012 • Ahmed Mohamed</p>
+            </div>
+          </div>
+          <div style="width: 60px;">
+            <input type="password" class="form-control" id="savedCardCvvInput" placeholder="CVV" style="height: 30px; padding: 4px; font-size: 0.75rem; text-align: center;" value="123">
+          </div>
+        </div>
+
+        <!-- Add New Card Option -->
+        <div style="border: 1px solid rgba(0, 0, 0, 0.08); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="radio" name="sparePartPayMethod" id="payMethodNewCard" value="new" style="accent-color: var(--primary-gold);">
+            <span style="font-size: 0.8rem; font-weight: 700; color: #20274f;"><i class="fa-solid fa-credit-card"></i> استخدام بطاقة دفع جديدة</span>
+          </div>
+          
+          <div id="newCardFieldsGroup" style="display: none; flex-direction: column; gap: 6px; margin-top: 4px;">
+            <input type="text" class="form-control" placeholder="رقم الكارت الجديد (16 رقم)" style="font-size: 0.75rem;">
+            <div style="display: flex; gap: 6px;">
+              <input type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.75rem; text-align: center;">
+              <input type="text" class="form-control" placeholder="CVV" style="font-size: 0.75rem; text-align: center;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted);">
+              <input type="checkbox" checked style="accent-color: var(--primary-gold);">
+              <span>حفظ هذا الكارت في حسابي للدفع السريع لاحقاً</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.confirmSparePartPayment()" style="width: 100%; margin-top: 10px;">
+        <i class="fa-solid fa-shield-halved"></i> إتمام الدفع الفوري الآمن
       </button>
     </div>
   </div>
@@ -1469,6 +1554,83 @@
           <button class="btn btn-sm" onclick="app.callDirectory('01011223344')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0;">اتصل الآن</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 11. Add New User / Staff Modal (جديد - لإدارة ورفع المستخدمين لـ Odoo) -->
+  <div class="modal-overlay" id="modalAddNewUser">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalAddNewUser')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-user-plus"></i> إضافة مستخدم وفني جديد لـ Odoo</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        سجل جهة اتصال جديدة (مالك، فني، مهندس) لرفعها ومزامنتها فوراً مع Odoo ERP.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل:</label>
+        <input type="text" id="newUserNameInput" class="form-control" placeholder="مثال: محمد صلاح">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني (الدخول):</label>
+        <input type="email" id="newUserEmailInput" class="form-control" placeholder="sales@domain.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الموبايل:</label>
+        <input type="tel" id="newUserPhoneInput" class="form-control" placeholder="010XXXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الدور الوظيفي والصلاحيات:</label>
+        <select id="newUserRoleSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
+          <option value="homeowner">مالك وحدة سكنية</option>
+          <option value="tenant">مستأجر سكني</option>
+          <option value="technician">فني صيانة ميداني</option>
+          <option value="engineer">مهندس مشرف</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitNewUserToOdoo()" style="width: 100%; margin-top: 10px;">
+        <i class="fa-solid fa-cloud-arrow-up"></i> حفظ ومزامنة المستخدم مع Odoo ERP
+      </button>
+    </div>
+  </div>
+
+  <!-- Add Family Member Modal -->
+  <div class="modal-overlay" id="modalAddFamilyMember">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalAddFamilyMember')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-user-plus"></i> إضافة فرد أسرة جديد للوحدة</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        قم بإضافة فرد عائلتك لإصدار حساب دخول محدود للقرية بدون إمكانية الدخول للبيانات المالية أو الفواتير.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">اسم فرد العائلة الكامل:</label>
+        <input type="text" id="familyMemberNameInput" class="form-control" placeholder="مثال: ياسمين أسامة">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الصلة / القرابة:</label>
+        <select id="familyMemberRelationSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
+          <option value="father">أب</option>
+          <option value="mother">أم</option>
+          <option value="brother">أخ</option>
+          <option value="sister">أخت</option>
+          <option value="son">ابن</option>
+          <option value="daughter">ابنة</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الموبايل (لتسجيل الدخول):</label>
+        <input type="tel" id="familyMemberPhoneInput" class="form-control" placeholder="010XXXXXXXX">
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitFamilyMember()" style="width: 100%; margin-top: 10px;">
+        <i class="fa-solid fa-user-shield"></i> إنشاء الحساب وتفعيل بوابات الدخول
+      </button>
     </div>
   </div>
 
