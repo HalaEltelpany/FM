@@ -6,6 +6,7 @@
 class UltimateFMApp {
   constructor() {
     this.currentRole = 'homeowner';
+    this.currentLang = localStorage.getItem('app_lang') || 'ar';
     this.isFullWidth = false;
     this.qrTimer = 30;
     this.qrInterval = null;
@@ -63,6 +64,12 @@ class UltimateFMApp {
       { id: 'CP-2081', name: 'عادل إمام', phone: '01001234567', details: 'ركن سيارة مخالف أمام الفيلا يغلق الممر', status: 'تحت المراجعة والتحرك الميداني', bgClass: 'badge-warning', requester: 'homeowner' }
     ];
 
+    // Initial housekeeping requests list
+    this.housekeepingRequests = [
+      { id: 'HK-101', requester: 'homeowner', requesterName: 'أسامة أحمد', location: 'فيلا 104', type: 'نظافة داخلية', status: 'بانتظار التخصيص', assignedWorker: '', time: '10:30 ص' },
+      { id: 'HK-102', requester: 'manager', requesterName: 'المهندس / أيمن', location: 'المسبح الرئيسي', type: 'نظافة مكان عام', status: 'جاري العمل', assignedWorker: 'أحمد حسن', time: '09:15 ص' }
+    ];
+
     // Initialize payment wallet balance
     this.ownerWalletBalance = 2500;
 
@@ -114,6 +121,7 @@ class UltimateFMApp {
   init() {
     document.addEventListener('DOMContentLoaded', () => {
       this.loadOdooFields();
+      this.applyLanguageUI();
       this.updateHomeownerNameUI();
       this.fetchOdooOwnerName();
       this.bindEvents();
@@ -266,6 +274,18 @@ class UltimateFMApp {
       });
     }
 
+    // Bottom phone navbar tab switcher listeners
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) {
+      phoneNav.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tab = btn.getAttribute('data-tab');
+          if (tab) this.switchHomeownerTab(tab);
+        });
+      });
+    }
+
     // Admin Emergency Broadcast
     const btnBroadcast = document.getElementById('btnSendBroadcast');
     if (btnBroadcast) {
@@ -385,7 +405,8 @@ class UltimateFMApp {
       'tenant': 'viewTenant',
       'commercial': 'viewCommercial',
       'admin': 'viewAdmin',
-      'security': 'viewSecurity'
+      'security': 'viewSecurity',
+      'housekeeping': 'viewHousekeeping'
     };
 
     const targetId = targetMap[role] || 'viewHomeowner';
@@ -393,6 +414,9 @@ class UltimateFMApp {
     if (activePanel) {
       activePanel.classList.add('active');
     }
+
+    // Render lists on role switch
+    this.renderHousekeeping();
 
     // Toggle Owner-Only Financial details visibility dynamically
     const financialElements = document.querySelectorAll('.owner-only-financial');
@@ -410,19 +434,33 @@ class UltimateFMApp {
     const ownerCardSubtitle = document.querySelector('#viewHomeowner .card.gold-border p');
 
     if (role === 'family') {
-      if (ownerTitle) ownerTitle.innerText = 'ياسمين أسامة (تابع للمالك)';
+      if (ownerTitle) {
+        ownerTitle.innerText = this.currentLang === 'en' ? 'Yasmin Ahmed (Family Member)' : 'ياسمين أحمد (تابع للمالك)';
+      }
       if (ownerCardBadge) {
-        ownerCardBadge.innerHTML = '<i class="fa-solid fa-user-shield"></i> حساب تابع (محدود)';
+        ownerCardBadge.innerHTML = this.currentLang === 'en' 
+          ? '<i class="fa-solid fa-user-shield"></i> Family Account (Restricted)' 
+          : '<i class="fa-solid fa-user-shield"></i> حساب تابع (محدود)';
         ownerCardBadge.className = 'badge badge-info';
       }
-      if (ownerCardSubtitle) ownerCardSubtitle.innerText = 'فيلا 104 - زون الساحل الشمالي • تابع للمالك الأساسي';
+      if (ownerCardSubtitle) {
+        ownerCardSubtitle.innerText = this.currentLang === 'en' 
+          ? 'Villa 104 - North Coast Zone • Associated to Main Owner' 
+          : 'فيلا 104 - زون الساحل الشمالي • تابع للمالك الأساسي';
+      }
     } else if (role === 'homeowner') {
       this.updateHomeownerNameUI();
       if (ownerCardBadge) {
-        ownerCardBadge.innerHTML = '<i class="fa-solid fa-check"></i> حساب مؤكد';
+        ownerCardBadge.innerHTML = this.currentLang === 'en' 
+          ? '<i class="fa-solid fa-check"></i> Verified Account' 
+          : '<i class="fa-solid fa-check"></i> حساب مؤكد';
         ownerCardBadge.className = 'badge badge-success';
       }
-      if (ownerCardSubtitle) ownerCardSubtitle.innerText = 'فيلا 104 - زون الساحل الشمالي';
+      if (ownerCardSubtitle) {
+        ownerCardSubtitle.innerText = this.currentLang === 'en' 
+          ? 'Villa 104 - North Coast Zone' 
+          : 'فيلا 104 - زون الساحل الشمالي';
+      }
     }
 
     const backBtn = document.getElementById('btnBackToRoleGrid');
@@ -827,28 +865,78 @@ class UltimateFMApp {
   }
 
   renderTickets() {
+    const isEn = this.currentLang === 'en';
+
+    const translateText = (txt) => {
+      if (!isEn) return txt;
+      if (!txt) return '';
+      const dict = {
+        'صيانة تكييف الماستر': 'Master A/C Maintenance',
+        'تسريب في محبس السباكة': 'Plumbing Valve Leak',
+        'كهروميكانيك': 'Electromechanical',
+        'سباكة': 'Plumbing',
+        'أصول وعامة': 'General Assets',
+        'قيد الفحص الميداني': 'Under Field Inspection',
+        'تم إسناد الفني': 'Technician Assigned',
+        'انتظار دفع المالك': 'Awaiting Owner Payment',
+        'تم الدفع - جاري التركيب': 'Paid - Installation in Progress',
+        'تم الانتهاء': 'Completed',
+        'لوحة تحكم تكييف': 'A/C Control Panel',
+        'محبس نحاس إيطالي': 'Italian Brass Valve',
+        'لا توجد بلاغات حالية': 'No active tickets',
+        'نشطة': 'active',
+        'تصريح دخول الوحدة': 'Unit Entry Permit',
+        'تصريح دخول البحر والبحيرات': 'Beach & Lake Entry Permit',
+        'دخول البحر والبحيرات والمسابح': 'Beach & Lakes Access Permit',
+        'تصريح دخول سيارات بضائع': 'Cargo Entry Permit',
+        'معتمد': 'Approved',
+        'تحت المراجعة': 'Under Review',
+        'لا توجد تصاريح حالية': 'No active permits',
+        'ركن سيارة مخالف أمام الفيلا يغلق الممر': 'Illegal car parking in front of the villa blocking the lane',
+        'تحت المراجعة والتحرك الميداني': 'Under Review & Field Dispatch',
+        'لا توجد شكاوى أمنية حالية': 'No active security complaints'
+      };
+      if (txt.startsWith('زائر: ')) {
+        return txt.replace('زائر: ', 'Visitor: ').replace('شاليه', 'Chalet').replace('فيلا', 'Villa');
+      }
+      return dict[txt] || txt;
+    };
+
     // 1. Homeowner, Tenant, and Commercial unified rendering helper
     const getTicketHtml = (tk) => {
+      const title = translateText(tk.title);
+      const status = translateText(tk.status);
+      const category = translateText(tk.category);
+      const partName = translateText(tk.partName);
+
       let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
         <div>
-          <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">صورة العطل:</span>
+          <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">${isEn ? 'Before Photo:' : 'صورة العطل:'}</span>
           <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
         </div>`;
       if (tk.status === 'تم الانتهاء') {
         photosHtml += `
         <div>
-          <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">صورة الإصلاح:</span>
+          <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">${isEn ? 'After Photo:' : 'صورة الإصلاح:'}</span>
           <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
         </div>
         <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-          <i class="fa-solid fa-clock-check"></i> مدة الحل: ${tk.resolutionTime}
+          <i class="fa-solid fa-clock-check"></i> ${isEn ? 'Resolution time:' : 'مدة الحل:'} ${tk.resolutionTime}
         </div>`;
       }
       photosHtml += `</div>`;
 
       let paymentHtml = '';
       if (tk.status === 'انتظار دفع المالك') {
-        paymentHtml = `
+        paymentHtml = isEn ? `
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <span>⚠️ <strong>Repair requires spare part:</strong> [${partName}] priced at <strong>${tk.partPrice} EGP</strong>.</span>
+            <span>Please complete the payment online to start the installation.</span>
+            <button class="btn btn-danger btn-sm" onclick="app.openSparePartPaymentModal('${tk.id}')" style="width: 100%; margin-top: 4px; font-size: 0.72rem; padding: 6px; font-weight: 700; height: 32px; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+              <i class="fa-solid fa-credit-card"></i> Pay for Spare Part (${tk.partPrice} EGP)
+            </button>
+          </div>
+        ` : `
           <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
             <span>⚠️ <strong>يتطلب الإصلاح قطعة غيار:</strong> [${tk.partName}] بسعر <strong>${tk.partPrice} ج.م</strong>.</span>
             <span>يرجى سداد القيمة إلكترونياً للبدء الفوري في التركيب من قبل الفني.</span>
@@ -858,7 +946,11 @@ class UltimateFMApp {
           </div>
         `;
       } else if (tk.status === 'تم الدفع - جاري التركيب') {
-        paymentHtml = `
+        paymentHtml = isEn ? `
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
+            <i class="fa-solid fa-circle-check"></i> Paid <strong>${tk.partPrice} EGP</strong> successfully. The technician will bring and install the [${partName}].
+          </div>
+        ` : `
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
             <i class="fa-solid fa-circle-check"></i> تم سداد <strong>${tk.partPrice} ج.م</strong> بنجاح. جاري إحضار قطعة [${tk.partName}] وتركيبها بواسطة الفني.
           </div>
@@ -868,10 +960,10 @@ class UltimateFMApp {
       return `
         <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')};">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 style="font-size: 0.85rem; font-weight: 700;">${tk.title}</h4>
-            <span class="badge ${tk.bgClass}">${tk.status}</span>
+            <h4 style="font-size: 0.85rem; font-weight: 700;">${title}</h4>
+            <span class="badge ${tk.bgClass}">${status}</span>
           </div>
-          <p style="font-size: 0.7rem; color: var(--text-muted);">التخصص: ${tk.category} • كود: #${tk.id} ${tk.assignedTech ? `• الفني: ${tk.assignedTech}` : ''}</p>
+          <p style="font-size: 0.7rem; color: var(--text-muted);">${isEn ? 'Category' : 'التخصص'}: ${category} • ${isEn ? 'Code' : 'كود'}: #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</p>
           ${photosHtml}
           ${paymentHtml}
         </div>
@@ -883,10 +975,10 @@ class UltimateFMApp {
     if (homeownerList) {
       const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner');
       const badge = document.getElementById('ticketCountBadge');
-      if (badge) badge.innerText = `${homeownerTks.length} نشطة`;
+      if (badge) badge.innerText = isEn ? `${homeownerTks.length} active` : `${homeownerTks.length} نشطة`;
       homeownerList.innerHTML = '';
       if (homeownerTks.length === 0) {
-        homeownerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
+        homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">${isEn ? 'No active tickets' : 'لا توجد بلاغات حالية'}</div>`;
       } else {
         homeownerTks.forEach(tk => {
           homeownerList.innerHTML += getTicketHtml(tk);
@@ -1109,16 +1201,20 @@ class UltimateFMApp {
       const list = this.permits.filter(p => p.requester === 'homeowner');
       homeownerPermits.innerHTML = '';
       if (list.length === 0) {
-        homeownerPermits.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+        homeownerPermits.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active permits' : 'لا توجد تصاريح حالية'}</div>`;
       } else {
         list.forEach(p => {
           let qrHtml = '';
+          const type = translateText(p.type);
+          const status = translateText(p.status);
+          const details = translateText(p.details);
+
           if (p.status === 'معتمد') {
             qrHtml = `
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
                 <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
                 <div>
-                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">${isEn ? 'Active Security Code:' : 'كود الأمن الفعال:'}</span>
                   <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
                 </div>
               </div>
@@ -1127,10 +1223,10 @@ class UltimateFMApp {
           homeownerPermits.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
-                <span class="badge ${p.bgClass}">${p.status}</span>
+                <h4 style="font-size: 0.82rem; font-weight: 700;">${type}</h4>
+                <span class="badge ${p.bgClass}">${status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${p.details} • كود الطلب: #${p.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} • ${isEn ? 'Request Code' : 'كود الطلب'}: #${p.id}</p>
               ${qrHtml}
             </div>
           `;
@@ -1259,19 +1355,21 @@ class UltimateFMApp {
     if (homeownerComplaints) {
       const list = this.complaints.filter(c => c.requester === 'homeowner');
       const badge = document.getElementById('homeownerComplaintsBadge');
-      if (badge) badge.innerText = `${list.length} نشطة`;
+      if (badge) badge.innerText = isEn ? `${list.length} active` : `${list.length} نشطة`;
       homeownerComplaints.innerHTML = '';
       if (list.length === 0) {
-        homeownerComplaints.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+        homeownerComplaints.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active security complaints' : 'لا توجد شكاوى أمنية حالية'}</div>`;
       } else {
         list.forEach(c => {
+          const details = translateText(c.details);
+          const status = translateText(c.status);
           homeownerComplaints.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني</h4>
-                <span class="badge ${c.bgClass}">${c.status}</span>
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> ${isEn ? 'Security Report' : 'بلاغ أمني'}</h4>
+                <span class="badge ${c.bgClass}">${status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${c.details} • كود: #${c.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} • ${isEn ? 'Code' : 'كود'}: #${c.id}</p>
             </div>
           `;
         });
@@ -1836,6 +1934,9 @@ class UltimateFMApp {
 
   executeLogin(role) {
     this.switchRole(role);
+    if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
+      this.switchHomeownerTab('home');
+    }
     
     // Hide standard back-to-grid buttons for strict separation feel
     document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
@@ -1930,7 +2031,7 @@ class UltimateFMApp {
     if (customName && customName.trim()) {
       el.innerText = customName;
     } else {
-      el.innerText = 'أحمد محمد';
+      el.innerText = this.currentLang === 'en' ? 'Ahmed Mohamed' : 'أحمد محمد';
     }
   }
 
@@ -2037,13 +2138,14 @@ class UltimateFMApp {
     else if (this.currentRole === 'engineer') iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-cyan);"></i>';
     else if (this.currentRole === 'admin') iconHtml = '<i class="fa-solid fa-chart-line" style="color: var(--primary-gold);"></i>';
 
-    titleSpan.innerHTML = `${iconHtml} ${this.getRoleArabicName(this.currentRole)}`;
+    const roleName = this.currentLang === 'en' ? this.getRoleEnglishName(this.currentRole) : this.getRoleArabicName(this.currentRole);
+    titleSpan.innerHTML = `${iconHtml} ${roleName}`;
 
     // Right side: Logout button
     const btn = document.createElement('button');
     btn.className = 'btn btn-sm';
     btn.style.cssText = 'padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;';
-    btn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> خروج';
+    btn.innerHTML = this.currentLang === 'en' ? '<i class="fa-solid fa-right-from-bracket"></i> Logout' : '<i class="fa-solid fa-right-from-bracket"></i> خروج';
     btn.onclick = (e) => {
       e.preventDefault();
       this.logout();
@@ -2322,6 +2424,581 @@ class UltimateFMApp {
         </button>
       `;
       list.appendChild(div);
+    });
+  }
+
+  toggleLanguage() {
+    this.currentLang = this.currentLang === 'ar' ? 'en' : 'ar';
+    this.applyLanguageUI();
+    
+    // Re-render header if logged in
+    if (this.currentRole !== 'login') {
+      this.switchRole(this.currentRole);
+    }
+
+    this.showToast(this.currentLang === 'en' ? '🌐 Language switched to English!' : '🌐 تم تغيير لغة النظام للعربية!');
+  }
+
+  applyLanguageUI() {
+    // Save language configuration
+    localStorage.setItem('app_lang', this.currentLang);
+
+    // Toggle simulator orientation direction (RTL / LTR)
+    const simulator = document.getElementById('phoneSimulator');
+    if (simulator) {
+      simulator.style.direction = this.currentLang === 'en' ? 'ltr' : 'rtl';
+    }
+
+    // Toggle body class for font direction override if needed
+    const root = document.documentElement;
+    if (root) {
+      if (this.currentLang === 'en') {
+        root.style.setProperty('--font-main', "'Inter', sans-serif");
+      } else {
+        root.style.setProperty('--font-main', "'Outfit', 'Cairo', sans-serif");
+      }
+    }
+
+    // Translate main brand texts
+    const brandSub = document.querySelector('.hero-brand-sub');
+    const loginTitle = document.querySelector('#viewLogin .card.gold-border .card-title');
+    const loginEmailLabel = document.querySelector('#viewLogin .form-group:nth-child(2) .form-label');
+    const loginPassLabel = document.querySelector('#viewLogin .form-group:nth-child(3) .form-label');
+    const loginBtnText = document.querySelector('#viewLogin button.btn-primary');
+
+    if (this.currentLang === 'en') {
+      if (brandSub) brandSub.innerText = 'Coastal Cities & Malls Facility Management';
+      if (loginTitle) loginTitle.innerHTML = '<i class="fa-solid fa-lock"></i> Secure System Portal Login';
+      if (loginEmailLabel) loginEmailLabel.innerText = 'Username / Email Address:';
+      if (loginPassLabel) loginPassLabel.innerText = 'Password:';
+      if (loginBtnText) loginBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Authenticate & Login';
+    } else {
+      if (brandSub) brandSub.innerText = 'إدارة المدن الساحلية والمراكز التجارية';
+      if (loginTitle) loginTitle.innerHTML = '<i class="fa-solid fa-lock"></i> تسجيل الدخول الآمن للنظام';
+      if (loginEmailLabel) loginEmailLabel.innerText = 'اسم المستخدم / البريد الإلكتروني:';
+      if (loginPassLabel) loginPassLabel.innerText = 'كلمة المرور:';
+      if (loginBtnText) loginBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
+    }
+
+    // Translate grid blocks
+    const blocks = document.querySelectorAll('.role-block-card');
+    const arTitles = ['شاشة المالك', 'فرد من أفراد الأسرة', 'المهندس الميداني', 'مدير الصيانة', 'الفني الميداني', 'المستأجر السكني', 'المستأجر التجاري', 'أمن وبوابات القرية', 'الإدارة العليا'];
+    const enTitles = ['Owner Screen', 'Family Member', 'Field Engineer', 'Maint. Manager', 'Field Technician', 'Res. Tenant', 'Comm. Tenant', 'Security Gates', 'Admin Executive'];
+    const arDescs = [
+      'البلاغات، العدادات وتصاريح الوحدة',
+      'دخول محدود بدون تفاصيل مالية',
+      'RO، البحيرات واللاندسكيب',
+      'توزيع وإسناد الفنيين',
+      'أوامر العمل والتوقيع',
+      'دخول القرية، العدادات والباقات',
+      'عدادات تجارية وتصاريح البضائع',
+      'إشراف بوابات الأمن والشكاوى',
+      'مؤشرات الأداء ومركز التحكم'
+    ];
+    const enDescs = [
+      'Tickets, meters & permits',
+      'Restricted access, no finance',
+      'RO, Lakes & Landscaping',
+      'Technician dispatch & SLA',
+      'Workorders & signatures',
+      'Resort access & meters',
+      'Meters & cargo permits',
+      'Security gates & complaints',
+      'KPI indicators & control panel'
+    ];
+
+    blocks.forEach((block, idx) => {
+      const titleEl = block.querySelector('.block-title');
+      const descEl = block.querySelector('.block-desc');
+      if (titleEl && enTitles[idx]) {
+        titleEl.innerText = this.currentLang === 'en' ? enTitles[idx] : arTitles[idx];
+      }
+      if (descEl && enDescs[idx]) {
+        descEl.innerText = this.currentLang === 'en' ? enDescs[idx] : arDescs[idx];
+      }
+    });
+
+    // Translate the bottom phone navigation items dynamically
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) {
+      const navItems = phoneNav.querySelectorAll('.nav-item span');
+      const arNav = ['الرئيسية', 'البلاغات', 'المالية', 'الإعدادات'];
+      const enNav = ['Home', 'Tickets', 'Finance', 'Settings'];
+      navItems.forEach((span, idx) => {
+        if (arNav[idx] && span) {
+          span.innerText = this.currentLang === 'en' ? enNav[idx] : arNav[idx];
+        }
+      });
+    }
+
+    // Toggle active state on language selector buttons inside settings
+    const btnAr = document.getElementById('btnLangAr');
+    const btnEn = document.getElementById('btnLangEn');
+    if (btnAr && btnEn) {
+      if (this.currentLang === 'en') {
+        btnEn.style.background = 'var(--brand-teal)';
+        btnEn.style.color = '#ffffff';
+        btnAr.style.background = 'rgba(255,255,255,0.1)';
+        btnAr.style.color = '#cccccc';
+      } else {
+        btnAr.style.background = 'var(--brand-teal)';
+        btnAr.style.color = '#ffffff';
+        btnEn.style.background = 'rgba(255,255,255,0.1)';
+        btnEn.style.color = '#cccccc';
+      }
+    }
+
+    // Toggle active state on login screen language switcher buttons
+    const loginAr = document.getElementById('loginLangAr');
+    const loginEn = document.getElementById('loginLangEn');
+    if (loginAr && loginEn) {
+      if (this.currentLang === 'en') {
+        loginEn.style.background = 'var(--brand-teal)';
+        loginEn.style.color = '#ffffff';
+        loginAr.style.background = 'rgba(255,255,255,0.1)';
+        loginAr.style.color = '#cccccc';
+      } else {
+        loginAr.style.background = 'var(--brand-teal)';
+        loginAr.style.color = '#ffffff';
+        loginEn.style.background = 'rgba(255,255,255,0.1)';
+        loginEn.style.color = '#cccccc';
+      }
+    }
+
+    // Set theme switch state on load
+    const savedThemeDark = localStorage.getItem('app_theme_dark') === 'true';
+    const themeSwitch = document.getElementById('themeToggleSwitch');
+    if (themeSwitch) {
+      themeSwitch.checked = savedThemeDark;
+      this.toggleTheme(savedThemeDark);
+    }
+
+    // Run deep translations for all static texts
+    this.translateStaticTexts();
+  }
+
+  getRoleEnglishName(role) {
+    const map = {
+      'homeowner': 'Main Homeowner',
+      'family': 'Family Member (Restricted)',
+      'tenant': 'Residential Tenant',
+      'commercial': 'Commercial Tenant',
+      'security': 'Resort Security Gates',
+      'manager': 'Maintenance Manager',
+      'technician': 'Field Technician',
+      'engineer': 'Supervising Engineer',
+      'admin': 'Admin Executive'
+    };
+    return map[role] || role;
+  }
+
+  switchHomeownerTab(tabId) {
+    // Hide all tab contents in viewHomeowner
+    document.querySelectorAll('.homeowner-tab-content').forEach(tab => {
+      tab.style.setProperty('display', 'none', 'important');
+      tab.classList.remove('active');
+    });
+
+    // Show selected tab content
+    const target = document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Homeowner`);
+    if (target) {
+      target.style.removeProperty('display');
+      target.classList.add('active');
+    }
+
+    // Update bottom navbar active styling
+    const navbar = document.getElementById('phoneNavbar');
+    if (navbar) {
+      navbar.querySelectorAll('.nav-item').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  setLanguage(lang) {
+    this.currentLang = lang;
+    this.applyLanguageUI();
+    if (this.currentRole !== 'login') {
+      this.switchRole(this.currentRole);
+    }
+    this.showToast(this.currentLang === 'en' ? '🌐 Language switched to English!' : '🌐 تم تحويل لغة التطبيق إلى العربية!');
+  }
+
+  toggleTheme(isDark) {
+    const simulator = document.getElementById('phoneSimulator');
+    if (simulator) {
+      if (isDark) {
+        simulator.classList.add('dark-theme');
+      } else {
+        simulator.classList.remove('dark-theme');
+      }
+    }
+    localStorage.setItem('app_theme_dark', isDark ? 'true' : 'false');
+  }
+
+  translateStaticTexts() {
+    const isEn = this.currentLang === 'en';
+
+    // 1. Home Tab Elements
+    const qrTitle = document.querySelector('#qrSecurityCard span:first-child');
+    if (qrTitle) qrTitle.innerHTML = isEn ? '<i class="fa-solid fa-qrcode"></i> Dynamic QR Access Code' : '<i class="fa-solid fa-qrcode"></i> كود الدخول الديناميكي';
+
+    const qrCountdownText = document.getElementById('qrCountdownText');
+    if (qrCountdownText) qrCountdownText.innerText = isEn ? '30 seconds' : '30 ثانية';
+
+    const qrFooter = document.querySelector('#qrSecurityCard .sec-badge');
+    if (qrFooter) qrFooter.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Changes auto • Screenshot blocked' : '<i class="fa-solid fa-shield-halved"></i> كود يتغير تلقائياً • حظر الـ Screenshot';
+
+    const permitsTitle = document.getElementById('permitsCardTitle');
+    if (permitsTitle) permitsTitle.innerHTML = isEn ? '<i class="fa-solid fa-key"></i> Approved Access Permits' : '<i class="fa-solid fa-key"></i> تصاريح الدخول المعتمدة';
+
+    const permitsDesc = document.getElementById('permitsCardDesc');
+    if (permitsDesc) permitsDesc.innerText = isEn ? 'Issue restricted temporary visitor permits' : 'إصدار تصاريح دخول مشروطة ومؤقتة بدقة لمتابعة الأمان والتحكم بالبوابات.';
+
+    const btnPermit1 = document.getElementById('btnUnitPermit');
+    if (btnPermit1) btnPermit1.innerHTML = isEn ? '<i class="fa-solid fa-door-open"></i> Unit Entry Permit' : '<i class="fa-solid fa-door-open"></i> تصريح دخول الوحدة';
+
+    const btnPermit2 = document.getElementById('btnBeachPermit');
+    if (btnPermit2) btnPermit2.innerHTML = isEn ? '<i class="fa-solid fa-umbrella-beach"></i> Beach & Lake Entry' : '<i class="fa-solid fa-umbrella-beach"></i> دخول البحر والبحيرات والمسابح';
+
+    const permitsListTitle = document.getElementById('permitsStatusLabel');
+    if (permitsListTitle) permitsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-stamp"></i> Requested Permits Status:' : '<i class="fa-solid fa-stamp"></i> حالة التصاريح المطلوبة:';
+
+    const btnSecurityComp = document.getElementById('btnSecurityComplaint');
+    if (btnSecurityComp) btnSecurityComp.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Emergency Security Reports' : '<i class="fa-solid fa-shield-halved"></i> بلاغات وشكاوى الأمن الطارئة';
+
+    const complaintsListTitle = document.getElementById('activeComplaintsLabelText');
+    if (complaintsListTitle) complaintsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Complaints:' : '<i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة:';
+
+    const lprTitle = document.getElementById('lprCardTitle');
+    if (lprTitle) lprTitle.innerHTML = isEn ? '<i class="fa-solid fa-car"></i> Smart License Plate (LPR) Registration' : '<i class="fa-solid fa-car"></i> تسجيل لوحات السيارات للبوابات الذكية (LPR)';
+
+    const lprDesc = document.getElementById('lprCardDesc');
+    if (lprDesc) lprDesc.innerText = isEn ? 'Register vehicle plates for automatic gate access' : 'سجل لوحة سيارتك لفتح بوابات القرية الذكية تلقائياً بالكاميرات الرقمية.';
+
+    const lprInput = document.getElementById('lprPlateInput');
+    if (lprInput) lprInput.placeholder = isEn ? 'e.g. ABC 1234' : 'مثال: أ ج 1234';
+
+    const btnLpr = document.querySelector('#lprCardTitle')?.parentNode?.parentNode?.querySelector('button');
+    if (btnLpr) btnLpr.innerHTML = isEn ? '<i class="fa-solid fa-plus"></i> Register' : '<i class="fa-solid fa-plus"></i> تسجيل';
+
+    const familyTitle = document.getElementById('familyCardTitle');
+    if (familyTitle) familyTitle.innerHTML = isEn ? '<i class="fa-solid fa-people-roof"></i> Family & Dependents Management' : '<i class="fa-solid fa-people-roof"></i> إدارة أفراد الأسرة والتابعين بالوحدة';
+
+    const familyDesc = document.getElementById('familyCardDesc');
+    if (familyDesc) familyDesc.innerText = isEn ? 'Manage family access and restricted gate passes' : 'تحكم في إضافة أفراد عائلتك وإصدار صلاحيات الدخول وبوابات الأمن المحدودة لهم دون صلاحيات مالية.';
+
+    const btnAddFamily = document.querySelector('#familyCardTitle')?.parentNode?.parentNode?.querySelector('button');
+    if (btnAddFamily) btnAddFamily.innerHTML = isEn ? '<i class="fa-solid fa-user-plus"></i> Add New Family Member' : '<i class="fa-solid fa-user-plus"></i> إضافة فرد أسرة جديد للوحدة';
+
+    const btnDir = document.querySelector('#tabHomeHomeowner > button.btn-secondary');
+    if (btnDir) btnDir.innerHTML = isEn ? '<i class="fa-solid fa-phone-volume"></i> Village Services & Emergency Directory' : '<i class="fa-solid fa-phone-volume"></i> دليل خدمات وطوارئ القرية';
+
+    // 2. Tickets Tab Elements
+    const btnNewTicket = document.querySelector('#tabTicketsHomeowner button');
+    if (btnNewTicket) btnNewTicket.innerHTML = isEn ? '<i class="fa-solid fa-wrench"></i> Request New Maintenance' : '<i class="fa-solid fa-wrench"></i> طلب صيانة جديدة للوحدة';
+
+    const ticketsTitle = document.querySelector('#tabTicketsHomeowner .card .card-title');
+    if (ticketsTitle) ticketsTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Maintenance Tickets' : '<i class="fa-solid fa-list-check"></i> طلبات الصيانة الحالية';
+
+    // 3. Finance Tab Elements
+    const financeTitle = document.querySelector('#tabWalletHomeowner .card:first-child .card-title');
+    if (financeTitle) financeTitle.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Financial Details & Maintenance Deposit' : '<i class="fa-solid fa-wallet"></i> البيانات المالية ووديعة الصيانة';
+
+    const financeBadge = document.querySelector('#tabWalletHomeowner .card:first-child .badge');
+    if (financeBadge) financeBadge.innerText = isEn ? 'Main Owner' : 'المالك الرئيسي';
+
+    const depLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:first-child .stat-label');
+    if (depLabel) depLabel.innerText = isEn ? 'Original Maintenance Deposit' : 'رصيد الوديعة الأصلية';
+
+    const yieldLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:last-child .stat-label');
+    if (yieldLabel) yieldLabel.innerText = isEn ? 'Annual Investment Yield' : 'عوائد الاستثمار السنوية';
+
+    const shareLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:first-child span:first-child');
+    if (shareLabel) shareLabel.innerText = isEn ? 'Unit Share of Operating Expenses:' : 'حصة الوحدة من مصاريف التشغيل:';
+
+    const varLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:last-child span:first-child');
+    if (varLabel) varLabel.innerText = isEn ? 'Net Maintenance Variance Due:' : 'صافي فروق الصيانة المطلوبة:';
+
+    const metersTitle = document.querySelector('#utilityMetersCard .card-title');
+    if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';
+
+    const elecLabel = document.querySelector('#utilityMetersCard .stat-box:first-child .stat-label');
+    if (elecLabel) elecLabel.innerHTML = isEn ? '<i class="fa-solid fa-bolt"></i> Elec. Meter' : '<i class="fa-solid fa-bolt"></i> عداد الكهرباء';
+
+    const waterLabel = document.querySelector('#utilityMetersCard .stat-box:last-child .stat-label');
+    if (waterLabel) waterLabel.innerHTML = isEn ? '<i class="fa-solid fa-droplet"></i> Water Meter' : '<i class="fa-solid fa-droplet"></i> عداد المياه';
+
+    const btnOpenRecharge = document.getElementById('btnOpenMeterRechargeModal');
+    if (btnOpenRecharge) btnOpenRecharge.innerHTML = isEn ? '<i class="fa-solid fa-charging-station"></i> Instant Utility Recharge' : '<i class="fa-solid fa-charging-station"></i> شحن العدادات الفوري (كهرباء / مياه)';
+
+    const bookingTitle = document.querySelector('#tabWalletHomeowner .card:last-child .card-title');
+    if (bookingTitle) bookingTitle.innerHTML = isEn ? '<i class="fa-solid fa-tennis-ball"></i> Sports & Playgrounds Booking' : '<i class="fa-solid fa-tennis-ball"></i> حجز الملاعب والأنشطة الترفيهية';
+
+    const bookingDesc = document.querySelector('#tabWalletHomeowner .card:last-child p');
+    if (bookingDesc) bookingDesc.innerText = isEn ? 'Book padel tennis or football courts from your wallet balance' : 'احجز ملاعب البادل تنس أو ملاعب كرة القدم مباشرة من رصيد محفظتك.';
+
+    const bookingWalletLabel = document.querySelector('#tabWalletHomeowner .card:last-child .owner-only-financial');
+    if (bookingWalletLabel) bookingWalletLabel.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Available Digital Wallet: <span id="bookingWalletBalanceText">2500</span> EGP' : '<i class="fa-solid fa-wallet"></i> رصيد محفظة الدفع المتاحة: <span id="bookingWalletBalanceText">2500</span> ج.م';
+
+    const bookingSelectLabel = document.querySelector('#tabWalletHomeowner .card:last-child .form-group:nth-of-type(1) .form-label');
+    if (bookingSelectLabel) bookingSelectLabel.innerText = isEn ? 'Select Activity / Court:' : 'اختر النشاط / الملعب:';
+
+    const bookingDateLabel = document.querySelector('#tabWalletHomeowner .card:last-child .grid-2 .form-group:first-child .form-label');
+    if (bookingDateLabel) bookingDateLabel.innerText = isEn ? 'Date:' : 'التاريخ:';
+
+    const bookingTimeLabel = document.querySelector('#tabWalletHomeowner .card:last-child .grid-2 .form-group:last-child .form-label');
+    if (bookingTimeLabel) bookingTimeLabel.innerText = isEn ? 'Time:' : 'الوقت:';
+
+    const btnBook = document.querySelector('#tabWalletHomeowner .card:last-child button');
+    if (btnBook) btnBook.innerHTML = isEn ? '<i class="fa-solid fa-calendar-check"></i> Confirm & Deduct Wallet' : '<i class="fa-solid fa-calendar-check"></i> تأكيد الحجز والخصم من المحفظة';
+
+    // 4. Settings Tab Elements
+    const settingsTitle = document.querySelector('#tabSettingsHomeowner .card .card-title');
+    if (settingsTitle) settingsTitle.innerHTML = isEn ? '<i class="fa-solid fa-sliders"></i> App & Theme Settings' : '<i class="fa-solid fa-sliders"></i> إعدادات التطبيق والمظهر';
+
+    const settingsDesc = document.querySelector('#tabSettingsHomeowner .card p');
+    if (settingsDesc) settingsDesc.innerText = isEn ? 'Customize user experience, preferred language and themes' : 'تخصيص تجربة الاستخدام، لغة التطبيق وتنبيهات الإشعارات الفورية.';
+
+    const langToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(1) span');
+    if (langToggleLabel) langToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-language"></i> System Language' : '<i class="fa-solid fa-language"></i> لغة النظام (Language)';
+
+    const langToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(1) p');
+    if (langToggleDesc) langToggleDesc.innerText = isEn ? 'Choose preferred application language' : 'اختر لغة واجهة التطبيق المفضلة';
+
+    const themeToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(2) span');
+    if (themeToggleLabel) themeToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-moon"></i> Dark Theme Mode' : '<i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)';
+
+    const themeToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(2) p');
+    if (themeToggleDesc) themeToggleDesc.innerText = isEn ? 'Toggle screen colors to night mode' : 'التحول لمظهر الألوان المظلم للأمان والراحة';
+
+    const notifyToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(3) span');
+    if (notifyToggleLabel) notifyToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-bell"></i> Push Notifications' : '<i class="fa-solid fa-bell"></i> الإشعارات الفورية';
+
+    const notifyToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(3) p');
+    if (notifyToggleDesc) notifyToggleDesc.innerText = isEn ? 'Alerts for ticket status and bookings updates' : 'تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات';
+
+    // 5. Translate Family members list elements
+    const familyList = document.getElementById('ownerFamilyMembersList');
+    if (familyList) {
+      familyList.querySelectorAll('div').forEach(item => {
+        const span = item.querySelector('span');
+        const p = item.querySelector('p');
+        const badge = item.querySelector('.badge');
+        
+        if (span) {
+          let text = span.innerText;
+          if (isEn) {
+            text = text.replace('سارة أحمد (الزوجة)', 'Sarah Ahmed (Wife)')
+                       .replace('عمر أحمد (الابن)', 'Omar Ahmed (Son)')
+                       .replace('(الزوجة)', '(Wife)')
+                       .replace('(الابن)', '(Son)')
+                       .replace('(أب)', '(Father)')
+                       .replace('(أم)', '(Mother)')
+                       .replace('(أخ)', '(Brother)')
+                       .replace('(أخت)', '(Sister)')
+                       .replace('(ابن)', '(Son)')
+                       .replace('(ابنة)', '(Daughter)');
+          } else {
+            text = text.replace('Sarah Ahmed (Wife)', 'سارة أحمد (الزوجة)')
+                       .replace('Omar Ahmed (Son)', 'عمر أحمد (الابن)')
+                       .replace('(Wife)', '(الزوجة)')
+                       .replace('(Son)', '(الابن)')
+                       .replace('(Father)', '(أب)')
+                       .replace('(Mother)', '(أم)')
+                       .replace('(Brother)', '(أخ)')
+                       .replace('(Sister)', '(أخت)')
+                       .replace('(Son)', '(الابن)')
+                       .replace('(Daughter)', '(ابنة)');
+          }
+          span.innerText = text;
+        }
+
+        if (p) {
+          let pText = p.innerText;
+          if (isEn) {
+            pText = pText.replace('صلاحية دخول البوابات والخدمات فقط', 'Gate access & services permit only');
+          } else {
+            pText = pText.replace('Gate access & services permit only', 'صلاحية دخول البوابات والخدمات فقط');
+          }
+          p.innerText = pText;
+        }
+
+        if (badge) {
+          let badgeText = badge.innerText;
+          if (isEn) {
+            badgeText = badgeText.replace('نشط', 'Active');
+          } else {
+            badgeText = badgeText.replace('Active', 'نشط');
+          }
+          badge.innerText = badgeText;
+        }
+      });
+    }
+
+    // Family Member Count Badge
+    const familyBadge = document.getElementById('ownerFamilyCountBadge');
+    if (familyBadge) {
+      const count = familyList ? familyList.children.length : 2;
+      familyBadge.innerText = isEn ? `${count} members` : `${count} أفراد`;
+    }
+
+    // Translate LPR Active Plates list items
+    const lprList = document.getElementById('lprActivePlatesList');
+    if (lprList) {
+      lprList.querySelectorAll('div').forEach(item => {
+        const badge = item.querySelector('.badge');
+        if (badge) {
+          if (isEn) {
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Active on Gates';
+          } else {
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> مفعل على البوابات';
+          }
+        }
+      });
+    }
+  }
+
+  requestHousekeeping(role) {
+    const isEn = this.currentLang === 'en';
+    let location = '';
+    let requesterName = '';
+    let type = 'نظافة داخلية';
+
+    if (role === 'owner') {
+      location = 'فيلا 104';
+      requesterName = isEn ? 'Owner (Osama Ahmed)' : 'المالك (أسامة أحمد)';
+    } else if (role === 'tenant') {
+      location = 'شاليه 402';
+      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'المستأجر (أحمد زاهر)';
+    } else if (role === 'commercial') {
+      location = 'محل 12 (Blue Wave)';
+      requesterName = isEn ? 'Commercial (Blue Wave)' : 'التجاري (Blue Wave)';
+    } else if (role === 'manager') {
+      const select = document.getElementById('managerCleaningLocation');
+      location = select ? select.value : 'منطقة عامة';
+      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'المدير (أيمن السعيد)';
+      type = 'نظافة مكان عام';
+    }
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    const newReq = {
+      id: `HK-${Math.floor(100 + Math.random() * 900)}`,
+      requester: role,
+      requesterName: requesterName,
+      location: location,
+      type: type,
+      status: 'بانتظار التخصيص',
+      assignedWorker: '',
+      time: timeStr
+    };
+
+    this.housekeepingRequests.unshift(newReq);
+    this.renderHousekeeping();
+    this.showToast(isEn ? '🧹 Housekeeping request submitted successfully!' : '🧹 تم تقديم طلب خدمة النظافة بنجاح!');
+  }
+
+  assignHousekeepingWorker(id) {
+    const isEn = this.currentLang === 'en';
+    const req = this.housekeepingRequests.find(r => r.id === id);
+    if (!req) return;
+
+    const select = document.getElementById(`assignWorkerSelect_${id}`);
+    const worker = select ? select.value : 'عامل نظافة';
+
+    req.status = 'جاري العمل';
+    req.assignedWorker = worker;
+
+    this.renderHousekeeping();
+    this.showToast(isEn ? `✅ Worker ${worker} assigned successfully!` : `✅ تم تكليف عامل النظافة ${worker} بنجاح!`);
+  }
+
+  completeHousekeepingRequest(id) {
+    const isEn = this.currentLang === 'en';
+    const req = this.housekeepingRequests.find(r => r.id === id);
+    if (!req) return;
+
+    req.status = 'تم الانتهاء';
+    this.renderHousekeeping();
+    this.showToast(isEn ? '🧹 Cleaning task completed!' : '🧹 تم إتمام مهمة النظافة بنجاح!');
+  }
+
+  renderHousekeeping() {
+    const isEn = this.currentLang === 'en';
+    const listContainer = document.getElementById('hkRequestsList');
+    if (!listContainer) return;
+
+    const badge = document.getElementById('hkRequestsInboxBadge');
+    const pendingRequests = this.housekeepingRequests.filter(r => r.status === 'بانتظار التخصيص');
+    if (badge) {
+      badge.innerText = isEn ? `${pendingRequests.length} pending` : `${pendingRequests.length} طلبات معلقة`;
+    }
+
+    listContainer.innerHTML = '';
+    if (this.housekeepingRequests.length === 0) {
+      listContainer.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No cleaning requests' : 'لا توجد طلبات نظافة حالية'}</div>`;
+      return;
+    }
+
+    this.housekeepingRequests.forEach(req => {
+      let actionHtml = '';
+      if (req.status === 'بانتظار التخصيص') {
+        actionHtml = `
+          <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+            <select id="assignWorkerSelect_${req.id}" class="form-control" style="font-size: 0.72rem; padding: 4px; height: 28px; width: 60%;">
+              <option value="محمد علي">محمد علي</option>
+              <option value="أحمد حسن">أحمد حسن</option>
+              <option value="مصطفى سيد">مصطفى سيد</option>
+            </select>
+            <button class="btn btn-primary" onclick="app.assignHousekeepingWorker('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; flex: 1; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-user-check"></i> ${isEn ? 'Assign' : 'إسناد وتكليف'}
+            </button>
+          </div>
+        `;
+      } else if (req.status === 'جاري العمل') {
+        actionHtml = `
+          <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.7rem; color: #00e5ff;"><i class="fa-solid fa-person-sweeping"></i> ${isEn ? 'Worker:' : 'العامل:'} ${req.assignedWorker}</span>
+            <button class="btn btn-success" onclick="app.completeHousekeepingRequest('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Complete' : 'إنهاء وإتمام'}
+            </button>
+          </div>
+        `;
+      } else {
+        actionHtml = `
+          <div style="margin-top: 6px; font-size: 0.7rem; color: #10b981;">
+            <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Completed by:' : 'تم الانتهاء بواسطة:'} <strong>${req.assignedWorker}</strong>
+          </div>
+        `;
+      }
+
+      const statusBadgeClass = req.status === 'تم الانتهاء' ? 'badge-success' : (req.status === 'جاري العمل' ? 'badge-cyan' : 'badge-warning');
+      const statusText = isEn 
+        ? (req.status === 'تم الانتهاء' ? 'Completed' : (req.status === 'جاري العمل' ? 'Cleaning...' : 'Pending'))
+        : req.status;
+
+      const typeText = isEn 
+        ? (req.type === 'نظافة داخلية' ? 'Internal Cleaning' : 'Common Area Cleaning')
+        : req.type;
+
+      listContainer.innerHTML += `
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px; border-left: 4px solid ${req.status === 'تم الانتهاء' ? '#10b981' : (req.status === 'جاري العمل' ? '#00e5ff' : '#f59e0b')};">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 0.82rem; font-weight: 700;">${isEn ? 'Location:' : 'الموقع:'} ${req.location}</h4>
+            <span class="badge ${statusBadgeClass}">${statusText}</span>
+          </div>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">
+            ${isEn ? 'Requester:' : 'الطالب:'} ${req.requesterName} • ${isEn ? 'Type:' : 'النوع:'} ${typeText} • ${isEn ? 'Time:' : 'الوقت:'} ${req.time}
+          </p>
+          ${actionHtml}
+        </div>
+      `;
     });
   }
 }

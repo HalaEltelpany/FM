@@ -947,3 +947,82 @@ header.global-header {
     padding-top: 0 !important;
   }
 }
+
+/* Dark Theme Variables Overrides */
+#phoneSimulator.dark-theme {
+  --bg-main: #0b1320;
+  --bg-card: #152033;
+  --bg-glass: rgba(21, 32, 51, 0.95);
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --border-gold: rgba(27, 143, 145, 0.6);
+  background: #0b1320 !important;
+}
+
+#phoneSimulator.dark-theme .card,
+#phoneSimulator.dark-theme .qr-container,
+#phoneSimulator.dark-theme .dynamic-logout-header,
+#phoneSimulator.dark-theme .modal-card {
+  background: #152033 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#phoneSimulator.dark-theme .brand-hero-card {
+  background: linear-gradient(135deg, #152033 0%, #0b1320 100%) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#phoneSimulator.dark-theme .form-control {
+  background: #0b1320 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+#phoneSimulator.dark-theme .form-label,
+#phoneSimulator.dark-theme .card-title,
+#phoneSimulator.dark-theme h1,
+#phoneSimulator.dark-theme h2,
+#phoneSimulator.dark-theme h3,
+#phoneSimulator.dark-theme h4,
+#phoneSimulator.dark-theme p,
+#phoneSimulator.dark-theme span {
+  color: #ffffff !important;
+}
+
+#phoneSimulator.dark-theme .phone-navbar {
+  background: #152033 !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#phoneSimulator.dark-theme .phone-navbar .nav-item {
+  color: #94a3b8 !important;
+}
+
+#phoneSimulator.dark-theme .phone-navbar .nav-item.active {
+  color: var(--primary-gold) !important;
+}
+
+/* Custom slider styles for toggle switches */
+.switch-container input:checked + .slider-round {
+  background-color: var(--brand-teal) !important;
+}
+.switch-container input:checked + .slider-round:before {
+  transform: translateX(22px);
+}
+.slider-round:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+#phoneSimulator.dark-theme .slider-round {
+  background-color: #334155 !important;
+}
+
