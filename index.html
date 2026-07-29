@@ -877,8 +877,8 @@
                     <h4 style="font-size: 0.85rem; font-weight: 700;">خدمة النظافة الفندقية للشاليه</h4>
                     <p style="font-size: 0.7rem; color: var(--text-muted);">تنظيف شامل وتغيير المفرشات</p>
                   </div>
-                  <button class="btn btn-cyan" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="app.chargeService('نظافة الشاليه', 350)">
-                    طلب بـ 350 ج.م
+                  <button class="btn btn-cyan" id="btnTenantHkPack" style="width: auto; padding: 6px 12px; font-size: 0.75rem; color: white;" onclick="app.requestHousekeeping('tenant')">
+                    طلب خدمة نظافة
                   </button>
                 </div>
               </div>
@@ -889,11 +889,16 @@
               <div class="card-header">
                 <span class="card-title"><i class="fa-solid fa-headset"></i> بلاغات صيانة الشاليه وإخلاء الطرف</span>
               </div>
-              <div class="grid-2" style="margin-bottom: 10px;">
-                <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
-                  <i class="fa-solid fa-plus-circle"></i> طلب صيانة عاجلة للشاليه
-                </button>
-                <button class="btn btn-cyan" onclick="app.showToast('✅ تم تسجيل طلب إخلاء الطرف وإعادة المفتاح بنجاح! جاري معاينة الشاليه قبل المغادرة.')">
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
+                <div class="grid-2">
+                  <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')" style="margin: 0;">
+                    <i class="fa-solid fa-plus-circle"></i> طلب صيانة عاجلة للشاليه
+                  </button>
+                  <button class="btn btn-cyan" id="btnTenantHk" onclick="app.requestHousekeeping('tenant')" style="margin: 0; color: white;">
+                    <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
+                  </button>
+                </div>
+                <button class="btn" style="border-color: rgba(32, 39, 79, 0.25); width: 100%;" onclick="app.showToast('✅ تم تسجيل طلب إخلاء الطرف وإعادة المفتاح بنجاح! جاري معاينة الشاليه قبل المغادرة.')">
                   <i class="fa-solid fa-key-skeleton"></i> إخلاء الطرف وإعادة المفتاح
                 </button>
               </div>
@@ -1015,11 +1020,16 @@
                 </div>
               </div>
 
-              <div class="grid-2" style="margin-top: 8px;">
-                <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')">
-                  <i class="fa-solid fa-wrench"></i> طلب صيانة داخلية للمحل
-                </button>
-                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4);" onclick="app.openSecurityComplaintModal()">
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <div class="grid-2">
+                  <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')" style="margin: 0;">
+                    <i class="fa-solid fa-wrench"></i> طلب صيانة للمحل
+                  </button>
+                  <button class="btn btn-cyan" id="btnCommercialHk" onclick="app.requestHousekeeping('commercial')" style="margin: 0; color: white;">
+                    <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
+                  </button>
+                </div>
+                <button class="btn" style="border-color: rgba(239, 68, 68, 0.4); width: 100%;" onclick="app.openSecurityComplaintModal()">
                   <i class="fa-solid fa-shield-cat"></i> شكاوى الأمن
                 </button>
               </div>
@@ -1246,6 +1256,37 @@
                 <span class="badge" style="background: #ef4444; color: #ffffff !important;" id="securityComplaintsInboxBadge">0 بلاغات</span>
               </div>
               <div class="list-group" id="securityComplaintsList">
+                <!-- Renders Dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 9. HOUSEKEEPING VIEW (واجهة الهاوس كيبينج) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewHousekeeping">
+            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
+              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+            </button>
+            
+            <div class="card gold-border" style="background: #0f172a; color: #ffffff;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: #94a3b8;" id="hkSupervisorLabel">إشراف الهاوس كيبينج والخدمات الفندقية</span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #ffffff;" id="hkSupervisorName">مشرف قسم النظافة (Housekeeping Supervisor)</h2>
+                  <p style="font-size: 0.75rem; color: #00e5ff;" id="hkSupervisorDesc">استقبال طلبات النظافة وإسناد عمال النظافة</p>
+                </div>
+                <span class="badge badge-success" id="hkStatusBadge"><i class="fa-solid fa-broom"></i> القسم نشط</span>
+              </div>
+            </div>
+
+            <!-- Cleaning Requests Queue -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title" id="hkRequestsTitle"><i class="fa-solid fa-inbox"></i> طلبات النظافة الواردة (Cleaning Requests)</span>
+                <span class="badge badge-warning" id="hkRequestsInboxBadge">0 طلبات</span>
+              </div>
+              <div class="list-group" id="hkRequestsList">
                 <!-- Renders Dynamically -->
               </div>
             </div>

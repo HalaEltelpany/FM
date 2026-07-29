@@ -2861,6 +2861,49 @@ class UltimateFMApp {
         }
       });
     }
+
+    // 9. Housekeeping translations
+    const roleTitleHk = document.getElementById('roleTitleHk');
+    if (roleTitleHk) roleTitleHk.innerText = isEn ? 'Housekeeping' : 'هاوس كيبينج';
+
+    const roleDescHk = document.getElementById('roleDescHk');
+    if (roleDescHk) roleDescHk.innerText = isEn ? 'Cleaning requests & staff assignment' : 'طلبات النظافة وإسناد عمال النظافة';
+
+    const btnHomeownerHk = document.getElementById('btnHomeownerHk');
+    if (btnHomeownerHk) btnHomeownerHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+
+    const btnTenantHk = document.getElementById('btnTenantHk');
+    if (btnTenantHk) btnTenantHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+
+    const btnTenantHkPack = document.getElementById('btnTenantHkPack');
+    if (btnTenantHkPack) btnTenantHkPack.innerText = isEn ? 'Request Cleaning' : 'طلب خدمة نظافة';
+
+    const btnCommercialHk = document.getElementById('btnCommercialHk');
+    if (btnCommercialHk) btnCommercialHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+
+    const managerHkTitle = document.getElementById('managerHkTitle');
+    if (managerHkTitle) managerHkTitle.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Public Area Cleaning Request' : '<i class="fa-solid fa-broom"></i> طلب نظافة للأماكن العامة';
+
+    const managerHkDesc = document.getElementById('managerHkDesc');
+    if (managerHkDesc) managerHkDesc.innerText = isEn ? 'Request cleaning for public zones (Main Pool, Lake Beach, Walkways, Admin).' : 'يمكنك هنا طلب تنظيف لقطاع عام بالقرية (مثل المسبح الرئيسي، الشاطئ، اللاندسكيب، الممرات).';
+
+    const btnManagerHkSubmit = document.getElementById('btnManagerHkSubmit');
+    if (btnManagerHkSubmit) btnManagerHkSubmit.innerHTML = isEn ? '<i class="fa-solid fa-paper-plane"></i> Send Request' : '<i class="fa-solid fa-paper-plane"></i> إرسال الطلب';
+
+    const hkSupervisorLabel = document.getElementById('hkSupervisorLabel');
+    if (hkSupervisorLabel) hkSupervisorLabel.innerText = isEn ? 'Housekeeping & Hotel Services Supervision' : 'إشراف الهاوس كيبينج والخدمات الفندقية';
+
+    const hkSupervisorName = document.getElementById('hkSupervisorName');
+    if (hkSupervisorName) hkSupervisorName.innerText = isEn ? 'Housekeeping Supervisor' : 'مشرف قسم النظافة (Housekeeping Supervisor)';
+
+    const hkSupervisorDesc = document.getElementById('hkSupervisorDesc');
+    if (hkSupervisorDesc) hkSupervisorDesc.innerText = isEn ? 'Receive cleaning orders and assign workers' : 'استقبال طلبات النظافة وإسناد عمال النظافة';
+
+    const hkStatusBadge = document.getElementById('hkStatusBadge');
+    if (hkStatusBadge) hkStatusBadge.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Department Active' : '<i class="fa-solid fa-broom"></i> القسم نشط';
+
+    const hkRequestsTitle = document.getElementById('hkRequestsTitle');
+    if (hkRequestsTitle) hkRequestsTitle.innerHTML = isEn ? '<i class="fa-solid fa-inbox"></i> Incoming Cleaning Requests' : '<i class="fa-solid fa-inbox"></i> طلبات النظافة الواردة (Cleaning Requests)';
   }
 
   requestHousekeeping(role) {
