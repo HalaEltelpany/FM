@@ -708,7 +708,42 @@ class UltimateFMApp {
     this.showToast(`✅ تم حفظ وتأكيد إعدادات Odoo ERP بنجاح!\nسيرفر: ${url || 'Odoo EDU Live'}\nقاعدة البيانات: ${db}\nالاسم المعتمد: ${name || 'جاري جلبه من Odoo'}\nتم تفعيل الربط المباشر مع جميع بلاغات الصيانة والعدادات.`);
   }
 
-  syncTicketToOdoo(ticket) {
+  async callOdoo(baseUrl, payload) {
+    const directUrl = `${baseUrl}/jsonrpc`;
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
+    
+    try {
+      console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
+      const response = await fetch(directUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[Odoo Call] Direct fetch succeeded:', data);
+        return data;
+      }
+      throw new Error(`Direct call returned status ${response.status}`);
+    } catch (err) {
+      console.warn('[Odoo Call] Direct fetch failed or CORS blocked. Trying proxy fallback...', err);
+      try {
+        const response = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        console.log('[Odoo Call] Proxy fetch succeeded:', data);
+        return data;
+      } catch (proxyErr) {
+        console.error('[Odoo Call] Proxy fallback also failed:', proxyErr);
+        throw proxyErr;
+      }
+    }
+  }
+
+  async syncTicketToOdoo(ticket) {
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -720,7 +755,6 @@ class UltimateFMApp {
     }
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
 
     // Step 1: Call common.authenticate to get the correct User ID (uid) dynamically
     const authPayload = {
@@ -736,13 +770,8 @@ class UltimateFMApp {
 
     console.log('[Odoo Sync] Authenticating to retrieve user UID...');
 
-    fetch(proxyAuthUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(authPayload)
-    })
-    .then(res => res.json())
-    .then(authData => {
+    try {
+      const authData = await this.callOdoo(baseUrl, authPayload);
       if (authData.error) {
         console.error('[Odoo Auth Error]:', authData.error);
         return;
@@ -774,64 +803,42 @@ class UltimateFMApp {
       };
 
       console.log('[Odoo Sync] Attempting to create ticket in project.task...');
-      fetch(proxyAuthUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(getPayload("project.task", taskFields))
-      })
-      .then(res => res.json())
-      .then(taskData => {
-        if (taskData.error) {
-          console.warn('[Odoo Sync] project.task failed. Trying fallback 1: helpdesk.ticket...', taskData.error);
+      const taskData = await this.callOdoo(baseUrl, getPayload("project.task", taskFields));
+      if (taskData.error) {
+        console.warn('[Odoo Sync] project.task failed. Trying fallback 1: helpdesk.ticket...', taskData.error);
+        
+        // Try 2: helpdesk.ticket (Helpdesk Module)
+        const ticketFields = {
+          name: `${ticket.id}: ${ticket.title}`,
+          description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
+          priority: "3"
+        };
+        
+        const ticketData = await this.callOdoo(baseUrl, getPayload("helpdesk.ticket", ticketFields));
+        if (ticketData.error) {
+          console.warn('[Odoo Sync] helpdesk.ticket failed. Trying fallback 2: maintenance.request...', ticketData.error);
           
-          // Try 2: helpdesk.ticket (Helpdesk Module)
-          const ticketFields = {
-            name: `${ticket.id}: ${ticket.title}`,
-            description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
-            priority: "3"
+          // Try 3: maintenance.request (Maintenance Module)
+          const maintFields = {
+            name: `${ticket.title} (#${ticket.id})`,
+            description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category}\nالوصف: ${ticket.details}`
           };
           
-          return fetch(proxyAuthUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(getPayload("helpdesk.ticket", ticketFields))
-          })
-          .then(res => res.json())
-          .then(ticketData => {
-            if (ticketData.error) {
-              console.warn('[Odoo Sync] helpdesk.ticket failed. Trying fallback 2: maintenance.request...', ticketData.error);
-              
-              // Try 3: maintenance.request (Maintenance Module)
-              const maintFields = {
-                name: `${ticket.title} (#${ticket.id})`,
-                description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category}\nالوصف: ${ticket.details}`
-              };
-              
-              return fetch(proxyAuthUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(getPayload("maintenance.request", maintFields))
-              })
-              .then(res => res.json())
-              .then(maintData => {
-                if (maintData.error) {
-                  console.error('[Odoo Sync Error] All Odoo models (project.task, helpdesk.ticket, maintenance.request) failed to register ticket:', maintData.error);
-                } else {
-                  console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
-                }
-              });
-            } else {
-              console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
-            }
-          });
+          const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", maintFields));
+          if (maintData.error) {
+            console.error('[Odoo Sync Error] All Odoo models (project.task, helpdesk.ticket, maintenance.request) failed to register ticket:', maintData.error);
+          } else {
+            console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
+          }
         } else {
-          console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
+          console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
         }
-      })
-      .catch(err => {
-        console.error('[Odoo Sync Exception]:', err);
-      });
-    });
+      } else {
+        console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
+      }
+    } catch (err) {
+      console.error('[Odoo Sync Exception]:', err);
+    }
   }
 
   handleMeterRechargeSubmit() {
@@ -2067,7 +2074,7 @@ class UltimateFMApp {
     }
   }
 
-  fetchOdooOwnerName() {
+  async fetchOdooOwnerName() {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2076,7 +2083,6 @@ class UltimateFMApp {
     if (!userInput || !keyInput) return;
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
 
     const authPayload = {
       jsonrpc: "2.0",
@@ -2089,13 +2095,8 @@ class UltimateFMApp {
       id: Math.floor(Math.random() * 1000)
     };
 
-    fetch(proxyAuthUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(authPayload)
-    })
-    .then(res => res.json())
-    .then(authData => {
+    try {
+      const authData = await this.callOdoo(baseUrl, authPayload);
       if (authData.error) return;
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') return;
@@ -2118,16 +2119,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
 
-      return fetch(proxyAuthUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(readPayload)
-      });
-    })
-    .then(res => {
-      if (res) return res.json();
-    })
-    .then(readData => {
+      const readData = await this.callOdoo(baseUrl, readPayload);
       if (readData && readData.result && readData.result[0]) {
         const odooName = readData.result[0].name;
         if (odooName) {
@@ -2137,10 +2129,9 @@ class UltimateFMApp {
           if (input) input.value = odooName;
         }
       }
-    })
-    .catch(err => {
+    } catch (err) {
       console.log('[Odoo Name Fetch Exception]:', err);
-    });
+    }
   }
 
   renderLogoutHeader() {
@@ -2265,7 +2256,7 @@ class UltimateFMApp {
     this.showToast(`📞 جاري الاتصال بـ (${number}) من الهاتف الميداني...`);
   }
 
-  submitNewUserToOdoo() {
+  async submitNewUserToOdoo() {
     const nameInput = document.getElementById('newUserNameInput');
     const emailInput = document.getElementById('newUserEmailInput');
     const phoneInput = document.getElementById('newUserPhoneInput');
@@ -2331,7 +2322,6 @@ class UltimateFMApp {
     }
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-    const proxyAuthUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${baseUrl}/jsonrpc`);
 
     const authPayload = {
       jsonrpc: "2.0",
@@ -2346,13 +2336,8 @@ class UltimateFMApp {
 
     this.showToast(`⏳ جاري الإرسال ومزامنة [${userName}] مع Odoo ERP...`);
 
-    fetch(proxyAuthUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(authPayload)
-    })
-    .then(res => res.json())
-    .then(authData => {
+    try {
+      const authData = await this.callOdoo(baseUrl, authPayload);
       if (authData.error) {
         throw new Error(JSON.stringify(authData.error));
       }
@@ -2384,14 +2369,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
 
-      return fetch(proxyAuthUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createPartnerPayload)
-      });
-    })
-    .then(res => res.json())
-    .then(createData => {
+      const createData = await this.callOdoo(baseUrl, createPartnerPayload);
       if (createData.error) {
         throw new Error(JSON.stringify(createData.error));
       }
@@ -2401,8 +2379,7 @@ class UltimateFMApp {
       emailInput.value = '';
       phoneInput.value = '';
       this.showToast(`✅ تم بنجاح مزامنة ورفع العميل [${userName}] بداخل جهات اتصال Odoo ERP (ID: ${createData.result})!`);
-    })
-    .catch(err => {
+    } catch (err) {
       console.error('[Odoo Contact Sync Exception]:', err);
       // Local fallback on error
       addUserToLocalList();
@@ -2411,7 +2388,7 @@ class UltimateFMApp {
       emailInput.value = '';
       phoneInput.value = '';
       this.showToast(`⚠️ تعذر الاتصال بـ Odoo (تم الحفظ محلياً في الموك أب):\n${err.message || err}`);
-    });
+    }
   }
 
   filterInventory() {
