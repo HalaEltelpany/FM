@@ -2904,6 +2904,28 @@ class UltimateFMApp {
 
     const hkRequestsTitle = document.getElementById('hkRequestsTitle');
     if (hkRequestsTitle) hkRequestsTitle.innerHTML = isEn ? '<i class="fa-solid fa-inbox"></i> Incoming Cleaning Requests' : '<i class="fa-solid fa-inbox"></i> طلبات النظافة الواردة (Cleaning Requests)';
+
+    // 10. Odoo Card translations
+    const odooSyncTitle = document.getElementById('odooSyncTitle');
+    if (odooSyncTitle) odooSyncTitle.innerHTML = isEn ? '<i class="fa-solid fa-cloud-arrow-up"></i> Odoo ERP Live Sync Center' : '<i class="fa-solid fa-cloud-arrow-up"></i> مركز مزامنة Odoo ERP المباشر';
+
+    const odooSyncDesc = document.getElementById('odooSyncDesc');
+    if (odooSyncDesc) odooSyncDesc.innerText = isEn ? 'Real-time synchronization with custom Odoo database to send tickets, retrieve owner names, and sync contacts.' : 'الربط اللحظي مع قاعدة بيانات Odoo المخصصة لإرسال بلاغات الصيانة، واستقبال أسماء الملاك، ومزامنة جهات الاتصال.';
+
+    const odooUrlLabel = document.getElementById('odooUrlLabel');
+    if (odooUrlLabel) odooUrlLabel.innerText = isEn ? 'Server URL:' : 'رابط السيرفر:';
+
+    const odooDbLabel = document.getElementById('odooDbLabel');
+    if (odooDbLabel) odooDbLabel.innerText = isEn ? 'Database Name:' : 'اسم قاعدة البيانات:';
+
+    const odooUserLabel = document.getElementById('odooUserLabel');
+    if (odooUserLabel) odooUserLabel.innerText = isEn ? 'User Email:' : 'البريد الإلكتروني:';
+
+    const odooOwnerNameLabel = document.getElementById('odooOwnerNameLabel');
+    if (odooOwnerNameLabel) odooOwnerNameLabel.innerText = isEn ? 'Fetched Name from Odoo:' : 'الاسم المسترجع من Odoo:';
+
+    const btnOdooTestConn = document.getElementById('btnOdooTestConn');
+    if (btnOdooTestConn) btnOdooTestConn.innerHTML = isEn ? '<i class="fa-solid fa-wifi"></i> Test & Activate Sync Now' : '<i class="fa-solid fa-wifi"></i> اختبار وتنشيط المزامنة الآن';
   }
 
   requestHousekeeping(role) {
