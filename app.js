@@ -75,10 +75,10 @@ class UltimateFMApp {
 
     // Hardcoded Odoo Connection Config (Edit these values directly to connect!)
     this.odooConfig = {
-      url: 'https://facility-management.odoo.com',
-      db: 'facility-management-edu',
-      user: 'ahmed.mohamed@domain.com',
-      key: 'YOUR_API_KEY_HERE' // Replace this with your actual Odoo API Key!
+      url: 'https://edu-fm-uc.odoo.com',
+      db: 'edu-fm-uc',
+      user: 'fmhala6@gmail.com',
+      key: '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
     };
 
     // Prepopulate Local Storage silently from configuration values
@@ -709,9 +709,9 @@ class UltimateFMApp {
   }
 
   syncTicketToOdoo(ticket) {
-    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
-    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'facility-management-edu';
-    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'admin@domain.com';
+    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
     const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) {
@@ -1829,8 +1829,8 @@ class UltimateFMApp {
   }
 
   testOdooEduConnection() {
-    const url = document.getElementById('odooUrlInput')?.value || 'https://facility-management.odoo.com';
-    const db = document.getElementById('odooDbInput')?.value || 'facility-management-edu';
+    const url = document.getElementById('odooUrlInput')?.value || 'https://edu-fm-uc.odoo.com';
+    const db = document.getElementById('odooDbInput')?.value || 'edu-fm-uc';
 
     const badge = document.getElementById('odooStatusBadge');
     if (badge) {
@@ -2003,9 +2003,9 @@ class UltimateFMApp {
     return map[role] || role;
   }
   loadOdooFields() {
-    const url = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
-    const db = localStorage.getItem('odoo_db') || 'facility-management-edu';
-    const user = localStorage.getItem('odoo_user') || 'ahmed.mohamed@domain.com';
+    const url = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const db = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const user = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
     const key = localStorage.getItem('odoo_key') || '';
     const name = localStorage.getItem('odoo_owner_name') || '';
 
@@ -2036,10 +2036,10 @@ class UltimateFMApp {
   }
 
   fetchOdooOwnerName() {
-    const urlInput = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'facility-management-edu';
-    const userInput = localStorage.getItem('odoo_user');
-    const keyInput = localStorage.getItem('odoo_key');
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '';
 
     if (!userInput || !keyInput) return;
 
@@ -2259,9 +2259,9 @@ class UltimateFMApp {
     };
     const roleArabic = roleMap[userRole] || userRole;
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://facility-management.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'facility-management-edu';
-    const userInput = localStorage.getItem('odoo_user') || 'admin@domain.com';
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
     const keyInput = localStorage.getItem('odoo_key') || '';
 
     // Render it locally first for immediate visual success feedback
