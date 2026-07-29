@@ -756,49 +756,81 @@ class UltimateFMApp {
 
       console.log('[Odoo Sync Success] Retrieved UID:', uid);
 
-      // Step 2: Create the helpdesk ticket with the correct dynamic UID
-      const createPayload = {
+      const getPayload = (modelName, fields) => ({
         jsonrpc: "2.0",
         method: "call",
         params: {
           service: "object",
           method: "execute_kw",
-          args: [
-            dbInput,
-            uid, // Use the correct user ID retrieved dynamically!
-            keyInput,
-            "helpdesk.ticket",
-            "create",
-            [{
-              name: `${ticket.id}: ${ticket.title}`,
-              description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
-              priority: "3"
-            }]
-          ]
+          args: [dbInput, uid, keyInput, modelName, "create", [fields]]
         },
         id: Math.floor(Math.random() * 1000)
+      });
+
+      // Try 1: project.task (Standard Project Module)
+      const taskFields = {
+        name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
+        description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category || 'عام'}\nالوصف: ${ticket.details || ''}`
       };
 
-      return fetch(proxyAuthUrl, {
+      console.log('[Odoo Sync] Attempting to create ticket in project.task...');
+      fetch(proxyAuthUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createPayload)
-      });
-    })
-    .then(res => {
-      if (res) return res.json();
-    })
-    .then(createData => {
-      if (createData) {
-        if (createData.error) {
-          console.error('[Odoo Ticket Creation Error]:', createData.error);
+        body: JSON.stringify(getPayload("project.task", taskFields))
+      })
+      .then(res => res.json())
+      .then(taskData => {
+        if (taskData.error) {
+          console.warn('[Odoo Sync] project.task failed. Trying fallback 1: helpdesk.ticket...', taskData.error);
+          
+          // Try 2: helpdesk.ticket (Helpdesk Module)
+          const ticketFields = {
+            name: `${ticket.id}: ${ticket.title}`,
+            description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
+            priority: "3"
+          };
+          
+          return fetch(proxyAuthUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(getPayload("helpdesk.ticket", ticketFields))
+          })
+          .then(res => res.json())
+          .then(ticketData => {
+            if (ticketData.error) {
+              console.warn('[Odoo Sync] helpdesk.ticket failed. Trying fallback 2: maintenance.request...', ticketData.error);
+              
+              // Try 3: maintenance.request (Maintenance Module)
+              const maintFields = {
+                name: `${ticket.title} (#${ticket.id})`,
+                description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category}\nالوصف: ${ticket.details}`
+              };
+              
+              return fetch(proxyAuthUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(getPayload("maintenance.request", maintFields))
+              })
+              .then(res => res.json())
+              .then(maintData => {
+                if (maintData.error) {
+                  console.error('[Odoo Sync Error] All Odoo models (project.task, helpdesk.ticket, maintenance.request) failed to register ticket:', maintData.error);
+                } else {
+                  console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
+                }
+              });
+            } else {
+              console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
+            }
+          });
         } else {
-          console.log('[Odoo Ticket Registered Successfully! ID]:', createData.result);
+          console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
         }
-      }
-    })
-    .catch(err => {
-      console.log('[Odoo Sync Execution Exception]:', err);
+      })
+      .catch(err => {
+        console.error('[Odoo Sync Exception]:', err);
+      });
     });
   }
 
