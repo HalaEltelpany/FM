@@ -712,35 +712,36 @@ class UltimateFMApp {
   async callOdoo(baseUrl, payload) {
     const directUrl = `${baseUrl}/jsonrpc`;
     
-    // If running on a hosted website (like GitHub Pages), use the Corsfix proxy to bypass CORS silently without popups!
-    if (window.location.protocol !== 'file:') {
-      const proxyUrl = 'https://proxy.corsfix.com/?' + encodeURIComponent(directUrl);
+    try {
+      console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
+      const response = await fetch(directUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[Odoo Call] Direct fetch succeeded:', data);
+        return data;
+      }
+      throw new Error(`Direct call returned status ${response.status}`);
+    } catch (err) {
+      console.warn('[Odoo Call] Direct fetch failed or CORS blocked. Trying proxy fallback...', err);
       try {
-        console.log(`[Odoo Call] Attempting Corsfix-proxied fetch to: ${directUrl}`);
+        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
         const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (response.ok) {
-          const data = await response.json();
-          console.log('[Odoo Call] Corsfix fetch succeeded:', data);
-          return data;
-        }
-        throw new Error(`Corsfix fetch returned status ${response.status}`);
-      } catch (err) {
-        console.warn('[Odoo Call] Corsfix fetch failed. Trying direct fallback...', err);
+        const data = await response.json();
+        console.log('[Odoo Call] Proxy fetch succeeded:', data);
+        return data;
+      } catch (proxyErr) {
+        console.error('[Odoo Call] Proxy fallback also failed:', proxyErr);
+        throw proxyErr;
       }
     }
-
-    // Direct fallback (works on localhost/file:// protocol)
-    console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
-    const response = await fetch(directUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    return await response.json();
   }
 
   async syncTicketToOdoo(ticket) {
@@ -888,8 +889,12 @@ class UltimateFMApp {
         this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (المهام)');
       }
     } catch (err) {
-      console.error('[Odoo Sync Exception]:', err);
-      this.showToast(`❌ حدث خطأ أثناء الاتصال بسيرفر أودو: ${err.message || err}`);
+      console.warn('[Odoo Sync Exception]:', err);
+      if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        this.showToast(`❌ حدث خطأ في اتصال أودو: ${err.message || err}`);
+      } else {
+        console.warn('[Odoo CORS Info]: Direct connection blocked by browser security policy on HTTPS web host.');
+      }
     }
   }
 
