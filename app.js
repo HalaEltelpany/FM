@@ -654,6 +654,7 @@ class UltimateFMApp {
       id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
       title: `${category}: ${desc.substring(0, 20)}...`,
       category: category,
+      details: desc,
       status: 'جديد',
       bgClass: 'badge-warning',
       requester: this.currentRole,
@@ -747,7 +748,7 @@ class UltimateFMApp {
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '';
+    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) {
       console.log('[Odoo Sync] Missing connection credentials.');
@@ -894,7 +895,7 @@ class UltimateFMApp {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -2260,7 +2261,7 @@ class UltimateFMApp {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!userInput || !keyInput) return;
 
@@ -2467,7 +2468,7 @@ class UltimateFMApp {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     // Render it locally first for immediate visual success feedback
     const list = document.getElementById('adminUserList');
