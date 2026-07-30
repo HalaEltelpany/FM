@@ -799,7 +799,7 @@ class UltimateFMApp {
       // Try 1: project.task (Standard Project Module)
       const taskFields = {
         name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
-        description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category || 'عام'}\nالوصف: ${ticket.details || ''}`
+        description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`
       };
 
       console.log('[Odoo Sync] Attempting to create ticket in project.task...');
@@ -810,7 +810,7 @@ class UltimateFMApp {
         // Try 2: helpdesk.ticket (Helpdesk Module)
         const ticketFields = {
           name: `${ticket.id}: ${ticket.title}`,
-          description: `بلاغ صيانة عاجل من تطبيق الموبايل - الفئة: ${ticket.category}`,
+          description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`,
           priority: "3"
         };
         
@@ -821,7 +821,7 @@ class UltimateFMApp {
           // Try 3: maintenance.request (Maintenance Module)
           const maintFields = {
             name: `${ticket.title} (#${ticket.id})`,
-            description: `بلاغ صيانة عاجل من تطبيق الموبايل\nالفئة: ${ticket.category}\nالوصف: ${ticket.details}`
+            description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`
           };
           
           const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", maintFields));
@@ -829,15 +829,122 @@ class UltimateFMApp {
             console.error('[Odoo Sync Error] All Odoo models (project.task, helpdesk.ticket, maintenance.request) failed to register ticket:', maintData.error);
           } else {
             console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
+            ticket.odooId = maintData.result;
+            ticket.odooModel = "maintenance.request";
           }
         } else {
           console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
+          ticket.odooId = ticketData.result;
+          ticket.odooModel = "helpdesk.ticket";
         }
       } else {
         console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
+        ticket.odooId = taskData.result;
+        ticket.odooModel = "project.task";
       }
     } catch (err) {
       console.error('[Odoo Sync Exception]:', err);
+    }
+  }
+
+  async syncTicketUpdateToOdoo(ticket) {
+    if (!ticket.odooId || !ticket.odooModel) {
+      console.log('[Odoo Update] Ticket does not have Odoo ID.');
+      return;
+    }
+
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    const authPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    console.log('[Odoo Update] Authenticating for ticket update...');
+
+    try {
+      const authData = await this.callOdoo(baseUrl, authPayload);
+      if (authData.error) return;
+      const uid = authData.result;
+      if (!uid || typeof uid !== 'number') return;
+
+      console.log(`[Odoo Update] Authenticated UID: ${uid}. Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}`);
+
+      // 1. Post to Chatter (message_post)
+      let statusText = `تحديث من تطبيق الموبايل:\nحالة التذكرة: ${ticket.status}`;
+      if (ticket.assignedTech) {
+        statusText += `\nالفني المخصص: ${ticket.assignedTech}`;
+      }
+
+      const chatterPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid,
+            keyInput,
+            ticket.odooModel,
+            "message_post",
+            [[ticket.odooId]],
+            { body: statusText }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
+
+      // 2. Update Odoo Ticket description to show full lifecycle status
+      let updatedDesc = `بلاغ صيانة عاجل من تطبيق الموبايل\n` +
+                        `---------------------------------\n` +
+                        `العميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\n` +
+                        `الموقع/الوحدة: ${ticket.location || 'فيلا 104'}\n` +
+                        `الفئة: ${ticket.category || 'عام'}\n` +
+                        `الوصف بالتفصيل: ${ticket.details || ''}\n` +
+                        `---------------------------------\n` +
+                        `حالة التكليف الحالية: ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}`;
+
+      const writePayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid,
+            keyInput,
+            ticket.odooModel,
+            "write",
+            [[ticket.odooId], { description: updatedDesc }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      const writeData = await this.callOdoo(baseUrl, writePayload);
+      if (writeData.error) {
+        console.error('[Odoo Update Description Error]:', writeData.error);
+      } else {
+        console.log('[Odoo Update Description Success]:', writeData.result);
+      }
+    } catch (err) {
+      console.error('[Odoo Update Exception]:', err);
     }
   }
 
@@ -1517,6 +1624,9 @@ class UltimateFMApp {
       tk.assignedTech = techName;
       this.renderTickets();
       this.showToast(`✅ تم إسناد المهمة للفني (${techName}) بنجاح!\nستظهر المهمة الآن في شاشة الفني الميدانية للبدء بالعمل.`);
+      
+      // Sync update to Odoo
+      this.syncTicketUpdateToOdoo(tk);
     }
   }
 
@@ -1543,6 +1653,9 @@ class UltimateFMApp {
 
       this.renderTickets();
       this.showToast(`🎉 تم تسجيل إتمام الإصلاح للعطل #${ticketId} بنجاح!\nصورة بعد الإصلاح تم حفظها كدليل للمالك، وتم تحديث التذكرة كـ "مكتمل" بمدة حل قدرها ${diffMins} دقيقة.`);
+      
+      // Sync update to Odoo
+      this.syncTicketUpdateToOdoo(tk);
     };
     reader.readAsDataURL(fileInput.files[0]);
   }
