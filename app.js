@@ -838,55 +838,46 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       });
 
-      // Try 1: project.task (Standard Project Module)
-      const taskFields = {
+      // Fields payload for Odoo ticket
+      const ticketFields = {
         name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
         description: formattedDescription
       };
 
-      console.log('[Odoo Sync] Attempting to create ticket in project.task...');
-      const taskData = await this.callOdoo(baseUrl, getPayload("project.task", taskFields));
-      if (taskData.error) {
-        console.warn('[Odoo Sync] project.task failed. Trying fallback 1: helpdesk.ticket...', taskData.error);
-        
-        // Try 2: helpdesk.ticket (Helpdesk Module)
-        const ticketFields = {
-          name: `${ticket.id}: ${ticket.title}`,
-          description: formattedDescription,
-          priority: "3"
-        };
-        
-        const ticketData = await this.callOdoo(baseUrl, getPayload("helpdesk.ticket", ticketFields));
-        if (ticketData.error) {
-          console.warn('[Odoo Sync] helpdesk.ticket failed. Trying fallback 2: maintenance.request...', ticketData.error);
-          
-          // Try 3: maintenance.request (Maintenance Module)
-          const maintFields = {
-            name: `${ticket.title} (#${ticket.id})`,
-            description: formattedDescription
-          };
-          
-          const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", maintFields));
-          if (maintData.error) {
-            console.error('[Odoo Sync Error] All Odoo models failed to register ticket:', maintData.error);
-            this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${maintData.error.message || JSON.stringify(maintData.error)}`);
-          } else {
-            console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
-            ticket.odooId = maintData.result;
-            ticket.odooModel = "maintenance.request";
-            this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (صيانة طلبات)');
-          }
-        } else {
-          console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
-          ticket.odooId = ticketData.result;
-          ticket.odooModel = "helpdesk.ticket";
-          this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (الدعم الفني)');
-        }
-      } else {
+      // Try 1: helpdesk.ticket (Helpdesk Module / الدعم الفني)
+      console.log('[Odoo Sync] Attempting to create ticket in helpdesk.ticket...');
+      const helpdeskData = await this.callOdoo(baseUrl, getPayload("helpdesk.ticket", ticketFields));
+      if (!helpdeskData.error && helpdeskData.result) {
+        console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', helpdeskData.result);
+        ticket.odooId = helpdeskData.result;
+        ticket.odooModel = "helpdesk.ticket";
+        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (الدعم الفني / Helpdesk)');
+        return;
+      }
+
+      // Try 2: maintenance.request (Maintenance Module / طلبات الصيانة)
+      console.warn('[Odoo Sync] helpdesk.ticket failed or model missing. Trying fallback 1: maintenance.request...', helpdeskData?.error);
+      const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", ticketFields));
+      if (!maintData.error && maintData.result) {
+        console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
+        ticket.odooId = maintData.result;
+        ticket.odooModel = "maintenance.request";
+        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (صيانة طلبات)');
+        return;
+      }
+
+      // Try 3: project.task (Tasks Module / المهام و To Do)
+      console.warn('[Odoo Sync] maintenance.request failed. Trying fallback 2: project.task...', maintData?.error);
+      const taskData = await this.callOdoo(baseUrl, getPayload("project.task", ticketFields));
+      if (!taskData.error && taskData.result) {
         console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
         ticket.odooId = taskData.result;
         ticket.odooModel = "project.task";
-        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (المهام)');
+        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (المهام / To Do)');
+        return;
+      } else if (taskData.error) {
+        console.error('[Odoo Sync Error] All Odoo models failed to register ticket:', taskData.error);
+        this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${taskData.error.message || JSON.stringify(taskData.error)}`);
       }
     } catch (err) {
       console.warn('[Odoo Sync Exception]:', err);
