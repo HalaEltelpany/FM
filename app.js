@@ -752,6 +752,7 @@ class UltimateFMApp {
 
     if (!urlInput || !dbInput || !userInput || !keyInput) {
       console.log('[Odoo Sync] Missing connection credentials.');
+      this.showToast('⚠️ لم يتم العثور على بيانات الاتصال بـ Odoo');
       return;
     }
 
@@ -775,12 +776,14 @@ class UltimateFMApp {
       const authData = await this.callOdoo(baseUrl, authPayload);
       if (authData.error) {
         console.error('[Odoo Auth Error]:', authData.error);
+        this.showToast(`❌ خطأ في ربط أودو: ${authData.error.message || JSON.stringify(authData.error)}`);
         return;
       }
       
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') {
         console.warn('[Odoo Auth Failed]: Invalid UID returned.', uid);
+        this.showToast(`⚠️ أودو أرجع معرف مستخدم غير صحيح: ${uid}`);
         return;
       }
 
@@ -865,24 +868,29 @@ class UltimateFMApp {
           
           const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", maintFields));
           if (maintData.error) {
-            console.error('[Odoo Sync Error] All Odoo models (project.task, helpdesk.ticket, maintenance.request) failed to register ticket:', maintData.error);
+            console.error('[Odoo Sync Error] All Odoo models failed to register ticket:', maintData.error);
+            this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${maintData.error.message || JSON.stringify(maintData.error)}`);
           } else {
             console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
             ticket.odooId = maintData.result;
             ticket.odooModel = "maintenance.request";
+            this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (صيانة طلبات)');
           }
         } else {
           console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketData.result);
           ticket.odooId = ticketData.result;
           ticket.odooModel = "helpdesk.ticket";
+          this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (الدعم الفني)');
         }
       } else {
         console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
         ticket.odooId = taskData.result;
         ticket.odooModel = "project.task";
+        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (المهام)');
       }
     } catch (err) {
       console.error('[Odoo Sync Exception]:', err);
+      this.showToast(`❌ حدث خطأ أثناء الاتصال بسيرفر أودو: ${err.message || err}`);
     }
   }
 
