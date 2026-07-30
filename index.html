@@ -230,50 +230,7 @@
                 </div>
               </div>
 
-              <!-- 💳 Property Financial Installments & Ledger Card -->
-              <div class="card gold-border" style="margin-top: 14px;">
-                <div class="card-header">
-                  <span class="card-title"><i class="fa-solid fa-file-invoice-dollar"></i> أقساط وكشف حساب الوحدة (Odoo Finance)</span>
-                  <span class="badge badge-warning" id="installmentStatusBadge"><i class="fa-solid fa-clock"></i> قسط قادم</span>
-                </div>
-                
-                <!-- Installments Progress Summary Bar -->
-                <div style="background: rgba(32, 39, 79, 0.05); border-radius: 8px; padding: 10px; margin-bottom: 12px; border: 1px solid rgba(32, 39, 79, 0.1);">
-                  <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 4px;">
-                    <span><b>إجمالي سعر الوحدة:</b> 4,500,000 ج.م</span>
-                    <span style="color: var(--brand-teal); font-weight: 700;">المسدد: 70%</span>
-                  </div>
-                  <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
-                    <div style="width: 70%; background: linear-gradient(90deg, var(--brand-teal), #10b981); height: 100%;"></div>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);">
-                    <span><b>المسدد فعلياً:</b> 3,150,000 ج.م</span>
-                    <span><b>المتبقي بأقساط:</b> 1,350,000 ج.م</span>
-                  </div>
-                </div>
 
-                <!-- Next Due Installment Highlight Box -->
-                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.75rem; font-weight: 800; color: #b45309;"><i class="fa-solid fa-triangle-exclamation"></i> القسط المستحق القادم (Q3 - 2026):</span>
-                    <span class="badge badge-warning" style="font-size: 0.65rem; padding: 2px 6px;">تاريخ الاستحقاق: 15 أغسطس 2026</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                      <div style="font-size: 1.2rem; font-weight: 900; color: #b45309; font-family: var(--font-number);">150,000 ج.م</div>
-                      <div style="font-size: 0.65rem; color: var(--text-muted);">القسط السابع من إجمالي 10 أقساط</div>
-                    </div>
-                    <button class="btn btn-sm btn-primary" onclick="app.payInstallment('Q3-2026', 150000)" style="font-size: 0.75rem; padding: 6px 12px; margin-top:0; width: auto;">
-                      <i class="fa-solid fa-credit-card"></i> سداد القسط الآن
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Full Installments Schedule Modal Button -->
-                <button class="btn" style="width: 100%; border-color: rgba(32, 39, 79, 0.25); color: var(--text-main); font-size: 0.78rem;" onclick="app.openModal('modalInstallmentsSchedule')">
-                  <i class="fa-solid fa-list-ol"></i> عرض جدول جميع الأقساط القادمة والسابقة (كشف حساب أودو)
-                </button>
-              </div>
 
               <!-- Dynamic Security QR Code -->
               <div class="qr-container" id="qrSecurityCard">
@@ -483,6 +440,51 @@
                     <span style="color: var(--accent-cyan);">3,900 ج.م</span>
                   </div>
                 </div>
+              </div>
+
+              <!-- 💳 Property Financial Installments & Ledger Card -->
+              <div class="card gold-border owner-only-financial" style="margin-top: 16px;">
+                <div class="card-header">
+                  <span class="card-title"><i class="fa-solid fa-file-invoice-dollar"></i> أقساط وكشف حساب الوحدة (Odoo Finance)</span>
+                  <span class="badge badge-warning" id="installmentStatusBadge"><i class="fa-solid fa-clock"></i> قسط قادم</span>
+                </div>
+                
+                <!-- Installments Progress Summary Bar -->
+                <div style="background: rgba(32, 39, 79, 0.05); border-radius: 8px; padding: 10px; margin-bottom: 12px; border: 1px solid rgba(32, 39, 79, 0.1);">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 4px;">
+                    <span><b>إجمالي سعر الوحدة:</b> 4,500,000 ج.م</span>
+                    <span style="color: var(--brand-teal); font-weight: 700;">المسدد: 70%</span>
+                  </div>
+                  <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
+                    <div style="width: 70%; background: linear-gradient(90deg, var(--brand-teal), #10b981); height: 100%;"></div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);">
+                    <span><b>المسدد فعلياً:</b> 3,150,000 ج.م</span>
+                    <span><b>المتبقي بأقساط:</b> 1,350,000 ج.م</span>
+                  </div>
+                </div>
+
+                <!-- Next Due Installment Highlight Box -->
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.75rem; font-weight: 800; color: #b45309;"><i class="fa-solid fa-triangle-exclamation"></i> القسط المستحق القادم (Q3 - 2026):</span>
+                    <span class="badge badge-warning" style="font-size: 0.65rem; padding: 2px 6px;">تاريخ الاستحقاق: 15 أغسطس 2026</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 1.2rem; font-weight: 900; color: #b45309; font-family: var(--font-number);">150,000 ج.م</div>
+                      <div style="font-size: 0.65rem; color: var(--text-muted);">القسط السابع من إجمالي 10 أقساط</div>
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="app.payInstallment('Q3-2026', 150000)" style="font-size: 0.75rem; padding: 6px 12px; margin-top:0; width: auto;">
+                      <i class="fa-solid fa-credit-card"></i> سداد القسط الآن
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Full Installments Schedule Modal Button -->
+                <button class="btn" style="width: 100%; border-color: rgba(32, 39, 79, 0.25); color: var(--text-main); font-size: 0.78rem;" onclick="app.openModal('modalInstallmentsSchedule')">
+                  <i class="fa-solid fa-list-ol"></i> عرض جدول جميع الأقساط القادمة والسابقة (كشف حساب أودو)
+                </button>
               </div>
 
               <!-- Smart Utility Meters -->

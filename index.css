@@ -976,7 +976,8 @@ header.global-header {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Overriding inline backgrounds on inner containers, badges, and list boxes */
+/* Overriding inline backgrounds on inner containers, badges, stat boxes, and list boxes */
+#phoneSimulator.dark-theme .stat-box,
 #phoneSimulator.dark-theme div[style*="background: #ffffff"],
 #phoneSimulator.dark-theme div[style*="background:#ffffff"],
 #phoneSimulator.dark-theme div[style*="background: rgba(32"],
@@ -992,7 +993,23 @@ header.global-header {
 #phoneSimulator.dark-theme #lprActivePlatesList > div {
   background: #1e293b !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+#phoneSimulator.dark-theme .stat-box .stat-label {
+  color: #cbd5e1 !important;
+}
+
+#phoneSimulator.dark-theme .stat-box .stat-value.gold {
+  color: #fbbf24 !important;
+}
+
+#phoneSimulator.dark-theme .stat-box .stat-value.green {
+  color: #34d399 !important;
+}
+
+#phoneSimulator.dark-theme .stat-box .stat-value.cyan {
+  color: #38bdf8 !important;
 }
 
 /* All headings, titles, labels, paragraphs, and spans */
