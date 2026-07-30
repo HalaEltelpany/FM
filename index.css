@@ -986,8 +986,49 @@ header.global-header {
 #phoneSimulator.dark-theme h2,
 #phoneSimulator.dark-theme h3,
 #phoneSimulator.dark-theme h4,
-#phoneSimulator.dark-theme p,
-#phoneSimulator.dark-theme span {
+#phoneSimulator.dark-theme p {
+  color: #ffffff !important;
+}
+
+/* Ensure spans inside dark cards get white text, but badge/button text inherits element colors */
+#phoneSimulator.dark-theme .card span,
+#phoneSimulator.dark-theme .modal-card span,
+#phoneSimulator.dark-theme .qr-container span {
+  color: #ffffff;
+}
+
+/* Badges & Light Element Overrides for High Contrast */
+#phoneSimulator.dark-theme .badge-warning {
+  background: #f59e0b !important;
+  color: #0f172a !important;
+}
+#phoneSimulator.dark-theme .badge-warning span {
+  color: #0f172a !important;
+}
+
+#phoneSimulator.dark-theme .badge-success {
+  background: #10b981 !important;
+  color: #ffffff !important;
+}
+
+#phoneSimulator.dark-theme .badge-light {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+#phoneSimulator.dark-theme .badge-light span {
+  color: #f8fafc !important;
+}
+
+#phoneSimulator.dark-theme .list-group-item,
+#phoneSimulator.dark-theme .ticket-item,
+#phoneSimulator.dark-theme .service-card {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#phoneSimulator.dark-theme select option {
+  background: #152033 !important;
   color: #ffffff !important;
 }
 

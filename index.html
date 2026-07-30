@@ -212,15 +212,21 @@
             <!-- Tab 1: الرئيسية (Home Tab) -->
             <!-- ========================================== -->
             <div class="homeowner-tab-content active" id="tabHomeHomeowner">
-              <!-- Welcome Header -->
+              <!-- Welcome Header & Customer Details Card -->
               <div class="card gold-border">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                   <div>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">أهلاً بك، المالك الرئيسي</span>
-                    <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);" id="homeownerNameText">جاري التحميل...</h2>
-                    <p style="font-size: 0.75rem; color: var(--primary-gold);">فيلا 104 - زون الساحل الشمالي</p>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">أهلاً بك، المالك الرئيسي</span>
+                    <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);" id="homeownerNameText">أسامة أحمد محمد الشريف</h2>
                   </div>
-                  <span class="badge badge-success"><i class="fa-solid fa-check"></i> حساب مؤكد</span>
+                  <span class="badge badge-success"><i class="fa-solid fa-shield-check"></i> مالك معتمد</span>
+                </div>
+
+                <!-- Customer Details Badge -->
+                <div style="background: rgba(32, 39, 79, 0.06); border-radius: 8px; padding: 8px 10px; font-size: 0.72rem; color: var(--text-main); display: flex; flex-direction: column; gap: 4px; border: 1px solid rgba(32,39,79,0.1);">
+                  <div><i class="fa-solid fa-house-chimney-user" style="color: var(--primary-gold); width: 16px;"></i> <b>رقم الوحدة:</b> <span id="homeownerUnitText">فيلا 104 - زون الساحل الشمالي</span></div>
+                  <div><i class="fa-solid fa-phone" style="color: var(--brand-teal); width: 16px;"></i> <b>رقم التليفون:</b> <span id="homeownerPhoneText">01223456789</span></div>
+                  <div><i class="fa-solid fa-envelope" style="color: #3b82f6; width: 16px;"></i> <b>البريد الإلكتروني:</b> <span id="homeownerEmailText">fmhala6@gmail.com</span></div>
                 </div>
               </div>
 
@@ -522,8 +528,8 @@
                 <!-- 1. Language Toggle Option -->
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
                   <div>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-language"></i> لغة النظام (Language)</span>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">اختر لغة واجهة التطبيق المفضلة</p>
+                    <span id="lblLangSettings" style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-language"></i> لغة النظام (Language)</span>
+                    <p id="descLangSettings" style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">اختر لغة واجهة التطبيق المفضلة</p>
                   </div>
                   <div style="display: flex; gap: 6px;">
                     <button class="btn btn-sm" id="btnLangAr" onclick="app.setLanguage('ar')" style="padding: 4px 10px; font-size: 0.7rem; margin-top:0; width: auto;">العربية</button>
@@ -534,8 +540,8 @@
                 <!-- 2. Dark/Light Mode Option -->
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
                   <div>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)</span>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">التحول لمظهر الألوان المظلم للأمان والراحة</p>
+                    <span id="lblThemeSettings" style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)</span>
+                    <p id="descThemeSettings" style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">التحول لمظهر الألوان المظلم للأمان والراحة</p>
                   </div>
                   <label class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px;">
                     <input type="checkbox" id="themeToggleSwitch" onchange="app.toggleTheme(this.checked)" style="opacity: 0; width: 0; height: 0;">
@@ -546,8 +552,8 @@
                 <!-- 3. Push Notifications Option -->
                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
                   <div>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-bell"></i> الإشعارات الفورية</span>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات</p>
+                    <span id="lblNotifySettings" style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-bell"></i> الإشعارات الفورية</span>
+                    <p id="descNotifySettings" style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات</p>
                   </div>
                   <label class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px;">
                     <input type="checkbox" id="notifyToggleSwitch" checked style="opacity: 0; width: 0; height: 0;">
@@ -1368,7 +1374,20 @@
   <div class="modal-overlay" id="modalNewTicket">
     <div class="modal-card">
       <button class="modal-close" onclick="app.closeModal('modalNewTicket')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 16px; color: var(--primary-gold);"><i class="fa-solid fa-wrench"></i> تقديم طلب صيانة جديدة</h3>
+      <h3 style="margin-bottom: 12px; color: var(--primary-gold);"><i class="fa-solid fa-wrench"></i> تقديم طلب صيانة جديدة</h3>
+      
+      <!-- Applicant Identity Summary Badge -->
+      <div style="background: rgba(32, 39, 79, 0.06); border: 1px solid rgba(32, 39, 79, 0.12); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: var(--primary-gold); margin-bottom: 4px;">
+          <i class="fa-solid fa-address-card"></i> بيانات صاحب البلاغ المسجلة تلقائياً:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>الاسم رباعي:</b> <span id="modalTicketOwnerName">أسامة أحمد محمد الشريف</span></div>
+          <div>• <b>رقم الوحدة:</b> <span id="modalTicketOwnerUnit">فيلا 104 - زون الساحل الشمالي</span></div>
+          <div>• <b>رقم التليفون:</b> <span id="modalTicketOwnerPhone">01223456789</span></div>
+          <div>• <b>البريد الإلكتروني:</b> <span id="modalTicketOwnerEmail">fmhala6@gmail.com</span></div>
+        </div>
+      </div>
       
       <div class="form-group">
         <label class="form-label">نوع الخدمة / التخصص</label>

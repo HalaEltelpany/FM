@@ -2009,6 +2009,46 @@ class UltimateFMApp {
     if (modalId === 'modalSignature') {
       setTimeout(() => this.initCanvas(), 100);
     }
+    if (modalId === 'modalNewTicket') {
+      this.updateModalTicketApplicantInfo();
+    }
+  }
+
+  updateModalTicketApplicantInfo() {
+    let fullName = 'أسامة أحمد محمد الشريف';
+    let phoneNum = '01223456789';
+    let emailAddress = 'fmhala6@gmail.com';
+    let unitNum = 'فيلا 104 - زون الساحل الشمالي';
+
+    const customName = localStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) fullName = customName;
+
+    if (this.currentRole === 'tenant') {
+      fullName = 'أحمد زاهر محمود';
+      phoneNum = '01009876543';
+      emailAddress = 'tenant.ahmed@domain.com';
+      unitNum = 'شاليه 402 - زون البحيرات';
+    } else if (this.currentRole === 'commercial') {
+      fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+      phoneNum = '01112233445';
+      emailAddress = 'bluewave@domain.com';
+      unitNum = 'محل 12 - المول التجاري';
+    } else if (this.currentRole === 'manager') {
+      fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+      phoneNum = '01221122334';
+      emailAddress = 'ayman.saeed@domain.com';
+      unitNum = 'الأماكن العامة بالقرية';
+    }
+
+    const elName = document.getElementById('modalTicketOwnerName');
+    const elUnit = document.getElementById('modalTicketOwnerUnit');
+    const elPhone = document.getElementById('modalTicketOwnerPhone');
+    const elEmail = document.getElementById('modalTicketOwnerEmail');
+
+    if (elName) elName.innerText = fullName;
+    if (elUnit) elUnit.innerText = unitNum;
+    if (elPhone) elPhone.innerText = phoneNum;
+    if (elEmail) elEmail.innerText = emailAddress;
   }
 
   closeModal(modalId) {
@@ -2936,22 +2976,22 @@ class UltimateFMApp {
     const settingsDesc = document.querySelector('#tabSettingsHomeowner .card p');
     if (settingsDesc) settingsDesc.innerText = isEn ? 'Customize user experience, preferred language and themes' : 'تخصيص تجربة الاستخدام، لغة التطبيق وتنبيهات الإشعارات الفورية.';
 
-    const langToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(1) span');
+    const langToggleLabel = document.getElementById('lblLangSettings');
     if (langToggleLabel) langToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-language"></i> System Language' : '<i class="fa-solid fa-language"></i> لغة النظام (Language)';
 
-    const langToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(1) p');
+    const langToggleDesc = document.getElementById('descLangSettings');
     if (langToggleDesc) langToggleDesc.innerText = isEn ? 'Choose preferred application language' : 'اختر لغة واجهة التطبيق المفضلة';
 
-    const themeToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(2) span');
+    const themeToggleLabel = document.getElementById('lblThemeSettings');
     if (themeToggleLabel) themeToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-moon"></i> Dark Theme Mode' : '<i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)';
 
-    const themeToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(2) p');
+    const themeToggleDesc = document.getElementById('descThemeSettings');
     if (themeToggleDesc) themeToggleDesc.innerText = isEn ? 'Toggle screen colors to night mode' : 'التحول لمظهر الألوان المظلم للأمان والراحة';
 
-    const notifyToggleLabel = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(3) span');
+    const notifyToggleLabel = document.getElementById('lblNotifySettings');
     if (notifyToggleLabel) notifyToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-bell"></i> Push Notifications' : '<i class="fa-solid fa-bell"></i> الإشعارات الفورية';
 
-    const notifyToggleDesc = document.querySelector('#tabSettingsHomeowner .card div:nth-of-type(3) p');
+    const notifyToggleDesc = document.getElementById('descNotifySettings');
     if (notifyToggleDesc) notifyToggleDesc.innerText = isEn ? 'Alerts for ticket status and bookings updates' : 'تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات';
 
     // 5. Translate Family members list elements
