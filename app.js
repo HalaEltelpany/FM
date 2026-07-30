@@ -712,27 +712,28 @@ class UltimateFMApp {
   async callOdoo(baseUrl, payload) {
     const directUrl = `${baseUrl}/jsonrpc`;
     
-    // Check if Puter.js is loaded and ready
-    if (typeof puter !== 'undefined' && puter.net && puter.net.fetch) {
+    // If running on a hosted website (like GitHub Pages), use the Corsfix proxy to bypass CORS silently without popups!
+    if (window.location.protocol !== 'file:') {
+      const proxyUrl = 'https://proxy.corsfix.com/?' + encodeURIComponent(directUrl);
       try {
-        console.log(`[Odoo Call] Attempting Puter-proxied fetch to: ${directUrl}`);
-        const response = await puter.net.fetch(directUrl, {
+        console.log(`[Odoo Call] Attempting Corsfix-proxied fetch to: ${directUrl}`);
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         if (response.ok) {
           const data = await response.json();
-          console.log('[Odoo Call] Puter fetch succeeded:', data);
+          console.log('[Odoo Call] Corsfix fetch succeeded:', data);
           return data;
         }
-        throw new Error(`Puter fetch returned status ${response.status}`);
+        throw new Error(`Corsfix fetch returned status ${response.status}`);
       } catch (err) {
-        console.warn('[Odoo Call] Puter fetch failed. Trying direct fallback...', err);
+        console.warn('[Odoo Call] Corsfix fetch failed. Trying direct fallback...', err);
       }
     }
 
-    // Direct fallback (works on localhost/file://, might fail on GitHub Pages due to CORS)
+    // Direct fallback (works on localhost/file:// protocol)
     console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
     const response = await fetch(directUrl, {
       method: 'POST',
