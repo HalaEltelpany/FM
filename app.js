@@ -827,64 +827,41 @@ class UltimateFMApp {
                                    `الفئة: ${ticket.category || 'عام'}\n` +
                                    `الوصف بالتفصيل: ${ticket.details || ticket.title || ''}`;
 
-      const getPayload = (modelName, fields) => ({
+      // Exclusively target helpdesk.ticket (Helpdesk Module / الدعم الفني)
+      const helpdeskFields = {
+        name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
+        description: formattedDescription,
+        partner_name: fullName,
+        partner_email: emailAddress,
+        partner_phone: phoneNum
+      };
+
+      const createPayload = {
         jsonrpc: "2.0",
         method: "call",
         params: {
           service: "object",
           method: "execute_kw",
-          args: [dbInput, uid, keyInput, modelName, "create", [fields]]
+          args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [helpdeskFields]]
         },
         id: Math.floor(Math.random() * 1000)
-      });
-
-      // Fields payload for Odoo ticket
-      const ticketFields = {
-        name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
-        description: formattedDescription
       };
 
-      // Try 1: helpdesk.ticket (Helpdesk Module / الدعم الفني)
-      console.log('[Odoo Sync] Attempting to create ticket in helpdesk.ticket...');
-      const helpdeskData = await this.callOdoo(baseUrl, getPayload("helpdesk.ticket", ticketFields));
-      if (!helpdeskData.error && helpdeskData.result) {
+      console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket...');
+      const helpdeskData = await this.callOdoo(baseUrl, createPayload);
+      if (helpdeskData && !helpdeskData.error && helpdeskData.result) {
         console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', helpdeskData.result);
         ticket.odooId = helpdeskData.result;
         ticket.odooModel = "helpdesk.ticket";
         this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (الدعم الفني / Helpdesk)');
-        return;
-      }
-
-      // Try 2: maintenance.request (Maintenance Module / طلبات الصيانة)
-      console.warn('[Odoo Sync] helpdesk.ticket failed or model missing. Trying fallback 1: maintenance.request...', helpdeskData?.error);
-      const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", ticketFields));
-      if (!maintData.error && maintData.result) {
-        console.log('[Odoo Sync Success] Ticket registered under maintenance.request. ID:', maintData.result);
-        ticket.odooId = maintData.result;
-        ticket.odooModel = "maintenance.request";
-        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (صيانة طلبات)');
-        return;
-      }
-
-      // Try 3: project.task (Tasks Module / المهام و To Do)
-      console.warn('[Odoo Sync] maintenance.request failed. Trying fallback 2: project.task...', maintData?.error);
-      const taskData = await this.callOdoo(baseUrl, getPayload("project.task", ticketFields));
-      if (!taskData.error && taskData.result) {
-        console.log('[Odoo Sync Success] Ticket registered under project.task. ID:', taskData.result);
-        ticket.odooId = taskData.result;
-        ticket.odooModel = "project.task";
-        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (المهام / To Do)');
-        return;
-      } else if (taskData.error) {
-        console.error('[Odoo Sync Error] All Odoo models failed to register ticket:', taskData.error);
-        this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${taskData.error.message || JSON.stringify(taskData.error)}`);
+      } else if (helpdeskData && helpdeskData.error) {
+        console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
+        this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
       }
     } catch (err) {
       console.warn('[Odoo Sync Exception]:', err);
       if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         this.showToast(`❌ حدث خطأ في اتصال أودو: ${err.message || err}`);
-      } else {
-        console.warn('[Odoo CORS Info]: Direct connection blocked by browser security policy on HTTPS web host.');
       }
     }
   }
