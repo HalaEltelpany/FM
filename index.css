@@ -958,73 +958,129 @@ header.global-header {
   --border-glass: rgba(255, 255, 255, 0.1);
   --border-gold: rgba(27, 143, 145, 0.6);
   background: #0b1320 !important;
+  color: #ffffff !important;
 }
 
+/* Force dark backgrounds on ALL cards, modals, containers, and inner divs */
 #phoneSimulator.dark-theme .card,
 #phoneSimulator.dark-theme .qr-container,
 #phoneSimulator.dark-theme .dynamic-logout-header,
-#phoneSimulator.dark-theme .modal-card {
+#phoneSimulator.dark-theme .modal-card,
+#phoneSimulator.dark-theme .list-group-item,
+#phoneSimulator.dark-theme .ticket-item,
+#phoneSimulator.dark-theme .service-card,
+#phoneSimulator.dark-theme .homeowner-tab-content,
+#phoneSimulator.dark-theme .view-panel {
   background: #152033 !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-#phoneSimulator.dark-theme .brand-hero-card {
-  background: linear-gradient(135deg, #152033 0%, #0b1320 100%) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-#phoneSimulator.dark-theme .form-control {
-  background: #0b1320 !important;
+/* Overriding inline backgrounds on inner containers, badges, and list boxes */
+#phoneSimulator.dark-theme div[style*="background: #ffffff"],
+#phoneSimulator.dark-theme div[style*="background:#ffffff"],
+#phoneSimulator.dark-theme div[style*="background: rgba(32"],
+#phoneSimulator.dark-theme div[style*="background: rgba(0,0,0,0.05)"],
+#phoneSimulator.dark-theme div[style*="background: rgba(0, 0, 0, 0.05)"],
+#phoneSimulator.dark-theme div[style*="background: rgba(0,0,0,0.15)"],
+#phoneSimulator.dark-theme div[style*="background: rgba(27, 143, 145, 0.08)"],
+#phoneSimulator.dark-theme .list-group > div,
+#phoneSimulator.dark-theme #homeownerComplaintsList > div,
+#phoneSimulator.dark-theme #homeownerPermitsList > div,
+#phoneSimulator.dark-theme #engineerTicketsList > div,
+#phoneSimulator.dark-theme #ownerFamilyMembersList > div,
+#phoneSimulator.dark-theme #lprActivePlatesList > div {
+  background: #1e293b !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-#phoneSimulator.dark-theme .form-label,
-#phoneSimulator.dark-theme .card-title,
+/* All headings, titles, labels, paragraphs, and spans */
 #phoneSimulator.dark-theme h1,
 #phoneSimulator.dark-theme h2,
 #phoneSimulator.dark-theme h3,
 #phoneSimulator.dark-theme h4,
-#phoneSimulator.dark-theme p {
+#phoneSimulator.dark-theme h5,
+#phoneSimulator.dark-theme h6,
+#phoneSimulator.dark-theme p,
+#phoneSimulator.dark-theme label,
+#phoneSimulator.dark-theme .form-label,
+#phoneSimulator.dark-theme .card-title,
+#phoneSimulator.dark-theme div,
+#phoneSimulator.dark-theme span:not(.badge):not(.btn) {
   color: #ffffff !important;
 }
 
-/* Ensure spans inside dark cards get white text, but badge/button text inherits element colors */
-#phoneSimulator.dark-theme .card span,
-#phoneSimulator.dark-theme .modal-card span,
-#phoneSimulator.dark-theme .qr-container span {
-  color: #ffffff;
+/* Buttons in Dark Mode - High Contrast Text */
+#phoneSimulator.dark-theme .btn {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Badges & Light Element Overrides for High Contrast */
-#phoneSimulator.dark-theme .badge-warning {
+#phoneSimulator.dark-theme .btn[style*="color: #20274f"],
+#phoneSimulator.dark-theme .btn-secondary,
+#phoneSimulator.dark-theme .owner-only-financial {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+#phoneSimulator.dark-theme .btn-primary {
+  background: var(--brand-teal) !important;
+  color: #ffffff !important;
+}
+
+#phoneSimulator.dark-theme .btn-cyan {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+/* Specific Badges Text Contrast */
+#phoneSimulator.dark-theme .badge-warning,
+#phoneSimulator.dark-theme .badge-warning * {
   background: #f59e0b !important;
   color: #0f172a !important;
 }
-#phoneSimulator.dark-theme .badge-warning span {
-  color: #0f172a !important;
-}
 
-#phoneSimulator.dark-theme .badge-success {
+#phoneSimulator.dark-theme .badge-success,
+#phoneSimulator.dark-theme .badge-success * {
   background: #10b981 !important;
   color: #ffffff !important;
 }
 
-#phoneSimulator.dark-theme .badge-light {
+#phoneSimulator.dark-theme .badge-cyan,
+#phoneSimulator.dark-theme .badge-cyan * {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+#phoneSimulator.dark-theme .badge-info,
+#phoneSimulator.dark-theme .badge-info * {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+#phoneSimulator.dark-theme .badge-light,
+#phoneSimulator.dark-theme .badge-light * {
   background: #334155 !important;
   color: #f8fafc !important;
 }
-#phoneSimulator.dark-theme .badge-light span {
-  color: #f8fafc !important;
+
+/* Dynamic Security QR Code Box in Dark Mode */
+#phoneSimulator.dark-theme .qr-box {
+  background: #ffffff !important;
+  padding: 10px;
+  border-radius: 12px;
 }
 
-#phoneSimulator.dark-theme .list-group-item,
-#phoneSimulator.dark-theme .ticket-item,
-#phoneSimulator.dark-theme .service-card {
-  background: #1e293b !important;
+/* Inputs, Selects, and Textareas */
+#phoneSimulator.dark-theme .form-control,
+#phoneSimulator.dark-theme select,
+#phoneSimulator.dark-theme textarea,
+#phoneSimulator.dark-theme input {
+  background: #0b1320 !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 #phoneSimulator.dark-theme select option {
@@ -1032,6 +1088,7 @@ header.global-header {
   color: #ffffff !important;
 }
 
+/* Bottom Navigation Bar */
 #phoneSimulator.dark-theme .phone-navbar {
   background: #152033 !important;
   border-top-color: rgba(255, 255, 255, 0.1) !important;

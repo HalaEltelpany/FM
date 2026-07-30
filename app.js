@@ -1954,6 +1954,18 @@ class UltimateFMApp {
     this.showToast(`🌊 تم إصدار تصريح دخول الشاطئ والبحيرات وحمامات السباحة بنجاح!\nرمز الـ Dynamic QR: ${code}\nتم تسجيل التصريح على بوابات الرفاهية الإلكترونية بالقرية.`);
   }
 
+  payInstallment(code, amount) {
+    const formattedAmount = Number(amount).toLocaleString();
+    this.showToast(`💳 تم سداد القسط المستحق (${code}) بقيمة ${formattedAmount} ج.م بنجاح!\nتم إصدار سند القبض الإلكتروني وتحديث كشف حساب الوحدة في Odoo.`);
+    
+    // Update UI badge status
+    const badge = document.getElementById('installmentStatusBadge');
+    if (badge) {
+      badge.className = 'badge badge-success';
+      badge.innerHTML = '<i class="fa-solid fa-check-double"></i> تم سداد جميع الأقساط المستحقة';
+    }
+  }
+
   openCommercialMeterModal() {
     this.openModal('modalMeterRecharge');
   }
