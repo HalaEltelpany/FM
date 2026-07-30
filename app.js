@@ -711,37 +711,35 @@ class UltimateFMApp {
 
   async callOdoo(baseUrl, payload) {
     const directUrl = `${baseUrl}/jsonrpc`;
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
     
-    try {
-      console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
-      const response = await fetch(directUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[Odoo Call] Direct fetch succeeded:', data);
-        return data;
-      }
-      throw new Error(`Direct call returned status ${response.status}`);
-    } catch (err) {
-      console.warn('[Odoo Call] Direct fetch failed or CORS blocked. Trying proxy fallback...', err);
+    // Check if Puter.js is loaded and ready
+    if (typeof puter !== 'undefined' && puter.net && puter.net.fetch) {
       try {
-        const response = await fetch(proxyUrl, {
+        console.log(`[Odoo Call] Attempting Puter-proxied fetch to: ${directUrl}`);
+        const response = await puter.net.fetch(directUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await response.json();
-        console.log('[Odoo Call] Proxy fetch succeeded:', data);
-        return data;
-      } catch (proxyErr) {
-        console.error('[Odoo Call] Proxy fallback also failed:', proxyErr);
-        throw proxyErr;
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[Odoo Call] Puter fetch succeeded:', data);
+          return data;
+        }
+        throw new Error(`Puter fetch returned status ${response.status}`);
+      } catch (err) {
+        console.warn('[Odoo Call] Puter fetch failed. Trying direct fallback...', err);
       }
     }
+
+    // Direct fallback (works on localhost/file://, might fail on GitHub Pages due to CORS)
+    console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
+    const response = await fetch(directUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return await response.json();
   }
 
   async syncTicketToOdoo(ticket) {

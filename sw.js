@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ultimate-fm-cache-v3';
+const CACHE_NAME = 'ultimate-fm-cache-v4';
 const ASSETS = [
   './',
   './index.html',
