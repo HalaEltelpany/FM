@@ -785,6 +785,44 @@ class UltimateFMApp {
 
       console.log('[Odoo Sync Success] Retrieved UID:', uid);
 
+      // Determine client information dynamically (Name رباعي, phone, email, unit)
+      let fullName = 'أسامة أحمد محمد الشريف';
+      let phoneNum = '01223456789';
+      let emailAddress = 'fmhala6@gmail.com';
+      let unitNum = 'فيلا 104 - زون الشمال';
+
+      const customName = localStorage.getItem('odoo_owner_name');
+      if (customName && customName.trim()) {
+        fullName = customName;
+      }
+
+      if (ticket.requester === 'tenant') {
+        fullName = 'أحمد زاهر محمود';
+        phoneNum = '01009876543';
+        emailAddress = 'tenant.ahmed@domain.com';
+        unitNum = 'شاليه 402 - زون البحيرات';
+      } else if (ticket.requester === 'commercial') {
+        fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+        phoneNum = '01112233445';
+        emailAddress = 'bluewave@domain.com';
+        unitNum = 'محل 12 - المول التجاري';
+      } else if (ticket.requester === 'manager') {
+        fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+        phoneNum = '01221122334';
+        emailAddress = 'ayman.saeed@domain.com';
+        unitNum = 'الأماكن العامة بالقرية';
+      }
+
+      const formattedDescription = `بلاغ صيانة عاجل من تطبيق الموبايل\n` +
+                                   `---------------------------------\n` +
+                                   `الاسم رباعي: ${fullName}\n` +
+                                   `رقم التليفون: ${phoneNum}\n` +
+                                   `البريد الإلكتروني: ${emailAddress}\n` +
+                                   `رقم الوحدة: ${unitNum}\n` +
+                                   `---------------------------------\n` +
+                                   `الفئة: ${ticket.category || 'عام'}\n` +
+                                   `الوصف بالتفصيل: ${ticket.details || ticket.title || ''}`;
+
       const getPayload = (modelName, fields) => ({
         jsonrpc: "2.0",
         method: "call",
@@ -799,7 +837,7 @@ class UltimateFMApp {
       // Try 1: project.task (Standard Project Module)
       const taskFields = {
         name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
-        description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`
+        description: formattedDescription
       };
 
       console.log('[Odoo Sync] Attempting to create ticket in project.task...');
@@ -810,7 +848,7 @@ class UltimateFMApp {
         // Try 2: helpdesk.ticket (Helpdesk Module)
         const ticketFields = {
           name: `${ticket.id}: ${ticket.title}`,
-          description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`,
+          description: formattedDescription,
           priority: "3"
         };
         
@@ -821,7 +859,7 @@ class UltimateFMApp {
           // Try 3: maintenance.request (Maintenance Module)
           const maintFields = {
             name: `${ticket.title} (#${ticket.id})`,
-            description: `بلاغ صيانة عاجل من تطبيق الموبايل\n---------------------------------\nالعميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\nالموقع/الوحدة: ${ticket.location || 'فيلا 104'}\nالفئة: ${ticket.category || 'عام'}\nالوصف بالتفصيل: ${ticket.details || ''}`
+            description: formattedDescription
           };
           
           const maintData = await this.callOdoo(baseUrl, getPayload("maintenance.request", maintFields));
@@ -910,12 +948,43 @@ class UltimateFMApp {
       this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
 
       // 2. Update Odoo Ticket description to show full lifecycle status
+      // Determine client information dynamically (Name رباعي, phone, email, unit)
+      let fullName = 'أسامة أحمد محمد الشريف';
+      let phoneNum = '01223456789';
+      let emailAddress = 'fmhala6@gmail.com';
+      let unitNum = 'فيلا 104 - زون الشمال';
+
+      const customName = localStorage.getItem('odoo_owner_name');
+      if (customName && customName.trim()) {
+        fullName = customName;
+      }
+
+      if (ticket.requester === 'tenant') {
+        fullName = 'أحمد زاهر محمود';
+        phoneNum = '01009876543';
+        emailAddress = 'tenant.ahmed@domain.com';
+        unitNum = 'شاليه 402 - زون البحيرات';
+      } else if (ticket.requester === 'commercial') {
+        fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+        phoneNum = '01112233445';
+        emailAddress = 'bluewave@domain.com';
+        unitNum = 'محل 12 - المول التجاري';
+      } else if (ticket.requester === 'manager') {
+        fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+        phoneNum = '01221122334';
+        emailAddress = 'ayman.saeed@domain.com';
+        unitNum = 'الأماكن العامة بالقرية';
+      }
+
       let updatedDesc = `بلاغ صيانة عاجل من تطبيق الموبايل\n` +
                         `---------------------------------\n` +
-                        `العميل الطالب: ${ticket.requesterName || 'المالك الرئيسي'}\n` +
-                        `الموقع/الوحدة: ${ticket.location || 'فيلا 104'}\n` +
+                        `الاسم رباعي: ${fullName}\n` +
+                        `رقم التليفون: ${phoneNum}\n` +
+                        `البريد الإلكتروني: ${emailAddress}\n` +
+                        `رقم الوحدة: ${unitNum}\n` +
+                        `---------------------------------\n` +
                         `الفئة: ${ticket.category || 'عام'}\n` +
-                        `الوصف بالتفصيل: ${ticket.details || ''}\n` +
+                        `الوصف بالتفصيل: ${ticket.details || ticket.title || ''}\n` +
                         `---------------------------------\n` +
                         `حالة التكليف الحالية: ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}`;
 
