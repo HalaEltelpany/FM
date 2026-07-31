@@ -73,12 +73,12 @@ class UltimateFMApp {
     // Initialize payment wallet balance
     this.ownerWalletBalance = 2500;
 
-    // Hardcoded Odoo Connection Config (Edit these values directly to connect!)
+    // Hardcoded Odoo Connection Config (Supports new Odoo.sh database!)
     this.odooConfig = {
-      url: 'https://edu-fm-uc.odoo.com',
-      db: 'edu-fm-uc',
-      user: 'fmhala6@gmail.com',
-      key: '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
+      url: localStorage.getItem('odoo_url') || 'https://ultimatecode-2019-fm-main-35713278.dev.odoo.com',
+      db: localStorage.getItem('odoo_db') || 'ultimatecode-2019-fm-main-35713278',
+      user: localStorage.getItem('odoo_user') || 'fmhala6@gmail.com',
+      key: localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
     };
 
     // Prepopulate Local Storage silently from configuration values
