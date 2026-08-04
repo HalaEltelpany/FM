@@ -638,6 +638,7 @@ class UltimateFMApp {
 
   handleNewTicketSubmit() {
     const category = document.getElementById('ticketCategorySelect').value;
+    const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
     const desc = document.getElementById('ticketDescInput').value || 'طلب صيانة عاجلة';
     const photoInput = document.getElementById('ticketPhotoInput');
     
@@ -654,6 +655,7 @@ class UltimateFMApp {
       id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
       title: `${category}: ${desc.substring(0, 20)}...`,
       category: category,
+      priority: priority,
       details: desc,
       status: 'جديد',
       bgClass: 'badge-warning',
@@ -817,24 +819,51 @@ class UltimateFMApp {
         unitNum = 'الأماكن العامة بالقرية';
       }
 
-      const formattedDescription = `بلاغ صيانة عاجل من تطبيق الموبايل\n` +
-                                   `---------------------------------\n` +
-                                   `الاسم رباعي: ${fullName}\n` +
-                                   `رقم التليفون: ${phoneNum}\n` +
-                                   `البريد الإلكتروني: ${emailAddress}\n` +
-                                   `رقم الوحدة: ${unitNum}\n` +
-                                   `---------------------------------\n` +
-                                   `الفئة: ${ticket.category || 'عام'}\n` +
-                                   `الوصف بالتفصيل: ${ticket.details || ticket.title || ''}`;
+      // Step 2: Try to search for matching res.partner ID in Odoo database
+      let partnerId = null;
+      try {
+        const searchPartnerPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "search",
+              [[ "|", "|", ["phone", "ilike", phoneNum], ["email", "ilike", emailAddress], ["name", "ilike", fullName] ]],
+              { limit: 1 }
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const searchPartnerData = await this.callOdoo(baseUrl, searchPartnerPayload);
+        if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
+          partnerId = searchPartnerData.result[0];
+          console.log('[Odoo Sync] Found matching res.partner ID:', partnerId);
+        }
+      } catch (pErr) {
+        console.warn('[Odoo Sync] Partner search skipped or failed:', pErr);
+      }
 
-      // Exclusively target helpdesk.ticket (Helpdesk Module / الدعم الفني)
+      // Clean description: ONLY the user's detailed problem description
+      const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
+
+      // Helpdesk Ticket payload with dedicated Odoo fields
       const helpdeskFields = {
-        name: `${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
-        description: formattedDescription,
+        name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
+        description: cleanDescription,
         partner_name: fullName,
         partner_email: emailAddress,
-        partner_phone: phoneNum
+        partner_phone: phoneNum,
+        priority: String(ticket.priority || '2') // Odoo Priority: '1'=1 Star, '2'=2 Stars, '3'=3 Stars
       };
+
+      // Link partner_id if resolved from Odoo contacts
+      if (partnerId) {
+        helpdeskFields.partner_id = partnerId;
+      }
 
       const createPayload = {
         jsonrpc: "2.0",
