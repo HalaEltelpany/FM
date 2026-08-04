@@ -855,6 +855,7 @@ class UltimateFMApp {
         name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
         description: cleanDescription,
         partner_name: fullName,
+        email_from: emailAddress,
         partner_email: emailAddress,
         partner_phone: phoneNum,
         priority: String(ticket.priority || '2') // Odoo Priority: '1'=1 Star, '2'=2 Stars, '3'=3 Stars
@@ -879,10 +880,57 @@ class UltimateFMApp {
       console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket...');
       const helpdeskData = await this.callOdoo(baseUrl, createPayload);
       if (helpdeskData && !helpdeskData.error && helpdeskData.result) {
-        console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', helpdeskData.result);
-        ticket.odooId = helpdeskData.result;
+        const ticketIdInOdoo = helpdeskData.result;
+        console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketIdInOdoo);
+        ticket.odooId = ticketIdInOdoo;
         ticket.odooModel = "helpdesk.ticket";
-        this.showToast('✅ تم تسجيل التذكرة بنجاح في أودو (الدعم الفني / Helpdesk)');
+
+        // Step 3: Attach problem photo to ticket in Odoo as ir.attachment
+        if (ticket.photoBefore) {
+          try {
+            let base64Content = "";
+            if (ticket.photoBefore.startsWith('data:image')) {
+              base64Content = ticket.photoBefore.split(',')[1];
+            } else if (ticket.photoBefore.startsWith('http')) {
+              const imgResp = await fetch(ticket.photoBefore);
+              const blob = await imgResp.blob();
+              base64Content = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(blob);
+              });
+            }
+
+            if (base64Content) {
+              const attachPayload = {
+                jsonrpc: "2.0",
+                method: "call",
+                params: {
+                  service: "object",
+                  method: "execute_kw",
+                  args: [
+                    dbInput, uid, keyInput,
+                    "ir.attachment",
+                    "create",
+                    [{
+                      name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
+                      datas: base64Content,
+                      res_model: "helpdesk.ticket",
+                      res_id: ticketIdInOdoo
+                    }]
+                  ]
+                },
+                id: Math.floor(Math.random() * 1000)
+              };
+              await this.callOdoo(baseUrl, attachPayload);
+              console.log('[Odoo Sync] Problem photo attached to Odoo ticket #', ticketIdInOdoo);
+            }
+          } catch (attErr) {
+            console.warn('[Odoo Attachment Exception]:', attErr);
+          }
+        }
+
+        this.showToast('✅ تم تسجيل التذكرة وإرفاق صورة العطل بنجاح في أودو (Helpdesk)');
       } else if (helpdeskData && helpdeskData.error) {
         console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
         this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
