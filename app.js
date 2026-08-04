@@ -819,7 +819,7 @@ class UltimateFMApp {
         unitNum = 'الأماكن العامة بالقرية';
       }
 
-      // Step 2: Try to search for matching res.partner ID in Odoo database
+      // Step 2: Resolve or Create matching res.partner ID in Odoo
       let partnerId = null;
       try {
         const searchPartnerPayload = {
@@ -832,7 +832,7 @@ class UltimateFMApp {
               dbInput, uid, keyInput,
               "res.partner",
               "search",
-              [[ "|", "|", ["phone", "ilike", phoneNum], ["email", "ilike", emailAddress], ["name", "ilike", fullName] ]],
+              [[["name", "ilike", fullName]]],
               { limit: 1 }
             ]
           },
@@ -842,26 +842,46 @@ class UltimateFMApp {
         if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
           partnerId = searchPartnerData.result[0];
           console.log('[Odoo Sync] Found matching res.partner ID:', partnerId);
+        } else {
+          // Auto create contact if not found
+          const createPartnerPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "res.partner",
+                "create",
+                [{ name: fullName, email: emailAddress, phone: phoneNum }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          const createPartnerData = await this.callOdoo(baseUrl, createPartnerPayload);
+          if (createPartnerData && createPartnerData.result) {
+            partnerId = createPartnerData.result;
+            console.log('[Odoo Sync] Auto-created res.partner ID:', partnerId);
+          }
         }
       } catch (pErr) {
-        console.warn('[Odoo Sync] Partner search skipped or failed:', pErr);
+        console.warn('[Odoo Sync] Partner resolution skipped:', pErr);
       }
 
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
 
-      // Helpdesk Ticket payload with dedicated Odoo fields
+      // Standard Helpdesk Ticket payload (Excluding invalid non-standard fields like partner_name)
       const helpdeskFields = {
         name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
         description: cleanDescription,
-        partner_name: fullName,
         email_from: emailAddress,
         partner_email: emailAddress,
         partner_phone: phoneNum,
         priority: String(ticket.priority || '2') // Odoo Priority: '1'=1 Star, '2'=2 Stars, '3'=3 Stars
       };
 
-      // Link partner_id if resolved from Odoo contacts
       if (partnerId) {
         helpdeskFields.partner_id = partnerId;
       }
@@ -878,7 +898,30 @@ class UltimateFMApp {
       };
 
       console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket...');
-      const helpdeskData = await this.callOdoo(baseUrl, createPayload);
+      let helpdeskData = await this.callOdoo(baseUrl, createPayload);
+
+      // Robust Fallback: If Odoo rejects optional fields, try minimal core fields
+      if (helpdeskData && helpdeskData.error) {
+        console.warn('[Odoo Sync] Full payload rejected, retrying with minimal core fields...', helpdeskData.error);
+        const minimalFields = {
+          name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
+          description: cleanDescription,
+          priority: String(ticket.priority || '2')
+        };
+        if (partnerId) minimalFields.partner_id = partnerId;
+
+        const fallbackPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [minimalFields]]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        helpdeskData = await this.callOdoo(baseUrl, fallbackPayload);
+      }
       if (helpdeskData && !helpdeskData.error && helpdeskData.result) {
         const ticketIdInOdoo = helpdeskData.result;
         console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketIdInOdoo);
