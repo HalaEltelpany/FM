@@ -872,11 +872,10 @@ class UltimateFMApp {
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
 
-      // Standard Helpdesk Ticket payload (Excluding invalid non-standard fields like partner_name)
+      // Standard Helpdesk Ticket payload (Excluding invalid non-standard fields like email_from)
       const helpdeskFields = {
         name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
         description: cleanDescription,
-        email_from: emailAddress,
         partner_email: emailAddress,
         partner_phone: phoneNum,
         priority: String(ticket.priority || '2') // Odoo Priority: '1'=1 Star, '2'=2 Stars, '3'=3 Stars
