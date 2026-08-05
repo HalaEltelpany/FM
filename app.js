@@ -131,6 +131,8 @@ class UltimateFMApp {
       this.updateClock();
       setInterval(() => this.updateClock(), 1000);
       this.initSplashScreen();
+      this.loadTicketsFromStorage();
+      this.syncTicketsFromOdoo();
       this.renderTickets();
 
       // Auto login if active session exists
@@ -651,6 +653,10 @@ class UltimateFMApp {
     };
     const defaultPhoto = fallbacks[category] || fallbacks['سباكة'];
 
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
     const newTicket = {
       id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
       title: `${category}: ${desc.substring(0, 20)}...`,
@@ -663,12 +669,15 @@ class UltimateFMApp {
       assignedTech: '',
       photoBefore: defaultPhoto,
       photoAfter: '',
-      createdAt: new Date(),
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr,
       resolutionTime: ''
     };
 
     const proceed = () => {
       this.tickets.unshift(newTicket);
+      this.saveTicketsToStorage();
       this.renderTickets();
       this.closeModal('modalNewTicket');
       if (photoInput) photoInput.value = '';
@@ -709,6 +718,119 @@ class UltimateFMApp {
 
     this.closeModal('modalOdooSettings');
     this.showToast(`✅ تم حفظ وتأكيد إعدادات Odoo ERP بنجاح!\nسيرفر: ${url || 'Odoo EDU Live'}\nقاعدة البيانات: ${db}\nالاسم المعتمد: ${name || 'جاري جلبه من Odoo'}\nتم تفعيل الربط المباشر مع جميع بلاغات الصيانة والعدادات.`);
+  }
+
+  saveTicketsToStorage() {
+    try {
+      localStorage.setItem('app_tickets', JSON.stringify(this.tickets));
+    } catch (e) {
+      console.warn('Could not save tickets to localStorage', e);
+    }
+  }
+
+  loadTicketsFromStorage() {
+    try {
+      const stored = localStorage.getItem('app_tickets');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          this.tickets = parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not load tickets from localStorage', e);
+    }
+  }
+
+  async syncTicketsFromOdoo() {
+    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    try {
+      const authPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const authData = await this.callOdoo(baseUrl, authPayload);
+      if (!authData || !authData.result) return;
+      const uid = authData.result;
+
+      const readPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "helpdesk.ticket",
+            "search_read",
+            [[]],
+            {
+              fields: ["id", "name", "description", "stage_id", "priority", "create_date", "partner_email", "partner_phone"],
+              order: "id desc",
+              limit: 50
+            }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const readData = await this.callOdoo(baseUrl, readPayload);
+      if (readData && readData.result && Array.isArray(readData.result)) {
+        console.log('[Odoo Sync Read] Retrieved tickets count:', readData.result.length);
+        const odooTickets = readData.result.map(rec => {
+          const rawDate = rec.create_date ? new Date(rec.create_date.replace(' ', 'T') + 'Z') : new Date();
+          const dateStr = rawDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+          const timeStr = rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+          let cat = 'صيانة العامة';
+          if (rec.name.includes('سباكة')) cat = 'سباكة';
+          else if (rec.name.includes('كهرباء')) cat = 'كهرباء';
+          else if (rec.name.includes('كهروميكانيك') || rec.name.includes('تكييف')) cat = 'كهروميكانيك';
+          else if (rec.name.includes('نجارة')) cat = 'نجارة';
+
+          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
+          let bg = 'badge-warning';
+          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved')) bg = 'badge-success';
+
+          return {
+            id: `TK-OD-${rec.id}`,
+            odooId: rec.id,
+            title: rec.name,
+            category: cat,
+            priority: String(rec.priority || '2'),
+            details: rec.description || '',
+            status: stageName,
+            bgClass: bg,
+            requester: 'homeowner',
+            createdAt: rawDate,
+            dateStr: dateStr,
+            timeStr: timeStr,
+            photoBefore: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80'
+          };
+        });
+
+        // Merge with existing tickets uniquely
+        const existingIds = new Set(this.tickets.map(t => String(t.id)));
+        odooTickets.forEach(otk => {
+          if (!existingIds.has(String(otk.id))) {
+            this.tickets.push(otk);
+          }
+        });
+
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      }
+    } catch (err) {
+      console.warn('[Odoo Tickets Sync Read Exception]', err);
+    }
   }
 
   async callOdoo(baseUrl, payload) {
@@ -1272,25 +1394,56 @@ class UltimateFMApp {
         `;
       }
 
+      const rawDate = tk.createdAt ? new Date(tk.createdAt) : new Date();
+      const dateDisplay = tk.dateStr || rawDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+      const timeDisplay = tk.timeStr || rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+      let priorityStars = '';
+      if (tk.priority === '3') priorityStars = ' ⭐⭐⭐';
+      else if (tk.priority === '2') priorityStars = ' ⭐⭐';
+      else if (tk.priority === '1') priorityStars = ' ⭐';
+
       return `
-        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')};">
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')}; font-family: var(--font-main);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 style="font-size: 0.85rem; font-weight: 700;">${title}</h4>
+            <h4 style="font-size: 0.85rem; font-weight: 700;">${title}${priorityStars}</h4>
             <span class="badge ${tk.bgClass}">${status}</span>
           </div>
-          <p style="font-size: 0.7rem; color: var(--text-muted);">${isEn ? 'Category' : 'التخصص'}: ${category} • ${isEn ? 'Code' : 'كود'}: #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</p>
+          <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+            <span>${isEn ? 'Category' : 'التخصص'}: <b>${category}</b> • #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</span>
+            <span style="font-size: 0.68rem; color: #1b8f91; font-weight: 700; background: rgba(27, 143, 145, 0.08); padding: 2px 6px; border-radius: 4px;">
+              <i class="fa-regular fa-calendar-days"></i> ${dateDisplay} • <i class="fa-regular fa-clock"></i> ${timeDisplay}
+            </span>
+          </div>
           ${photosHtml}
           ${paymentHtml}
         </div>
       `;
     };
 
-    // Render Homeowner Tickets list
+    // Render Homeowner Tickets list & Update Category Counters
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
       const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner');
+
+      // Emaar-style Category Counters Summary
+      const plumbingCount = homeownerTks.filter(t => t.category === 'سباكة').length;
+      const elecCount = homeownerTks.filter(t => t.category === 'كهرباء').length;
+      const hvacCount = homeownerTks.filter(t => t.category === 'كهروميكانيك' || t.category === 'تكييف').length;
+      const woodCount = homeownerTks.filter(t => t.category === 'نجارة').length;
+
+      const elPlumb = document.getElementById('catPlumbingCount');
+      const elElec = document.getElementById('catElecCount');
+      const elHvac = document.getElementById('catHvacCount');
+      const elWood = document.getElementById('catWoodCount');
+
+      if (elPlumb) elPlumb.innerText = plumbingCount;
+      if (elElec) elElec.innerText = elecCount;
+      if (elHvac) elHvac.innerText = hvacCount;
+      if (elWood) elWood.innerText = woodCount;
+
       const badge = document.getElementById('ticketCountBadge');
-      if (badge) badge.innerText = isEn ? `${homeownerTks.length} active` : `${homeownerTks.length} نشطة`;
+      if (badge) badge.innerText = isEn ? `${homeownerTks.length} total` : `${homeownerTks.length} طلبات مسجلة`;
       homeownerList.innerHTML = '';
       if (homeownerTks.length === 0) {
         homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">${isEn ? 'No active tickets' : 'لا توجد بلاغات حالية'}</div>`;
@@ -1386,6 +1539,18 @@ class UltimateFMApp {
         managerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد بلاغات واردة غير مخصصة</div>';
       } else {
         unassignedTks.forEach(tk => {
+          const createDate = tk.createdAt ? new Date(tk.createdAt) : new Date();
+          const elapsedMins = Math.max(1, Math.round((Date.now() - createDate) / 60000));
+          
+          let slaBadgeHtml = '';
+          if (elapsedMins <= 30) {
+            slaBadgeHtml = `<span class="badge badge-success" style="font-size: 0.68rem; margin-top:0;"><i class="fa-solid fa-stopwatch"></i> SLA ممتاز: 30د مستهدفة (منذ ${elapsedMins}د)</span>`;
+          } else if (elapsedMins <= 60) {
+            slaBadgeHtml = `<span class="badge badge-warning" style="font-size: 0.68rem; margin-top:0;"><i class="fa-solid fa-clock"></i> SLA مقبول: 60د أقصى (منذ ${elapsedMins}د)</span>`;
+          } else {
+            slaBadgeHtml = `<span class="badge badge-danger" style="font-size: 0.68rem; margin-top:0;"><i class="fa-solid fa-triangle-exclamation"></i> SLA متأخر: تجاوز ${elapsedMins}د (أداء ضعيف)</span>`;
+          }
+
           let actionHtml = '';
           if (tk.status === 'جديد') {
             actionHtml = `
@@ -1404,7 +1569,7 @@ class UltimateFMApp {
           } else {
             actionHtml = `
               <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #6ee7b7; margin-top: 8px;">
-                <i class="fa-solid fa-user-check"></i> تم التعيين للفني: <strong>${tk.assignedTech}</strong>
+                <i class="fa-solid fa-user-check"></i> تم التعيين للفني: <strong>${tk.assignedTech}</strong> (زمن التخصيص: ${tk.dispatchMins || 1} دقيقة)
               </div>
             `;
           }
@@ -1413,11 +1578,12 @@ class UltimateFMApp {
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="badge ${tk.bgClass}">${tk.status}</span>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">المرسل: ${tk.requester} • #${tk.id}</span>
+                ${slaBadgeHtml}
               </div>
-              <h4 style="font-size: 0.88rem; font-weight: 700;">${tk.title}</h4>
+              <h4 style="font-size: 0.88rem; font-weight: 700; margin-top: 4px;">${tk.title}</h4>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">المرسل: ${tk.requester} • #${tk.id}</div>
               
-              <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
                 <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;">
                 <span style="font-size: 0.72rem; color: var(--text-muted);">معاينة صورة المشكلة لتقييم الكفاءة المطلوبة</span>
               </div>
@@ -1786,13 +1952,24 @@ class UltimateFMApp {
     if (!techSelect) return;
     const techName = techSelect.value;
 
-    const tk = this.tickets.find(t => t.id === ticketId);
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (tk) {
+      const now = new Date();
+      tk.dispatchedAt = now;
       tk.status = 'تم التعيين للفني';
       tk.bgClass = 'badge-info';
       tk.assignedTech = techName;
+
+      // Calculate Manager Response Time
+      const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
+      const dispatchMins = Math.max(1, Math.round((now - createTime) / 60000));
+      tk.dispatchMins = dispatchMins;
+
+      let managerRating = dispatchMins <= 15 ? '🟢 استجابة سريعة جداً (خلال 15د)' : (dispatchMins <= 30 ? '🟡 استجابة متوسطة' : '🔴 تأخير في التخصيص (تجاوز SLA)');
+
+      this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) بنجاح!\nستظهر المهمة الآن في شاشة الفني الميدانية للبدء بالعمل.`);
+      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) خلال ${dispatchMins} دقيقة!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
       // Sync update to Odoo
       this.syncTicketUpdateToOdoo(tk);
@@ -1800,7 +1977,7 @@ class UltimateFMApp {
   }
 
   completeTicket(ticketId, fileInputId) {
-    const tk = this.tickets.find(t => t.id === ticketId);
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
     const fileInput = document.getElementById(fileInputId);
@@ -1811,17 +1988,33 @@ class UltimateFMApp {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      // Calculate resolution time
-      const diffMs = new Date() - tk.createdAt;
-      const diffMins = Math.max(2, Math.round(diffMs / 6000)); // Simulating 6 seconds = 1 minute
+      const now = new Date();
+      tk.resolvedAt = now;
+      const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
+      const totalMins = Math.max(1, Math.round((now - createTime) / 60000));
       
       tk.status = 'تم الانتهاء';
       tk.bgClass = 'badge-success';
       tk.photoAfter = e.target.result;
-      tk.resolutionTime = `${diffMins} دقيقة (التزام كامل بـ SLA)`;
+      tk.totalResolutionMins = totalMins;
 
+      // SLA Metric Evaluation (Target: <= 30 mins, Max: <= 60 mins)
+      if (totalMins <= 30) {
+        tk.slaRating = '🟢 أداء ممتاز (تم الحل في أقل من 30 دقيقة)';
+        tk.slaBadgeClass = 'badge-success';
+      } else if (totalMins <= 60) {
+        tk.slaRating = '🟡 أداء مقبول (تم الحل خلال ساعة)';
+        tk.slaBadgeClass = 'badge-warning';
+      } else {
+        tk.slaRating = '🔴 أداء ضعيف / تجاوز SLA (أكثر من 60 دقيقة)';
+        tk.slaBadgeClass = 'badge-danger';
+      }
+
+      tk.resolutionTime = `${totalMins} دقيقة • ${tk.slaRating}`;
+
+      this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم تسجيل إتمام الإصلاح للعطل #${ticketId} بنجاح!\nصورة بعد الإصلاح تم حفظها كدليل للمالك، وتم تحديث التذكرة كـ "مكتمل" بمدة حل قدرها ${diffMins} دقيقة.`);
+      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} بنجاح!\nمدة الإنجاز الكلية: ${totalMins} دقيقة.\nمؤشر تقييم SLA: ${tk.slaRating}`);
       
       // Sync update to Odoo
       this.syncTicketUpdateToOdoo(tk);
