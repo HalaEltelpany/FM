@@ -414,6 +414,8 @@ class UltimateFMApp {
     const targetId = targetMap[role] || 'viewHomeowner';
     const activePanel = document.getElementById(targetId);
     if (activePanel) {
+      activePanel.style.setProperty('display', 'flex', 'important');
+      activePanel.style.setProperty('flex-direction', 'column', 'important');
       activePanel.classList.add('active');
     }
 
@@ -3137,10 +3139,11 @@ class UltimateFMApp {
       tab.classList.remove('active');
     });
 
-    // Show selected tab content
+    // Show selected tab content explicitly as flex column
     const target = document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Homeowner`);
     if (target) {
-      target.style.removeProperty('display');
+      target.style.setProperty('display', 'flex', 'important');
+      target.style.setProperty('flex-direction', 'column', 'important');
       target.classList.add('active');
     }
 

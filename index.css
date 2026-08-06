@@ -511,10 +511,26 @@ header.global-header {
   padding: 16px;
   gap: 16px;
   animation: fadeIn 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .view-panel.active {
-  display: flex;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.homeowner-tab-content {
+  display: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.homeowner-tab-content.active {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
 }
 
 @keyframes fadeIn {
