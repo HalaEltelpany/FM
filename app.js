@@ -1409,11 +1409,13 @@ class UltimateFMApp {
             <h4 style="font-size: 0.85rem; font-weight: 700;">${title}${priorityStars}</h4>
             <span class="badge ${tk.bgClass}">${status}</span>
           </div>
-          <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
-            <span>${isEn ? 'Category' : 'التخصص'}: <b>${category}</b> • #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</span>
-            <span style="font-size: 0.68rem; color: #1b8f91; font-weight: 700; background: rgba(27, 143, 145, 0.08); padding: 2px 6px; border-radius: 4px;">
-              <i class="fa-regular fa-calendar-days"></i> ${dateDisplay} • <i class="fa-regular fa-clock"></i> ${timeDisplay}
-            </span>
+          <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 4px; background: rgba(32, 39, 79, 0.03); padding: 6px 8px; border-radius: 6px; width: 100%; box-sizing: border-box;">
+            <div>${isEn ? 'Category' : 'التخصص'}: <b>${category}</b> • #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</div>
+            <div style="font-size: 0.68rem; color: #1b8f91; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; width: 100%;">
+              <span><i class="fa-regular fa-calendar-days"></i> ${dateDisplay}</span>
+              <span>•</span>
+              <span><i class="fa-regular fa-clock"></i> ${timeDisplay}</span>
+            </div>
           </div>
           ${photosHtml}
           ${paymentHtml}

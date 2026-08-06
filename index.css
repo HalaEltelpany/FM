@@ -261,6 +261,11 @@
   font-size: 2rem;
 }
 
+html, body, .app-wrapper, .main-stage, .phone-simulator, .phone-screen, .view-panel, .card, .homeowner-tab-content, .ticket-item {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 body {
   background: var(--bg-main);
   background-image: 
@@ -270,7 +275,7 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   direction: rtl;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 }
 
 /* App Wrapper & Simulator Controls */
@@ -281,6 +286,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 header.global-header {
