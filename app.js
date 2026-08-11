@@ -898,27 +898,37 @@ class UltimateFMApp {
                        combinedNorm.includes('زوار') || 
                        combinedNorm.includes('security') || 
                        combinedNorm.includes('lpr') || 
-                       combinedNorm.includes('دخول البحر') || 
-                       combinedNorm.includes('بلاغ');
+                       combinedNorm.includes('دخول البحر');
 
-    // 2. Customer Care & Financials & Complaints & Suggestions & Deposits & Installments -> Route to "Customer Care" (خدمة العملاء)
-    const isCustomerCare = combinedNorm.includes('شكوي') || 
-                          combinedNorm.includes('شكاوي') || 
-                          combinedNorm.includes('مقترح') || 
-                          combinedNorm.includes('مقترحات') || 
-                          combinedNorm.includes('وديعه') || 
-                          combinedNorm.includes('ودائع') || 
-                          combinedNorm.includes('اقساط') || 
-                          combinedNorm.includes('قسط') || 
-                          combinedNorm.includes('ماليات') || 
-                          combinedNorm.includes('استفسار') || 
-                          combinedNorm.includes('استفسارات') || 
-                          combinedNorm.includes('فواتير') || 
-                          combinedNorm.includes('خدمه العملاء') || 
-                          combinedNorm.includes('customer care');
+    // 2. Accounting & Financial Inquiries -> Route to "فريق الحسابات" (Accounting Team)
+    const isAccounting = combinedNorm.includes('حسابات') || 
+                         combinedNorm.includes('الحسابات') || 
+                         combinedNorm.includes('مالي') || 
+                         combinedNorm.includes('ماليات') || 
+                         combinedNorm.includes('كشف حساب') || 
+                         combinedNorm.includes('وديعه') || 
+                         combinedNorm.includes('ودائع') || 
+                         combinedNorm.includes('اقساط') || 
+                         combinedNorm.includes('قسط') || 
+                         combinedNorm.includes('فواتير') || 
+                         combinedNorm.includes('accounting') || 
+                         combinedNorm.includes('finance');
 
-    // 3. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
-    const isMaintenance = !isSecurity && !isCustomerCare && (
+    // 3. Customer Care & General Complaints & Suggestions -> Route to "Customer Care" (خدمة العملاء)
+    const isCustomerCare = !isSecurity && !isAccounting && (
+      combinedNorm.includes('شكوي') || 
+      combinedNorm.includes('شكاوي') || 
+      combinedNorm.includes('مقترح') || 
+      combinedNorm.includes('مقترحات') || 
+      combinedNorm.includes('استفسار') || 
+      combinedNorm.includes('استفسارات') || 
+      combinedNorm.includes('خدمه العملاء') || 
+      combinedNorm.includes('customer care') || 
+      combinedNorm.includes('care')
+    );
+
+    // 4. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
+    const isMaintenance = !isSecurity && !isAccounting && !isCustomerCare && (
       combinedNorm.includes('صيانه') || 
       combinedNorm.includes('سباكه') || 
       combinedNorm.includes('كهرباء') || 
@@ -942,6 +952,11 @@ class UltimateFMApp {
         const tNorm = normalizeAr(t.name);
         return tNorm.includes('امن') || tNorm.includes('الامن') || tNorm.includes('security');
       });
+    } else if (isAccounting) {
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('حسابات') || tNorm.includes('الحسابات') || tNorm.includes('الماليه') || tNorm.includes('ماليه') || tNorm.includes('accounting') || tNorm.includes('finance');
+      });
     } else if (isCustomerCare) {
       targetTeam = teams.find(t => {
         const tNorm = normalizeAr(t.name);
@@ -956,13 +971,10 @@ class UltimateFMApp {
 
     // Broad fallback matching
     if (!targetTeam) {
-      if (isSecurity) {
-        targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
-      } else if (isMaintenance) {
-        targetTeam = teams.find(t => normalizeAr(t.name).includes('صيانه'));
-      } else {
-        targetTeam = teams.find(t => normalizeAr(t.name).includes('عملاء') || normalizeAr(t.name).includes('care'));
-      }
+      if (isSecurity) targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
+      else if (isAccounting) targetTeam = teams.find(t => normalizeAr(t.name).includes('حسابات') || normalizeAr(t.name).includes('ماليه') || normalizeAr(t.name).includes('account'));
+      else if (isCustomerCare) targetTeam = teams.find(t => normalizeAr(t.name).includes('عملاء') || normalizeAr(t.name).includes('care'));
+      else if (isMaintenance) targetTeam = teams.find(t => normalizeAr(t.name).includes('صيانه'));
     }
 
     if (targetTeam) {
@@ -1230,7 +1242,17 @@ class UltimateFMApp {
           }
         }
 
-        this.showToast('✅ تم تسجيل التذكرة وإرفاق صورة العطل بنجاح في أودو (Helpdesk)');
+        if (ticket.photoBefore) {
+          this.showToast('✅ تم تسجيل تذكرة الصيانة وإرفاق صورة العطل بنجاح في أودو (Helpdesk)');
+        } else if (ticket.category && (ticket.category.includes('أمني') || ticket.category.includes('أمن'))) {
+          this.showToast('🚨 تم تسجيل البلاغ/التصريح وإرساله فوراً لفريق الأمن بـ أودو (Helpdesk)');
+        } else if (ticket.category && (ticket.category.includes('حسابات') || ticket.category.includes('مالي'))) {
+          this.showToast('💳 تم إرسال الاستفسار المالي لفريق الحسابات بنجاح في أودو (Helpdesk)');
+        } else if (ticket.category && (ticket.category.includes('شكاوى') || ticket.category.includes('مقترحات'))) {
+          this.showToast('💬 تم إرسال الشكوى/المقترح لفريق خدمة العملاء (Customer Care) في أودو!');
+        } else {
+          this.showToast('✅ تم تسجيل الطلب بنجاح في نظام أودو (Helpdesk)');
+        }
       } else if (helpdeskData && helpdeskData.error) {
         console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
         this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
