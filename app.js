@@ -1642,6 +1642,20 @@ class UltimateFMApp {
       }
     }
 
+    // Render Financial Inquiries list in Tab 3 (Financials Tab)
+    const finInquiriesList = document.getElementById('financialInquiriesList');
+    if (finInquiriesList) {
+      const finTks = this.tickets.filter(tk => tk.category && (tk.category.includes('حسابات') || tk.category.includes('مالي')));
+      finInquiriesList.innerHTML = '';
+      if (finTks.length === 0) {
+        finInquiriesList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد استفسارات مالية حالية. اضغط الزر أعلاه لإرسال استفسار مالي جديد.</div>`;
+      } else {
+        finTks.forEach(tk => {
+          finInquiriesList.innerHTML += getTicketHtml(tk);
+        });
+      }
+    }
+
     // Render Tenant Tickets list
     const tenantList = document.getElementById('tenantTicketsList');
     if (tenantList) {
@@ -2717,17 +2731,27 @@ class UltimateFMApp {
     }
 
     const csTicket = {
+      id: 'CS-' + Math.floor(1000 + Math.random() * 9000),
       category: 'شكاوى ومقترحات لخدمة العملاء',
       title: `${type}: ${details.substring(0, 30)}`,
       details: `مقدم الطلب: ${name}\nرقم الموبايل: ${phone}\nنوع الطلب: ${type}\nالتفاصيل: ${details}`,
-      priority: '2'
+      status: 'قيد المراجعة والرد',
+      bgClass: 'badge-warning',
+      requester: 'homeowner',
+      priority: '2',
+      createdAt: new Date().toISOString()
     };
 
+    this.tickets.unshift(csTicket);
+    this.saveTicketsToStorage();
+    this.renderTickets();
     this.closeModal('modalComplaintSuggestion');
     this.showToast(`💬 تم إرسال الشكوى/المقترح بنجاح لخدمة العملاء (Customer Care)!\nسنقوم بالمتابعة معكم في أقرب وقت.`);
 
     try {
       await this.syncTicketToOdoo(csTicket, phone, name);
+      this.saveTicketsToStorage();
+      this.renderTickets();
     } catch (err) {
       console.warn('[Odoo Customer Care Sync Exception]:', err);
     }
@@ -2763,17 +2787,27 @@ class UltimateFMApp {
     }
 
     const finTicket = {
+      id: 'FIN-' + Math.floor(1000 + Math.random() * 9000),
       category: 'استفسار مالي وحسابات',
       title: `استفسار مالي: ${type}`,
       details: `مقدم الاستفسار: ${name}\nرقم الموبايل: ${phone}\nموضوع الاستفسار: ${type}\nالتفاصيل: ${details}`,
-      priority: '2'
+      status: 'قيد الفحص والرد من الحسابات',
+      bgClass: 'badge-warning',
+      requester: 'homeowner',
+      priority: '2',
+      createdAt: new Date().toISOString()
     };
 
+    this.tickets.unshift(finTicket);
+    this.saveTicketsToStorage();
+    this.renderTickets();
     this.closeModal('modalFinancialInquiry');
     this.showToast(`💳 تم إرسال الاستفسار المالي بنجاح لفريق الحسابات!\nجاري المراجعة والرد بكشف الحساب.`);
 
     try {
       await this.syncTicketToOdoo(finTicket, phone, name);
+      this.saveTicketsToStorage();
+      this.renderTickets();
     } catch (err) {
       console.warn('[Odoo Financial Sync Exception]:', err);
     }
