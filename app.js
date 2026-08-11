@@ -873,79 +873,95 @@ class UltimateFMApp {
   resolveOdooTeamId(ticket, teams) {
     if (!teams || !Array.isArray(teams) || teams.length === 0) return null;
 
-    const catStr = String(ticket.category || '').toLowerCase();
-    const titleStr = String(ticket.title || '').toLowerCase();
-    const detailsStr = String(ticket.details || ticket.description || '').toLowerCase();
-    const typeStr = String(ticket.type || '').toLowerCase();
-    const combinedStr = `${catStr} ${titleStr} ${detailsStr} ${typeStr}`;
+    const normalizeAr = (s) => String(s || '').toLowerCase()
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .trim();
+
+    const catNorm = normalizeAr(ticket.category);
+    const titleNorm = normalizeAr(ticket.title);
+    const detailsNorm = normalizeAr(ticket.details || ticket.description);
+    const typeNorm = normalizeAr(ticket.type);
+    const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
 
     // 1. Security & Gate Passes Keywords -> Route to "الأمن" (Security Team)
-    const isSecurity = combinedStr.includes('أمن') || 
-                       combinedStr.includes('أمني') || 
-                       combinedStr.includes('تصريح') || 
-                       combinedStr.includes('تصاريح') || 
-                       combinedStr.includes('بوابة') || 
-                       combinedStr.includes('بوابات') || 
-                       combinedStr.includes('سيارات') || 
-                       combinedStr.includes('لوحة') || 
-                       combinedStr.includes('شحنة') || 
-                       combinedStr.includes('زائر') || 
-                       combinedStr.includes('security') || 
-                       combinedStr.includes('lpr') || 
-                       combinedStr.includes('دخول البحر');
+    const isSecurity = combinedNorm.includes('امن') || 
+                       combinedNorm.includes('تصريح') || 
+                       combinedNorm.includes('تصاريح') || 
+                       combinedNorm.includes('بوابه') || 
+                       combinedNorm.includes('بوابات') || 
+                       combinedNorm.includes('سيارات') || 
+                       combinedNorm.includes('لوحه') || 
+                       combinedNorm.includes('شحنه') || 
+                       combinedNorm.includes('زائر') || 
+                       combinedNorm.includes('زوار') || 
+                       combinedNorm.includes('security') || 
+                       combinedNorm.includes('lpr') || 
+                       combinedNorm.includes('دخول البحر') || 
+                       combinedNorm.includes('بلاغ');
 
     // 2. Customer Care & Financials & Complaints & Suggestions & Deposits & Installments -> Route to "Customer Care" (خدمة العملاء)
-    const isCustomerCare = combinedStr.includes('شكوى') || 
-                          combinedStr.includes('شكاوى') || 
-                          combinedStr.includes('مقترح') || 
-                          combinedStr.includes('مقترحات') || 
-                          combinedStr.includes('وديعة') || 
-                          combinedStr.includes('ودائع') || 
-                          combinedStr.includes('أقساط') || 
-                          combinedStr.includes('قسط') || 
-                          combinedStr.includes('ماليات') || 
-                          combinedStr.includes('استفسار') || 
-                          combinedStr.includes('استفسارات') || 
-                          combinedStr.includes('فواتير') || 
-                          combinedStr.includes('خدمة العملاء') || 
-                          combinedStr.includes('customer care');
+    const isCustomerCare = combinedNorm.includes('شكوي') || 
+                          combinedNorm.includes('شكاوي') || 
+                          combinedNorm.includes('مقترح') || 
+                          combinedNorm.includes('مقترحات') || 
+                          combinedNorm.includes('وديعه') || 
+                          combinedNorm.includes('ودائع') || 
+                          combinedNorm.includes('اقساط') || 
+                          combinedNorm.includes('قسط') || 
+                          combinedNorm.includes('ماليات') || 
+                          combinedNorm.includes('استفسار') || 
+                          combinedNorm.includes('استفسارات') || 
+                          combinedNorm.includes('فواتير') || 
+                          combinedNorm.includes('خدمه العملاء') || 
+                          combinedNorm.includes('customer care');
 
     // 3. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
     const isMaintenance = !isSecurity && !isCustomerCare && (
-      combinedStr.includes('صيانة') || 
-      combinedStr.includes('سباكة') || 
-      combinedStr.includes('كهرباء') || 
-      combinedStr.includes('تكييف') || 
-      combinedStr.includes('نجارة') || 
-      combinedStr.includes('زراعة') || 
-      combinedStr.includes('نظافة') || 
-      combinedStr.includes('أعطال') || 
-      combinedStr.includes('تسريب') || 
-      combinedStr.includes('مواسير') || 
-      combinedStr.includes('مرافق') || 
-      combinedStr.includes('داخلية') || 
-      combinedStr.includes('خارجية') || 
-      combinedStr.includes('maintenance')
+      combinedNorm.includes('صيانه') || 
+      combinedNorm.includes('سباكه') || 
+      combinedNorm.includes('كهرباء') || 
+      combinedNorm.includes('تكييف') || 
+      combinedNorm.includes('نجاره') || 
+      combinedNorm.includes('زراعه') || 
+      combinedNorm.includes('نظافه') || 
+      combinedNorm.includes('اعطال') || 
+      combinedNorm.includes('تسريب') || 
+      combinedNorm.includes('مواسير') || 
+      combinedNorm.includes('مرافق') || 
+      combinedNorm.includes('داخليه') || 
+      combinedNorm.includes('خارجيه') || 
+      combinedNorm.includes('maintenance')
     );
 
     let targetTeam = null;
 
     if (isSecurity) {
-      targetTeam = teams.find(t => t.name.includes('الأمن') || t.name.includes('أمن') || t.name.toLowerCase().includes('security'));
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('امن') || tNorm.includes('الامن') || tNorm.includes('security');
+      });
     } else if (isCustomerCare) {
-      targetTeam = teams.find(t => t.name.includes('خدمة العملاء') || t.name.toLowerCase().includes('customer care') || t.name.toLowerCase().includes('care'));
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('خدمه العملاء') || tNorm.includes('عملاء') || tNorm.includes('customer care') || tNorm.includes('care');
+      });
     } else if (isMaintenance) {
-      targetTeam = teams.find(t => t.name.includes('فريق الصيانة') || t.name.includes('الصيانة') || t.name.includes('صيانة') || t.name.toLowerCase().includes('maintenance'));
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('فريق الصيانه') || tNorm.includes('صيانه') || tNorm.includes('الصيانه') || tNorm.includes('maintenance');
+      });
     }
 
-    // Fallbacks if exact team name not matched
+    // Broad fallback matching
     if (!targetTeam) {
       if (isSecurity) {
-        targetTeam = teams.find(t => t.name.includes('أمن') || t.name.includes('الأمن'));
+        targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
       } else if (isMaintenance) {
-        targetTeam = teams.find(t => t.name.includes('صيانة') || t.name.includes('الصيانة'));
+        targetTeam = teams.find(t => normalizeAr(t.name).includes('صيانه'));
       } else {
-        targetTeam = teams.find(t => t.name.includes('خدمة العملاء') || t.name.toLowerCase().includes('customer care'));
+        targetTeam = teams.find(t => normalizeAr(t.name).includes('عملاء') || normalizeAr(t.name).includes('care'));
       }
     }
 
@@ -956,7 +972,7 @@ class UltimateFMApp {
     return null;
   }
 
-  async syncTicketToOdoo(ticket) {
+  async syncTicketToOdoo(ticket, overridePhone, overrideName) {
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2609,13 +2625,13 @@ class UltimateFMApp {
   async syncComplaintToOdoo(name, phone, details) {
     console.log(`[Odoo Sync] Syncing Security Emergency Complaint for ${name} (${phone}): ${details}`);
     const secTicket = {
-      category: 'بلاغ أمني عاجل',
-      title: `بلاغ أمني طارئ: ${details.substring(0, 35)}`,
+      category: 'بلاغ أمني طارئ',
+      title: `بلاغ أمني عاجل: ${details.substring(0, 35)}`,
       details: `بلاغ أمني عاجل من: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}`,
       priority: '3' // ⭐⭐⭐ Red Alert High Priority
     };
     try {
-      await this.syncTicketToOdoo(secTicket);
+      await this.syncTicketToOdoo(secTicket, phone, name);
     } catch (secErr) {
       console.warn('[Odoo Security Sync Exception]:', secErr);
     }
