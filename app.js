@@ -870,6 +870,92 @@ class UltimateFMApp {
     }
   }
 
+  resolveOdooTeamId(ticket, teams) {
+    if (!teams || !Array.isArray(teams) || teams.length === 0) return null;
+
+    const catStr = String(ticket.category || '').toLowerCase();
+    const titleStr = String(ticket.title || '').toLowerCase();
+    const detailsStr = String(ticket.details || ticket.description || '').toLowerCase();
+    const typeStr = String(ticket.type || '').toLowerCase();
+    const combinedStr = `${catStr} ${titleStr} ${detailsStr} ${typeStr}`;
+
+    // 1. Security & Gate Passes Keywords -> Route to "الأمن" (Security Team)
+    const isSecurity = combinedStr.includes('أمن') || 
+                       combinedStr.includes('أمني') || 
+                       combinedStr.includes('تصريح') || 
+                       combinedStr.includes('تصاريح') || 
+                       combinedStr.includes('بوابة') || 
+                       combinedStr.includes('بوابات') || 
+                       combinedStr.includes('سيارات') || 
+                       combinedStr.includes('لوحة') || 
+                       combinedStr.includes('شحنة') || 
+                       combinedStr.includes('زائر') || 
+                       combinedStr.includes('security') || 
+                       combinedStr.includes('lpr') || 
+                       combinedStr.includes('دخول البحر');
+
+    // 2. Customer Care & Financials & Complaints & Suggestions & Deposits & Installments -> Route to "Customer Care" (خدمة العملاء)
+    const isCustomerCare = combinedStr.includes('شكوى') || 
+                          combinedStr.includes('شكاوى') || 
+                          combinedStr.includes('مقترح') || 
+                          combinedStr.includes('مقترحات') || 
+                          combinedStr.includes('وديعة') || 
+                          combinedStr.includes('ودائع') || 
+                          combinedStr.includes('أقساط') || 
+                          combinedStr.includes('قسط') || 
+                          combinedStr.includes('ماليات') || 
+                          combinedStr.includes('استفسار') || 
+                          combinedStr.includes('استفسارات') || 
+                          combinedStr.includes('فواتير') || 
+                          combinedStr.includes('خدمة العملاء') || 
+                          combinedStr.includes('customer care');
+
+    // 3. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
+    const isMaintenance = !isSecurity && !isCustomerCare && (
+      combinedStr.includes('صيانة') || 
+      combinedStr.includes('سباكة') || 
+      combinedStr.includes('كهرباء') || 
+      combinedStr.includes('تكييف') || 
+      combinedStr.includes('نجارة') || 
+      combinedStr.includes('زراعة') || 
+      combinedStr.includes('نظافة') || 
+      combinedStr.includes('أعطال') || 
+      combinedStr.includes('تسريب') || 
+      combinedStr.includes('مواسير') || 
+      combinedStr.includes('مرافق') || 
+      combinedStr.includes('داخلية') || 
+      combinedStr.includes('خارجية') || 
+      combinedStr.includes('maintenance')
+    );
+
+    let targetTeam = null;
+
+    if (isSecurity) {
+      targetTeam = teams.find(t => t.name.includes('الأمن') || t.name.includes('أمن') || t.name.toLowerCase().includes('security'));
+    } else if (isCustomerCare) {
+      targetTeam = teams.find(t => t.name.includes('خدمة العملاء') || t.name.toLowerCase().includes('customer care') || t.name.toLowerCase().includes('care'));
+    } else if (isMaintenance) {
+      targetTeam = teams.find(t => t.name.includes('فريق الصيانة') || t.name.includes('الصيانة') || t.name.includes('صيانة') || t.name.toLowerCase().includes('maintenance'));
+    }
+
+    // Fallbacks if exact team name not matched
+    if (!targetTeam) {
+      if (isSecurity) {
+        targetTeam = teams.find(t => t.name.includes('أمن') || t.name.includes('الأمن'));
+      } else if (isMaintenance) {
+        targetTeam = teams.find(t => t.name.includes('صيانة') || t.name.includes('الصيانة'));
+      } else {
+        targetTeam = teams.find(t => t.name.includes('خدمة العملاء') || t.name.toLowerCase().includes('customer care'));
+      }
+    }
+
+    if (targetTeam) {
+      console.log(`[Odoo Helpdesk Team Router] Category: "${ticket.category || 'Default'}" -> Routed to Team: "${targetTeam.name}" (ID: ${targetTeam.id})`);
+      return targetTeam.id;
+    }
+    return null;
+  }
+
   async syncTicketToOdoo(ticket) {
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
@@ -993,6 +1079,34 @@ class UltimateFMApp {
         console.warn('[Odoo Sync] Partner resolution skipped:', pErr);
       }
 
+      // Step 2.5: Dynamic Odoo Helpdesk Team Routing (فريق الصيانة / خدمة العملاء / الأمن)
+      let resolvedTeamId = null;
+      try {
+        const getTeamsPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "helpdesk.team",
+              "search_read",
+              [[]],
+              { fields: ["id", "name"] }
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const teamsData = await this.callOdoo(baseUrl, getTeamsPayload);
+        if (teamsData && teamsData.result && Array.isArray(teamsData.result)) {
+          console.log('[Odoo Sync] Retrieved Odoo Helpdesk Teams:', teamsData.result);
+          resolvedTeamId = this.resolveOdooTeamId(ticket, teamsData.result);
+        }
+      } catch (teamErr) {
+        console.warn('[Odoo Team Resolution Exception]:', teamErr);
+      }
+
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
 
@@ -1008,6 +1122,9 @@ class UltimateFMApp {
       if (partnerId) {
         helpdeskFields.partner_id = partnerId;
       }
+      if (resolvedTeamId) {
+        helpdeskFields.team_id = resolvedTeamId;
+      }
 
       const createPayload = {
         jsonrpc: "2.0",
@@ -1020,7 +1137,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
 
-      console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket...');
+      console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket with team_id:', resolvedTeamId);
       let helpdeskData = await this.callOdoo(baseUrl, createPayload);
 
       // Robust Fallback: If Odoo rejects optional fields, try minimal core fields
@@ -1032,6 +1149,7 @@ class UltimateFMApp {
           priority: String(ticket.priority || '2')
         };
         if (partnerId) minimalFields.partner_id = partnerId;
+        if (resolvedTeamId) minimalFields.team_id = resolvedTeamId;
 
         const fallbackPayload = {
           jsonrpc: "2.0",
@@ -2037,6 +2155,8 @@ class UltimateFMApp {
     const newPermit = {
       id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
       type: type,
+      category: 'تصريح دخول بوابات أمني',
+      title: `تصريح دخول بوابات: ${type}`,
       status: 'تحت المراجعة',
       bgClass: 'badge-warning',
       requester: requester,
@@ -2046,7 +2166,14 @@ class UltimateFMApp {
 
     this.permits.unshift(newPermit);
     this.renderTickets();
-    this.showToast(`✅ تم تقديم طلب التصريح رقم #${newPermit.id} بنجاح!\nالطلب قيد المراجعة حالياً من قبل مدير التشغيل لضمان أمان البوابات.`);
+    this.showToast(`✅ تم تقديم طلب التصريح رقم #${newPermit.id} بنجاح!\nالطلب قيد المراجعة حالياً من قبل فريق الأمن والبوابات.`);
+
+    // Sync permit to Odoo Security Team ("الأمن")
+    try {
+      this.syncTicketToOdoo(newPermit);
+    } catch (pErr) {
+      console.warn('[Odoo Permit Sync Exception]:', pErr);
+    }
   }
 
   approvePermit(permitId) {
@@ -2479,8 +2606,19 @@ class UltimateFMApp {
     this.syncComplaintToOdoo(name, phone, details);
   }
 
-  syncComplaintToOdoo(name, phone, details) {
-    console.log(`[Odoo Sync] Security Complaint synced successfully for ${name} (${phone}): ${details}`);
+  async syncComplaintToOdoo(name, phone, details) {
+    console.log(`[Odoo Sync] Syncing Security Emergency Complaint for ${name} (${phone}): ${details}`);
+    const secTicket = {
+      category: 'بلاغ أمني عاجل',
+      title: `بلاغ أمني طارئ: ${details.substring(0, 35)}`,
+      details: `بلاغ أمني عاجل من: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}`,
+      priority: '3' // ⭐⭐⭐ Red Alert High Priority
+    };
+    try {
+      await this.syncTicketToOdoo(secTicket);
+    } catch (secErr) {
+      console.warn('[Odoo Security Sync Exception]:', secErr);
+    }
   }
   handleLogin() {
     const email = document.getElementById('loginEmailInput')?.value || '';
