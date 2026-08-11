@@ -298,6 +298,12 @@
                   </button>
                 </div>
 
+                <div style="margin-top: 12px; border-top: 1px dashed rgba(27, 143, 145, 0.25); padding-top: 12px;">
+                  <button class="btn" id="btnComplaintSuggestion" style="border-color: rgba(27, 143, 145, 0.4); background: rgba(27, 143, 145, 0.08); color: #1b8f91; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="app.openComplaintSuggestionModal()">
+                    <i class="fa-solid fa-comments"></i> تقديم شكوى أو مقترح لخدمة العملاء (Customer Care)
+                  </button>
+                </div>
+
                 <div style="margin-top: 12px; border-top: 1px dashed rgba(239, 68, 68, 0.25); padding-top: 12px;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444;" id="activeComplaintsLabelText"><i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة:</span>
@@ -505,6 +511,12 @@
                 <button class="btn" style="width: 100%; border-color: rgba(32, 39, 79, 0.25); color: var(--text-main); font-size: 0.78rem;" onclick="app.openModal('modalInstallmentsSchedule')">
                   <i class="fa-solid fa-list-ol"></i> عرض جدول جميع الأقساط القادمة والسابقة (كشف حساب أودو)
                 </button>
+
+                <div style="margin-top: 10px;">
+                  <button class="btn btn-primary" id="btnFinancialInquiry" onclick="app.openFinancialInquiryModal()" style="width: 100%; background: linear-gradient(135deg, #20274f 0%, #171d3d 100%); color: #d4af37; border: 1px solid #d4af37; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-calculator"></i> <span>استفسار مالي أو كشف حساب لخدمة الحسابات</span>
+                  </button>
+                </div>
               </div>
 
               <!-- Smart Utility Meters -->
@@ -1433,6 +1445,85 @@
 
       <button class="btn btn-primary" onclick="app.submitSecurityComplaint()" style="width: 100%; margin-top: 10px;">
         <i class="fa-solid fa-paper-plane"></i> إرسال البلاغ لغرفة عمليات الأمن
+      </button>
+    </div>
+  </div>
+
+  <!-- Customer Care Complaints & Suggestions Modal -->
+  <div class="modal-overlay" id="modalComplaintSuggestion">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalComplaintSuggestion')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #1b8f91;"><i class="fa-solid fa-comments"></i> تقديم شكوى أو مقترح لخدمة العملاء</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        سيتم إرسال شكواك أو مقترحك مباشرة إلى فريق خدمة العملاء (Customer Care) للمتابعة والرد الفوري.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل:</label>
+        <input type="text" id="csNameInput" class="form-control" placeholder="اسم مقدم الطلب">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الموبايل للتواصل:</label>
+        <input type="tel" id="csPhoneInput" class="form-control" placeholder="رقم الموبايل">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">نوع الطلب:</label>
+        <select id="csTypeSelect" class="form-control">
+          <option value="شكوى عن الخدمات العامة بالقرية">شكوى عن الخدمات العامة بالقرية</option>
+          <option value="مقترح لتطوير الخدمات والمشروع">مقترح لتطوير الخدمات والمشروع</option>
+          <option value="استفسار عام لمكتب خدمة العملاء">استفسار عام لمكتب خدمة العملاء</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تفاصيل الشكوى أو المقترح:</label>
+        <textarea id="csDetailsInput" class="form-control" rows="3" placeholder="اكتب تفاصيل الشكوى أو المقترح بدقة..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitComplaintSuggestion()" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #1b8f91 0%, #0f5b5d 100%); border: none;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال لفريق خدمة العملاء (Customer Care)
+      </button>
+    </div>
+  </div>
+
+  <!-- Accounting & Financial Inquiry Modal -->
+  <div class="modal-overlay" id="modalFinancialInquiry">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalFinancialInquiry')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #20274f;"><i class="fa-solid fa-calculator"></i> استفسار مالي أو كشف حساب لخدمة الحسابات</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        سيتم توجيه استفسارك المالي مباشرة إلى فريق الحسابات والمالية للتدقيق والرد بالتفاصيل.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل للمالك:</label>
+        <input type="text" id="finNameInput" class="form-control" placeholder="اسم المالك">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم الموبايل للتواصل:</label>
+        <input type="tel" id="finPhoneInput" class="form-control" placeholder="رقم الموبايل">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">موضوع الاستفسار المالي:</label>
+        <select id="finTypeSelect" class="form-control">
+          <option value="استفسار عن وديعة الصيانة وعوائدها">استفسار عن وديعة الصيانة وعوائد الاستثمار</option>
+          <option value="استفسار عن قسط سداد وتواريخ الاستحقاق">استفسار عن قسط سداد وتواريخ الاستحقاق</option>
+          <option value="استفسار عن فروق التشغيل والصيانة السنوية">استفسار عن فروق التشغيل والصيانة السنوية</option>
+          <option value="طلب كشف حساب مالي تفصيلي للوحدة">طلب كشف حساب مالي تفصيلي للوحدة</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">تفاصيل الاستفسار المالي:</label>
+        <textarea id="finDetailsInput" class="form-control" rows="3" placeholder="اكتب الاستفسار المالي المطلوب..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitFinancialInquiry()" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #20274f 0%, #171d3d 100%); color: #d4af37; border: 1px solid #d4af37;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال لفريق الحسابات والمالية
       </button>
     </div>
   </div>

@@ -2636,6 +2636,98 @@ class UltimateFMApp {
       console.warn('[Odoo Security Sync Exception]:', secErr);
     }
   }
+
+  openComplaintSuggestionModal() {
+    const nameInput = document.getElementById('csNameInput');
+    const phoneInput = document.getElementById('csPhoneInput');
+    const detailsInput = document.getElementById('csDetailsInput');
+
+    if (nameInput && phoneInput) {
+      let ownerName = 'أسامة أحمد محمد الشريف';
+      const nameEl = document.getElementById('homeownerNameText');
+      if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+        ownerName = nameEl.innerText;
+      }
+      nameInput.value = ownerName;
+      phoneInput.value = '01223456789';
+    }
+    if (detailsInput) detailsInput.value = '';
+    this.openModal('modalComplaintSuggestion');
+  }
+
+  async submitComplaintSuggestion() {
+    const name = document.getElementById('csNameInput')?.value || '';
+    const phone = document.getElementById('csPhoneInput')?.value || '';
+    const type = document.getElementById('csTypeSelect')?.value || 'شكوى عن الخدمات العامة';
+    const details = document.getElementById('csDetailsInput')?.value || '';
+
+    if (!details.trim()) {
+      this.showToast('⚠️ يرجى كتابة تفاصيل الشكوى أو المقترح أولاً!');
+      return;
+    }
+
+    const csTicket = {
+      category: 'شكاوى ومقترحات لخدمة العملاء',
+      title: `${type}: ${details.substring(0, 30)}`,
+      details: `مقدم الطلب: ${name}\nرقم الموبايل: ${phone}\nنوع الطلب: ${type}\nالتفاصيل: ${details}`,
+      priority: '2'
+    };
+
+    this.closeModal('modalComplaintSuggestion');
+    this.showToast(`💬 تم إرسال الشكوى/المقترح بنجاح لخدمة العملاء (Customer Care)!\nسنقوم بالمتابعة معكم في أقرب وقت.`);
+
+    try {
+      await this.syncTicketToOdoo(csTicket, phone, name);
+    } catch (err) {
+      console.warn('[Odoo Customer Care Sync Exception]:', err);
+    }
+  }
+
+  openFinancialInquiryModal() {
+    const nameInput = document.getElementById('finNameInput');
+    const phoneInput = document.getElementById('finPhoneInput');
+    const detailsInput = document.getElementById('finDetailsInput');
+
+    if (nameInput && phoneInput) {
+      let ownerName = 'أسامة أحمد محمد الشريف';
+      const nameEl = document.getElementById('homeownerNameText');
+      if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+        ownerName = nameEl.innerText;
+      }
+      nameInput.value = ownerName;
+      phoneInput.value = '01223456789';
+    }
+    if (detailsInput) detailsInput.value = '';
+    this.openModal('modalFinancialInquiry');
+  }
+
+  async submitFinancialInquiry() {
+    const name = document.getElementById('finNameInput')?.value || '';
+    const phone = document.getElementById('finPhoneInput')?.value || '';
+    const type = document.getElementById('finTypeSelect')?.value || 'استفسار مالي وحسابات';
+    const details = document.getElementById('finDetailsInput')?.value || '';
+
+    if (!details.trim()) {
+      this.showToast('⚠️ يرجى كتابة تفاصيل الاستفسار المالي أولاً!');
+      return;
+    }
+
+    const finTicket = {
+      category: 'استفسار مالي وحسابات',
+      title: `استفسار مالي: ${type}`,
+      details: `مقدم الاستفسار: ${name}\nرقم الموبايل: ${phone}\nموضوع الاستفسار: ${type}\nالتفاصيل: ${details}`,
+      priority: '2'
+    };
+
+    this.closeModal('modalFinancialInquiry');
+    this.showToast(`💳 تم إرسال الاستفسار المالي بنجاح لفريق الحسابات!\nجاري المراجعة والرد بكشف الحساب.`);
+
+    try {
+      await this.syncTicketToOdoo(finTicket, phone, name);
+    } catch (err) {
+      console.warn('[Odoo Financial Sync Exception]:', err);
+    }
+  }
   handleLogin() {
     const email = document.getElementById('loginEmailInput')?.value || '';
     let role = 'owner';
