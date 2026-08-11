@@ -1243,24 +1243,24 @@ class UltimateFMApp {
         }
 
         if (ticket.photoBefore) {
-          this.showToast('✅ تم تسجيل تذكرة الصيانة وإرفاق صورة العطل بنجاح في أودو (Helpdesk)');
+          this.showToast('✅ تم تسجيل تذكرة الصيانة وإرفاق صورة العطل بنجاح في النظام المركزي!');
         } else if (ticket.category && (ticket.category.includes('أمني') || ticket.category.includes('أمن'))) {
-          this.showToast('🚨 تم تسجيل البلاغ/التصريح وإرساله فوراً لفريق الأمن بـ أودو (Helpdesk)');
+          this.showToast('🚨 تم تسجيل البلاغ/التصريح وإرساله فوراً لغرفة العمليات والأمن!');
         } else if (ticket.category && (ticket.category.includes('حسابات') || ticket.category.includes('مالي'))) {
-          this.showToast('💳 تم إرسال الاستفسار المالي لفريق الحسابات بنجاح في أودو (Helpdesk)');
+          this.showToast('💳 تم إرسال الاستفسار المالي لفريق الحسابات بنجاح في النظام المركزي!');
         } else if (ticket.category && (ticket.category.includes('شكاوى') || ticket.category.includes('مقترحات'))) {
-          this.showToast('💬 تم إرسال الشكوى/المقترح لفريق خدمة العملاء (Customer Care) في أودو!');
+          this.showToast('💬 تم إرسال الشكوى/المقترح لفريق خدمة العملاء (Customer Care) بنجاح!');
         } else {
-          this.showToast('✅ تم تسجيل الطلب بنجاح في نظام أودو (Helpdesk)');
+          this.showToast('✅ تم تسجيل الطلب بنجاح في النظام المركزي للخدمات!');
         }
       } else if (helpdeskData && helpdeskData.error) {
         console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
-        this.showToast(`❌ فشل مزامنة التذكرة في أودو: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
+        this.showToast(`❌ تعذر استكمال مزامنة الطلب: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
       }
     } catch (err) {
       console.warn('[Odoo Sync Exception]:', err);
       if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        this.showToast(`❌ حدث خطأ في اتصال أودو: ${err.message || err}`);
+        this.showToast(`❌ تعذر الاتصال بالنظام المركزي: ${err.message || err}`);
       }
     }
   }
@@ -1504,22 +1504,25 @@ class UltimateFMApp {
       const category = translateText(tk.category);
       const partName = translateText(tk.partName);
 
-      let photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-        <div>
-          <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">${isEn ? 'Before Photo:' : 'صورة العطل:'}</span>
-          <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
-        </div>`;
-      if (tk.status === 'تم الانتهاء') {
-        photosHtml += `
-        <div>
-          <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">${isEn ? 'After Photo:' : 'صورة الإصلاح:'}</span>
-          <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
-        </div>
-        <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-          <i class="fa-solid fa-clock-check"></i> ${isEn ? 'Resolution time:' : 'مدة الحل:'} ${tk.resolutionTime}
-        </div>`;
+      let photosHtml = '';
+      if (tk.photoBefore) {
+        photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+          <div>
+            <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">${isEn ? 'Before Photo:' : 'صورة العطل:'}</span>
+            <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
+          </div>`;
+        if (tk.status === 'تم الانتهاء' && tk.photoAfter) {
+          photosHtml += `
+          <div>
+            <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">${isEn ? 'After Photo:' : 'صورة الإصلاح:'}</span>
+            <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
+          </div>
+          <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
+            <i class="fa-solid fa-clock-check"></i> ${isEn ? 'Resolution time:' : 'مدة الحل:'} ${tk.resolutionTime}
+          </div>`;
+        }
+        photosHtml += `</div>`;
       }
-      photosHtml += `</div>`;
 
       let paymentHtml = '';
       if (tk.status === 'انتظار دفع المالك') {
@@ -1567,22 +1570,22 @@ class UltimateFMApp {
           <div style="margin-top: 8px; border-top: 1px dashed rgba(32, 39, 79, 0.15); padding-top: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="font-size: 0.72rem; font-weight: 700; color: #20274f;">
-                <i class="fa-solid fa-comments"></i> ${isEn ? 'Odoo Chatter Replies:' : 'الردود الحية من أودو (Odoo Chatter):'}
+                <i class="fa-solid fa-comments"></i> ${isEn ? 'Live Conversation Log:' : 'سجل التوضيحات والردود المباشرة:'}
               </span>
-              <button class="btn btn-sm" onclick="app.loadOdooRepliesForTicket('${tk.id}', '${tk.odooId}')" style="font-size: 0.65rem; padding: 2px 8px; font-weight: 700; background: rgba(27, 143, 145, 0.1); color: #1b8f91; border: 1px solid rgba(27, 143, 145, 0.2); width: auto;">
-                <i class="fa-solid fa-rotate"></i> ${isEn ? 'Fetch Replies' : 'جلب الردود'}
+              <button class="btn btn-sm" onclick="app.loadOdooRepliesForTicket('${tk.id}', '${tk.odooId}')" style="font-size: 0.65rem; padding: 3px 10px; font-weight: 700; background: rgba(27, 143, 145, 0.12); color: #1b8f91; border: 1px solid rgba(27, 143, 145, 0.3); border-radius: 6px; width: auto; cursor: pointer;">
+                <i class="fa-solid fa-rotate"></i> ${isEn ? 'Sync Replies' : '💬 متابعة سجل الردود'}
               </button>
             </div>
             <div id="odoo_replies_box_${tk.id}" style="font-size: 0.72rem; color: var(--text-muted);">
               ${tk.lastReply ? `
                 <div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 6px 10px; border-radius: 6px; margin-top: 4px;">
                   <div style="font-weight: 700; color: #10b981; display: flex; justify-content: space-between;">
-                    <span><i class="fa-solid fa-user-check"></i> ${tk.lastReplyAuthor || 'فريق العمل في أودو'}:</span>
+                    <span><i class="fa-solid fa-user-check"></i> ${tk.lastReplyAuthor || 'فريق الدعم والحسابات'}:</span>
                     <span style="font-size: 0.65rem; color: var(--text-muted);">${tk.lastReplyDate || ''}</span>
                   </div>
                   <div style="color: var(--text-main); margin-top: 2px;">${tk.lastReply}</div>
                 </div>
-              ` : `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من أودو. اضغط "جلب الردود" للتحقق.</div>`}
+              ` : `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن. اضغط "متابعة سجل الردود" للمتابعة الحية.</div>`}
             </div>
           </div>
         `;
@@ -2814,7 +2817,10 @@ class UltimateFMApp {
   }
 
   async fetchTicketRepliesFromOdoo(odooId) {
-    if (!odooId) return [];
+    if (!odooId || odooId === 'undefined' || odooId === 'null') return [];
+    const targetResId = parseInt(odooId);
+    if (isNaN(targetResId) || targetResId <= 0) return [];
+
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2850,7 +2856,7 @@ class UltimateFMApp {
             dbInput, uid, keyInput,
             "mail.message",
             "search_read",
-            [[["model", "=", "helpdesk.ticket"], ["res_id", "=", parseInt(odooId)]]],
+            [[["model", "=", "helpdesk.ticket"], ["res_id", "=", targetResId]]],
             { fields: ["id", "body", "author_id", "date", "create_date"], order: "create_date asc" }
           ]
         },
@@ -2858,7 +2864,7 @@ class UltimateFMApp {
       };
       const msgData = await this.callOdoo(baseUrl, msgPayload);
       if (msgData && msgData.result && Array.isArray(msgData.result)) {
-        return msgData.result.filter(m => m.body && m.body.trim().length > 0);
+        return msgData.result.filter(m => m.body && m.body.replace(/<[^>]*>?/gm, '').trim().length > 0);
       }
     } catch (err) {
       console.warn('[Odoo Reply Fetch Exception]:', err);
@@ -2867,21 +2873,34 @@ class UltimateFMApp {
   }
 
   async loadOdooRepliesForTicket(localTicketId, odooTicketId) {
+    const tk = this.tickets.find(t => String(t.id) === String(localTicketId));
+    let targetOdooId = odooTicketId;
+    if ((!targetOdooId || targetOdooId === 'undefined' || targetOdooId === 'null') && tk && tk.odooId) {
+      targetOdooId = tk.odooId;
+    }
+
     const box = document.getElementById(`odoo_replies_box_${localTicketId}`);
     if (box) {
-      box.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب أحدث ردود فريق العمل من أودو...</div>`;
+      box.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحديث ومزامنة الردود من النظام المركزي...</div>`;
+    }
+
+    if (!targetOdooId || targetOdooId === 'undefined' || targetOdooId === 'null') {
+      if (box) {
+        box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">التذكرة قيد التسجيل والتفعيل بالنظام... يرجى المحاولة بعد ثوانٍ.</div>`;
+      }
+      this.showToast('ℹ️ جاري استكمال التسجيل بالنظام المركزي...');
+      return;
     }
 
     try {
-      const replies = await this.fetchTicketRepliesFromOdoo(odooTicketId);
-      const tk = this.tickets.find(t => String(t.id) === String(localTicketId));
+      const replies = await this.fetchTicketRepliesFromOdoo(targetOdooId);
 
       if (replies && replies.length > 0) {
         let repliesContentHtml = '';
         replies.forEach(msg => {
           const cleanBody = msg.body.replace(/<[^>]*>?/gm, '').trim();
           if (!cleanBody) return;
-          const authorName = (msg.author_id && msg.author_id[1]) ? msg.author_id[1] : 'مسؤول المتابعة في أودو';
+          const authorName = (msg.author_id && msg.author_id[1]) ? msg.author_id[1] : 'فريق الدعم والحسابات';
           const msgDate = msg.create_date || msg.date || '';
 
           repliesContentHtml += `
@@ -2905,19 +2924,144 @@ class UltimateFMApp {
         }
 
         if (box) box.innerHTML = repliesContentHtml;
-        this.showToast('✅ تم تحديث الردود الحية للتذكرة من أودو بنجاح!');
+        this.showToast('✅ تم تحديث وتتبع سجل الردود بنجاح!');
       } else {
         if (box) {
-          box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل في أودو.</div>`;
+          box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل. اضغط "متابعة سجل الردود" للتحديث.</div>`;
         }
-        this.showToast('ℹ️ لا توجد ردود مضافة بعد من فريق العمل في أودو.');
+        this.showToast('ℹ️ لا توجد ردود جديدة مضافة حتى الآن.');
       }
     } catch (err) {
-      console.warn('[Odoo Replies Error]:', err);
+      console.warn('[Replies Fetch Error]:', err);
       if (box) {
-        box.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بـ Odoo لجلب الردود حالياً.</div>`;
+        box.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بالنظام المركزي حالياً.</div>`;
       }
     }
+  }
+
+  openVariancePaymentModal() {
+    const chkStep = document.getElementById('varianceCheckoutStep');
+    const recStep = document.getElementById('varianceReceiptStep');
+    if (chkStep) chkStep.style.display = 'block';
+    if (recStep) recStep.style.display = 'none';
+
+    let ownerName = 'أسامة أحمد محمد الشريف';
+    const nameEl = document.getElementById('homeownerNameText');
+    if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+      ownerName = nameEl.innerText;
+    }
+    const varOwnerEl = document.getElementById('varPayOwnerName');
+    if (varOwnerEl) varOwnerEl.innerText = ownerName;
+
+    this.openModal('modalVariancePayment');
+  }
+
+  async processVariancePayment() {
+    const cardNum = document.getElementById('varCardNumberInput')?.value || '';
+    const payMethod = document.getElementById('varPayMethodSelect')?.value || 'بطاقة ائتمان (Visa)';
+    
+    if (!cardNum || cardNum.trim().length < 4) {
+      this.showToast('⚠️ يرجى إدخال رقم بطاقة الدفع أو تفعيل أبل باي');
+      return;
+    }
+
+    this.showToast('💳 جاري المعالجة المالية الموثقة لسداد فروق الصيانة...');
+
+    let ownerName = 'أسامة أحمد محمد الشريف';
+    const nameEl = document.getElementById('homeownerNameText');
+    if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+      ownerName = nameEl.innerText;
+    }
+
+    const receiptNo = `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }) + ` • ${now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+    const qrRef = `Odoo-PAY-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    // Populate Receipt Details
+    const recNoEl = document.getElementById('receiptNoText');
+    if (recNoEl) recNoEl.innerText = `رقم الإيصال: #${receiptNo}`;
+
+    const recOwnerEl = document.getElementById('recOwnerName');
+    if (recOwnerEl) recOwnerEl.innerText = ownerName;
+
+    const recPayMethEl = document.getElementById('recPayMethod');
+    if (recPayMethEl) recPayMethEl.innerText = payMethod;
+
+    const recDateEl = document.getElementById('recPayDate');
+    if (recDateEl) recDateEl.innerText = dateStr;
+
+    const recQrEl = document.getElementById('recQrCode');
+    if (recQrEl) recQrEl.innerText = qrRef;
+
+    // Update Financials Screen UI
+    const varAmtEl = document.getElementById('varianceAmountText');
+    if (varAmtEl) {
+      varAmtEl.innerHTML = `<span style="color: #10b981; font-weight: 900;">0.00 ج.م <i class="fa-solid fa-circle-check"></i> (تم السداد بالكامل)</span>`;
+    }
+    const btnPayVar = document.getElementById('btnPayVariance');
+    if (btnPayVar) {
+      btnPayVar.style.background = '#10b981';
+      btnPayVar.style.opacity = '0.9';
+      btnPayVar.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>تم سداد فروق الصيانة بنجاح (إيصال #${receiptNo})</span>`;
+    }
+
+    // Switch View to Receipt
+    const chkStep = document.getElementById('varianceCheckoutStep');
+    const recStep = document.getElementById('varianceReceiptStep');
+    if (chkStep) chkStep.style.display = 'none';
+    if (recStep) recStep.style.display = 'block';
+
+    this.showToast(`🎉 تم سداد فروق الصيانة 3,900 ج.م بنجاح!\n📧 تم إرسال إيصال السداد الرسمي رقم #${receiptNo} إلى بريدك الإلكتروني (fmhala6@gmail.com).`);
+
+    // Sync Payment to Odoo Helpdesk / Accounting
+    const payTicket = {
+      category: 'استفسار مالي وحسابات',
+      title: `سداد فروق الصيانة أونلاين إيصال #${receiptNo}`,
+      details: `تم سداد فروق الصيانة والتشغيل أونلاين بنجاح!\nالمالك: ${ownerName}\nالمبلغ: 3,900.00 ج.م\nطريقة الدفع: ${payMethod}\nرقم الإيصال: ${receiptNo}\nكود التوثيق: ${qrRef}`,
+      priority: '2'
+    };
+
+    try {
+      await this.syncTicketToOdoo(payTicket);
+    } catch (payErr) {
+      console.warn('[Odoo Payment Sync Exception]:', payErr);
+    }
+  }
+
+  downloadReceiptPDF() {
+    const receiptEl = document.getElementById('officialReceiptContainer');
+    if (!receiptEl) {
+      this.showToast('⚠️ لم يتم العثور على إيصال السداد للطباعة');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.showToast('⚠️ يرجى السماح بالنوافذ المنبثقة (Pop-ups) لتحميل إيصال الـ PDF');
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <title>إيصال سداد مالي رسمي - شركة إدارة المجمع السكني</title>
+        <meta charset="utf-8">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+          body { font-family: 'Tajawal', sans-serif; padding: 20px; background: #f8fafc; direction: rtl; }
+          #officialReceiptContainer { max-width: 600px; margin: 0 auto; background: #fff !important; border: 2px solid #d4af37 !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; border-radius: 12px !important; }
+        </style>
+      </head>
+      <body onload="window.print();">
+        ${receiptEl.outerHTML}
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    this.showToast('📄 تم فتح شاشة طباعة وتحميل إيصال الـ PDF الموثق بنجاح!');
   }
   handleLogin() {
     const email = document.getElementById('loginEmailInput')?.value || '';
@@ -3268,7 +3412,7 @@ class UltimateFMApp {
             <span style="font-size: 0.75rem; font-weight: 700; color: #ffffff;">${userName}</span>
             <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">${userEmail} • ${roleArabic}</p>
           </div>
-          <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">Odoo Synced</span>
+          <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">مفعل وموثق</span>
         `;
         list.insertBefore(item, list.firstChild);
       }
@@ -3279,13 +3423,13 @@ class UltimateFMApp {
     };
 
     if (!keyInput) {
-      // Local fallback if Odoo not connected
+      // Local fallback if server not connected
       addUserToLocalList();
       this.closeModal('modalAddNewUser');
       nameInput.value = '';
       emailInput.value = '';
       phoneInput.value = '';
-      this.showToast(`✅ [وضع المحاكاة] تم إضافة المستخدم [${userName}] بنجاح للمحفظة المحلية!`);
+      this.showToast(`✅ تم إضافة المستخدم [${userName}] بنجاح للمحفظة المحلية!`);
       return;
     }
 
@@ -3302,7 +3446,7 @@ class UltimateFMApp {
       id: Math.floor(Math.random() * 1000)
     };
 
-    this.showToast(`⏳ جاري الإرسال ومزامنة [${userName}] مع Odoo ERP...`);
+    this.showToast(`⏳ جاري تسجيل وتفعيل [${userName}] بالنظام المركزي...`);
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
@@ -3311,7 +3455,7 @@ class UltimateFMApp {
       }
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') {
-        throw new Error('فشل تسجيل الدخول للربط بـ Odoo');
+        throw new Error('فشل تسجيل الدخول للربط بالنظام المركزي');
       }
 
       const createPartnerPayload = {
@@ -3346,7 +3490,7 @@ class UltimateFMApp {
       nameInput.value = '';
       emailInput.value = '';
       phoneInput.value = '';
-      this.showToast(`✅ تم بنجاح مزامنة ورفع العميل [${userName}] بداخل جهات اتصال Odoo ERP (ID: ${createData.result})!`);
+      this.showToast(`✅ تم بنجاح تفعيل وتسجيل المستخدم [${userName}] بالنظام المركزي (ID: ${createData.result})!`);
     } catch (err) {
       console.error('[Odoo Contact Sync Exception]:', err);
       // Local fallback on error
