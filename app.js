@@ -1561,6 +1561,33 @@ class UltimateFMApp {
       else if (tk.priority === '2') priorityStars = ' ⭐⭐';
       else if (tk.priority === '1') priorityStars = ' ⭐';
 
+      let odooRepliesHtml = '';
+      if (tk.odooId) {
+        odooRepliesHtml = `
+          <div style="margin-top: 8px; border-top: 1px dashed rgba(32, 39, 79, 0.15); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #20274f;">
+                <i class="fa-solid fa-comments"></i> ${isEn ? 'Odoo Chatter Replies:' : 'الردود الحية من أودو (Odoo Chatter):'}
+              </span>
+              <button class="btn btn-sm" onclick="app.loadOdooRepliesForTicket('${tk.id}', '${tk.odooId}')" style="font-size: 0.65rem; padding: 2px 8px; font-weight: 700; background: rgba(27, 143, 145, 0.1); color: #1b8f91; border: 1px solid rgba(27, 143, 145, 0.2); width: auto;">
+                <i class="fa-solid fa-rotate"></i> ${isEn ? 'Fetch Replies' : 'جلب الردود'}
+              </button>
+            </div>
+            <div id="odoo_replies_box_${tk.id}" style="font-size: 0.72rem; color: var(--text-muted);">
+              ${tk.lastReply ? `
+                <div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 6px 10px; border-radius: 6px; margin-top: 4px;">
+                  <div style="font-weight: 700; color: #10b981; display: flex; justify-content: space-between;">
+                    <span><i class="fa-solid fa-user-check"></i> ${tk.lastReplyAuthor || 'فريق العمل في أودو'}:</span>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">${tk.lastReplyDate || ''}</span>
+                  </div>
+                  <div style="color: var(--text-main); margin-top: 2px;">${tk.lastReply}</div>
+                </div>
+              ` : `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من أودو. اضغط "جلب الردود" للتحقق.</div>`}
+            </div>
+          </div>
+        `;
+      }
+
       return `
         <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')}; font-family: var(--font-main);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1577,6 +1604,7 @@ class UltimateFMApp {
           </div>
           ${photosHtml}
           ${paymentHtml}
+          ${odooRepliesHtml}
         </div>
       `;
     };
@@ -2748,6 +2776,113 @@ class UltimateFMApp {
       await this.syncTicketToOdoo(finTicket, phone, name);
     } catch (err) {
       console.warn('[Odoo Financial Sync Exception]:', err);
+    }
+  }
+
+  async fetchTicketRepliesFromOdoo(odooId) {
+    if (!odooId) return [];
+    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return [];
+
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    try {
+      const authPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "common",
+          method: "authenticate",
+          args: [dbInput, userInput, keyInput, {}]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const authData = await this.callOdoo(baseUrl, authPayload);
+      if (!authData || !authData.result) return [];
+
+      const uid = authData.result;
+
+      const msgPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "mail.message",
+            "search_read",
+            [[["model", "=", "helpdesk.ticket"], ["res_id", "=", parseInt(odooId)]]],
+            { fields: ["id", "body", "author_id", "date", "create_date"], order: "create_date asc" }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const msgData = await this.callOdoo(baseUrl, msgPayload);
+      if (msgData && msgData.result && Array.isArray(msgData.result)) {
+        return msgData.result.filter(m => m.body && m.body.trim().length > 0);
+      }
+    } catch (err) {
+      console.warn('[Odoo Reply Fetch Exception]:', err);
+    }
+    return [];
+  }
+
+  async loadOdooRepliesForTicket(localTicketId, odooTicketId) {
+    const box = document.getElementById(`odoo_replies_box_${localTicketId}`);
+    if (box) {
+      box.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب أحدث ردود فريق العمل من أودو...</div>`;
+    }
+
+    try {
+      const replies = await this.fetchTicketRepliesFromOdoo(odooTicketId);
+      const tk = this.tickets.find(t => String(t.id) === String(localTicketId));
+
+      if (replies && replies.length > 0) {
+        let repliesContentHtml = '';
+        replies.forEach(msg => {
+          const cleanBody = msg.body.replace(/<[^>]*>?/gm, '').trim();
+          if (!cleanBody) return;
+          const authorName = (msg.author_id && msg.author_id[1]) ? msg.author_id[1] : 'مسؤول المتابعة في أودو';
+          const msgDate = msg.create_date || msg.date || '';
+
+          repliesContentHtml += `
+            <div style="background: rgba(32, 39, 79, 0.05); border-right: 3px solid #1b8f91; padding: 6px 10px; border-radius: 6px; margin-top: 6px;">
+              <div style="font-weight: 700; color: #20274f; display: flex; justify-content: space-between; font-size: 0.7rem;">
+                <span><i class="fa-solid fa-reply"></i> ${authorName}:</span>
+                <span style="font-size: 0.65rem; color: var(--text-muted);">${msgDate}</span>
+              </div>
+              <div style="color: var(--text-main); margin-top: 3px; font-size: 0.72rem; line-height: 1.4;">${cleanBody}</div>
+            </div>
+          `;
+          if (tk) {
+            tk.lastReply = cleanBody;
+            tk.lastReplyAuthor = authorName;
+            tk.lastReplyDate = msgDate;
+          }
+        });
+
+        if (!repliesContentHtml) {
+          repliesContentHtml = `<div style="font-size: 0.68rem; color: var(--text-muted);">لم يتم إضافة ردود نصية بعد من أخصائي الحسابات.</div>`;
+        }
+
+        if (box) box.innerHTML = repliesContentHtml;
+        this.showToast('✅ تم تحديث الردود الحية للتذكرة من أودو بنجاح!');
+      } else {
+        if (box) {
+          box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل في أودو.</div>`;
+        }
+        this.showToast('ℹ️ لا توجد ردود مضافة بعد من فريق العمل في أودو.');
+      }
+    } catch (err) {
+      console.warn('[Odoo Replies Error]:', err);
+      if (box) {
+        box.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بـ Odoo لجلب الردود حالياً.</div>`;
+      }
     }
   }
   handleLogin() {
