@@ -51,6 +51,12 @@
 }
 
 /* Animated App Splash Screen */
+@keyframes autoHideSplashOverlay {
+  0% { opacity: 1; visibility: visible; }
+  70% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; pointer-events: none; display: none !important; }
+}
+
 .splash-screen-overlay {
   position: fixed;
   inset: 0;
@@ -61,13 +67,15 @@
   justify-content: center;
   text-align: center;
   padding: 24px;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  animation: autoHideSplashOverlay 1.5s forwards ease-in-out;
 }
 
 .splash-screen-overlay.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  display: none !important;
 }
 
 .splash-content {

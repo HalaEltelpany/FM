@@ -18,7 +18,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
   <!-- Animated App Splash Screen -->
-  <div class="splash-screen-overlay" id="appSplashScreen">
+  <div class="splash-screen-overlay" id="appSplashScreen" onclick="this.style.display='none'; this.style.opacity='0'; this.style.visibility='hidden';">
     <div class="splash-content">
       <div class="splash-logo-box">
         <img src="logo.png" alt="Ultimate FM Logo" class="splash-logo">
@@ -31,6 +31,17 @@
       <span class="splash-footer">Ultimate Code • Out of the Box Solutions</span>
     </div>
   </div>
+  <script>
+    setTimeout(function() {
+      var s = document.getElementById('appSplashScreen');
+      if (s) {
+        s.style.opacity = '0';
+        s.style.visibility = 'hidden';
+        s.style.pointerEvents = 'none';
+        setTimeout(function() { s.style.display = 'none'; }, 300);
+      }
+    }, 1400);
+  </script>
 
   <div class="app-wrapper">
     <!-- Main Content Area -->
