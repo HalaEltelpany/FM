@@ -820,7 +820,32 @@ class UltimateFMApp {
       const readData = await this.callOdoo(baseUrl, readPayload);
       if (readData && readData.result && Array.isArray(readData.result)) {
         console.log('[Odoo Sync Read] Retrieved tickets count:', readData.result.length);
-        const odooTickets = readData.result.map(rec => {
+        
+        readData.result.forEach(rec => {
+          const recOdooIdStr = String(rec.id);
+          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
+          let bg = 'badge-warning';
+          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved')) bg = 'badge-success';
+
+          // 1. If this Odoo ticket ID is already linked to a local ticket, update its status
+          const existingByOdooId = this.tickets.find(t => String(t.odooId) === recOdooIdStr || String(t.id) === `TK-OD-${rec.id}`);
+          if (existingByOdooId) {
+            existingByOdooId.status = stageName;
+            existingByOdooId.bgClass = bg;
+            return;
+          }
+
+          // 2. If a local ticket with matching title/name exists (recently created local copy without odooId linked yet), link & update it!
+          const cleanName = (rec.name || '').trim().toLowerCase();
+          const existingMatchingLocal = this.tickets.find(t => !t.odooId && (t.title || '').trim().toLowerCase() === cleanName);
+          if (existingMatchingLocal) {
+            existingMatchingLocal.odooId = rec.id;
+            existingMatchingLocal.status = stageName;
+            existingMatchingLocal.bgClass = bg;
+            return;
+          }
+
+          // 3. Otherwise, if it's a completely new ticket created directly in Odoo backend, push it as a new ticket
           const rawDate = rec.create_date ? new Date(rec.create_date.replace(' ', 'T') + 'Z') : new Date();
           const dateStr = rawDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
           const timeStr = rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
@@ -830,12 +855,10 @@ class UltimateFMApp {
           else if (rec.name.includes('كهرباء')) cat = 'كهرباء';
           else if (rec.name.includes('كهروميكانيك') || rec.name.includes('تكييف')) cat = 'كهروميكانيك';
           else if (rec.name.includes('نجارة')) cat = 'نجارة';
+          else if (rec.name.includes('نظافة') || rec.name.includes('هاوس')) cat = 'نظافة وهاوس كيبينج';
+          else if (rec.name.includes('حدائق') || rec.name.includes('لاند')) cat = 'صيانة الحدائق واللاندسكيب';
 
-          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
-          let bg = 'badge-warning';
-          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved')) bg = 'badge-success';
-
-          return {
+          this.tickets.push({
             id: `TK-OD-${rec.id}`,
             odooId: rec.id,
             title: rec.name,
@@ -849,15 +872,7 @@ class UltimateFMApp {
             dateStr: dateStr,
             timeStr: timeStr,
             photoBefore: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80'
-          };
-        });
-
-        // Merge with existing tickets uniquely
-        const existingIds = new Set(this.tickets.map(t => String(t.id)));
-        odooTickets.forEach(otk => {
-          if (!existingIds.has(String(otk.id))) {
-            this.tickets.push(otk);
-          }
+          });
         });
 
         this.saveTicketsToStorage();
