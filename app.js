@@ -2706,6 +2706,50 @@ class UltimateFMApp {
     this.updateModalTicketApplicantInfo();
   }
 
+  openHousekeepingModal(role = 'owner') {
+    this._activeHkRole = role;
+    let name = 'أسامة أحمد محمد الشريف';
+    let unit = 'فيلا 104 - زون الساحل الشمالي';
+
+    const customName = localStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) name = customName;
+
+    if (role === 'tenant') {
+      name = 'أحمد زاهر محمود';
+      unit = 'شاليه 402 - زون البحيرات';
+    } else if (role === 'commercial') {
+      name = 'مطعم وكافيه Blue Wave';
+      unit = 'محل 12 - المول التجاري';
+    } else if (role === 'manager') {
+      name = 'المهندس أيمن السعيد (مدير الصيانة)';
+      unit = 'الأماكن العامة بالقرية';
+    }
+
+    const nameEl = document.getElementById('modalHkOwnerName');
+    const unitEl = document.getElementById('modalHkOwnerUnit');
+    if (nameEl) nameEl.innerText = name;
+    if (unitEl) unitEl.innerText = unit;
+
+    const notesInput = document.getElementById('hkNotesInput');
+    if (notesInput) notesInput.value = '';
+
+    this.openModal('modalHousekeepingRequest');
+  }
+
+  submitHousekeepingModalForm() {
+    const role = this._activeHkRole || this.currentRole || 'owner';
+    const typeSelect = document.getElementById('hkTypeSelect');
+    const slotSelect = document.getElementById('hkSlotSelect');
+    const notesInput = document.getElementById('hkNotesInput');
+
+    const selectedType = typeSelect ? typeSelect.value : 'نظافة خفيفة يومية';
+    const selectedSlot = slotSelect ? slotSelect.value : 'الفترة الصباحية';
+    const notes = notesInput ? notesInput.value.trim() : '';
+
+    this.closeModal('modalHousekeepingRequest');
+    this.requestHousekeeping(role, selectedType, selectedSlot, notes);
+  }
+
   updateModalTicketApplicantInfo() {
     let fullName = 'أسامة أحمد محمد الشريف';
     let phoneNum = '01223456789';
