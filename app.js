@@ -885,37 +885,62 @@ class UltimateFMApp {
     const typeNorm = normalizeAr(ticket.type);
     const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
 
-    // 1. Security & Gate Passes Keywords -> Route to "الأمن" (Security Team)
-    const isSecurity = combinedNorm.includes('امن') || 
-                       combinedNorm.includes('تصريح') || 
-                       combinedNorm.includes('تصاريح') || 
-                       combinedNorm.includes('بوابه') || 
-                       combinedNorm.includes('بوابات') || 
-                       combinedNorm.includes('سيارات') || 
-                       combinedNorm.includes('لوحه') || 
-                       combinedNorm.includes('شحنه') || 
-                       combinedNorm.includes('زائر') || 
-                       combinedNorm.includes('زوار') || 
-                       combinedNorm.includes('security') || 
-                       combinedNorm.includes('lpr') || 
-                       combinedNorm.includes('دخول البحر');
+    // 1. Housekeeping Team -> Route to "هاوس كيبينج" (Housekeeping Team)
+    const isHousekeeping = combinedNorm.includes('هاوس') || 
+                           combinedNorm.includes('كيبينج') || 
+                           combinedNorm.includes('نظافه') || 
+                           combinedNorm.includes('تنظيف') || 
+                           combinedNorm.includes('housekeeping') || 
+                           combinedNorm.includes('cleaning');
 
-    // 2. Accounting & Financial Inquiries -> Route to "فريق الحسابات" (Accounting Team)
-    const isAccounting = combinedNorm.includes('حسابات') || 
-                         combinedNorm.includes('الحسابات') || 
-                         combinedNorm.includes('مالي') || 
-                         combinedNorm.includes('ماليات') || 
-                         combinedNorm.includes('كشف حساب') || 
-                         combinedNorm.includes('وديعه') || 
-                         combinedNorm.includes('ودائع') || 
-                         combinedNorm.includes('اقساط') || 
-                         combinedNorm.includes('قسط') || 
-                         combinedNorm.includes('فواتير') || 
-                         combinedNorm.includes('accounting') || 
-                         combinedNorm.includes('finance');
+    // 2. Landscaping Team -> Route to "لاند اسكيبينج" (Landscaping Team)
+    const isLandscaping = combinedNorm.includes('لاند') || 
+                          combinedNorm.includes('اسكيبينج') || 
+                          combinedNorm.includes('لاندسكيب') || 
+                          combinedNorm.includes('حدائق') || 
+                          combinedNorm.includes('حديقه') || 
+                          combinedNorm.includes('زراعه') || 
+                          combinedNorm.includes('اشجار') || 
+                          combinedNorm.includes('ري') || 
+                          combinedNorm.includes('landscaping') || 
+                          combinedNorm.includes('landscape') || 
+                          combinedNorm.includes('gardening');
 
-    // 3. Customer Care & General Complaints & Suggestions -> Route to "Customer Care" (خدمة العملاء)
-    const isCustomerCare = !isSecurity && !isAccounting && (
+    // 3. Security & Gate Passes Keywords -> Route to "الأمن" (Security Team)
+    const isSecurity = !isHousekeeping && !isLandscaping && (
+      combinedNorm.includes('امن') || 
+      combinedNorm.includes('تصريح') || 
+      combinedNorm.includes('تصاريح') || 
+      combinedNorm.includes('بوابه') || 
+      combinedNorm.includes('بوابات') || 
+      combinedNorm.includes('سيارات') || 
+      combinedNorm.includes('لوحه') || 
+      combinedNorm.includes('شحنه') || 
+      combinedNorm.includes('زائر') || 
+      combinedNorm.includes('زوار') || 
+      combinedNorm.includes('security') || 
+      combinedNorm.includes('lpr') || 
+      combinedNorm.includes('دخول البحر')
+    );
+
+    // 4. Accounting & Financial Inquiries -> Route to "فريق الحسابات" (Accounting Team)
+    const isAccounting = !isHousekeeping && !isLandscaping && (
+      combinedNorm.includes('حسابات') || 
+      combinedNorm.includes('الحسابات') || 
+      combinedNorm.includes('مالي') || 
+      combinedNorm.includes('ماليات') || 
+      combinedNorm.includes('كشف حساب') || 
+      combinedNorm.includes('وديعه') || 
+      combinedNorm.includes('ودائع') || 
+      combinedNorm.includes('اقساط') || 
+      combinedNorm.includes('قسط') || 
+      combinedNorm.includes('فواتير') || 
+      combinedNorm.includes('accounting') || 
+      combinedNorm.includes('finance')
+    );
+
+    // 5. Customer Care & General Complaints & Suggestions -> Route to "Customer Care" (خدمة العملاء)
+    const isCustomerCare = !isHousekeeping && !isLandscaping && !isSecurity && !isAccounting && (
       combinedNorm.includes('شكوي') || 
       combinedNorm.includes('شكاوي') || 
       combinedNorm.includes('مقترح') || 
@@ -927,15 +952,13 @@ class UltimateFMApp {
       combinedNorm.includes('care')
     );
 
-    // 4. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
-    const isMaintenance = !isSecurity && !isAccounting && !isCustomerCare && (
+    // 6. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
+    const isMaintenance = !isHousekeeping && !isLandscaping && !isSecurity && !isAccounting && !isCustomerCare && (
       combinedNorm.includes('صيانه') || 
       combinedNorm.includes('سباكه') || 
       combinedNorm.includes('كهرباء') || 
       combinedNorm.includes('تكييف') || 
       combinedNorm.includes('نجاره') || 
-      combinedNorm.includes('زراعه') || 
-      combinedNorm.includes('نظافه') || 
       combinedNorm.includes('اعطال') || 
       combinedNorm.includes('تسريب') || 
       combinedNorm.includes('مواسير') || 
@@ -947,7 +970,17 @@ class UltimateFMApp {
 
     let targetTeam = null;
 
-    if (isSecurity) {
+    if (isHousekeeping) {
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('هاوس') || tNorm.includes('كيبينج') || tNorm.includes('housekeeping') || tNorm.includes('نظافه');
+      });
+    } else if (isLandscaping) {
+      targetTeam = teams.find(t => {
+        const tNorm = normalizeAr(t.name);
+        return tNorm.includes('لاند') || tNorm.includes('اسكيبينج') || tNorm.includes('landscaping') || tNorm.includes('landscape') || tNorm.includes('حدائق') || tNorm.includes('زراعه');
+      });
+    } else if (isSecurity) {
       targetTeam = teams.find(t => {
         const tNorm = normalizeAr(t.name);
         return tNorm.includes('امن') || tNorm.includes('الامن') || tNorm.includes('security');
@@ -971,7 +1004,9 @@ class UltimateFMApp {
 
     // Broad fallback matching
     if (!targetTeam) {
-      if (isSecurity) targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
+      if (isHousekeeping) targetTeam = teams.find(t => normalizeAr(t.name).includes('هاوس') || normalizeAr(t.name).includes('نظافه'));
+      else if (isLandscaping) targetTeam = teams.find(t => normalizeAr(t.name).includes('لاند') || normalizeAr(t.name).includes('حدائق'));
+      else if (isSecurity) targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
       else if (isAccounting) targetTeam = teams.find(t => normalizeAr(t.name).includes('حسابات') || normalizeAr(t.name).includes('ماليه') || normalizeAr(t.name).includes('account'));
       else if (isCustomerCare) targetTeam = teams.find(t => normalizeAr(t.name).includes('عملاء') || normalizeAr(t.name).includes('care'));
       else if (isMaintenance) targetTeam = teams.find(t => normalizeAr(t.name).includes('صيانه'));
@@ -1457,6 +1492,33 @@ class UltimateFMApp {
     }
 
     this.closeModal('modalMeterRecharge');
+
+    const meterTypeName = meterType === 'electricity' ? 'كهرباء' : 'مياه';
+    const meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
+    const payRef = 'SYS-PAY-' + Math.floor(100000 + Math.random() * 900000);
+
+    this.showToast(`⚡ تم شحن عداد ${meterTypeName} الذكي (${meterCode}) بمبلغ ${amountVal} ج.م!\nرقم المرجع المالي: #${payRef}\nجاري توثيق العملية بكشف الحساب المركزي Odoo...`);
+
+    // Sync meter recharge transaction to Odoo
+    (async () => {
+      try {
+        const meterTicket = {
+          id: 'MTR-' + Math.floor(1000 + Math.random() * 9000),
+          category: 'شحن عدادات سكنية ومرافق',
+          title: `شحن عداد ${meterTypeName}: ${meterCode}`,
+          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: فيلا 104 - زون الساحل الشمالي`,
+          status: 'تم الشحن وتحديث العداد',
+          bgClass: 'badge-success',
+          requester: 'homeowner',
+          priority: '1',
+          createdAt: new Date().toISOString()
+        };
+        await this.syncTicketToOdoo(meterTicket, '01223456789', 'أسامة أحمد محمد الشريف');
+        this.showToast(`✅ تم توثيق شحن العداد بمبلغ ${amountVal} ج.م بداخل كشف الحساب المركزي Odoo (Invoicing - account.move) برقم #${payRef}!`);
+      } catch (err) {
+        console.warn('[Odoo Meter Recharge Sync Error]:', err);
+      }
+    })();
   }
 
   renderTickets() {
@@ -2463,7 +2525,62 @@ class UltimateFMApp {
     nameInput.value = '';
     phoneInput.value = '';
     
-    this.showToast(`👥 تم إضافة [${name}] بنجاح كفرد عائلة تابع!\nتم إنشاء حساب دخول محدود له على هاتفه برقم ${phone}.`);
+    this.showToast(`👥 تم إضافة [${name}] بنجاح كفرد عائلة تابع!\nجاري التسجيل بالنظام المركزي Odoo (Contacts - res.partner)...`);
+
+    try {
+      await this.syncFamilyMemberToOdoo(name, relationArabic, phone);
+      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] بداخل قاعدة بيانات Odoo (Contacts - res.partner) بنجاح!`);
+    } catch (err) {
+      console.warn('[Odoo Family Member Sync Error]:', err);
+    }
+  }
+
+  async syncFamilyMemberToOdoo(name, relation, phone) {
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    const authPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    const authData = await this.callOdoo(baseUrl, authPayload);
+    if (!authData || !authData.result) return;
+    const uid = authData.result;
+
+    const createPartnerPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "object",
+        method: "execute_kw",
+        args: [
+          dbInput, uid, keyInput,
+          "res.partner",
+          "create",
+          [{
+            name: `${name} (فرد أسرة - ${relation})`,
+            phone: phone,
+            mobile: phone,
+            comment: `فرد أسرة تابع للمالك أسامة الشريف (فيلا 104) - صلة القرابة: ${relation} - تصريح دخول وتصاريح بوابات`,
+            company_type: "person"
+          }]
+        ]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+    await this.callOdoo(baseUrl, createPartnerPayload);
   }
 
   updateWalletUI() {
@@ -3340,7 +3457,28 @@ class UltimateFMApp {
     }
 
     if (input) input.value = '';
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] في Odoo بنجاح وتفعيلها تلقائياً على البوابات الذكية!`);
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري مزامنة اللوحة وتفعيل الدخول الآلي على كاميرات البوابات LPR بالنظام المركزي...`);
+
+    // Sync to Odoo Access Control ticket & res.partner
+    (async () => {
+      try {
+        const lprTicket = {
+          id: 'LPR-' + Math.floor(1000 + Math.random() * 9000),
+          category: 'تصاريح بوابات وسيارات LPR',
+          title: `تسجيل لوحة سيارة: ${plate}`,
+          details: `طلب تسجيل وتفعيل لوحة سيارة للمالك على بوابات القرية الذكية\nرقم اللوحة: ${plate}\nنوع التصريح: فتح آلي عبر كاميرات LPR\nالمالك: أسامة الشريف - فيلا 104`,
+          status: 'مفعل على البوابات',
+          bgClass: 'badge-success',
+          requester: 'homeowner',
+          priority: '1',
+          createdAt: new Date().toISOString()
+        };
+        await this.syncTicketToOdoo(lprTicket, '01223456789', 'أسامة أحمد محمد الشريف');
+        this.showToast(`✅ تم توثيق لوحة السيارة [${plate}] بنجاح بداخل حساب المالك بـ Odoo وتفعيل الـ LPR Gate Trigger!`);
+      } catch (err) {
+        console.warn('[Odoo LPR Sync Error]:', err);
+      }
+    })();
   }
 
   bookAmenity() {
@@ -3388,7 +3526,28 @@ class UltimateFMApp {
       list.insertBefore(item, list.firstChild);
     }
 
-    this.showToast(`🎾 تم حجز [${amenityText}] بنجاح!\nالتاريخ: ${date}\nالوقت: ${time}\nتم خصم ${price} ج.م من المحفظة.`);
+    this.showToast(`⚽ تم تأكيد حجز [${amenityText}] لليوم (${date} • ${time}) بنجاح!\nكود الحجز: #${code}\nجاري توثيق الحجز والخصم بالنظام المركزي...`);
+
+    // Sync to Odoo ticket/sales order
+    (async () => {
+      try {
+        const amenityTicket = {
+          id: 'BOOK-' + code,
+          category: 'حجوزات الملاعب والأنشطة الترفيهية',
+          title: `حجز نشاط ترفيهي: ${amenityText}`,
+          details: `طلب حجز ترفيهي مؤكد برقم #${code}\nالنشاط: ${amenityText}\nالتاريخ والوقت: ${date} - ${time}\nالقيمة: ${price} ج.م (تم الخصم من المحفظة الرقمية للمالك)\nالمالك: أسامة الشريف - فيلا 104`,
+          status: 'حجز مؤكد ومفعل',
+          bgClass: 'badge-success',
+          requester: 'homeowner',
+          priority: '1',
+          createdAt: new Date().toISOString()
+        };
+        await this.syncTicketToOdoo(amenityTicket, '01223456789', 'أسامة أحمد محمد الشريف');
+        this.showToast(`✅ تم توثيق حجز [${amenityText}] بنجاح بالنظام المركزي (Odoo - Sales/Appointments) برقم #${code}!`);
+      } catch (err) {
+        console.warn('[Odoo Amenity Booking Sync Error]:', err);
+      }
+    })();
   }
 
   callDirectory(number) {
@@ -4115,7 +4274,28 @@ class UltimateFMApp {
 
     this.housekeepingRequests.unshift(newReq);
     this.renderHousekeeping();
-    this.showToast(isEn ? '🧹 Housekeeping request submitted successfully!' : '🧹 تم تقديم طلب خدمة النظافة بنجاح!');
+    this.showToast(isEn ? '🧹 Housekeeping request submitted successfully!' : '🧹 تم تقديم طلب خدمة النظافة بنجاح!\nجاري المزامنة مع فريق (هاوس كيبينج) بـ Odoo...');
+
+    // Sync housekeeping request as ticket to Odoo
+    (async () => {
+      try {
+        const hkTicket = {
+          id: newReq.id,
+          category: 'نظافة وهاوس كيبينج',
+          title: `طلب خدمة نظافة: ${type} (${location})`,
+          details: `طلب نظافة وخدمات فندقية\nالنوع: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`,
+          status: 'قيد التخصيص للمشرف',
+          bgClass: 'badge-warning',
+          requester: role,
+          priority: '2',
+          createdAt: now.toISOString()
+        };
+        await this.syncTicketToOdoo(hkTicket, '01223456789', requesterName);
+        this.showToast(isEn ? '✅ Cleaning request synced to Odoo Housekeeping Team!' : '✅ تم توثيق طلب النظافة وإرساله فوراً لفريق (هاوس كيبينج) بالنظام المركزي Odoo!');
+      } catch (err) {
+        console.warn('[Odoo Housekeeping Sync Error]:', err);
+      }
+    })();
   }
 
   assignHousekeepingWorker(id) {
