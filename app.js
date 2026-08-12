@@ -2493,7 +2493,7 @@ class UltimateFMApp {
     this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
   }
 
-  submitFamilyMember() {
+  async submitFamilyMember() {
     const nameInput = document.getElementById('familyMemberNameInput');
     const relationSelect = document.getElementById('familyMemberRelationSelect');
     const phoneInput = document.getElementById('familyMemberPhoneInput');
@@ -2554,6 +2554,10 @@ class UltimateFMApp {
     } catch (err) {
       console.warn('[Odoo Family Member Sync Error]:', err);
     }
+  }
+
+  async addFamilyMember() {
+    return this.submitFamilyMember();
   }
 
   async syncFamilyMemberToOdoo(name, relation, phone) {
