@@ -395,13 +395,16 @@
             <!-- Tab 2: البلاغات (Tickets Tab) -->
             <!-- ========================================== -->
             <div class="homeowner-tab-content" id="tabTicketsHomeowner" style="display: none;">
-              <!-- Maintenance & Housekeeping Request Buttons -->
-              <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                <button class="btn btn-primary" id="btnNewMaintenanceTicket" style="margin: 0; flex: 1; font-size: 0.8rem; height: 38px;">
-                  <i class="fa-solid fa-wrench"></i> طلب صيانة للوحدة
+              <!-- Maintenance, Housekeeping & Landscaping Service Request Buttons -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
+                <button class="btn btn-primary" id="btnNewMaintenanceTicket" style="margin: 0; font-size: 0.72rem; height: 38px; padding: 4px 4px; white-space: nowrap;">
+                  <i class="fa-solid fa-wrench"></i> طلب صيانة
                 </button>
-                <button class="btn btn-cyan" id="btnHomeownerHk" onclick="app.openHousekeepingModal('owner')" style="margin: 0; flex: 1; font-size: 0.8rem; height: 38px; color: white;">
-                  <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
+                <button class="btn btn-cyan" id="btnHomeownerHk" onclick="app.openHousekeepingModal('owner')" style="margin: 0; font-size: 0.72rem; height: 38px; padding: 4px 4px; color: white; white-space: nowrap;">
+                  <i class="fa-solid fa-broom"></i> خدمة نظافة
+                </button>
+                <button class="btn btn-success" id="btnHomeownerLandscape" onclick="app.openLandscapingModal('owner')" style="margin: 0; font-size: 0.72rem; height: 38px; padding: 4px 4px; color: white; background: #16a34a; border-color: #16a34a; white-space: nowrap;">
+                  <i class="fa-solid fa-seedling"></i> لاندسكيب
                 </button>
               </div>
 
@@ -1822,6 +1825,54 @@
     </div>
   </div>
 
+  <!-- 1.6 Landscaping & Garden Maintenance Request Modal -->
+  <div class="modal-overlay" id="modalLandscapingRequest">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalLandscapingRequest')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 12px; color: #16a34a;"><i class="fa-solid fa-seedling"></i> طلب خدمة اللاندسكيب وصيانة الحدائق</h3>
+      
+      <!-- Applicant Info Summary Badge -->
+      <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: #16a34a; margin-bottom: 4px;">
+          <i class="fa-solid fa-house-user"></i> بيانات طالب خدمة اللاندسكيب:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>صاحب الطلب:</b> <span id="modalLandscapeOwnerName">أسامة أحمد محمد الشريف</span></div>
+          <div>• <b>الموقع / الوحدة:</b> <span id="modalLandscapeOwnerUnit">فيلا 104 - زون الساحل الشمالي</span></div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">اختر نوع خدمة اللاندسكيب والحدائق المطلوبة</label>
+        <select class="form-control" id="landscapeTypeSelect">
+          <option value="تقليم وقص الأشجار والنجيل (Lawn Mowing & Tree Trimming)">🌿 تقليم وقص الأشجار والنجيل والمسطحات الخضراء</option>
+          <option value="صيانة وتصليح شبكات الري التلقائي (Irrigation Repair)">💧 صيانة وتصليح شبكات الري التلقائي والنوازل</option>
+          <option value="تسميد ومكافحة آفات المزروعات (Pest Control & Fertilization)">🧪 تسميد ومكافحة آفات النباتات والأشجار</option>
+          <option value="تنسيق حدائق وزراعة شتلات جديدة (Landscaping & Planting)">🌺 تنسيق حدائق وزراعة زهور وشتلات جديدة</option>
+          <option value="تنظيف حديقة الفيلا وجمع أوراق الشجر (Garden Clean-up)">🧹 تنظيف حديقة الفيلا وتجميع أوراق الشجر والمخلفات</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">توقيت التنفيذ المفضل</label>
+        <select class="form-control" id="landscapeSlotSelect">
+          <option value="الفترة الصباحية (8 صباحاً - 11 صباحاً)">🌅 الفترة الصباحية (8 صباحاً - 11 صباحاً)</option>
+          <option value="الفترة المسائية (3 عصراً - 6 مساءً)">🌆 الفترة المسائية (3 عصراً - 6 مساءً)</option>
+          <option value="طلب عاجل فوراً">⚡ طلب عاجل فوراً</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات وتفاصيل إضافية (اختياري)</label>
+        <textarea class="form-control" rows="3" id="landscapeNotesInput" placeholder="أدخل أي تفاصيل خاصة (مثال: قص نجيل حديقة المدخل الرئيسي، أو فحص تسريب شبكة الري التلقائي)..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitLandscapingModalForm()" style="background: #16a34a; border-color: #16a34a;">
+        <i class="fa-solid fa-paper-plane"></i> تأكيد وإرسال طلب اللاندسكيب لـ Odoo
+      </button>
+    </div>
+  </div>
+
   <!-- 2. Inventory Spare Parts Search Modal -->
   <div class="modal-overlay" id="modalInventory">
     <div class="modal-card">
@@ -2294,6 +2345,6 @@
   </div>
 
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=58.0"></script>
+  <script src="app.js?v=59.0"></script>
 </body>
 </html>

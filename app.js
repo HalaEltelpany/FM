@@ -2750,6 +2750,108 @@ class UltimateFMApp {
     this.requestHousekeeping(role, selectedType, selectedSlot, notes);
   }
 
+  openLandscapingModal(role = 'owner') {
+    this._activeLandscapeRole = role;
+    let name = 'أسامة أحمد محمد الشريف';
+    let unit = 'فيلا 104 - زون الساحل الشمالي';
+
+    const customName = localStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) name = customName;
+
+    if (role === 'tenant') {
+      name = 'أحمد زاهر محمود';
+      unit = 'شاليه 402 - زون البحيرات';
+    } else if (role === 'commercial') {
+      name = 'مطعم وكافيه Blue Wave';
+      unit = 'محل 12 - المول التجاري';
+    } else if (role === 'manager') {
+      name = 'المهندس أيمن السعيد (مدير الصيانة)';
+      unit = 'الأماكن العامة بالقرية';
+    }
+
+    const nameEl = document.getElementById('modalLandscapeOwnerName');
+    const unitEl = document.getElementById('modalLandscapeOwnerUnit');
+    if (nameEl) nameEl.innerText = name;
+    if (unitEl) unitEl.innerText = unit;
+
+    const notesInput = document.getElementById('landscapeNotesInput');
+    if (notesInput) notesInput.value = '';
+
+    this.openModal('modalLandscapingRequest');
+  }
+
+  submitLandscapingModalForm() {
+    const role = this._activeLandscapeRole || this.currentRole || 'owner';
+    const typeSelect = document.getElementById('landscapeTypeSelect');
+    const slotSelect = document.getElementById('landscapeSlotSelect');
+    const notesInput = document.getElementById('landscapeNotesInput');
+
+    const selectedType = typeSelect ? typeSelect.value : 'تقليم وقص الأشجار والنجيل';
+    const selectedSlot = slotSelect ? slotSelect.value : 'الفترة الصباحية';
+    const notes = notesInput ? notesInput.value.trim() : '';
+
+    this.closeModal('modalLandscapingRequest');
+    this.requestLandscaping(role, selectedType, selectedSlot, notes);
+  }
+
+  requestLandscaping(role = 'owner', customType = null, slot = null, notes = '') {
+    if (this._isLandscapeSubmitting) return;
+    this._isLandscapeSubmitting = true;
+    setTimeout(() => { this._isLandscapeSubmitting = false; }, 2500);
+
+    const isEn = this.currentLang === 'en';
+    let location = 'فيلا 104';
+    let requesterName = isEn ? 'Owner (Osama Ahmed)' : 'المالك (أسامة أحمد)';
+    let type = customType || 'تقليم وقص الأشجار والنجيل';
+
+    const customName = localStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) requesterName = customName;
+
+    if (role === 'tenant') {
+      location = 'شاليه 402';
+      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'المستأجر (أحمد زاهر)';
+    } else if (role === 'commercial') {
+      location = 'محل 12 (Blue Wave)';
+      requesterName = isEn ? 'Commercial (Blue Wave)' : 'التجاري (Blue Wave)';
+    } else if (role === 'manager') {
+      location = 'الأماكن العامة والحدائق بالقرية';
+      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'المدير (أيمن السعيد)';
+    }
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    let fullDetails = `طلب خدمة صيانة الحدائق واللاندسكيب\nنوع الخدمة المطلوب: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`;
+    if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
+    if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
+
+    const newTicket = {
+      id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
+      title: `خدمة لاندسكيب: ${type} (${location})`,
+      category: 'صيانة الحدائق واللاندسكيب',
+      priority: '2',
+      details: fullDetails,
+      status: 'جديد',
+      bgClass: 'badge-warning',
+      requester: role === 'family' ? 'family' : 'homeowner',
+      assignedTech: '',
+      photoBefore: 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=300&q=80',
+      photoAfter: '',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr
+    };
+
+    this.tickets.unshift(newTicket);
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.showToast(isEn ? '🌿 Landscaping request submitted successfully!' : '🌿 تم تقديم طلب خدمة اللاندسكيب بنجاح!\nجاري المزامنة مع فريق (لاند اسكيبينج) بـ Odoo...');
+
+    // Sync ticket to Odoo (routed to Landscaping team automatically)
+    this.syncTicketToOdoo(newTicket, '01223456789', requesterName);
+  }
+
   updateModalTicketApplicantInfo() {
     let fullName = 'أسامة أحمد محمد الشريف';
     let phoneNum = '01223456789';
