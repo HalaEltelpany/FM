@@ -2901,7 +2901,33 @@ class UltimateFMApp {
         replies.forEach(msg => {
           const cleanBody = msg.body.replace(/<[^>]*>?/gm, '').trim();
           if (!cleanBody) return;
-          const authorName = (msg.author_id && msg.author_id[1]) ? msg.author_id[1] : 'فريق الدعم والحسابات';
+
+          const l = cleanBody.toLowerCase();
+          // Filter out ALL system creation logs
+          if (l.includes('ticket created') || l.includes('helpdesk ticket')) return;
+
+          // Filter out ALL automated template acknowledgements & auto-emails
+          if (
+            l.startsWith('dear ') ||
+            l.includes('dear fm-') ||
+            l.includes('your request') ||
+            l.includes('received') ||
+            l.includes('is being reviewed') ||
+            l.includes('reference for your ticket') ||
+            l.includes('simply reply to this email') ||
+            l.includes('view ticket') ||
+            l.includes('best regards') ||
+            l.includes('accounting team')
+          ) return;
+
+          let authorName = 'فريق الحسابات والدعم';
+          if (msg.author_id && Array.isArray(msg.author_id) && msg.author_id[1]) {
+            const origName = msg.author_id[1];
+            if (!origName.includes('Halah') && !origName.includes('Odoo') && !origName.includes('Bot') && !origName.includes('Admin')) {
+              authorName = origName;
+            }
+          }
+
           const msgDate = msg.create_date || msg.date || '';
 
           repliesContentHtml += `
