@@ -886,35 +886,43 @@ class UltimateFMApp {
   async callOdoo(baseUrl, payload) {
     const directUrl = `${baseUrl}/jsonrpc`;
     
+    // On web deployments (e.g. GitHub Pages), direct fetch triggers CORS fallback retries that create duplicate tickets in Odoo!
+    // Always use proxy first on web client requests so exactly ONE single POST request is transmitted to Odoo.
+    const isWebDeployment = window.location.hostname.includes('github.io') || 
+                            window.location.protocol === 'https:' || 
+                            (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:');
+
+    const primaryUrl = isWebDeployment 
+      ? 'https://corsproxy.io/?' + encodeURIComponent(directUrl)
+      : directUrl;
+
     try {
-      console.log(`[Odoo Call] Attempting direct fetch to: ${directUrl}`);
-      const response = await fetch(directUrl, {
+      console.log(`[Odoo Call] Requesting via primary endpoint: ${primaryUrl}`);
+      const response = await fetch(primaryUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+
       if (response.ok) {
         const data = await response.json();
-        console.log('[Odoo Call] Direct fetch succeeded:', data);
+        console.log('[Odoo Call] Primary call succeeded:', data);
         return data;
       }
-      throw new Error(`Direct call returned status ${response.status}`);
+      throw new Error(`Primary call returned status ${response.status}`);
     } catch (err) {
-      console.warn('[Odoo Call] Direct fetch failed or CORS blocked. Trying proxy fallback...', err);
-      try {
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
-        const response = await fetch(proxyUrl, {
+      console.warn('[Odoo Call] Primary call failed:', err);
+      // Secondary fallback only if primary failed
+      if (primaryUrl !== directUrl) {
+        console.log('[Odoo Call] Trying direct URL as secondary fallback:', directUrl);
+        const directResp = await fetch(directUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await response.json();
-        console.log('[Odoo Call] Proxy fetch succeeded:', data);
-        return data;
-      } catch (proxyErr) {
-        console.error('[Odoo Call] Proxy fallback also failed:', proxyErr);
-        throw proxyErr;
+        return await directResp.json();
       }
+      throw err;
     }
   }
 
