@@ -1565,7 +1565,8 @@ class UltimateFMApp {
       else if (tk.priority === '1') priorityStars = ' ⭐';
 
       let odooRepliesHtml = '';
-      if (tk.odooId) {
+      const isFinancialInquiry = tk.category && (tk.category.includes('حسابات') || tk.category.includes('مالي'));
+      if (tk.odooId && isFinancialInquiry) {
         odooRepliesHtml = `
           <div style="margin-top: 8px; border-top: 1px dashed rgba(32, 39, 79, 0.15); padding-top: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -1576,7 +1577,7 @@ class UltimateFMApp {
                 <i class="fa-solid fa-rotate"></i> ${isEn ? 'Sync Replies' : '💬 متابعة سجل الردود'}
               </button>
             </div>
-            <div id="odoo_replies_box_${tk.id}" style="font-size: 0.72rem; color: var(--text-muted);">
+            <div id="odoo_replies_box_${tk.id}" class="odoo-replies-box-${tk.id}" style="font-size: 0.72rem; color: var(--text-muted);">
               ${tk.lastReply ? `
                 <div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 6px 10px; border-radius: 6px; margin-top: 4px;">
                   <div style="font-weight: 700; color: #10b981; display: flex; justify-content: space-between;">
@@ -1612,10 +1613,10 @@ class UltimateFMApp {
       `;
     };
 
-    // Render Homeowner Tickets list & Update Category Counters
+    // Render Homeowner Tickets list & Update Category Counters (Excluding Financial Inquiries)
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
-      const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner');
+      const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner' && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
 
       // Emaar-style Category Counters Summary
       const plumbingCount = homeownerTks.filter(t => t.category === 'سباكة').length;
@@ -2879,15 +2880,15 @@ class UltimateFMApp {
       targetOdooId = tk.odooId;
     }
 
-    const box = document.getElementById(`odoo_replies_box_${localTicketId}`);
-    if (box) {
-      box.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحديث ومزامنة الردود من النظام المركزي...</div>`;
-    }
+    const boxes = document.querySelectorAll(`.odoo-replies-box-${localTicketId}, #odoo_replies_box_${localTicketId}`);
+    boxes.forEach(b => {
+      b.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحديث ومزامنة الردود من النظام المركزي...</div>`;
+    });
 
     if (!targetOdooId || targetOdooId === 'undefined' || targetOdooId === 'null') {
-      if (box) {
-        box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">التذكرة قيد التسجيل والتفعيل بالنظام... يرجى المحاولة بعد ثوانٍ.</div>`;
-      }
+      boxes.forEach(b => {
+        b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">التذكرة قيد التسجيل والتفعيل بالنظام... يرجى المحاولة بعد ثوانٍ.</div>`;
+      });
       this.showToast('ℹ️ جاري استكمال التسجيل بالنظام المركزي...');
       return;
     }
@@ -2923,19 +2924,19 @@ class UltimateFMApp {
           repliesContentHtml = `<div style="font-size: 0.68rem; color: var(--text-muted);">لم يتم إضافة ردود نصية بعد من أخصائي الحسابات.</div>`;
         }
 
-        if (box) box.innerHTML = repliesContentHtml;
+        boxes.forEach(b => { b.innerHTML = repliesContentHtml; });
         this.showToast('✅ تم تحديث وتتبع سجل الردود بنجاح!');
       } else {
-        if (box) {
-          box.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل. اضغط "متابعة سجل الردود" للتحديث.</div>`;
-        }
+        boxes.forEach(b => {
+          b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل. اضغط "متابعة سجل الردود" للتحديث.</div>`;
+        });
         this.showToast('ℹ️ لا توجد ردود جديدة مضافة حتى الآن.');
       }
     } catch (err) {
       console.warn('[Replies Fetch Error]:', err);
-      if (box) {
-        box.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بالنظام المركزي حالياً.</div>`;
-      }
+      boxes.forEach(b => {
+        b.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بالنظام المركزي حالياً.</div>`;
+      });
     }
   }
 

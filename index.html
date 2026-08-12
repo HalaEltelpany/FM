@@ -204,9 +204,14 @@
           <!-- 1. HOMEOWNER VIEW (تطبيق المالك) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewHomeowner">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-house-user"></i> <span>بوابة المالك الرئيسي</span>
+              </div>
+            </div>
 
             <!-- ========================================== -->
             <!-- Tab 1: الرئيسية (Home Tab) -->
@@ -658,9 +663,14 @@
           <!-- 2. ENGINEER VIEW (واجهة المهندس - 3 تخصصات) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewEngineer">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-compass-drafting"></i> <span>بوابة المهندس المشرف</span>
+              </div>
+            </div>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -741,9 +751,14 @@
           <!-- 3. MAINTENANCE MANAGER VIEW (شاشة مدير الصيانة) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewManager">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-users-gear"></i> <span>إدارة الصيانة</span>
+              </div>
+            </div>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -795,9 +810,14 @@
           <!-- 4. FIELD TECHNICIAN VIEW (شاشة الفني الميداني) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewTechnician">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-wrench"></i> <span>الفني الميداني</span>
+              </div>
+            </div>
             
             <div class="card gold-border">
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -828,9 +848,14 @@
           <!-- 3. TENANT VIEW (واجهة المستأجر السكني المتكاملة) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewTenant">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-user-tag"></i> <span>بوابة المستأجر</span>
+              </div>
+            </div>
             
             <!-- Tenant Welcome Header -->
             <div class="card gold-border">
@@ -1158,9 +1183,14 @@
           <!-- 6. ADMIN & EXECUTIVE VIEW (لوحة الإدارة العليا) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewAdmin">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-chart-line"></i> <span>الإدارة العليا</span>
+              </div>
+            </div>
             
             <!-- Daily Occupancy, Access Control & Staffing Decision Matrix -->
             <div class="card gold-border">
@@ -1333,9 +1363,14 @@
           <!-- 8. SECURITY & GATES VIEW (شاشة ضابط الأمن والسلامة) -->
           <!-- ========================================== -->
           <div class="view-panel" id="viewSecurity">
-            <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin-bottom: 8px; box-shadow: var(--shadow-sm);">
-              <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
-            </button>
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="app.showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-shield-halved"></i> <span>غرفة عمليات الأمن</span>
+              </div>
+            </div>
             
             <div class="card gold-border" style="background: #0f172a; color: #ffffff;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
