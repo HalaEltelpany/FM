@@ -1205,13 +1205,11 @@ class UltimateFMApp {
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
 
-      // Standard Helpdesk Ticket payload (Excluding invalid non-standard fields like email_from)
+      // Standard Helpdesk Ticket payload using valid stored Odoo fields
       const helpdeskFields = {
         name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
         description: cleanDescription,
-        partner_email: emailAddress,
-        partner_phone: phoneNum,
-        priority: String(ticket.priority || '2') // Odoo Priority: '1'=1 Star, '2'=2 Stars, '3'=3 Stars
+        priority: String(ticket.priority || '2')
       };
 
       if (partnerId) {
@@ -1233,31 +1231,8 @@ class UltimateFMApp {
       };
 
       console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket with team_id:', resolvedTeamId);
-      let helpdeskData = await this.callOdoo(baseUrl, createPayload);
+      const helpdeskData = await this.callOdoo(baseUrl, createPayload);
 
-      // Robust Fallback: If Odoo rejects optional fields, try minimal core fields
-      if (helpdeskData && helpdeskData.error) {
-        console.warn('[Odoo Sync] Full payload rejected, retrying with minimal core fields...', helpdeskData.error);
-        const minimalFields = {
-          name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
-          description: cleanDescription,
-          priority: String(ticket.priority || '2')
-        };
-        if (partnerId) minimalFields.partner_id = partnerId;
-        if (resolvedTeamId) minimalFields.team_id = resolvedTeamId;
-
-        const fallbackPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [minimalFields]]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        helpdeskData = await this.callOdoo(baseUrl, fallbackPayload);
-      }
       if (helpdeskData && !helpdeskData.error && helpdeskData.result) {
         const ticketIdInOdoo = helpdeskData.result;
         console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketIdInOdoo);
