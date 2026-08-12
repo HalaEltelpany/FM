@@ -119,47 +119,68 @@ class UltimateFMApp {
   }
 
   init() {
-    document.addEventListener('DOMContentLoaded', () => {
-      this.loadOdooFields();
-      this.applyLanguageUI();
-      this.updateHomeownerNameUI();
-      this.fetchOdooOwnerName();
-      this.bindEvents();
-      this.startQRTimer();
-      this.initCanvas();
-      this.renderPdfLogo();
-      this.updateClock();
-      setInterval(() => this.updateClock(), 1000);
-      this.initSplashScreen();
-      this.loadTicketsFromStorage();
-      this.syncTicketsFromOdoo();
-      this.renderTickets();
+    const runSetup = () => {
+      try {
+        this.loadOdooFields();
+        this.applyLanguageUI();
+        this.updateHomeownerNameUI();
+        this.fetchOdooOwnerName();
+        this.bindEvents();
+        this.startQRTimer();
+        this.initCanvas();
+        this.renderPdfLogo();
+        this.updateClock();
+        setInterval(() => this.updateClock(), 1000);
+        this.initSplashScreen();
+        this.loadTicketsFromStorage();
+        this.syncTicketsFromOdoo();
+        this.renderTickets();
 
-      // Auto login if active session exists
-      const savedRole = localStorage.getItem('active_session_role');
-      if (savedRole) {
-        setTimeout(() => this.executeLogin(savedRole), 100);
+        // Auto login if active session exists
+        const savedRole = localStorage.getItem('active_session_role');
+        if (savedRole) {
+          setTimeout(() => this.executeLogin(savedRole), 100);
+        }
+        // Register PWA Service Worker
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('[PWA] Service Worker registered successfully.'))
+            .catch((err) => console.log('[PWA] Service Worker registration failed:', err));
+        }
+      } catch (err) {
+        console.error('[App Init Exception]:', err);
+        const splash = document.getElementById('appSplashScreen');
+        if (splash) {
+          splash.classList.add('hidden');
+          splash.style.display = 'none';
+        }
       }
-      // Register PWA Service Worker
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-          .then(() => console.log('[PWA] Service Worker registered successfully.'))
-          .catch((err) => console.log('[PWA] Service Worker registration failed:', err));
-      }
-    });
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(runSetup, 10);
+    } else {
+      document.addEventListener('DOMContentLoaded', runSetup);
+    }
   }
 
   initSplashScreen() {
     const splash = document.getElementById('appSplashScreen');
     if (!splash) return;
     
-    // Auto hide splash after 2.2s
+    // Auto hide splash after 1.5s
     setTimeout(() => {
       splash.classList.add('hidden');
-    }, 2200);
+    }, 1500);
+
+    // Hard safety timeout: Ensure display none after 2.5s
+    setTimeout(() => {
+      if (splash) splash.style.display = 'none';
+    }, 2500);
 
     splash.addEventListener('click', () => {
       splash.classList.add('hidden');
+      splash.style.display = 'none';
     });
   }
 
