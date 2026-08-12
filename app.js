@@ -4460,7 +4460,7 @@ class UltimateFMApp {
     if (btnOdooTestConn) btnOdooTestConn.innerHTML = isEn ? '<i class="fa-solid fa-wifi"></i> Test & Activate Sync Now' : '<i class="fa-solid fa-wifi"></i> اختبار وتنشيط المزامنة الآن';
   }
 
-  requestHousekeeping(role) {
+  requestHousekeeping(role = 'owner', customType = null, slot = null, notes = '') {
     if (this._isHkSubmitting) return;
     this._isHkSubmitting = true;
     setTimeout(() => { this._isHkSubmitting = false; }, 2500);
@@ -4468,7 +4468,7 @@ class UltimateFMApp {
     const isEn = this.currentLang === 'en';
     let location = '';
     let requesterName = '';
-    let type = 'نظافة داخلية';
+    let type = customType || 'نظافة روتينية يومية';
 
     if (role === 'owner') {
       location = 'فيلا 104';
@@ -4483,11 +4483,15 @@ class UltimateFMApp {
       const select = document.getElementById('managerCleaningLocation');
       location = select ? select.value : 'منطقة عامة';
       requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'المدير (أيمن السعيد)';
-      type = 'نظافة مكان عام';
+      type = customType || 'نظافة مكان عام';
     }
 
     const now = new Date();
     const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    let fullDetails = `طلب خدمة نظافة وهاوس كيبينج\nنوع الخدمة المطلوب: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`;
+    if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
+    if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
 
     const newReq = {
       id: `HK-${Math.floor(100 + Math.random() * 900)}`,
@@ -4495,6 +4499,7 @@ class UltimateFMApp {
       requesterName: requesterName,
       location: location,
       type: type,
+      details: fullDetails,
       status: 'بانتظار التخصيص',
       assignedWorker: '',
       time: timeStr
@@ -4502,6 +4507,7 @@ class UltimateFMApp {
 
     this.housekeepingRequests.unshift(newReq);
     this.renderHousekeeping();
+    this.renderTickets();
     this.showToast(isEn ? '🧹 Housekeeping request submitted successfully!' : '🧹 تم تقديم طلب خدمة النظافة بنجاح!\nجاري المزامنة مع فريق (هاوس كيبينج) بـ Odoo...');
 
     // Sync housekeeping request as ticket to Odoo
@@ -4510,8 +4516,8 @@ class UltimateFMApp {
         const hkTicket = {
           id: newReq.id,
           category: 'نظافة وهاوس كيبينج',
-          title: `طلب خدمة نظافة: ${type} (${location})`,
-          details: `طلب نظافة وخدمات فندقية\nالنوع: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`,
+          title: `خدمة نظافة: ${type} (${location})`,
+          details: fullDetails,
           status: 'قيد التخصيص للمشرف',
           bgClass: 'badge-warning',
           requester: role,
@@ -4519,7 +4525,6 @@ class UltimateFMApp {
           createdAt: now.toISOString()
         };
         await this.syncTicketToOdoo(hkTicket, '01223456789', requesterName);
-        this.showToast(isEn ? '✅ Cleaning request synced to Odoo Housekeeping Team!' : '✅ تم توثيق طلب النظافة وإرساله فوراً لفريق (هاوس كيبينج) بالنظام المركزي Odoo!');
       } catch (err) {
         console.warn('[Odoo Housekeeping Sync Error]:', err);
       }
