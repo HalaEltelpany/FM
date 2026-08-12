@@ -2703,9 +2703,7 @@ class UltimateFMApp {
     if (modalId === 'modalSignature') {
       setTimeout(() => this.initCanvas(), 100);
     }
-    if (modalId === 'modalNewTicket') {
-      this.updateModalTicketApplicantInfo();
-    }
+    this.updateModalTicketApplicantInfo();
   }
 
   updateModalTicketApplicantInfo() {
@@ -2734,6 +2732,7 @@ class UltimateFMApp {
       unitNum = 'الأماكن العامة بالقرية';
     }
 
+    // Maintenance ticket modal identity elements
     const elName = document.getElementById('modalTicketOwnerName');
     const elUnit = document.getElementById('modalTicketOwnerUnit');
     const elPhone = document.getElementById('modalTicketOwnerPhone');
@@ -2743,6 +2742,30 @@ class UltimateFMApp {
     if (elUnit) elUnit.innerText = unitNum;
     if (elPhone) elPhone.innerText = phoneNum;
     if (elEmail) elEmail.innerText = emailAddress;
+
+    // Housekeeping modal identity elements
+    const hkName = document.getElementById('modalHkOwnerName');
+    const hkUnit = document.getElementById('modalHkOwnerUnit');
+    if (hkName) hkName.innerText = fullName;
+    if (hkUnit) hkUnit.innerText = unitNum;
+
+    // Financial inquiry modal identity input defaults
+    const finNameInput = document.getElementById('finNameInput');
+    const finPhoneInput = document.getElementById('finPhoneInput');
+    if (finNameInput && !finNameInput.value) finNameInput.value = fullName;
+    if (finPhoneInput && !finPhoneInput.value) finPhoneInput.value = phoneNum;
+
+    // Security complaint modal identity input defaults
+    const secNameInput = document.getElementById('complaintNameInput');
+    const secPhoneInput = document.getElementById('complaintPhoneInput');
+    if (secNameInput && !secNameInput.value) secNameInput.value = fullName;
+    if (secPhoneInput && !secPhoneInput.value) secPhoneInput.value = phoneNum;
+
+    // Customer care complaint modal identity input defaults
+    const csNameInput = document.getElementById('csNameInput');
+    const csPhoneInput = document.getElementById('csPhoneInput');
+    if (csNameInput && !csNameInput.value) csNameInput.value = fullName;
+    if (csPhoneInput && !csPhoneInput.value) csPhoneInput.value = phoneNum;
   }
 
   closeModal(modalId) {
@@ -4188,13 +4211,6 @@ class UltimateFMApp {
 
     const varLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:last-child span:first-child');
     if (varLabel) varLabel.innerText = isEn ? 'Net Maintenance Variance Due:' : 'صافي فروق الصيانة المطلوبة:';
-
-    const metersTitle = document.querySelector('#utilityMetersCard .card-title');
-    if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';
-
-    const elecLabel = document.querySelector('#utilityMetersCard .stat-box:first-child .stat-label');
-    if (elecLabel) elecLabel.innerHTML = isEn ? '<i class="fa-solid fa-bolt"></i> Elec. Meter' : '<i class="fa-solid fa-bolt"></i> عداد الكهرباء';
-  }
 
     const metersTitle = document.querySelector('#utilityMetersCard .card-title');
     if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';
