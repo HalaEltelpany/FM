@@ -1708,21 +1708,27 @@ class UltimateFMApp {
     if (homeownerList) {
       const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner' && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
 
-      // Emaar-style Category Counters Summary
+      // Category Counters Summary (6 Categories)
       const plumbingCount = homeownerTks.filter(t => t.category === 'سباكة').length;
       const elecCount = homeownerTks.filter(t => t.category === 'كهرباء').length;
       const hvacCount = homeownerTks.filter(t => t.category === 'كهروميكانيك' || t.category === 'تكييف').length;
       const woodCount = homeownerTks.filter(t => t.category === 'نجارة').length;
+      const hkCount = homeownerTks.filter(t => t.category && (t.category.includes('نظافة') || t.category.includes('هاوس'))).length + (this.housekeepingRequests ? this.housekeepingRequests.filter(r => r.requester === 'owner').length : 0);
+      const landscapeCount = homeownerTks.filter(t => t.category && (t.category.includes('حدائق') || t.category.includes('لاند'))).length;
 
       const elPlumb = document.getElementById('catPlumbingCount');
       const elElec = document.getElementById('catElecCount');
       const elHvac = document.getElementById('catHvacCount');
       const elWood = document.getElementById('catWoodCount');
+      const elHk = document.getElementById('catHkCount');
+      const elLandscape = document.getElementById('catLandscapeCount');
 
       if (elPlumb) elPlumb.innerText = plumbingCount;
       if (elElec) elElec.innerText = elecCount;
       if (elHvac) elHvac.innerText = hvacCount;
       if (elWood) elWood.innerText = woodCount;
+      if (elHk) elHk.innerText = hkCount;
+      if (elLandscape) elLandscape.innerText = landscapeCount;
 
       const badge = document.getElementById('ticketCountBadge');
       if (badge) badge.innerText = isEn ? `${homeownerTks.length} total` : `${homeownerTks.length} طلبات مسجلة`;
@@ -4174,7 +4180,6 @@ class UltimateFMApp {
 
     const depLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:first-child .stat-label');
     if (depLabel) depLabel.innerText = isEn ? 'Original Maintenance Deposit' : 'رصيد الوديعة الأصلية';
-
     const yieldLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:last-child .stat-label');
     if (yieldLabel) yieldLabel.innerText = isEn ? 'Annual Investment Yield' : 'عوائد الاستثمار السنوية';
 
@@ -4183,6 +4188,13 @@ class UltimateFMApp {
 
     const varLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:last-child span:first-child');
     if (varLabel) varLabel.innerText = isEn ? 'Net Maintenance Variance Due:' : 'صافي فروق الصيانة المطلوبة:';
+
+    const metersTitle = document.querySelector('#utilityMetersCard .card-title');
+    if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';
+
+    const elecLabel = document.querySelector('#utilityMetersCard .stat-box:first-child .stat-label');
+    if (elecLabel) elecLabel.innerHTML = isEn ? '<i class="fa-solid fa-bolt"></i> Elec. Meter' : '<i class="fa-solid fa-bolt"></i> عداد الكهرباء';
+  }
 
     const metersTitle = document.querySelector('#utilityMetersCard .card-title');
     if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';

@@ -400,28 +400,36 @@
                 <button class="btn btn-primary" id="btnNewMaintenanceTicket" style="margin: 0; flex: 1; font-size: 0.8rem; height: 38px;">
                   <i class="fa-solid fa-wrench"></i> طلب صيانة للوحدة
                 </button>
-                <button class="btn btn-cyan" id="btnHomeownerHk" onclick="app.requestHousekeeping('owner')" style="margin: 0; flex: 1; font-size: 0.8rem; height: 38px; color: white;">
+                <button class="btn btn-cyan" id="btnHomeownerHk" onclick="app.openHousekeepingModal('owner')" style="margin: 0; flex: 1; font-size: 0.8rem; height: 38px; color: white;">
                   <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
                 </button>
               </div>
 
-              <!-- Emaar-Style Ticket Category Summary Counters -->
-              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px;">
-                <div style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #2563eb; font-weight: 700;"><i class="fa-solid fa-wrench"></i> سباكة</div>
-                  <div style="font-size: 1.05rem; font-weight: 900; color: #1e3a8a; font-family: var(--font-number);" id="catPlumbingCount">0</div>
+              <!-- Ticket Category Summary Counters Grid (6 Categories) -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
+                <div style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #2563eb; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-wrench"></i> سباكة</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #1e3a8a; font-family: var(--font-number);" id="catPlumbingCount">0</div>
                 </div>
-                <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #b45309; font-weight: 700;"><i class="fa-solid fa-bolt"></i> كهرباء</div>
-                  <div style="font-size: 1.05rem; font-weight: 900; color: #78350f; font-family: var(--font-number);" id="catElecCount">0</div>
+                <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #b45309; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-bolt"></i> كهرباء</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #78350f; font-family: var(--font-number);" id="catElecCount">0</div>
                 </div>
-                <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 8px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #0284c7; font-weight: 700;"><i class="fa-solid fa-snowflake"></i> تكييف</div>
-                  <div style="font-size: 1.05rem; font-weight: 900; color: #075985; font-family: var(--font-number);" id="catHvacCount">0</div>
+                <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #0284c7; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-snowflake"></i> تكييف</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #075985; font-family: var(--font-number);" id="catHvacCount">0</div>
                 </div>
-                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;"><i class="fa-solid fa-hammer"></i> نجارة</div>
-                  <div style="font-size: 1.05rem; font-weight: 900; color: #064e3b; font-family: var(--font-number);" id="catWoodCount">0</div>
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #059669; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hammer"></i> نجارة</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #064e3b; font-family: var(--font-number);" id="catWoodCount">0</div>
+                </div>
+                <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #9333ea; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-broom"></i> نظافة</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #6b21a8; font-family: var(--font-number);" id="catHkCount">0</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; padding: 5px 3px; text-align: center;">
+                  <div style="font-size: 0.62rem; color: #16a34a; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-seedling"></i> لاندسكيب</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #14532d; font-family: var(--font-number);" id="catLandscapeCount">0</div>
                 </div>
               </div>
 
@@ -797,7 +805,7 @@
                   <option value="ممرات المشاة">ممرات المشاة (Pedestrian Walkways)</option>
                   <option value="مبنى الإدارة">مبنى الإدارة (Administration Building)</option>
                 </select>
-                <button class="btn btn-primary" id="btnManagerHkSubmit" onclick="app.requestHousekeeping('manager')" style="font-size: 0.8rem; white-space: nowrap; height: 36px; line-height: 1; display: flex; align-items: center; gap: 4px;">
+                <button class="btn btn-primary" id="btnManagerHkSubmit" onclick="app.openHousekeepingModal('manager')" style="font-size: 0.8rem; white-space: nowrap; height: 36px; line-height: 1; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-paper-plane"></i> إرسال الطلب
                 </button>
               </div>
@@ -1008,7 +1016,7 @@
                     <h4 style="font-size: 0.85rem; font-weight: 700;">خدمة النظافة الفندقية للشاليه</h4>
                     <p style="font-size: 0.7rem; color: var(--text-muted);">تنظيف شامل وتغيير المفرشات</p>
                   </div>
-                  <button class="btn btn-cyan" id="btnTenantHkPack" style="width: auto; padding: 6px 12px; font-size: 0.75rem; color: white;" onclick="app.requestHousekeeping('tenant')">
+                  <button class="btn btn-cyan" id="btnTenantHkPack" style="width: auto; padding: 6px 12px; font-size: 0.75rem; color: white;" onclick="app.openHousekeepingModal('tenant')">
                     طلب خدمة نظافة
                   </button>
                 </div>
@@ -1025,7 +1033,7 @@
                   <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')" style="margin: 0;">
                     <i class="fa-solid fa-plus-circle"></i> طلب صيانة عاجلة للشاليه
                   </button>
-                  <button class="btn btn-cyan" id="btnTenantHk" onclick="app.requestHousekeeping('tenant')" style="margin: 0; color: white;">
+                  <button class="btn btn-cyan" id="btnTenantHk" onclick="app.openHousekeepingModal('tenant')" style="margin: 0; color: white;">
                     <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
                   </button>
                 </div>
@@ -1156,7 +1164,7 @@
                   <button class="btn btn-primary" onclick="app.openModal('modalNewTicket')" style="margin: 0;">
                     <i class="fa-solid fa-wrench"></i> طلب صيانة للمحل
                   </button>
-                  <button class="btn btn-cyan" id="btnCommercialHk" onclick="app.requestHousekeeping('commercial')" style="margin: 0; color: white;">
+                  <button class="btn btn-cyan" id="btnCommercialHk" onclick="app.openHousekeepingModal('commercial')" style="margin: 0; color: white;">
                     <i class="fa-solid fa-broom"></i> طلب خدمة نظافة
                   </button>
                 </div>
@@ -1765,6 +1773,54 @@
       </div>
 
       <button class="btn btn-primary" id="btnSubmitTicket">إرسال التذكرة لفريق خدمة العملاء</button>
+    </div>
+  </div>
+
+  <!-- 1.5 Housekeeping Request Modal with Specialized Options & Notes -->
+  <div class="modal-overlay" id="modalHousekeepingRequest">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalHousekeepingRequest')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 12px; color: var(--brand-teal);"><i class="fa-solid fa-broom"></i> طلب خدمة النظافة والهاوس كيبينج</h3>
+      
+      <!-- Applicant Info Summary Badge -->
+      <div style="background: rgba(27, 143, 145, 0.08); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: var(--brand-teal); margin-bottom: 4px;">
+          <i class="fa-solid fa-house-user"></i> بيانات طالب خدمة النظافة:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>صاحب الطلب:</b> <span id="modalHkOwnerName">أسامة أحمد محمد الشريف</span></div>
+          <div>• <b>الموقع / الوحدة:</b> <span id="modalHkOwnerUnit">فيلا 104 - زون الساحل الشمالي</span></div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">اختر نوع خدمة النظافة المطلوبة</label>
+        <select class="form-control" id="hkTypeSelect">
+          <option value="نظافة خفيفة يومية / روتينية (Daily Express Cleaning)">🧹 نظافة خفيفة يومية / روتينية (Daily Express Cleaning)</option>
+          <option value="نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)">✨ نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)</option>
+          <option value="تنظيف التراس والحديقة والمساحات الخارجية (Outdoor Cleaning)">🌿 تنظيف التراس والحديقة والمساحات الخارجية (Outdoor)</option>
+          <option value="تنظيف وتطهير الروف والسطح (Roof & Terrace Cleaning)">🏡 تنظيف وتطهير الروف والسطح (Roof & Terrace)</option>
+          <option value="تنظيف وتلميع الواجهات والزجاج (Window & Facade Cleaning)">🪟 تنظيف وتلميع الواجهات والزجاج (Window & Facade)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">توقيت التنفيذ المفضل</label>
+        <select class="form-control" id="hkSlotSelect">
+          <option value="الفترة الصباحية (9 صباحاً - 12 ظهراً)">🌅 الفترة الصباحية (9 صباحاً - 12 ظهراً)</option>
+          <option value="الفترة المسائية (1 ظهراً - 4 عصراً)">🌆 الفترة المسائية (1 ظهراً - 4 عصراً)</option>
+          <option value="طلب عاجل فوراً">⚡ طلب عاجل فوراً</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ملاحظات وتعليمات إضافية (اختياري)</label>
+        <textarea class="form-control" rows="3" id="hkNotesInput" placeholder="أدخل أي ملاحظات خاصة (مثال: يرجى التركيز على المطبخ والفرش، أو إحضار أدوات تطهير مخصصة)..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitHousekeepingModalForm()" style="background: var(--brand-teal); border-color: var(--brand-teal);">
+        <i class="fa-solid fa-paper-plane"></i> تأكيد وإرسال طلب النظافة لـ Odoo
+      </button>
     </div>
   </div>
 
