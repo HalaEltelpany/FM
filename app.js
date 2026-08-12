@@ -662,6 +662,10 @@ class UltimateFMApp {
   }
 
   handleNewTicketSubmit() {
+    if (this._isTicketSubmitting) return;
+    this._isTicketSubmitting = true;
+    setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
+
     const category = document.getElementById('ticketCategorySelect').value;
     const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
     const desc = document.getElementById('ticketDescInput').value || 'طلب صيانة عاجلة';
@@ -1041,6 +1045,13 @@ class UltimateFMApp {
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
+    if (!ticket) return;
+    if (ticket._odooSynced || ticket.odooId) {
+      console.log('[Odoo Sync] Ticket already synced or currently syncing, skipping duplicate:', ticket.id);
+      return;
+    }
+    ticket._odooSynced = true;
+
     const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2922,6 +2933,10 @@ class UltimateFMApp {
   }
 
   async submitFinancialInquiry() {
+    if (this._isFinSubmitting) return;
+    this._isFinSubmitting = true;
+    setTimeout(() => { this._isFinSubmitting = false; }, 2500);
+
     const name = document.getElementById('finNameInput')?.value || '';
     const phone = document.getElementById('finPhoneInput')?.value || '';
     const type = document.getElementById('finTypeSelect')?.value || 'استفسار مالي وحسابات';
@@ -3482,28 +3497,144 @@ class UltimateFMApp {
     }
 
     if (input) input.value = '';
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري مزامنة اللوحة وتفعيل الدخول الآلي على كاميرات البوابات LPR بالنظام المركزي...`);
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري الحفظ المباشر بداخل خانة (كارز نمبر / cars_number) بكارت العميل بـ Odoo Contacts...`);
 
-    // Sync to Odoo Access Control ticket & res.partner
+    // ZERO Helpdesk ticket creation! Direct write to res.partner Contacts ONLY!
     (async () => {
       try {
-        const lprTicket = {
-          id: 'LPR-' + Math.floor(1000 + Math.random() * 9000),
-          category: 'تصاريح بوابات وسيارات LPR',
-          title: `تسجيل لوحة سيارة: ${plate}`,
-          details: `طلب تسجيل وتفعيل لوحة سيارة للمالك على بوابات القرية الذكية\nرقم اللوحة: ${plate}\nنوع التصريح: فتح آلي عبر كاميرات LPR\nالمالك: أسامة الشريف - فيلا 104`,
-          status: 'مفعل على البوابات',
-          bgClass: 'badge-success',
-          requester: 'homeowner',
-          priority: '1',
-          createdAt: new Date().toISOString()
-        };
-        await this.syncTicketToOdoo(lprTicket, '01223456789', 'أسامة أحمد محمد الشريف');
-        this.showToast(`✅ تم توثيق لوحة السيارة [${plate}] بنجاح بداخل حساب المالك بـ Odoo وتفعيل الـ LPR Gate Trigger!`);
+        await this.syncCarPlateToOdooPartner(plate);
+        this.showToast(`✅ تم توثيق وحفظ رقم اللوحة [${plate}] بداخل خانة (كارز نمبر) بكارت العميل في Odoo Contacts (res.partner) بنجاح!`);
       } catch (err) {
-        console.warn('[Odoo LPR Sync Error]:', err);
+        console.warn('[Odoo Car Plate Sync Error]:', err);
       }
     })();
+  }
+
+  async syncCarPlateToOdooPartner(plate) {
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    // Step 1: Authenticate
+    const authPayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "common",
+        method: "authenticate",
+        args: [dbInput, userInput, keyInput, {}]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    const authData = await this.callOdoo(baseUrl, authPayload);
+    if (!authData || !authData.result) return;
+    const uid = authData.result;
+
+    let fullName = 'أسامة أحمد محمد الشريف';
+    const customName = localStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) fullName = customName;
+
+    // Step 2: Find partner ID for current owner
+    let partnerId = null;
+    let existingComment = "";
+    try {
+      const searchPartnerPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "search_read",
+            [[["name", "ilike", fullName]]],
+            { fields: ["id", "comment"], limit: 1 }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const searchPartnerData = await this.callOdoo(baseUrl, searchPartnerPayload);
+      if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
+        partnerId = searchPartnerData.result[0].id;
+        existingComment = searchPartnerData.result[0].comment || "";
+      } else {
+        partnerId = 3;
+      }
+    } catch (sErr) {
+      partnerId = 3;
+    }
+
+    if (!partnerId) return;
+
+    // Step 3: Write directly to candidate custom car number fields on res.partner Contacts screen!
+    const carFieldsToTry = [
+      'cars_number',
+      'x_cars_number',
+      'x_studio_cars_number',
+      'car_number',
+      'x_car_number',
+      'x_studio_car_number',
+      'x_studio_cars_num'
+    ];
+
+    for (const fieldName of carFieldsToTry) {
+      try {
+        const writePayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "write",
+              [[partnerId], { [fieldName]: plate }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const res = await this.callOdoo(baseUrl, writePayload);
+        if (res && res.result === true) {
+          console.log(`[Odoo LPR Partner Sync] Successfully wrote plate "${plate}" to field "${fieldName}" on res.partner #${partnerId}`);
+          break;
+        }
+      } catch (wErr) {
+        // Try next field candidate
+      }
+    }
+
+    // Step 4: Always append to partner comment/notes as guaranteed log
+    try {
+      const updatedNote = existingComment 
+        ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`
+        : `🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`;
+
+      const notePayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "write",
+            [[partnerId], { comment: updatedNote }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, notePayload);
+    } catch (cErr) {
+      console.warn('[Odoo Partner Comment Update Note Exception]:', cErr);
+    }
   }
 
   bookAmenity() {
@@ -4262,6 +4393,10 @@ class UltimateFMApp {
   }
 
   requestHousekeeping(role) {
+    if (this._isHkSubmitting) return;
+    this._isHkSubmitting = true;
+    setTimeout(() => { this._isHkSubmitting = false; }, 2500);
+
     const isEn = this.currentLang === 'en';
     let location = '';
     let requesterName = '';
