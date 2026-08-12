@@ -119,7 +119,12 @@ class UltimateFMApp {
   }
 
   init() {
+    if (this._initialized) return;
+    this._initialized = true;
+
     const runSetup = () => {
+      if (this._setupDone) return;
+      this._setupDone = true;
       try {
         this.loadOdooFields();
         this.applyLanguageUI();
@@ -213,6 +218,9 @@ class UltimateFMApp {
   }
 
   bindEvents() {
+    if (this._eventsBound) return;
+    this._eventsBound = true;
+
     // Role Switcher Buttons
     const roleBtns = document.querySelectorAll('#roleSelector .role-btn');
     roleBtns.forEach(btn => {
@@ -1284,17 +1292,7 @@ class UltimateFMApp {
           }
         }
 
-        if (ticket.photoBefore) {
-          this.showToast('✅ تم تسجيل تذكرة الصيانة وإرفاق صورة العطل بنجاح في النظام المركزي!');
-        } else if (ticket.category && (ticket.category.includes('أمني') || ticket.category.includes('أمن'))) {
-          this.showToast('🚨 تم تسجيل البلاغ/التصريح وإرساله فوراً لغرفة العمليات والأمن!');
-        } else if (ticket.category && (ticket.category.includes('حسابات') || ticket.category.includes('مالي'))) {
-          this.showToast('💳 تم إرسال الاستفسار المالي لفريق الحسابات بنجاح في النظام المركزي!');
-        } else if (ticket.category && (ticket.category.includes('شكاوى') || ticket.category.includes('مقترحات'))) {
-          this.showToast('💬 تم إرسال الشكوى/المقترح لفريق خدمة العملاء (Customer Care) بنجاح!');
-        } else {
-          this.showToast('✅ تم تسجيل الطلب بنجاح في النظام المركزي للخدمات!');
-        }
+        console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo Helpdesk Ticket ID: ${ticketIdInOdoo}`);
       } else if (helpdeskData && helpdeskData.error) {
         console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
         this.showToast(`❌ تعذر استكمال مزامنة الطلب: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
