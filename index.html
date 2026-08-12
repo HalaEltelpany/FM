@@ -395,44 +395,44 @@
             <!-- Tab 2: البلاغات (Tickets Tab) -->
             <!-- ========================================== -->
             <div class="homeowner-tab-content" id="tabTicketsHomeowner" style="display: none;">
-              <!-- Maintenance, Housekeeping & Landscaping Service Request Buttons -->
+              <!-- Maintenance, Housekeeping & Landscaping Service Request Buttons using 3 Exact Brand Colors -->
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;">
-                <button class="btn" id="btnNewMaintenanceTicket" style="margin: 0; font-size: 0.73rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: linear-gradient(135deg, #0d9488, #0f766e); border: 1px solid #0f766e; box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
+                <button class="btn" id="btnNewMaintenanceTicket" style="margin: 0; font-size: 0.74rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #20274f; border: 1px solid #20274f; box-shadow: 0 4px 12px rgba(32, 39, 79, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
                   <i class="fa-solid fa-wrench"></i> طلب صيانة
                 </button>
-                <button class="btn" id="btnHomeownerHk" onclick="app.openHousekeepingModal('owner')" style="margin: 0; font-size: 0.73rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: linear-gradient(135deg, #14b8a6, #0d9488); border: 1px solid #0d9488; box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
+                <button class="btn" id="btnHomeownerHk" onclick="app.openHousekeepingModal('owner')" style="margin: 0; font-size: 0.74rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #995789; border: 1px solid #995789; box-shadow: 0 4px 12px rgba(153, 87, 137, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
                   <i class="fa-solid fa-broom"></i> خدمة نظافة
                 </button>
-                <button class="btn" id="btnHomeownerLandscape" onclick="app.openLandscapingModal('owner')" style="margin: 0; font-size: 0.73rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: linear-gradient(135deg, #0f766e, #115e59); border: 1px solid #115e59; box-shadow: 0 2px 8px rgba(17, 94, 89, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
+                <button class="btn" id="btnHomeownerLandscape" onclick="app.openLandscapingModal('owner')" style="margin: 0; font-size: 0.74rem; height: 42px; padding: 0 4px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #1b8f91; border: 1px solid #1b8f91; box-shadow: 0 4px 12px rgba(27, 143, 145, 0.25); display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
                   <i class="fa-solid fa-seedling"></i> لاندسكيب
                 </button>
               </div>
 
-              <!-- Ticket Category Summary Counters Grid (6 Categories) -->
+              <!-- Ticket Category Summary Counters Grid (6 Categories matching 3 Brand Colors) -->
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
-                <div style="background: rgba(15, 118, 110, 0.06); border: 1px solid rgba(15, 118, 110, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #0f766e; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-wrench"></i> سباكة</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #0f766e; font-family: var(--font-number);" id="catPlumbingCount">0</div>
+                <div style="background: rgba(32, 39, 79, 0.08); border: 1px solid rgba(32, 39, 79, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #20274f; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-wrench"></i> سباكة</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #20274f; font-family: var(--font-number);" id="catPlumbingCount">0</div>
                 </div>
-                <div style="background: rgba(13, 148, 136, 0.06); border: 1px solid rgba(13, 148, 136, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #0d9488; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-bolt"></i> كهرباء</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #0d9488; font-family: var(--font-number);" id="catElecCount">0</div>
+                <div style="background: rgba(153, 87, 137, 0.08); border: 1px solid rgba(153, 87, 137, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #995789; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-bolt"></i> كهرباء</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #995789; font-family: var(--font-number);" id="catElecCount">0</div>
                 </div>
-                <div style="background: rgba(2, 132, 199, 0.06); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #0284c7; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-snowflake"></i> تكييف</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #0284c7; font-family: var(--font-number);" id="catHvacCount">0</div>
+                <div style="background: rgba(27, 143, 145, 0.08); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #1b8f91; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-snowflake"></i> تكييف</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #1b8f91; font-family: var(--font-number);" id="catHvacCount">0</div>
                 </div>
-                <div style="background: rgba(15, 118, 110, 0.06); border: 1px solid rgba(15, 118, 110, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #0f766e; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hammer"></i> نجارة</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #0f766e; font-family: var(--font-number);" id="catWoodCount">0</div>
+                <div style="background: rgba(32, 39, 79, 0.08); border: 1px solid rgba(32, 39, 79, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #20274f; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hammer"></i> نجارة</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #20274f; font-family: var(--font-number);" id="catWoodCount">0</div>
                 </div>
-                <div style="background: rgba(20, 184, 166, 0.06); border: 1px solid rgba(20, 184, 166, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #14b8a6; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-broom"></i> نظافة</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #14b8a6; font-family: var(--font-number);" id="catHkCount">0</div>
+                <div style="background: rgba(153, 87, 137, 0.08); border: 1px solid rgba(153, 87, 137, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #995789; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-broom"></i> نظافة</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #995789; font-family: var(--font-number);" id="catHkCount">0</div>
                 </div>
-                <div style="background: rgba(17, 94, 89, 0.06); border: 1px solid rgba(17, 94, 89, 0.18); border-radius: 10px; padding: 6px 4px; text-align: center;">
-                  <div style="font-size: 0.65rem; color: #115e59; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-seedling"></i> لاندسكيب</div>
-                  <div style="font-size: 1rem; font-weight: 900; color: #115e59; font-family: var(--font-number);" id="catLandscapeCount">0</div>
+                <div style="background: rgba(27, 143, 145, 0.08); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 10px; padding: 6px 4px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #1b8f91; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-seedling"></i> لاندسكيب</div>
+                  <div style="font-size: 1rem; font-weight: 900; color: #1b8f91; font-family: var(--font-number);" id="catLandscapeCount">0</div>
                 </div>
               </div>
 
@@ -2345,6 +2345,6 @@
   </div>
 
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=60.0"></script>
+  <script src="app.js?v=62.0"></script>
 </body>
 </html>
