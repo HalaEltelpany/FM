@@ -4334,8 +4334,8 @@ class UltimateFMApp {
     if (btnDir) btnDir.innerHTML = isEn ? '<i class="fa-solid fa-phone-volume"></i> Village Services & Emergency Directory' : '<i class="fa-solid fa-phone-volume"></i> دليل خدمات وطوارئ القرية';
 
     // 2. Tickets Tab Elements
-    const btnNewTicket = document.querySelector('#tabTicketsHomeowner button');
-    if (btnNewTicket) btnNewTicket.innerHTML = isEn ? '<i class="fa-solid fa-wrench"></i> Request New Maintenance' : '<i class="fa-solid fa-wrench"></i> طلب صيانة جديدة للوحدة';
+    const btnNewTicket = document.getElementById('btnNewMaintenanceTicket');
+    if (btnNewTicket) btnNewTicket.innerHTML = isEn ? '<i class="fa-solid fa-wrench"></i> Request Internal Maintenance' : '<i class="fa-solid fa-wrench"></i> طلب صيانة داخلية';
 
     const ticketsTitle = document.querySelector('#tabTicketsHomeowner .card .card-title');
     if (ticketsTitle) ticketsTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Maintenance Tickets' : '<i class="fa-solid fa-list-check"></i> طلبات الصيانة الحالية';
