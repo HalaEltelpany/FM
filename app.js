@@ -2510,15 +2510,22 @@ class UltimateFMApp {
     const nameInput = document.getElementById('familyMemberNameInput');
     const relationSelect = document.getElementById('familyMemberRelationSelect');
     const phoneInput = document.getElementById('familyMemberPhoneInput');
+    const emailInput = document.getElementById('familyMemberEmailInput');
 
     if (!nameInput || !relationSelect || !phoneInput) return;
 
     const name = nameInput.value.trim();
     const relation = relationSelect.value;
     const phone = phoneInput.value.trim();
+    const email = emailInput ? emailInput.value.trim() : '';
 
     if (!name || !phone) {
       this.showToast('⚠️ يرجى إدخال اسم فرد العائلة ورقم الموبايل!');
+      return;
+    }
+
+    if (!email || !email.includes('@')) {
+      this.showToast('⚠️ يرجى إدخال بريد إلكتروني صحيح لإصدار حساب التطبيق وفرد الأسرة!');
       return;
     }
 
@@ -2542,9 +2549,9 @@ class UltimateFMApp {
       item.innerHTML = `
         <div>
           <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">${name} (${relationArabic})</span>
-          <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">صلاحية دخول البوابات والخدمات فقط • ${phone}</p>
+          <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">حساب فرد أسرة • ${phone} • ${email}</p>
         </div>
-        <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">نشط</span>
+        <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">حساب نشط</span>
       `;
       list.appendChild(item);
 
@@ -2558,12 +2565,13 @@ class UltimateFMApp {
     this.closeModal('modalAddFamilyMember');
     nameInput.value = '';
     phoneInput.value = '';
+    if (emailInput) emailInput.value = '';
     
-    this.showToast(`👥 تم إضافة [${name}] بنجاح كفرد عائلة تابع!\nجاري التسجيل بالنظام المركزي Odoo (Contacts - res.partner)...`);
+    this.showToast(`👥 تم إنشاء حساب فرد الأسرة [${name}] بنجاح!\nجاري المزامنة والتسجيل بالنظام المركزي Odoo (Contacts)...`);
 
     try {
-      await this.syncFamilyMemberToOdoo(name, relationArabic, phone);
-      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] بداخل قاعدة بيانات Odoo (Contacts - res.partner) بنجاح!`);
+      await this.syncFamilyMemberToOdoo(name, relationArabic, phone, email);
+      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] والبريد الإلكتروني [${email}] بـ Odoo Contacts بنجاح!`);
     } catch (err) {
       console.warn('[Odoo Family Member Sync Error]:', err);
     }
@@ -2628,7 +2636,7 @@ class UltimateFMApp {
     return 3;
   }
 
-  async syncFamilyMemberToOdoo(name, relation, phone) {
+  async syncFamilyMemberToOdoo(name, relation, phone, email) {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2654,107 +2662,10 @@ class UltimateFMApp {
     const uid = authData.result;
 
     // Step 2: Get exact target partnerId for owner
-    const partnerId = await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput);
+    const partnerId = (await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput)) || 3;
 
-    // Candidate fields for family members in Studio / res.partner
-    const familyFieldsToTry = [
-      'family_members',
-      'x_family_members',
-      'x_studio_family_members',
-      'x_studio_family_members_1',
-      'family_member_ids',
-      'x_family_member_ids',
-      'x_studio_family',
-      'x_family'
-    ];
-
-    const familyEntryText = `• ${name} (${relation}) - م: ${phone}`;
-
-    // Step 3: Fetch existing values of candidate family fields & comment
-    let existingComment = '';
-    let existingFamilyValues = {};
-
-    if (partnerId) {
-      try {
-        const readPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "read",
-              [[partnerId]],
-              { fields: ["comment", ...familyFieldsToTry] }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const readRes = await this.callOdoo(baseUrl, readPayload);
-        if (readRes && readRes.result && readRes.result.length > 0) {
-          const partnerData = readRes.result[0];
-          existingComment = partnerData.comment || '';
-          familyFieldsToTry.forEach(fn => {
-            if (partnerData[fn]) existingFamilyValues[fn] = partnerData[fn];
-          });
-        }
-      } catch (rErr) {}
-
-      // Step 4: Write to ALL candidate family fields on res.partner
-      for (const fieldName of familyFieldsToTry) {
-        try {
-          const prevVal = existingFamilyValues[fieldName] || '';
-          const newVal = prevVal ? `${prevVal}\n${familyEntryText}` : familyEntryText;
-          const writePayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                "res.partner",
-                "write",
-                [[partnerId], { [fieldName]: newVal }]
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          const res = await this.callOdoo(baseUrl, writePayload);
-          if (res && res.result === true) {
-            console.log(`[Odoo Family Sync] Wrote family member to field "${fieldName}" on res.partner #${partnerId}`);
-          }
-        } catch (wErr) {}
-      }
-
-      // Step 5: Append to partner comment/notes
-      try {
-        const updatedNote = existingComment 
-          ? `${existingComment}\n👥 فرد أسرة (family_members): ${familyEntryText}`
-          : `👥 فرد أسرة (family_members): ${familyEntryText}`;
-
-        const notePayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "write",
-              [[partnerId], { comment: updatedNote }]
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        await this.callOdoo(baseUrl, notePayload);
-      } catch (nErr) {}
-    }
-
-    // Step 6: Create child contact in res.partner and link to x_studio_many2many_field_7m1_1jvs7m7ps (Family Members tab)
+    // Step 3: Create child contact in res.partner for family member with email
+    let childPartnerId = null;
     try {
       const childPayload = {
         jsonrpc: "2.0",
@@ -2768,11 +2679,12 @@ class UltimateFMApp {
             "create",
             [{
               name: `${name} (${relation})`,
-              parent_id: partnerId || 3,
+              parent_id: partnerId,
               phone: phone,
               mobile: phone,
+              email: email || '',
               type: "other",
-              comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation}`,
+              comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
               company_type: "person"
             }]
           ]
@@ -2780,10 +2692,17 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
       const childRes = await this.callOdoo(baseUrl, childPayload);
-      const childPartnerId = childRes ? childRes.result : null;
+      if (childRes && childRes.result) {
+        childPartnerId = childRes.result;
+        console.log(`[Odoo Family Sync] Created child partner #${childPartnerId} for family member "${name}" with email "${email}"`);
+      }
+    } catch (cErr) {
+      console.warn('[Odoo Family Sync Child Create Error]:', cErr);
+    }
 
-      if (childPartnerId && partnerId) {
-        // Link child partner to x_studio_many2many_field_7m1_1jvs7m7ps (Family Members tab)
+    if (childPartnerId && partnerId) {
+      // Step 4: Link child partner directly to Family Members tab (x_studio_many2many_field_7m1_1jvs7m7ps) AND child_ids
+      try {
         const linkPayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -2794,19 +2713,25 @@ class UltimateFMApp {
               dbInput, uid, keyInput,
               "res.partner",
               "write",
-              [[partnerId], {
-                "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId]],
-                "child_ids": [[4, childPartnerId]]
-              }]
+              [
+                [partnerId],
+                {
+                  "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId, 0]],
+                  "child_ids": [[4, childPartnerId, 0]]
+                }
+              ]
             ]
           },
           id: Math.floor(Math.random() * 1000)
         };
-        await this.callOdoo(baseUrl, linkPayload);
+        const linkRes = await this.callOdoo(baseUrl, linkPayload);
+        console.log(`[Odoo Family Sync] Linked child #${childPartnerId} to Family Members tab on #${partnerId}:`, linkRes);
+      } catch (lErr) {
+        console.warn('[Odoo Family Sync Link Error]:', lErr);
       }
-    } catch (cErr) {}
+    }
 
-    // Step 7: Update specific relation fields if matched (Wife, Husband, Son, Daughter, Father, Mother)
+    // Step 5: Update specific relation fields if matched (x_studio_wife, x_studio_husband, etc.)
     if (partnerId) {
       try {
         const relLower = (relation || '').toLowerCase();
@@ -2837,6 +2762,29 @@ class UltimateFMApp {
           await this.callOdoo(baseUrl, relWritePayload);
         }
       } catch (rErr) {}
+    }
+
+    // Step 6: Append to partner comment/notes as guaranteed log
+    if (partnerId) {
+      try {
+        const familyEntryText = `• ${name} (${relation}) - م: ${phone}`;
+        const notePayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "write",
+              [[partnerId], { comment: `👥 فرد أسرة جديد: ${familyEntryText}` }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(baseUrl, notePayload);
+      } catch (nErr) {}
     }
   }
 
