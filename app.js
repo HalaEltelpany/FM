@@ -2573,6 +2573,61 @@ class UltimateFMApp {
     return this.submitFamilyMember();
   }
 
+  async getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput) {
+    // Strategy 1: Check partner_id on res.users for current logged-in user (uid)
+    try {
+      const userPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.users",
+            "read",
+            [[uid]],
+            { fields: ["partner_id"] }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const uRes = await this.callOdoo(baseUrl, userPayload);
+      if (uRes && uRes.result && uRes.result.length > 0 && uRes.result[0].partner_id) {
+        const pid = Array.isArray(uRes.result[0].partner_id) ? uRes.result[0].partner_id[0] : uRes.result[0].partner_id;
+        if (pid) return pid;
+      }
+    } catch (e) {}
+
+    // Strategy 2: Search partner by email or name
+    try {
+      const userEmail = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+      const customName = localStorage.getItem('odoo_owner_name') || 'أسامة';
+      const searchPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "search_read",
+            ["|", ["email", "ilike", userEmail], ["name", "ilike", customName]],
+            { fields: ["id"], limit: 1 }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const sRes = await this.callOdoo(baseUrl, searchPayload);
+      if (sRes && sRes.result && sRes.result.length > 0) {
+        return sRes.result[0].id;
+      }
+    } catch (e) {}
+
+    return 3;
+  }
+
   async syncFamilyMemberToOdoo(name, relation, phone) {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
@@ -2582,6 +2637,7 @@ class UltimateFMApp {
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
 
+    // Step 1: Authenticate
     const authPayload = {
       jsonrpc: "2.0",
       method: "call",
@@ -2597,28 +2653,134 @@ class UltimateFMApp {
     if (!authData || !authData.result) return;
     const uid = authData.result;
 
-    const createPartnerPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "object",
-        method: "execute_kw",
-        args: [
-          dbInput, uid, keyInput,
-          "res.partner",
-          "create",
-          [{
-            name: `${name} (فرد أسرة - ${relation})`,
-            phone: phone,
-            mobile: phone,
-            comment: `فرد أسرة تابع للمالك أسامة الشريف (فيلا 104) - صلة القرابة: ${relation} - تصريح دخول وتصاريح بوابات`,
-            company_type: "person"
-          }]
-        ]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-    await this.callOdoo(baseUrl, createPartnerPayload);
+    // Step 2: Get exact target partnerId for owner
+    const partnerId = await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput);
+
+    // Candidate fields for family members in Studio / res.partner
+    const familyFieldsToTry = [
+      'family_members',
+      'x_family_members',
+      'x_studio_family_members',
+      'x_studio_family_members_1',
+      'family_member_ids',
+      'x_family_member_ids',
+      'x_studio_family',
+      'x_family'
+    ];
+
+    const familyEntryText = `• ${name} (${relation}) - م: ${phone}`;
+
+    // Step 3: Fetch existing values of candidate family fields & comment
+    let existingComment = '';
+    let existingFamilyValues = {};
+
+    if (partnerId) {
+      try {
+        const readPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "read",
+              [[partnerId]],
+              { fields: ["comment", ...familyFieldsToTry] }
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const readRes = await this.callOdoo(baseUrl, readPayload);
+        if (readRes && readRes.result && readRes.result.length > 0) {
+          const partnerData = readRes.result[0];
+          existingComment = partnerData.comment || '';
+          familyFieldsToTry.forEach(fn => {
+            if (partnerData[fn]) existingFamilyValues[fn] = partnerData[fn];
+          });
+        }
+      } catch (rErr) {}
+
+      // Step 4: Write to ALL candidate family fields on res.partner
+      for (const fieldName of familyFieldsToTry) {
+        try {
+          const prevVal = existingFamilyValues[fieldName] || '';
+          const newVal = prevVal ? `${prevVal}\n${familyEntryText}` : familyEntryText;
+          const writePayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "res.partner",
+                "write",
+                [[partnerId], { [fieldName]: newVal }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          const res = await this.callOdoo(baseUrl, writePayload);
+          if (res && res.result === true) {
+            console.log(`[Odoo Family Sync] Wrote family member to field "${fieldName}" on res.partner #${partnerId}`);
+          }
+        } catch (wErr) {}
+      }
+
+      // Step 5: Append to partner comment/notes
+      try {
+        const updatedNote = existingComment 
+          ? `${existingComment}\n👥 فرد أسرة (family_members): ${familyEntryText}`
+          : `👥 فرد أسرة (family_members): ${familyEntryText}`;
+
+        const notePayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "write",
+              [[partnerId], { comment: updatedNote }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(baseUrl, notePayload);
+      } catch (nErr) {}
+    }
+
+    // Step 6: Always create child contact in res.partner linked via parent_id (populates Contacts & Addresses / Sub-views)
+    try {
+      const childPartnerPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "create",
+            [{
+              name: `${name} (${relation})`,
+              parent_id: partnerId || 3,
+              phone: phone,
+              mobile: phone,
+              type: "other",
+              comment: `فرد أسرة تابع للمالك الرئيسي (فيلا 104) - صلة القرابة: ${relation}`,
+              company_type: "person"
+            }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, childPartnerPayload);
+    } catch (cErr) {}
   }
 
   updateWalletUI() {
@@ -3706,15 +3868,29 @@ class UltimateFMApp {
     if (!authData || !authData.result) return;
     const uid = authData.result;
 
-    let fullName = 'أسامة أحمد محمد الشريف';
-    const customName = localStorage.getItem('odoo_owner_name');
-    if (customName && customName.trim()) fullName = customName;
+    // Step 2: Get exact target partnerId for logged in user / owner
+    const partnerId = await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput);
+    if (!partnerId) return;
 
-    // Step 2: Find partner ID for current owner
-    let partnerId = null;
-    let existingComment = "";
+    // Step 3: Fetch existing values of candidate car fields & comment from res.partner
+    const carFieldsToTry = [
+      'cars_number',
+      'x_cars_number',
+      'x_studio_cars_number',
+      'x_studio_cars_number_1',
+      'x_studio_cars_num',
+      'x_studio_cars',
+      'car_number',
+      'x_car_number',
+      'x_studio_car_number',
+      'x_studio_car_numbers'
+    ];
+
+    let existingComment = '';
+    let existingCarValues = {};
+
     try {
-      const searchPartnerPayload = {
+      const readPayload = {
         jsonrpc: "2.0",
         method: "call",
         params: {
@@ -3723,39 +3899,28 @@ class UltimateFMApp {
           args: [
             dbInput, uid, keyInput,
             "res.partner",
-            "search_read",
-            [[["name", "ilike", fullName]]],
-            { fields: ["id", "comment"], limit: 1 }
+            "read",
+            [[partnerId]],
+            { fields: ["comment", ...carFieldsToTry] }
           ]
         },
         id: Math.floor(Math.random() * 1000)
       };
-      const searchPartnerData = await this.callOdoo(baseUrl, searchPartnerPayload);
-      if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
-        partnerId = searchPartnerData.result[0].id;
-        existingComment = searchPartnerData.result[0].comment || "";
-      } else {
-        partnerId = 3;
+      const readRes = await this.callOdoo(baseUrl, readPayload);
+      if (readRes && readRes.result && readRes.result.length > 0) {
+        const partnerData = readRes.result[0];
+        existingComment = partnerData.comment || '';
+        carFieldsToTry.forEach(fn => {
+          if (partnerData[fn]) existingCarValues[fn] = partnerData[fn];
+        });
       }
-    } catch (sErr) {
-      partnerId = 3;
-    }
+    } catch (rErr) {}
 
-    if (!partnerId) return;
-
-    // Step 3: Write directly to candidate custom car number fields on res.partner Contacts screen!
-    const carFieldsToTry = [
-      'cars_number',
-      'x_cars_number',
-      'x_studio_cars_number',
-      'car_number',
-      'x_car_number',
-      'x_studio_car_number',
-      'x_studio_cars_num'
-    ];
-
+    // Step 4: Write to ALL candidate car fields on res.partner
     for (const fieldName of carFieldsToTry) {
       try {
+        const prevVal = existingCarValues[fieldName] || '';
+        const newVal = prevVal ? `${prevVal}, ${plate}` : plate;
         const writePayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -3766,22 +3931,19 @@ class UltimateFMApp {
               dbInput, uid, keyInput,
               "res.partner",
               "write",
-              [[partnerId], { [fieldName]: plate }]
+              [[partnerId], { [fieldName]: newVal }]
             ]
           },
           id: Math.floor(Math.random() * 1000)
         };
         const res = await this.callOdoo(baseUrl, writePayload);
         if (res && res.result === true) {
-          console.log(`[Odoo LPR Partner Sync] Successfully wrote plate "${plate}" to field "${fieldName}" on res.partner #${partnerId}`);
-          break;
+          console.log(`[Odoo LPR Partner Sync] Wrote plate "${newVal}" to field "${fieldName}" on res.partner #${partnerId}`);
         }
-      } catch (wErr) {
-        // Try next field candidate
-      }
+      } catch (wErr) {}
     }
 
-    // Step 4: Always append to partner comment/notes as guaranteed log
+    // Step 5: Always append to partner comment/notes as guaranteed log
     try {
       const updatedNote = existingComment 
         ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`
@@ -3803,9 +3965,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
       await this.callOdoo(baseUrl, notePayload);
-    } catch (cErr) {
-      console.warn('[Odoo Partner Comment Update Note Exception]:', cErr);
-    }
+    } catch (cErr) {}
   }
 
   bookAmenity() {
