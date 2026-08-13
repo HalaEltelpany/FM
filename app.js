@@ -3814,6 +3814,34 @@ class UltimateFMApp {
     activeView.insertBefore(header, activeView.firstChild);
   }
 
+  handleLicenseFrontPreview(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.lprFrontBase64 = e.target.result;
+      const img = document.getElementById('lprFrontPreviewImg');
+      const box = document.getElementById('lprFrontPreviewBox');
+      if (img) img.src = this.lprFrontBase64;
+      if (box) box.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handleLicenseBackPreview(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.lprBackBase64 = e.target.result;
+      const img = document.getElementById('lprBackPreviewImg');
+      const box = document.getElementById('lprBackPreviewBox');
+      if (img) img.src = this.lprBackBase64;
+      if (box) box.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
   registerLprPlate() {
     const input = document.getElementById('lprPlateInput');
     const plate = input ? input.value.trim() : '';
@@ -3822,32 +3850,50 @@ class UltimateFMApp {
       return;
     }
 
+    const frontData = this.lprFrontBase64 || null;
+    const backData = this.lprBackBase64 || null;
+
     const list = document.getElementById('lprActivePlatesList');
     if (list) {
       const item = document.createElement('div');
       item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(27, 143, 145, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(27, 143, 145, 0.15); margin-top: 6px;';
       item.innerHTML = `
-        <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">${plate}</span>
+        <div>
+          <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">${plate}</span>
+          <p style="font-size: 0.62rem; color: var(--text-muted); margin: 0;">الرخصة: ${frontData || backData ? 'تم رفع صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}</p>
+        </div>
         <span class="badge badge-success" style="font-size: 0.65rem; margin-top:0;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
       `;
       list.insertBefore(item, list.firstChild);
     }
 
     if (input) input.value = '';
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري الحفظ المباشر بداخل خانة (كارز نمبر / cars_number) بكارت العميل بـ Odoo Contacts...`);
 
-    // ZERO Helpdesk ticket creation! Direct write to res.partner Contacts ONLY!
+    // Clear previews & stored base64
+    this.lprFrontBase64 = null;
+    this.lprBackBase64 = null;
+    const frontBox = document.getElementById('lprFrontPreviewBox');
+    const backBox = document.getElementById('lprBackPreviewBox');
+    const frontInput = document.getElementById('lprLicenseFrontInput');
+    const backInput = document.getElementById('lprLicenseBackInput');
+    if (frontBox) frontBox.style.display = 'none';
+    if (backBox) backBox.style.display = 'none';
+    if (frontInput) frontInput.value = '';
+    if (backInput) backInput.value = '';
+
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] وصور الرخصة بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
+
     (async () => {
       try {
-        await this.syncCarPlateToOdooPartner(plate);
-        this.showToast(`✅ تم توثيق وحفظ رقم اللوحة [${plate}] بداخل خانة (كارز نمبر) بكارت العميل في Odoo Contacts (res.partner) بنجاح!`);
+        await this.syncCarPlateToOdooPartner(plate, frontData, backData);
+        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] وصور الرخصة وش وضهر بـ Odoo Contacts (res.partner) بنجاح!`);
       } catch (err) {
         console.warn('[Odoo Car Plate Sync Error]:', err);
       }
     })();
   }
 
-  async syncCarPlateToOdooPartner(plate) {
+  async syncCarPlateToOdooPartner(plate, frontBase64, backBase64) {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -3948,6 +3994,7 @@ class UltimateFMApp {
     }
 
     // Step 5: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
+    let carLineId = null;
     try {
       const carLinePayload = {
         jsonrpc: "2.0",
@@ -3967,36 +4014,77 @@ class UltimateFMApp {
         },
         id: Math.floor(Math.random() * 1000)
       };
-      await this.callOdoo(baseUrl, carLinePayload);
+      const cRes = await this.callOdoo(baseUrl, carLinePayload);
+      if (cRes && cRes.result) carLineId = cRes.result;
     } catch (cLineErr) {}
 
-    // Step 6: Also write via res.partner One2many field (x_studio_one2many_field_3nh_1jvs8ot39)
-    try {
-      const o2mWritePayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput, uid, keyInput,
-            "res.partner",
-            "write",
-            [[partnerId], {
-              "x_studio_one2many_field_3nh_1jvs8ot39": [[0, 0, { "x_name": plate }]]
-            }]
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-      await this.callOdoo(baseUrl, o2mWritePayload);
-    } catch (o2mErr) {}
+    // Step 6: Create attachments for Front & Back license photos linked to res.partner in Odoo
+    if (frontBase64) {
+      try {
+        const cleanFront = frontBase64.replace(/^data:image\/\w+;base64,/, '');
+        const frontAttachPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "ir.attachment",
+              "create",
+              [{
+                name: `رخصة_سيارة_${plate}_وجه.jpg`,
+                datas: cleanFront,
+                res_model: "res.partner",
+                res_id: partnerId
+              }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(baseUrl, frontAttachPayload);
+        console.log(`[Odoo Attachment Sync] Created Front License Attachment for car ${plate}`);
+      } catch (fErr) {
+        console.warn('[Odoo Front License Attachment Error]:', fErr);
+      }
+    }
+
+    if (backBase64) {
+      try {
+        const cleanBack = backBase64.replace(/^data:image\/\w+;base64,/, '');
+        const backAttachPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "ir.attachment",
+              "create",
+              [{
+                name: `رخصة_سيارة_${plate}_ظهر.jpg`,
+                datas: cleanBack,
+                res_model: "res.partner",
+                res_id: partnerId
+              }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(baseUrl, backAttachPayload);
+        console.log(`[Odoo Attachment Sync] Created Back License Attachment for car ${plate}`);
+      } catch (bErr) {
+        console.warn('[Odoo Back License Attachment Error]:', bErr);
+      }
+    }
 
     // Step 7: Always append to partner comment/notes as guaranteed log
     try {
+      const licenseNoteText = (frontBase64 || backBase64) ? ' (مرفق صور الرخصة وش وضهر 📷)' : '';
       const updatedNote = existingComment 
-        ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`
-        : `🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`;
+        ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}${licenseNoteText}`
+        : `🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}${licenseNoteText}`;
 
       const notePayload = {
         jsonrpc: "2.0",
