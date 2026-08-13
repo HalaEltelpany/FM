@@ -2681,7 +2681,6 @@ class UltimateFMApp {
               name: `${name} (${relation})`,
               parent_id: partnerId,
               phone: phone,
-              mobile: phone,
               email: email || '',
               type: "other",
               comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
