@@ -2754,9 +2754,9 @@ class UltimateFMApp {
       } catch (nErr) {}
     }
 
-    // Step 6: Always create child contact in res.partner linked via parent_id (populates Contacts & Addresses / Sub-views)
+    // Step 6: Create child contact in res.partner and link to x_studio_many2many_field_7m1_1jvs7m7ps (Family Members tab)
     try {
-      const childPartnerPayload = {
+      const childPayload = {
         jsonrpc: "2.0",
         method: "call",
         params: {
@@ -2772,15 +2772,72 @@ class UltimateFMApp {
               phone: phone,
               mobile: phone,
               type: "other",
-              comment: `فرد أسرة تابع للمالك الرئيسي (فيلا 104) - صلة القرابة: ${relation}`,
+              comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation}`,
               company_type: "person"
             }]
           ]
         },
         id: Math.floor(Math.random() * 1000)
       };
-      await this.callOdoo(baseUrl, childPartnerPayload);
+      const childRes = await this.callOdoo(baseUrl, childPayload);
+      const childPartnerId = childRes ? childRes.result : null;
+
+      if (childPartnerId && partnerId) {
+        // Link child partner to x_studio_many2many_field_7m1_1jvs7m7ps (Family Members tab)
+        const linkPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "write",
+              [[partnerId], {
+                "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId]],
+                "child_ids": [[4, childPartnerId]]
+              }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(baseUrl, linkPayload);
+      }
     } catch (cErr) {}
+
+    // Step 7: Update specific relation fields if matched (Wife, Husband, Son, Daughter, Father, Mother)
+    if (partnerId) {
+      try {
+        const relLower = (relation || '').toLowerCase();
+        let relField = null;
+        if (relLower.includes('زوجة') || relLower.includes('wife')) relField = 'x_studio_wife';
+        else if (relLower.includes('زوج') || relLower.includes('husband')) relField = 'x_studio_husband';
+        else if (relLower.includes('ابن') || relLower.includes('son')) relField = 'x_studio_son';
+        else if (relLower.includes('ابنة') || relLower.includes('daughter')) relField = 'x_studio_daughter';
+        else if (relLower.includes('أب') || relLower.includes('father')) relField = 'x_studio_father';
+        else if (relLower.includes('أم') || relLower.includes('mother')) relField = 'x_studio_mother';
+
+        if (relField) {
+          const relWritePayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "res.partner",
+                "write",
+                [[partnerId], { [relField]: `${name} (${phone})` }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, relWritePayload);
+        }
+      } catch (rErr) {}
+    }
   }
 
   updateWalletUI() {
@@ -3943,7 +4000,52 @@ class UltimateFMApp {
       } catch (wErr) {}
     }
 
-    // Step 5: Always append to partner comment/notes as guaranteed log
+    // Step 5: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
+    try {
+      const carLinePayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "x_res_partner_line_62022",
+            "create",
+            [{
+              "x_name": plate,
+              "x_res_partner_id": partnerId
+            }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, carLinePayload);
+    } catch (cLineErr) {}
+
+    // Step 6: Also write via res.partner One2many field (x_studio_one2many_field_3nh_1jvs8ot39)
+    try {
+      const o2mWritePayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "write",
+            [[partnerId], {
+              "x_studio_one2many_field_3nh_1jvs8ot39": [[0, 0, { "x_name": plate }]]
+            }]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, o2mWritePayload);
+    } catch (o2mErr) {}
+
+    // Step 7: Always append to partner comment/notes as guaranteed log
     try {
       const updatedNote = existingComment 
         ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}`
