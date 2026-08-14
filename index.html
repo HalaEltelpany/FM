@@ -2379,6 +2379,40 @@
         <input type="email" id="familyMemberEmailInput" class="form-control" placeholder="example@domain.com" required>
       </div>
 
+      <!-- National ID Photo Upload Area (Front & Back) -->
+      <div style="margin-top: 10px; margin-bottom: 12px;">
+        <label class="form-label" style="font-weight: 700;">صور البطاقة الشخصية للفرد (وجه وظهر):</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <!-- Front ID Box -->
+          <div style="border: 2px dashed rgba(27, 143, 145, 0.35); border-radius: 10px; padding: 10px 6px; text-align: center; background: rgba(27, 143, 145, 0.04); position: relative;">
+            <i class="fa-solid fa-address-card" style="font-size: 1.4rem; color: #1b8f91; margin-bottom: 4px;"></i>
+            <div style="font-size: 0.7rem; font-weight: 700; color: #20274f;">وجه البطاقة الشخصية</div>
+            <label for="familyMemberIdFrontInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #1b8f91; color: #fff; cursor: pointer; border-radius: 6px;">
+              <i class="fa-solid fa-camera"></i> رفع / تصوير
+            </label>
+            <input type="file" id="familyMemberIdFrontInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdFrontPreview(event)">
+            <div id="familyIdFrontPreviewBox" style="margin-top: 6px; display: none;">
+              <img id="familyIdFrontPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #1b8f91;" src="" alt="Front ID Preview">
+              <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الوجه ✅</span>
+            </div>
+          </div>
+
+          <!-- Back ID Box -->
+          <div style="border: 2px dashed rgba(153, 87, 137, 0.35); border-radius: 10px; padding: 10px 6px; text-align: center; background: rgba(153, 87, 137, 0.04); position: relative;">
+            <i class="fa-solid fa-id-badge" style="font-size: 1.4rem; color: #995789; margin-bottom: 4px;"></i>
+            <div style="font-size: 0.7rem; font-weight: 700; color: #20274f;">ظهر البطاقة الشخصية</div>
+            <label for="familyMemberIdBackInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #995789; color: #fff; cursor: pointer; border-radius: 6px;">
+              <i class="fa-solid fa-camera"></i> رفع / تصوير
+            </label>
+            <input type="file" id="familyMemberIdBackInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdBackPreview(event)">
+            <div id="familyIdBackPreviewBox" style="margin-top: 6px; display: none;">
+              <img id="familyIdBackPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #995789;" src="" alt="Back ID Preview">
+              <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الظهر ✅</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button class="btn btn-primary" onclick="app.submitFamilyMember()" style="width: 100%; margin-top: 10px;">
         <i class="fa-solid fa-user-shield"></i> إنشاء الحساب وتفعيل بوابات الدخول
       </button>
@@ -2386,6 +2420,6 @@
   </div>
 
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=72.0"></script>
+  <script src="app.js?v=74.0"></script>
 </body>
 </html>

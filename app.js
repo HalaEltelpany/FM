@@ -2506,6 +2506,34 @@ class UltimateFMApp {
     this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
   }
 
+  handleFamilyIdFrontPreview(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.familyIdFrontBase64 = e.target.result;
+      const img = document.getElementById('familyIdFrontPreviewImg');
+      const box = document.getElementById('familyIdFrontPreviewBox');
+      if (img) img.src = this.familyIdFrontBase64;
+      if (box) box.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handleFamilyIdBackPreview(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.familyIdBackBase64 = e.target.result;
+      const img = document.getElementById('familyIdBackPreviewImg');
+      const box = document.getElementById('familyIdBackPreviewBox');
+      if (img) img.src = this.familyIdBackBase64;
+      if (box) box.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
   async submitFamilyMember() {
     const nameInput = document.getElementById('familyMemberNameInput');
     const relationSelect = document.getElementById('familyMemberRelationSelect');
@@ -2529,6 +2557,9 @@ class UltimateFMApp {
       return;
     }
 
+    const idFrontData = this.familyIdFrontBase64 || null;
+    const idBackData = this.familyIdBackBase64 || null;
+
     const relationMap = {
       'father': 'أب',
       'mother': 'أم',
@@ -2549,7 +2580,7 @@ class UltimateFMApp {
       item.innerHTML = `
         <div>
           <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">${name} (${relationArabic})</span>
-          <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">حساب فرد أسرة • ${phone} • ${email}</p>
+          <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">حساب فرد أسرة • ${phone} • ${email} • ${idFrontData || idBackData ? 'تم رفع صور البطاقة 🪪' : 'بدون مرفقات'}</p>
         </div>
         <span class="badge badge-cyan" style="font-size: 0.6rem; margin-top:0;">حساب نشط</span>
       `;
@@ -2566,12 +2597,24 @@ class UltimateFMApp {
     nameInput.value = '';
     phoneInput.value = '';
     if (emailInput) emailInput.value = '';
+
+    // Reset National ID base64 & previews
+    this.familyIdFrontBase64 = null;
+    this.familyIdBackBase64 = null;
+    const frontBox = document.getElementById('familyIdFrontPreviewBox');
+    const backBox = document.getElementById('familyIdBackPreviewBox');
+    const frontInput = document.getElementById('familyMemberIdFrontInput');
+    const backInput = document.getElementById('familyMemberIdBackInput');
+    if (frontBox) frontBox.style.display = 'none';
+    if (backBox) backBox.style.display = 'none';
+    if (frontInput) frontInput.value = '';
+    if (backInput) backInput.value = '';
     
-    this.showToast(`👥 تم إنشاء حساب فرد الأسرة [${name}] بنجاح!\nجاري المزامنة والتسجيل بالنظام المركزي Odoo (Contacts)...`);
+    this.showToast(`👥 تم إنشاء حساب فرد الأسرة [${name}] بنجاح!\nجاري المزامنة والتسجيل بـ Odoo Contacts مع صور البطاقة الشخصية...`);
 
     try {
-      await this.syncFamilyMemberToOdoo(name, relationArabic, phone, email);
-      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] والبريد الإلكتروني [${email}] بـ Odoo Contacts بنجاح!`);
+      await this.syncFamilyMemberToOdoo(name, relationArabic, phone, email, idFrontData, idBackData);
+      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] وصور البطاقة الشخصية وش وضهر بـ Odoo Contacts بنجاح!`);
     } catch (err) {
       console.warn('[Odoo Family Member Sync Error]:', err);
     }
@@ -2636,7 +2679,7 @@ class UltimateFMApp {
     return 3;
   }
 
-  async syncFamilyMemberToOdoo(name, relation, phone, email) {
+  async syncFamilyMemberToOdoo(name, relation, phone, email, idFrontBase64, idBackBase64) {
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
     const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
     const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
@@ -2679,7 +2722,6 @@ class UltimateFMApp {
             "create",
             [{
               name: `${name} (${relation})`,
-              parent_id: partnerId,
               phone: phone,
               email: email || '',
               type: "other",
@@ -2693,14 +2735,14 @@ class UltimateFMApp {
       const childRes = await this.callOdoo(baseUrl, childPayload);
       if (childRes && childRes.result) {
         childPartnerId = childRes.result;
-        console.log(`[Odoo Family Sync] Created child partner #${childPartnerId} for family member "${name}" with email "${email}"`);
+        console.log(`[Odoo Family Sync] Created standalone partner #${childPartnerId} for family member "${name}" with email "${email}"`);
       }
     } catch (cErr) {
       console.warn('[Odoo Family Sync Child Create Error]:', cErr);
     }
 
     if (childPartnerId && partnerId) {
-      // Step 4: Link child partner directly to Family Members tab (x_studio_many2many_field_7m1_1jvs7m7ps) AND child_ids
+      // Step 4: Link child partner directly to Family Members tab (x_studio_many2many_field_7m1_1jvs7m7ps) ONLY!
       try {
         const linkPayload = {
           jsonrpc: "2.0",
@@ -2715,8 +2757,7 @@ class UltimateFMApp {
               [
                 [partnerId],
                 {
-                  "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId, 0]],
-                  "child_ids": [[4, childPartnerId, 0]]
+                  "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId, 0]]
                 }
               ]
             ]
@@ -2730,7 +2771,65 @@ class UltimateFMApp {
       }
     }
 
-    // Step 5: Update specific relation fields if matched (x_studio_wife, x_studio_husband, etc.)
+    // Step 5: Upload National ID photos (Front & Back) as attachments to Odoo ir.attachment
+    const targetAttachIds = [childPartnerId, partnerId].filter(Boolean);
+    for (const targetId of targetAttachIds) {
+      if (idFrontBase64) {
+        try {
+          const cleanFront = idFrontBase64.replace(/^data:image\/\w+;base64,/, '');
+          const frontPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "ir.attachment",
+                "create",
+                [{
+                  name: `بطاقة_شخصية_${name}_وجه.jpg`,
+                  datas: cleanFront,
+                  res_model: "res.partner",
+                  res_id: targetId
+                }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, frontPayload);
+        } catch (fErr) {}
+      }
+
+      if (idBackBase64) {
+        try {
+          const cleanBack = idBackBase64.replace(/^data:image\/\w+;base64,/, '');
+          const backPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "ir.attachment",
+                "create",
+                [{
+                  name: `بطاقة_شخصية_${name}_ظهر.jpg`,
+                  datas: cleanBack,
+                  res_model: "res.partner",
+                  res_id: targetId
+                }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, backPayload);
+        } catch (bErr) {}
+      }
+    }
+
+    // Step 6: Update specific relation fields if matched (x_studio_wife, x_studio_husband, etc.)
     if (partnerId) {
       try {
         const relLower = (relation || '').toLowerCase();
@@ -2763,10 +2862,11 @@ class UltimateFMApp {
       } catch (rErr) {}
     }
 
-    // Step 6: Append to partner comment/notes as guaranteed log
+    // Step 7: Append to partner comment/notes as guaranteed log
     if (partnerId) {
       try {
-        const familyEntryText = `• ${name} (${relation}) - م: ${phone}`;
+        const idNoteText = (idFrontBase64 || idBackBase64) ? ' (مرفق صور البطاقة وش وضهر 🪪)' : '';
+        const familyEntryText = `• ${name} (${relation}) - م: ${phone} - ميل: ${email}${idNoteText}`;
         const notePayload = {
           jsonrpc: "2.0",
           method: "call",
