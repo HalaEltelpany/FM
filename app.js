@@ -5463,3 +5463,4 @@ class UltimateFMApp {
 
 // Global App Instance
 const app = new UltimateFMApp();
+window.app = app;
