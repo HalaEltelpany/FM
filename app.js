@@ -1282,9 +1282,15 @@ class UltimateFMApp {
   }
 
   async syncTicketUpdateToOdoo(ticket) {
-    if (!ticket || !ticket.odooId || !ticket.odooModel) {
-      console.log('[Odoo Update] Ticket does not have Odoo ID.');
-      return;
+    if (!ticket) return;
+
+    if (!ticket.odooId || !ticket.odooModel) {
+      console.log('[Odoo Update] Ticket does not have Odoo ID yet. Registering in Odoo first...');
+      await this.syncTicketToOdoo(ticket);
+      if (!ticket.odooId) {
+        console.warn('[Odoo Update] Failed to retrieve Odoo ID for ticket:', ticket.id);
+        return;
+      }
     }
 
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
@@ -4837,8 +4843,8 @@ class UltimateFMApp {
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
       const navItems = phoneNav.querySelectorAll('.nav-item span');
-      const arNav = ['الرئيسية', 'البلاغات', 'الرسائل', 'المالية', 'الإعدادات'];
-      const enNav = ['Home', 'Tickets', 'Messages', 'Finance', 'Settings'];
+      const arNav = ['الرئيسية', 'البلاغات', 'المالية', 'الرسائل', 'الإعدادات'];
+      const enNav = ['Home', 'Tickets', 'Finance', 'Messages', 'Settings'];
       navItems.forEach((span, idx) => {
         if (arNav[idx] && span) {
           span.innerText = this.currentLang === 'en' ? enNav[idx] : arNav[idx];
