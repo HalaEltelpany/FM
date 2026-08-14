@@ -1178,7 +1178,7 @@ class UltimateFMApp {
 
       // Standard Helpdesk Ticket payload using valid stored Odoo fields
       const helpdeskFields = {
-        name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'}`,
+        name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
         description: cleanDescription,
         priority: String(ticket.priority || '2')
       };
@@ -1209,6 +1209,7 @@ class UltimateFMApp {
         console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketIdInOdoo);
         ticket.odooId = ticketIdInOdoo;
         ticket.odooModel = "helpdesk.ticket";
+        this.saveTicketsToStorage();
 
         // Step 3: Attach problem photo to ticket in Odoo as ir.attachment
         if (ticket.photoBefore) {
@@ -1284,13 +1285,57 @@ class UltimateFMApp {
   async syncTicketUpdateToOdoo(ticket) {
     if (!ticket) return;
 
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    // Search Odoo by local ticket code (#TK-XXXX) if odooId is missing, preventing duplicate creation!
     if (!ticket.odooId || !ticket.odooModel) {
-      console.log('[Odoo Update] Ticket does not have Odoo ID yet. Registering in Odoo first...');
-      await this.syncTicketToOdoo(ticket);
-      if (!ticket.odooId) {
-        console.warn('[Odoo Update] Failed to retrieve Odoo ID for ticket:', ticket.id);
-        return;
+      try {
+        const authPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const authData = await this.callOdoo(baseUrl, authPayload);
+        if (authData && authData.result) {
+          const uid = authData.result;
+          const searchPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "helpdesk.ticket",
+                "search_read",
+                [[["name", "ilike", ticket.id]]],
+                { fields: ["id", "name"], limit: 1 }
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          const searchRes = await this.callOdoo(baseUrl, searchPayload);
+          if (searchRes && searchRes.result && searchRes.result.length > 0) {
+            ticket.odooId = searchRes.result[0].id;
+            ticket.odooModel = "helpdesk.ticket";
+            this.saveTicketsToStorage();
+            console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
+          }
+        }
+      } catch (sErr) {
+        console.warn('[Odoo Search Error]:', sErr);
       }
+
+      if (!ticket.odooId) {
+        await this.syncTicketToOdoo(ticket);
+      }
+      if (!ticket.odooId) return;
     }
 
     const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
