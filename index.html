@@ -246,6 +246,30 @@
                 </div>
               </div>
 
+              <!-- Management Direct Messages & Chatter Alerts Card -->
+              <div class="card gold-border" style="margin-top: 14px; border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, #ffffff 0%, #faf8f5 100%);">
+                <div class="card-header" style="margin-bottom: 8px;">
+                  <span class="card-title" style="color: #20274f; font-size: 0.85rem; font-weight: 800;">
+                    <i class="fa-solid fa-bullhorn" style="color: #d4af37; margin-left: 4px;"></i> رسائل وتنويهات الإدارة المباشرة (Odoo Chatter)
+                  </span>
+                  <span class="badge badge-warning" id="ownerMessagesCountBadge" style="font-size: 0.62rem;">1 جديدة</span>
+                </div>
+                
+                <div id="ownerManagementMessagesContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="background: rgba(32, 39, 79, 0.05); border: 1px solid rgba(32, 39, 79, 0.12); border-right: 4px solid #d4af37; padding: 10px 12px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;"><i class="fa-solid fa-user-shield" style="color: #1b8f91;"></i> إدارة القرية (Odoo Admin)</span>
+                      <span style="font-size: 0.62rem; color: #64748b;">12:11 AM</span>
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #0f172a; margin-top: 2px;">يرجى التواصل مع الاداره للأهميه</div>
+                  </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="app.openModal('modalAllManagementMessages')" style="width: 100%; margin-top: 10px; font-size: 0.75rem; height: 36px; background: rgba(32, 39, 79, 0.06); color: #20274f; font-weight: 700;">
+                  <i class="fa-solid fa-comments"></i> عرض جميع رسائل وتنبيهات الإدارة 💬
+                </button>
+              </div>
+
 
 
               <!-- Dynamic Security QR Code -->
@@ -2419,7 +2443,32 @@
     </div>
   </div>
 
+  <!-- 13. All Management Direct Messages Modal (Odoo Chatter Messages) -->
+  <div class="modal-overlay" id="modalAllManagementMessages">
+    <div class="modal-card">
+      <button class="modal-close" onclick="app.closeModal('modalAllManagementMessages')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #20274f;"><i class="fa-solid fa-comments" style="color: #d4af37;"></i> رسائل وتنويهات الإدارة (Odoo Chatter)</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
+        جميع الرسائل الموجهة من إدارة القرية لكارت المالك بـ Odoo Contacts.
+      </p>
+
+      <div id="modalAllMessagesList" style="display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; padding-right: 2px;">
+        <div style="background: rgba(32, 39, 79, 0.05); border: 1px solid rgba(32, 39, 79, 0.12); border-right: 4px solid #d4af37; padding: 10px 12px; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;"><i class="fa-solid fa-user-shield" style="color: #1b8f91;"></i> إدارة القرية (Odoo Admin)</span>
+            <span style="font-size: 0.62rem; color: #64748b;">12:11 AM</span>
+          </div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: #0f172a; margin-top: 2px;">يرجى التواصل مع الاداره للأهميه</div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="app.closeModal('modalAllManagementMessages')" style="width: 100%; margin-top: 14px;">
+        إغلاق النافذة
+      </button>
+    </div>
+  </div>
+
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=74.0"></script>
+  <script src="app.js?v=77.0"></script>
 </body>
 </html>

@@ -139,6 +139,7 @@ class UltimateFMApp {
         this.initSplashScreen();
         this.loadTicketsFromStorage();
         this.syncTicketsFromOdoo();
+        this.fetchOwnerChatterMessagesFromOdoo();
         this.renderTickets();
 
         // Auto login if active session exists
@@ -927,152 +928,68 @@ class UltimateFMApp {
   }
 
   resolveOdooTeamId(ticket, teams) {
-    if (!teams || !Array.isArray(teams) || teams.length === 0) return null;
+    if (!teams || !Array.isArray(teams) || teams.length === 0) return 1;
 
-    const normalizeAr = (s) => String(s || '').toLowerCase()
+    const normalize = (s) => String(s || '').toLowerCase()
       .replace(/[أإآ]/g, 'ا')
       .replace(/ة/g, 'ه')
       .replace(/ى/g, 'ي')
       .trim();
 
-    const catNorm = normalizeAr(ticket.category);
-    const titleNorm = normalizeAr(ticket.title);
-    const detailsNorm = normalizeAr(ticket.details || ticket.description);
-    const typeNorm = normalizeAr(ticket.type);
+    const catNorm = normalize(ticket.category);
+    const titleNorm = normalize(ticket.title);
+    const detailsNorm = normalize(ticket.details || ticket.description);
+    const typeNorm = normalize(ticket.type);
     const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
 
-    // 1. Housekeeping Team -> Route to "هاوس كيبينج" (Housekeeping Team)
-    const isHousekeeping = combinedNorm.includes('هاوس') || 
-                           combinedNorm.includes('كيبينج') || 
-                           combinedNorm.includes('نظافه') || 
-                           combinedNorm.includes('تنظيف') || 
-                           combinedNorm.includes('housekeeping') || 
-                           combinedNorm.includes('cleaning');
+    // Helper to find team by ID or matching English/Arabic names
+    const findTeam = (targetId, keywords) => {
+      let found = teams.find(t => t.id === targetId);
+      if (!found) {
+        found = teams.find(t => {
+          const tn = normalize(t.name);
+          return keywords.some(k => tn.includes(normalize(k)));
+        });
+      }
+      return found;
+    };
 
-    // 2. Landscaping Team -> Route to "لاند اسكيبينج" (Landscaping Team)
-    const isLandscaping = combinedNorm.includes('لاند') || 
-                          combinedNorm.includes('اسكيبينج') || 
-                          combinedNorm.includes('لاندسكيب') || 
-                          combinedNorm.includes('حدائق') || 
-                          combinedNorm.includes('حديقه') || 
-                          combinedNorm.includes('زراعه') || 
-                          combinedNorm.includes('اشجار') || 
-                          combinedNorm.includes('ري') || 
-                          combinedNorm.includes('landscaping') || 
-                          combinedNorm.includes('landscape') || 
-                          combinedNorm.includes('gardening');
-
-    // 3. Security & Gate Passes Keywords -> Route to "الأمن" (Security Team)
-    const isSecurity = !isHousekeeping && !isLandscaping && (
-      combinedNorm.includes('امن') || 
-      combinedNorm.includes('تصريح') || 
-      combinedNorm.includes('تصاريح') || 
-      combinedNorm.includes('بوابه') || 
-      combinedNorm.includes('بوابات') || 
-      combinedNorm.includes('سيارات') || 
-      combinedNorm.includes('لوحه') || 
-      combinedNorm.includes('شحنه') || 
-      combinedNorm.includes('زائر') || 
-      combinedNorm.includes('زوار') || 
-      combinedNorm.includes('security') || 
-      combinedNorm.includes('lpr') || 
-      combinedNorm.includes('دخول البحر')
-    );
-
-    // 4. Accounting & Financial Inquiries -> Route to "فريق الحسابات" (Accounting Team)
-    const isAccounting = !isHousekeeping && !isLandscaping && (
-      combinedNorm.includes('حسابات') || 
-      combinedNorm.includes('الحسابات') || 
-      combinedNorm.includes('مالي') || 
-      combinedNorm.includes('ماليات') || 
-      combinedNorm.includes('كشف حساب') || 
-      combinedNorm.includes('وديعه') || 
-      combinedNorm.includes('ودائع') || 
-      combinedNorm.includes('اقساط') || 
-      combinedNorm.includes('قسط') || 
-      combinedNorm.includes('فواتير') || 
-      combinedNorm.includes('accounting') || 
-      combinedNorm.includes('finance')
-    );
-
-    // 5. Customer Care & General Complaints & Suggestions -> Route to "Customer Care" (خدمة العملاء)
-    const isCustomerCare = !isHousekeeping && !isLandscaping && !isSecurity && !isAccounting && (
-      combinedNorm.includes('شكوي') || 
-      combinedNorm.includes('شكاوي') || 
-      combinedNorm.includes('مقترح') || 
-      combinedNorm.includes('مقترحات') || 
-      combinedNorm.includes('استفسار') || 
-      combinedNorm.includes('استفسارات') || 
-      combinedNorm.includes('خدمه العملاء') || 
-      combinedNorm.includes('customer care') || 
-      combinedNorm.includes('care')
-    );
-
-    // 6. Maintenance Keywords -> Route to "فريق الصيانة" (Maintenance Team)
-    const isMaintenance = !isHousekeeping && !isLandscaping && !isSecurity && !isAccounting && !isCustomerCare && (
-      combinedNorm.includes('صيانه') || 
-      combinedNorm.includes('سباكه') || 
-      combinedNorm.includes('كهرباء') || 
-      combinedNorm.includes('تكييف') || 
-      combinedNorm.includes('نجاره') || 
-      combinedNorm.includes('اعطال') || 
-      combinedNorm.includes('تسريب') || 
-      combinedNorm.includes('مواسير') || 
-      combinedNorm.includes('مرافق') || 
-      combinedNorm.includes('داخليه') || 
-      combinedNorm.includes('خارجيه') || 
-      combinedNorm.includes('maintenance')
-    );
-
-    let targetTeam = null;
-
-    if (isHousekeeping) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('هاوس') || tNorm.includes('كيبينج') || tNorm.includes('housekeeping') || tNorm.includes('نظافه');
-      });
-    } else if (isLandscaping) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('لاند') || tNorm.includes('اسكيبينج') || tNorm.includes('landscaping') || tNorm.includes('landscape') || tNorm.includes('حدائق') || tNorm.includes('زراعه');
-      });
-    } else if (isSecurity) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('امن') || tNorm.includes('الامن') || tNorm.includes('security');
-      });
-    } else if (isAccounting) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('حسابات') || tNorm.includes('الحسابات') || tNorm.includes('الماليه') || tNorm.includes('ماليه') || tNorm.includes('accounting') || tNorm.includes('finance');
-      });
-    } else if (isCustomerCare) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('خدمه العملاء') || tNorm.includes('عملاء') || tNorm.includes('customer care') || tNorm.includes('care');
-      });
-    } else if (isMaintenance) {
-      targetTeam = teams.find(t => {
-        const tNorm = normalizeAr(t.name);
-        return tNorm.includes('فريق الصيانه') || tNorm.includes('صيانه') || tNorm.includes('الصيانه') || tNorm.includes('maintenance');
-      });
+    // 1. Housekeeping (ID 5)
+    if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
+      const team = findTeam(5, ['housekeeping', 'هاوس', 'نظافة']);
+      if (team) return team.id;
     }
 
-    // Broad fallback matching
-    if (!targetTeam) {
-      if (isHousekeeping) targetTeam = teams.find(t => normalizeAr(t.name).includes('هاوس') || normalizeAr(t.name).includes('نظافه'));
-      else if (isLandscaping) targetTeam = teams.find(t => normalizeAr(t.name).includes('لاند') || normalizeAr(t.name).includes('حدائق'));
-      else if (isSecurity) targetTeam = teams.find(t => normalizeAr(t.name).includes('امن'));
-      else if (isAccounting) targetTeam = teams.find(t => normalizeAr(t.name).includes('حسابات') || normalizeAr(t.name).includes('ماليه') || normalizeAr(t.name).includes('account'));
-      else if (isCustomerCare) targetTeam = teams.find(t => normalizeAr(t.name).includes('عملاء') || normalizeAr(t.name).includes('care'));
-      else if (isMaintenance) targetTeam = teams.find(t => normalizeAr(t.name).includes('صيانه'));
+    // 2. Landscaping (ID 7)
+    if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
+      const team = findTeam(7, ['landscaping', 'لاند', 'حدائق']);
+      if (team) return team.id;
     }
 
-    if (targetTeam) {
-      console.log(`[Odoo Helpdesk Team Router] Category: "${ticket.category || 'Default'}" -> Routed to Team: "${targetTeam.name}" (ID: ${targetTeam.id})`);
-      return targetTeam.id;
+    // 3. Security (ID 3)
+    if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
+      const team = findTeam(3, ['security', 'أمن']);
+      if (team) return team.id;
     }
-    return null;
+
+    // 4. Accounting (ID 4)
+    if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
+      const team = findTeam(4, ['accounting', 'حسابات']);
+      if (team) return team.id;
+    }
+
+    // 5. Maintenance (ID 2)
+    if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
+      const team = findTeam(2, ['maintenance', 'صيانة']);
+      if (team) return team.id;
+    }
+
+    // 6. Customer Care (ID 1) - Default for Complaints, Suggestions, Queries & General Feedback!
+    const customerCareTeam = findTeam(1, ['customer care', 'care', 'خدمة العملاء', 'عملاء', 'شكوى', 'مقترح']);
+    if (customerCareTeam) return customerCareTeam.id;
+
+    const fallbackTeam = teams.find(t => t.id === 1) || teams[0];
+    return fallbackTeam ? fallbackTeam.id : 1;
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
@@ -2724,6 +2641,7 @@ class UltimateFMApp {
               name: `${name} (${relation})`,
               phone: phone,
               email: email || '',
+              function: relation,
               type: "other",
               comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
               company_type: "person"
@@ -2961,6 +2879,94 @@ class UltimateFMApp {
     if (this.ctx && this.canvas) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+  }
+
+  async fetchOwnerChatterMessagesFromOdoo() {
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    if (!urlInput || !dbInput || !userInput || !keyInput) return;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+
+    try {
+      const authPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "common",
+          method: "authenticate",
+          args: [dbInput, userInput, keyInput, {}]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const authData = await this.callOdoo(baseUrl, authPayload);
+      if (!authData || !authData.result) return;
+      const uid = authData.result;
+
+      const partnerId = (await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput)) || 3;
+
+      const msgPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "mail.message",
+            "search_read",
+            [[["model", "=", "res.partner"], ["res_id", "=", partnerId]]],
+            { fields: ["id", "body", "author_id", "date", "create_date"], order: "create_date desc", limit: 15 }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const msgRes = await this.callOdoo(baseUrl, msgPayload);
+      if (msgRes && msgRes.result && Array.isArray(msgRes.result)) {
+        const cleanMsgs = msgRes.result.filter(m => {
+          if (!m.body) return false;
+          const txt = m.body.replace(/<[^>]*>?/gm, '').trim();
+          if (!txt) return false;
+          if (txt.includes('Partner') || txt.includes('Name') || txt.includes('Phone') || txt.includes('Email') || txt.includes('فرد أسرة') || txt.includes('مرفق') || txt.includes('رخصة')) return false;
+          return true;
+        });
+        this.renderOwnerChatterMessages(cleanMsgs);
+      }
+    } catch (e) {
+      console.warn('[Odoo Chatter Fetch Error]:', e);
+    }
+  }
+
+  renderOwnerChatterMessages(messages) {
+    const cardContainer = document.getElementById('ownerManagementMessagesContainer');
+    const modalContainer = document.getElementById('modalAllMessagesList');
+    const badge = document.getElementById('ownerMessagesCountBadge');
+
+    if (!messages || messages.length === 0) return;
+
+    if (badge) badge.innerText = `${messages.length} جديدة`;
+
+    const htmlItems = messages.map(m => {
+      const cleanBody = m.body.replace(/<[^>]*>?/gm, '').trim();
+      const authorName = Array.isArray(m.author_id) ? m.author_id[1] : 'إدارة القرية (Odoo Admin)';
+      const dateObj = new Date(m.create_date || m.date);
+      const dateStr = !isNaN(dateObj) ? dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '12:11 AM';
+
+      return `
+        <div style="background: rgba(32, 39, 79, 0.05); border: 1px solid rgba(32, 39, 79, 0.12); border-right: 4px solid #d4af37; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;"><i class="fa-solid fa-user-shield" style="color: #1b8f91;"></i> ${authorName}</span>
+            <span style="font-size: 0.62rem; color: #64748b;">${dateStr}</span>
+          </div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: #0f172a; margin-top: 2px;">${cleanBody}</div>
+        </div>
+      `;
+    }).join('');
+
+    if (cardContainer) cardContainer.innerHTML = htmlItems;
+    if (modalContainer) modalContainer.innerHTML = htmlItems;
   }
 
   openModal(modalId) {
