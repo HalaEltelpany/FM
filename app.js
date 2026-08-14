@@ -143,13 +143,10 @@ class UltimateFMApp {
       try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
 
-      // Auto login if active session exists
+      // Start cleanly on the main role selection grid so all 10 screens are accessible
       try {
-        const savedRole = localStorage.getItem('active_session_role');
-        if (savedRole) {
-          setTimeout(() => this.executeLogin(savedRole), 100);
-        }
-      } catch (e) { console.warn('[Auto Login warning]:', e); }
+        this.showRoleGrid();
+      } catch (e) { console.warn('[RoleGrid warning]:', e); }
 
       // Register PWA Service Worker
       try {
@@ -384,30 +381,29 @@ class UltimateFMApp {
   }
 
   showRoleGrid() {
-    this.currentRole = 'grid';
-    document.querySelectorAll('#roleSelector .role-btn').forEach(btn => {
-      if (btn.getAttribute('data-role') === 'grid') {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
+    this.currentRole = 'login';
+    localStorage.removeItem('active_session_role');
 
-    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    // Hide ALL view panels explicitly
+    document.querySelectorAll('.view-panel').forEach(panel => {
+      panel.classList.remove('active');
+      panel.style.display = 'none';
+    });
     
     const gridPanel = document.getElementById('viewLogin') || document.getElementById('viewRoleGrid');
-    if (gridPanel) gridPanel.classList.add('active');
+    if (gridPanel) {
+      gridPanel.classList.add('active');
+      gridPanel.style.setProperty('display', 'flex', 'important');
+      gridPanel.style.setProperty('flex-direction', 'column', 'important');
+    }
 
-    const backBtn = document.getElementById('btnBackToRoleGrid');
-    if (backBtn) backBtn.style.display = 'none';
-
-    // Hide navigation bar header
-    const navBar = document.getElementById('appNavBar');
-    if (navBar) navBar.style.display = 'none';
+    // Hide phone bottom navbar when on login/selection grid
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) phoneNav.style.display = 'none';
   }
 
   switchRole(role) {
-    if (role === 'grid') {
+    if (role === 'grid' || role === 'login') {
       this.showRoleGrid();
       return;
     }
@@ -424,7 +420,10 @@ class UltimateFMApp {
     });
 
     // Hide all views & show active
-    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('.view-panel').forEach(panel => {
+      panel.classList.remove('active');
+      panel.style.display = 'none';
+    });
     
     const targetMap = {
       'homeowner': 'viewHomeowner',
@@ -442,10 +441,15 @@ class UltimateFMApp {
     const targetId = targetMap[role] || 'viewHomeowner';
     const activePanel = document.getElementById(targetId);
     if (activePanel) {
+      activePanel.classList.add('active');
       activePanel.style.setProperty('display', 'flex', 'important');
       activePanel.style.setProperty('flex-direction', 'column', 'important');
-      activePanel.classList.add('active');
     }
+
+    // ALWAYS keep back-to-grid buttons VISIBLE so the user can easily navigate between screens!
+    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
+      btn.style.setProperty('display', 'inline-flex', 'important');
+    });
 
     // Render lists on role switch
     this.renderHousekeeping();
@@ -4042,14 +4046,10 @@ class UltimateFMApp {
       this.switchHomeownerTab('home');
     }
     
-    // Hide standard back-to-grid buttons for strict separation feel
+    // ALWAYS keep back-to-grid buttons VISIBLE so the user can easily switch screens!
     document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
-      btn.style.display = 'none';
+      btn.style.setProperty('display', 'inline-flex', 'important');
     });
-
-    // Show navigation bar header
-    const navBar = document.getElementById('appNavBar');
-    if (navBar) navBar.style.display = 'flex';
 
     // Show phone bottom navbar only if resident role
     const phoneNav = document.getElementById('phoneNavbar');
@@ -4064,32 +4064,12 @@ class UltimateFMApp {
     // Save active session
     localStorage.setItem('active_session_role', role);
 
-    this.showToast(`🔑 تم تسجيل الدخول بنجاح كـ [${this.getRoleArabicName(role)}]!`);
+    this.showToast(`🔑 تم فتح شاشة [${this.getRoleArabicName(role)}] بنجاح!`);
   }
 
   logout() {
-    localStorage.removeItem('active_session_role');
-    this.currentRole = 'login';
-    
-    // Hide all views & show login
-    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
-    const loginPanel = document.getElementById('viewLogin');
-    if (loginPanel) loginPanel.classList.add('active');
-
-    // Restore standard back-to-grid buttons for dev grid purposes if wanted
-    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
-      btn.style.display = 'inline-flex';
-    });
-
-    // Hide navigation bar header
-    const navBar = document.getElementById('appNavBar');
-    if (navBar) navBar.style.display = 'none';
-
-    // Hide phone bottom navbar
-    const phoneNav = document.getElementById('phoneNavbar');
-    if (phoneNav) phoneNav.style.display = 'none';
-
-    this.showToast('🚪 تم تسجيل الخروج من النظام بنجاح.');
+    this.showRoleGrid();
+    this.showToast('🚪 تم تسجيل الخروج والعودة للقائمة الرئيسية.');
   }
 
   getRoleArabicName(role) {
