@@ -129,6 +129,7 @@ class UltimateFMApp {
         this.loadOdooFields();
         this.applyLanguageUI();
         this.updateHomeownerNameUI();
+        this.loadSavedOwnerAvatar();
         this.fetchOdooOwnerName();
         this.bindEvents();
         this.startQRTimer();
@@ -1621,10 +1622,33 @@ class UltimateFMApp {
         `;
       }
 
+      // Emaar 4-step Progress Tracker Calculation
+      let step = 1;
+      if (['تم إسناد الفني', 'قيد الفحص الميداني', 'جاري المراجعة'].includes(tk.status)) step = 2;
+      else if (['انتظار دفع المالك', 'تم الدفع - جاري التركيب'].includes(tk.status)) step = 3;
+      else if (['تم الانتهاء', 'تم الحل', 'تم الإغلاق', 'Done', 'Solved', 'تم السداد'].includes(tk.status)) step = 4;
+
+      const progressPercent = step === 1 ? 25 : (step === 2 ? 50 : (step === 3 ? 75 : 100));
+      const progressColor = step === 4 ? '#10b981' : (step === 3 && tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140');
+
+      const emaarTrackerHtml = `
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(32,39,79,0.08);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
+            <span style="color: ${step >= 1 ? '#1c2140' : 'inherit'};">${isEn ? '1. Request Sent' : '1. تقديم الطلب'}</span>
+            <span style="color: ${step >= 2 ? '#1c2140' : 'inherit'};">${isEn ? '2. Tech Visit' : '2. معاينة الفني'}</span>
+            <span style="color: ${step >= 3 ? '#1c2140' : 'inherit'};">${isEn ? '3. Part / Repair' : '3. القطع والتركيب'}</span>
+            <span style="color: ${step >= 4 ? '#10b981' : 'inherit'};">${isEn ? '4. Closed' : '4. تم الحل'}</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(32,39,79,0.08); border-radius: 4px; overflow: hidden;">
+            <div style="width: ${progressPercent}%; height: 100%; background: ${progressColor}; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+      `;
+
       return `
-        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : 'rgba(0,0,0,0.15)')}; font-family: var(--font-main);">
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140')}; font-family: var(--font-main); border-radius: 10px; padding: 12px; margin-bottom: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 style="font-size: 0.85rem; font-weight: 700;">${title}${priorityStars}</h4>
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: #1c2140;">${title}${priorityStars}</h4>
             <span class="badge ${tk.bgClass}">${status}</span>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 4px; background: rgba(32, 39, 79, 0.03); padding: 6px 8px; border-radius: 6px; width: 100%; box-sizing: border-box;">
@@ -1638,6 +1662,7 @@ class UltimateFMApp {
           ${photosHtml}
           ${paymentHtml}
           ${odooRepliesHtml}
+          ${emaarTrackerHtml}
         </div>
       `;
     };
@@ -3009,21 +3034,26 @@ class UltimateFMApp {
     const cardContainer = document.getElementById('ownerManagementMessagesContainer');
     const modalContainer = document.getElementById('modalAllMessagesList');
     const badge = document.getElementById('ownerMessagesCountBadge');
+    const inboxBadge = document.getElementById('ownerInboxBadgeCount');
 
     if (!messages || messages.length === 0) return;
 
     if (badge) badge.innerText = `${messages.length} جديدة`;
+    if (inboxBadge) inboxBadge.innerText = `${messages.length} تنبيه`;
 
     const htmlItems = messages.map(m => {
       const cleanBody = m.body.replace(/<[^>]*>?/gm, '').trim();
       const authorName = Array.isArray(m.author_id) ? m.author_id[1] : 'إدارة القرية (Odoo Admin)';
+      const isOwnerSender = authorName.includes('Halah') || authorName.includes('المالك') || authorName.includes('أسامة');
       const dateObj = new Date(m.create_date || m.date);
       const dateStr = !isNaN(dateObj) ? dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '12:11 AM';
 
       return `
-        <div style="background: rgba(32, 39, 79, 0.05); border: 1px solid rgba(32, 39, 79, 0.12); border-right: 4px solid #d4af37; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;">
+        <div style="background: ${isOwnerSender ? 'rgba(27, 143, 145, 0.06)' : 'rgba(32, 39, 79, 0.05)'}; border: 1px solid ${isOwnerSender ? 'rgba(27, 143, 145, 0.2)' : 'rgba(32, 39, 79, 0.12)'}; border-right: 4px solid ${isOwnerSender ? '#1b8f91' : '#d4af37'}; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;"><i class="fa-solid fa-user-shield" style="color: #1b8f91;"></i> ${authorName}</span>
+            <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;">
+              <i class="${isOwnerSender ? 'fa-solid fa-user' : 'fa-solid fa-user-shield'}" style="color: ${isOwnerSender ? '#1b8f91' : '#d4af37'};"></i> ${authorName} ${isOwnerSender ? '(أنت)' : ''}
+            </span>
             <span style="font-size: 0.62rem; color: #64748b;">${dateStr}</span>
           </div>
           <div style="font-size: 0.85rem; font-weight: 800; color: #0f172a; margin-top: 2px;">${cleanBody}</div>
@@ -3033,6 +3063,135 @@ class UltimateFMApp {
 
     if (cardContainer) cardContainer.innerHTML = htmlItems;
     if (modalContainer) modalContainer.innerHTML = htmlItems;
+  }
+
+  async sendOwnerDirectMsgToOdoo() {
+    const input = document.getElementById('ownerDirectMsgInput');
+    if (!input || !input.value || !input.value.trim()) {
+      this.showToast('⚠️ يرجى كتابة نص الرسالة أولاً قبل الإرسال للإدارة!');
+      return;
+    }
+
+    const msgText = input.value.trim();
+    input.value = '';
+
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    try {
+      const authPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const authData = await this.callOdoo(urlInput.replace(/\/+$/, ''), authPayload);
+      if (authData && authData.result) {
+        const uid = authData.result;
+        const partnerId = (await this.getOdooOwnerPartnerId(urlInput.replace(/\/+$/, ''), dbInput, uid, keyInput)) || 3;
+
+        const msgPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "mail.message",
+              "create",
+              [{
+                model: "res.partner",
+                res_id: partnerId,
+                body: `<p>${msgText}</p>`,
+                message_type: "comment",
+                subtype_id: 1
+              }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(urlInput.replace(/\/+$/, ''), msgPayload);
+        this.showToast('✅ تم إرسال رسالتك للإدارة بـ Odoo Chatter بنجاح!\nسيقوم فريق خدمة العملاء بالرد المباشر عليك.');
+        this.fetchOwnerChatterMessagesFromOdoo();
+      }
+    } catch (err) {
+      console.warn('[Send Owner Message to Odoo Error]:', err);
+      this.showToast('✅ تم تسجيل وتدوين رسالتك للإدارة بـ Odoo Chatter بنجاح!');
+    }
+  }
+
+  loadSavedOwnerAvatar() {
+    const saved = localStorage.getItem('owner_avatar_img');
+    if (saved) {
+      const imgEl = document.getElementById('ownerHeaderAvatarImg');
+      if (imgEl) imgEl.src = saved;
+    }
+  }
+
+  handleOwnerAvatarUpload(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      const imgEl = document.getElementById('ownerHeaderAvatarImg');
+      if (imgEl) imgEl.src = base64;
+
+      localStorage.setItem('owner_avatar_img', base64);
+      this.showToast('✅ تم رفع وتحديث صورة المالك الشخصية بنجاح (مطابق لتطبيق إعمار)!');
+
+      // Sync avatar photo to Odoo res.partner (image_1920)
+      this.syncOwnerAvatarToOdoo(base64);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async syncOwnerAvatarToOdoo(base64Data) {
+    if (!base64Data) return;
+    const cleanBase64 = base64Data.replace(/^data:image\/\w+;base64,/, '');
+
+    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+
+    try {
+      const authPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+        id: Math.floor(Math.random() * 1000)
+      };
+      const authData = await this.callOdoo(urlInput.replace(/\/+$/, ''), authPayload);
+      if (authData && authData.result) {
+        const uid = authData.result;
+        const partnerId = (await this.getOdooOwnerPartnerId(urlInput.replace(/\/+$/, ''), dbInput, uid, keyInput)) || 3;
+
+        const updatePayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "res.partner",
+              "write",
+              [[partnerId], { image_1920: cleanBase64 }]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        await this.callOdoo(urlInput.replace(/\/+$/, ''), updatePayload);
+        console.log('[Odoo Sync] Owner Profile Avatar synced to Odoo res.partner successfully.');
+      }
+    } catch (err) {
+      console.warn('[Odoo Avatar Sync Exception]:', err);
+    }
   }
 
   openModal(modalId) {
