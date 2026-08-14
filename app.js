@@ -518,17 +518,17 @@ class UltimateFMApp {
   }
 
   submitStaffPermit() {
-    const name = document.getElementById('staffNameInput').value || 'موظف جديد';
-    const job = document.getElementById('staffJobInput').value || 'عامل نشاط';
-    const ins = document.getElementById('staffInsuranceInput').value || '#INS-80941';
+    const name = document.getElementById('staffNameInput')?.value || 'موظف جديد';
+    const job = document.getElementById('staffJobInput')?.value || 'عامل نشاط';
+    const ins = document.getElementById('staffInsuranceInput')?.value || '#INS-80941';
 
     this.closeModal('modalStaffPermit');
     this.showToast(`✅ تم توقيع وتأكيد تصريح عمل الموظف (${name}) بنجاح!\nالمسمّى: ${job}\nرقم الملف التأميني للدولة: ${ins}\nتم إصدار كود دخول البوابات الإلكترونية.`);
   }
 
   submitCargoPermit() {
-    const desc = document.getElementById('cargoDescInput').value || 'شحنة تجارية';
-    const driver = document.getElementById('cargoDriverInput').value || 'سائق التوريد';
+    const desc = document.getElementById('cargoDescInput')?.value || 'شحنة تجارية';
+    const driver = document.getElementById('cargoDriverInput')?.value || 'سائق التوريد';
     const code = Math.floor(100000 + Math.random() * 900000);
 
     this.closeModal('modalCargoPermit');
@@ -677,9 +677,9 @@ class UltimateFMApp {
     this._isTicketSubmitting = true;
     setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
 
-    const category = document.getElementById('ticketCategorySelect').value;
+    const category = document.getElementById('ticketCategorySelect')?.value || 'سباكة';
     const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
-    const desc = document.getElementById('ticketDescInput').value || 'طلب صيانة عاجلة';
+    const desc = document.getElementById('ticketDescInput')?.value || 'طلب صيانة عاجلة';
     const photoInput = document.getElementById('ticketPhotoInput');
     
     // Category fallback before-repair images
@@ -1504,8 +1504,8 @@ class UltimateFMApp {
   }
 
   handleMeterRechargeSubmit() {
-    const meterType = document.getElementById('meterTypeSelect').value;
-    const amountVal = parseFloat(document.getElementById('meterAmountInput').value) || 0;
+    const meterType = document.getElementById('meterTypeSelect')?.value || 'electricity';
+    const amountVal = parseFloat(document.getElementById('meterAmountInput')?.value || '0') || 0;
 
     if (amountVal <= 0) {
       this.showToast('⚠️ يرجى إدخال مبلغ شحن صحيح');
