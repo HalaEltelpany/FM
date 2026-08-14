@@ -5444,3 +5444,9 @@ class UltimateFMApp {
 // Global App Instance
 const app = new UltimateFMApp();
 window.app = app;
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+  app.init();
+}
