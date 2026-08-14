@@ -125,43 +125,40 @@ class UltimateFMApp {
     const runSetup = () => {
       if (this._setupDone) return;
       this._setupDone = true;
-      try {
-        this.loadOdooFields();
-        this.applyLanguageUI();
-        this.updateHomeownerNameUI();
-        this.loadSavedOwnerAvatar();
-        this.fetchOdooOwnerName();
-        this.bindEvents();
-        this.startQRTimer();
-        this.initCanvas();
-        this.renderPdfLogo();
-        this.updateClock();
-        setInterval(() => this.updateClock(), 1000);
-        this.initSplashScreen();
-        this.loadTicketsFromStorage();
-        this.syncTicketsFromOdoo();
-        this.fetchOwnerChatterMessagesFromOdoo();
-        this.renderTickets();
 
-        // Auto login if active session exists
+      try { this.loadOdooFields(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.applyLanguageUI(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.updateHomeownerNameUI(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.loadSavedOwnerAvatar(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.fetchOdooOwnerName(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.bindEvents(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.startQRTimer(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.initCanvas(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderPdfLogo(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.updateClock(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { setInterval(() => this.updateClock(), 1000); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.initSplashScreen(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.loadTicketsFromStorage(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.syncTicketsFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
+
+      // Auto login if active session exists
+      try {
         const savedRole = localStorage.getItem('active_session_role');
         if (savedRole) {
           setTimeout(() => this.executeLogin(savedRole), 100);
         }
-        // Register PWA Service Worker
+      } catch (e) { console.warn('[Auto Login warning]:', e); }
+
+      // Register PWA Service Worker
+      try {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('./sw.js')
             .then(() => console.log('[PWA] Service Worker registered successfully.'))
             .catch((err) => console.log('[PWA] Service Worker registration failed:', err));
         }
-      } catch (err) {
-        console.error('[App Init Exception]:', err);
-        const splash = document.getElementById('appSplashScreen');
-        if (splash) {
-          splash.classList.add('hidden');
-          splash.style.display = 'none';
-        }
-      }
+      } catch (e) { console.warn('[PWA warning]:', e); }
     };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
