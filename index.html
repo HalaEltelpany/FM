@@ -496,28 +496,29 @@
                 </div>
               </div>
 
-              <!-- Active Maintenance Tickets & Full History -->
+              <!-- Active Maintenance Tickets & Full History (Emaar One App Layout) -->
               <div class="card">
-                <div class="card-header">
-                  <span class="card-title"><i class="fa-solid fa-list-check"></i> طلبات الصيانة الحالية</span>
-                  <span class="badge badge-warning" id="ticketCountBadge">2 نشطة</span>
-                </div>
-                <div class="list-group" id="homeownerTicketsList">
-                  <div class="ticket-item">
-                    <div class="ticket-info">
-                      <h4>صيانة تكييف الماستر</h4>
-                      <p>التخصص: كهروميكانيك • كود: #TK-8041</p>
-                    </div>
-                    <span class="badge badge-warning">قيد الفحص الميداني</span>
-                  </div>
-                  <div class="ticket-item">
-                    <div class="ticket-info">
-                      <h4>تسريب في محبس السباكة</h4>
-                      <p>التخصص: سباكة • كود: #TK-7930</p>
-                    </div>
-                    <span class="badge badge-info">تم إسناد الفني</span>
+                <div class="card-header" style="margin-bottom: 8px;">
+                  <span class="card-title"><i class="fa-solid fa-list-check"></i> قائمة وتاريخ الطلبات</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <button class="btn btn-sm" onclick="app.resetAndWipeAllAppTickets()" style="font-size: 0.62rem; padding: 3px 8px; background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); border-radius: 6px; cursor: pointer; font-weight: 700;">
+                      <i class="fa-solid fa-broom"></i> تصفير السجل
+                    </button>
+                    <span class="badge badge-warning" id="ticketCountBadge">0 نشطة</span>
                   </div>
                 </div>
+
+                <!-- Emaar One App Segmented Toggle Control -->
+                <div style="display: flex; background: rgba(32, 39, 79, 0.08); padding: 3px; border-radius: 10px; margin-bottom: 12px;">
+                  <button id="emaarTabActive" onclick="app.setEmaarTicketFilter('active')" class="btn btn-sm" style="flex: 1; border-radius: 8px; font-weight: 800; font-size: 0.72rem; padding: 6px 0; margin: 0; background: #20274f; color: #ffffff; transition: 0.2s;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> الطلبات النشطة (<span id="emaarActiveCountNum">0</span>)
+                  </button>
+                  <button id="emaarTabCompleted" onclick="app.setEmaarTicketFilter('completed')" class="btn btn-sm" style="flex: 1; border-radius: 8px; font-weight: 800; font-size: 0.72rem; padding: 6px 0; margin: 0; background: transparent; color: #20274f; transition: 0.2s;">
+                    <i class="fa-solid fa-circle-check"></i> السجل والمنتهية (<span id="emaarCompletedCountNum">0</span>)
+                  </button>
+                </div>
+
+                <div class="list-group" id="homeownerTicketsList"></div>
               </div>
             </div>
 
@@ -2469,6 +2470,6 @@
   </div>
 
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=77.0"></script>
+  <script src="app.js?v=79.0"></script>
 </body>
 </html>

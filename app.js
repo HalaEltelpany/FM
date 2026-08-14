@@ -822,6 +822,14 @@ class UltimateFMApp {
       if (readData && readData.result && Array.isArray(readData.result)) {
         console.log('[Odoo Sync Read] Retrieved tickets count:', readData.result.length);
         
+        if (readData.result.length === 0) {
+          // Odoo backend has 0 tickets (User deleted all tickets in Odoo) -> wipe local tickets
+          this.tickets = [];
+          this.saveTicketsToStorage();
+          this.renderTickets();
+          return;
+        }
+
         readData.result.forEach(rec => {
           const recOdooIdStr = String(rec.id);
           const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
@@ -882,6 +890,20 @@ class UltimateFMApp {
     } catch (err) {
       console.warn('[Odoo Tickets Sync Read Exception]', err);
     }
+  }
+
+  resetAndWipeAllAppTickets() {
+    this.tickets = [];
+    this.complaints = [];
+    this.housekeepingRequests = [];
+    this.permits = [];
+    localStorage.removeItem('fm_tickets_v1');
+    localStorage.removeItem('fm_complaints_v1');
+    localStorage.removeItem('fm_permits_v1');
+    localStorage.removeItem('fm_housekeeping_v1');
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.showToast('🧹 تم تصفير ومسح جميع التذاكر والبلاغات المحلية بنجاح!\nتم ضبط التطبيق بـ 0 طلبات نشطة والمزامنة مع أودو.');
   }
 
   async callOdoo(baseUrl, payload) {
@@ -1620,18 +1642,23 @@ class UltimateFMApp {
       `;
     };
 
-    // Render Homeowner Tickets list & Update Category Counters (Excluding Financial Inquiries)
+    // Render Homeowner Tickets list & Update Category Counters (Emaar App Active vs Completed History Separation)
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
       const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner' && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
 
-      // Category Counters Summary (6 Categories)
-      const plumbingCount = homeownerTks.filter(t => t.category === 'سباكة').length;
-      const elecCount = homeownerTks.filter(t => t.category === 'كهرباء').length;
-      const hvacCount = homeownerTks.filter(t => t.category === 'كهروميكانيك' || t.category === 'تكييف').length;
-      const woodCount = homeownerTks.filter(t => t.category === 'نجارة').length;
-      const hkCount = homeownerTks.filter(t => t.category && (t.category.includes('نظافة') || t.category.includes('هاوس'))).length + (this.housekeepingRequests ? this.housekeepingRequests.filter(r => r.requester === 'owner').length : 0);
-      const landscapeCount = homeownerTks.filter(t => t.category && (t.category.includes('حدائق') || t.category.includes('لاند'))).length;
+      const isCompletedStatus = (st) => ['تم الانتهاء', 'تم الإغلاق', 'Done', 'Solved', 'تم الحل', 'تم السداد'].includes(st);
+
+      const activeTks = homeownerTks.filter(t => !isCompletedStatus(t.status));
+      const completedTks = homeownerTks.filter(t => isCompletedStatus(t.status));
+
+      // Category Counters Summary for Active Tickets (6 Categories)
+      const plumbingCount = activeTks.filter(t => t.category === 'سباكة').length;
+      const elecCount = activeTks.filter(t => t.category === 'كهرباء').length;
+      const hvacCount = activeTks.filter(t => t.category === 'كهروميكانيك' || t.category === 'تكييف').length;
+      const woodCount = activeTks.filter(t => t.category === 'نجارة').length;
+      const hkCount = activeTks.filter(t => t.category && (t.category.includes('نظافة') || t.category.includes('هاوس'))).length + (this.housekeepingRequests ? this.housekeepingRequests.filter(r => r.requester === 'owner').length : 0);
+      const landscapeCount = activeTks.filter(t => t.category && (t.category.includes('حدائق') || t.category.includes('لاند'))).length;
 
       const elPlumb = document.getElementById('catPlumbingCount');
       const elElec = document.getElementById('catElecCount');
@@ -1648,14 +1675,48 @@ class UltimateFMApp {
       if (elLandscape) elLandscape.innerText = landscapeCount;
 
       const badge = document.getElementById('ticketCountBadge');
-      if (badge) badge.innerText = isEn ? `${homeownerTks.length} total` : `${homeownerTks.length} طلبات مسجلة`;
+      if (badge) badge.innerText = isEn ? `${activeTks.length} active` : `${activeTks.length} نشطة`;
+
+      const elActiveNum = document.getElementById('emaarActiveCountNum');
+      const elCompNum = document.getElementById('emaarCompletedCountNum');
+      if (elActiveNum) elActiveNum.innerText = activeTks.length;
+      if (elCompNum) elCompNum.innerText = completedTks.length;
+
+      const activeBtn = document.getElementById('emaarTabActive');
+      const compBtn = document.getElementById('emaarTabCompleted');
+      if (activeBtn && compBtn) {
+        if (this._emaarTicketFilter === 'completed') {
+          compBtn.style.background = '#20274f';
+          compBtn.style.color = '#ffffff';
+          activeBtn.style.background = 'transparent';
+          activeBtn.style.color = '#20274f';
+        } else {
+          activeBtn.style.background = '#20274f';
+          activeBtn.style.color = '#ffffff';
+          compBtn.style.background = 'transparent';
+          compBtn.style.color = '#20274f';
+        }
+      }
+
       homeownerList.innerHTML = '';
-      if (homeownerTks.length === 0) {
-        homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">${isEn ? 'No active tickets' : 'لا توجد بلاغات حالية'}</div>`;
+      const filterMode = this._emaarTicketFilter || 'active';
+
+      if (filterMode === 'active') {
+        if (activeTks.length === 0) {
+          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No active tickets' : 'لا توجد بلاغات نشطة حالياً'}</div>`;
+        } else {
+          activeTks.forEach(tk => {
+            homeownerList.innerHTML += getTicketHtml(tk);
+          });
+        }
       } else {
-        homeownerTks.forEach(tk => {
-          homeownerList.innerHTML += getTicketHtml(tk);
-        });
+        if (completedTks.length === 0) {
+          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No completed history tickets' : 'لا يوجد سجل تذاكر منتهية حالياً'}</div>`;
+        } else {
+          completedTks.forEach(tk => {
+            homeownerList.innerHTML += getTicketHtml(tk);
+          });
+        }
       }
     }
 
@@ -2834,6 +2895,11 @@ class UltimateFMApp {
 
   openCommercialMeterModal() {
     this.openModal('modalMeterRecharge');
+  }
+
+  setEmaarTicketFilter(filterState) {
+    this._emaarTicketFilter = filterState || 'active';
+    this.renderTickets();
   }
 
   initCanvas() {
