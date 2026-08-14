@@ -1268,8 +1268,21 @@ class UltimateFMApp {
     }
   }
 
+  resolveOdooStageId(status) {
+    if (!status) return 1;
+    const s = String(status).trim();
+
+    if (s.includes('جديد') || s === 'New') return 1;
+    if (s.includes('تعيين') || s.includes('جاري') || s.includes('معاينة') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s === 'In Progress') return 2;
+    if (s.includes('قطع') || s.includes('غيار') || s.includes('معلق') || s.includes('انتظار') || s === 'On Hold') return 3;
+    if (s.includes('انهاء') || s.includes('انتهى') || s.includes('مكتمل') || s.includes('حل') || s.includes('تمت') || s === 'Solved') return 4;
+    if (s.includes('ملغي') || s === 'Cancelled') return 5;
+
+    return 2;
+  }
+
   async syncTicketUpdateToOdoo(ticket) {
-    if (!ticket.odooId || !ticket.odooModel) {
+    if (!ticket || !ticket.odooId || !ticket.odooModel) {
       console.log('[Odoo Update] Ticket does not have Odoo ID.');
       return;
     }
@@ -1301,13 +1314,14 @@ class UltimateFMApp {
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') return;
 
-      console.log(`[Odoo Update] Authenticated UID: ${uid}. Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}`);
+      const targetStageId = this.resolveOdooStageId(ticket.status);
+      console.log(`[Odoo Update] Authenticated UID: ${uid}. Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
       // 1. Post to Chatter (message_post)
-      let statusText = `تحديث من تطبيق الموبايل:\nحالة التذكرة: ${ticket.status}`;
-      if (ticket.assignedTech) {
-        statusText += `\nالفني المخصص: ${ticket.assignedTech}`;
-      }
+      let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
+                       `<p>• <b>الحالة الحالية:</b> ${ticket.status}</p>` +
+                       (ticket.assignedTech ? `<p>• <b>الفني المكلف:</b> ${ticket.assignedTech}</p>` : '') +
+                       (ticket.resolutionTime ? `<p>• <b>مؤشر تقييم SLA وإغلاق التذكرة:</b> ${ticket.resolutionTime}</p>` : '');
 
       const chatterPayload = {
         jsonrpc: "2.0",
@@ -1321,7 +1335,7 @@ class UltimateFMApp {
             keyInput,
             ticket.odooModel,
             "message_post",
-            [[ticket.odooId]],
+            [[parseInt(ticket.odooId)]],
             { body: statusText }
           ]
         },
@@ -1330,8 +1344,7 @@ class UltimateFMApp {
 
       this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
 
-      // 2. Update Odoo Ticket description to show full lifecycle status
-      // Determine client information dynamically (Name رباعي, phone, email, unit)
+      // 2. Update Odoo Ticket Description and Stage ID (stage_id)
       let fullName = 'أسامة أحمد محمد الشريف';
       let phoneNum = '01223456789';
       let emailAddress = 'fmhala6@gmail.com';
@@ -1359,17 +1372,22 @@ class UltimateFMApp {
         unitNum = 'الأماكن العامة بالقرية';
       }
 
-      let updatedDesc = `بلاغ صيانة عاجل من تطبيق الموبايل\n` +
-                        `---------------------------------\n` +
-                        `الاسم رباعي: ${fullName}\n` +
-                        `رقم التليفون: ${phoneNum}\n` +
-                        `البريد الإلكتروني: ${emailAddress}\n` +
-                        `رقم الوحدة: ${unitNum}\n` +
-                        `---------------------------------\n` +
-                        `الفئة: ${ticket.category || 'عام'}\n` +
-                        `الوصف بالتفصيل: ${ticket.details || ticket.title || ''}\n` +
-                        `---------------------------------\n` +
-                        `حالة التكليف الحالية: ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}`;
+      let updatedDesc = `<p><b>بلاغ صيانة عاجل من تطبيق الموبايل</b></p>` +
+                        `<hr/>` +
+                        `<p><b>الاسم رباعي:</b> ${fullName}</p>` +
+                        `<p><b>رقم التليفون:</b> ${phoneNum}</p>` +
+                        `<p><b>البريد الإلكتروني:</b> ${emailAddress}</p>` +
+                        `<p><b>رقم الوحدة:</b> ${unitNum}</p>` +
+                        `<hr/>` +
+                        `<p><b>الفئة:</b> ${ticket.category || 'عام'}</p>` +
+                        `<p><b>الوصف بالتفصيل:</b> ${ticket.details || ticket.title || ''}</p>` +
+                        `<hr/>` +
+                        `<p><b>حالة التكليف الحالية:</b> ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}</p>`;
+
+      const writeFields = {
+        description: updatedDesc,
+        stage_id: targetStageId
+      };
 
       const writePayload = {
         jsonrpc: "2.0",
@@ -1383,7 +1401,7 @@ class UltimateFMApp {
             keyInput,
             ticket.odooModel,
             "write",
-            [[ticket.odooId], { description: updatedDesc }]
+            [[parseInt(ticket.odooId)], writeFields]
           ]
         },
         id: Math.floor(Math.random() * 1000)
@@ -1391,9 +1409,42 @@ class UltimateFMApp {
 
       const writeData = await this.callOdoo(baseUrl, writePayload);
       if (writeData.error) {
-        console.error('[Odoo Update Description Error]:', writeData.error);
+        console.error('[Odoo Update Write Error]:', writeData.error);
       } else {
-        console.log('[Odoo Update Description Success]:', writeData.result);
+        console.log(`[Odoo Update Write Success] Updated stage_id to ${targetStageId}:`, writeData.result);
+      }
+
+      // 3. Attach Photo After Repair to Odoo if available
+      if (ticket.photoAfter && ticket.photoAfter.startsWith('data:image')) {
+        try {
+          const base64Content = ticket.photoAfter.split(',')[1];
+          if (base64Content) {
+            const attachPayload = {
+              jsonrpc: "2.0",
+              method: "call",
+              params: {
+                service: "object",
+                method: "execute_kw",
+                args: [
+                  dbInput, uid, keyInput,
+                  "ir.attachment",
+                  "create",
+                  [{
+                    name: `صورة_بعد_الإصلاح_تذكرة_${ticket.id}.jpg`,
+                    datas: base64Content,
+                    res_model: "helpdesk.ticket",
+                    res_id: parseInt(ticket.odooId)
+                  }]
+                ]
+              },
+              id: Math.floor(Math.random() * 1000)
+            };
+            await this.callOdoo(baseUrl, attachPayload);
+            console.log('[Odoo Sync] After-repair photo attached to Odoo ticket #', ticket.odooId);
+          }
+        } catch (attErr) {
+          console.warn('[Odoo Attachment After Exception]:', attErr);
+        }
       }
     } catch (err) {
       console.error('[Odoo Update Exception]:', err);
@@ -2428,6 +2479,7 @@ class UltimateFMApp {
 
         this.renderTickets();
         this.showToast(`✅ تم توقيع المالك بنجاح!\nتم تحويل حالة البلاغ لـ "انتظار دفع المالك".\nستظهر التذكرة الآن بانتظار السداد الإلكتروني بقيمة ${this.selectedPart.price} ج.م في شاشة العميل.`);
+        this.syncTicketUpdateToOdoo(tk);
       }
       this.activeAuditTicketId = null;
       this.uploadedDamagedPhoto = null;
@@ -2504,6 +2556,7 @@ class UltimateFMApp {
     tk.bgClass = 'badge-info';
 
     this.renderTickets();
+    this.syncTicketUpdateToOdoo(tk);
 
     const methodArabic = method === 'saved' ? 'البطاقة المسجلة (تنتهي بـ 4012)' : 'البطاقة الجديدة';
     this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
@@ -4784,8 +4837,8 @@ class UltimateFMApp {
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
       const navItems = phoneNav.querySelectorAll('.nav-item span');
-      const arNav = ['الرئيسية', 'البلاغات', 'المالية', 'الإعدادات'];
-      const enNav = ['Home', 'Tickets', 'Finance', 'Settings'];
+      const arNav = ['الرئيسية', 'البلاغات', 'الرسائل', 'المالية', 'الإعدادات'];
+      const enNav = ['Home', 'Tickets', 'Messages', 'Finance', 'Settings'];
       navItems.forEach((span, idx) => {
         if (arNav[idx] && span) {
           span.innerText = this.currentLang === 'en' ? enNav[idx] : arNav[idx];
