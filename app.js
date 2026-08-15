@@ -9,7 +9,7 @@ const safeStorage = {
   getItem: function(key) {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
-        return window.safeStorage.getItem(key);
+        return window.localStorage.getItem(key);
       }
     } catch (e) {
       console.warn('[Storage Polyfill] localStorage access restricted:', e);
@@ -19,7 +19,7 @@ const safeStorage = {
   setItem: function(key, val) {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
-        window.safeStorage.setItem(key, val);
+        window.localStorage.setItem(key, val);
         return;
       }
     } catch (e) {
@@ -30,7 +30,7 @@ const safeStorage = {
   removeItem: function(key) {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
-        window.safeStorage.removeItem(key);
+        window.localStorage.removeItem(key);
         return;
       }
     } catch (e) {
@@ -181,9 +181,15 @@ class UltimateFMApp {
       try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
 
-      // Start cleanly on the main role selection grid so all 10 screens are accessible
+      // Start cleanly on the main role selection grid so all 10 screens are accessible, or execute pending click
       try {
-        this.showRoleGrid();
+        if (window._pendingRole) {
+          const pending = window._pendingRole;
+          window._pendingRole = null;
+          this.quickLogin(pending);
+        } else {
+          this.showRoleGrid();
+        }
       } catch (e) { console.warn('[RoleGrid warning]:', e); }
 
       // Register PWA Service Worker
@@ -959,45 +965,35 @@ class UltimateFMApp {
 
   async callOdoo(baseUrl, payload) {
     const directUrl = `${baseUrl}/jsonrpc`;
-    
-    // On web deployments (e.g. GitHub Pages), direct fetch triggers CORS fallback retries that create duplicate tickets in Odoo!
-    // Always use proxy first on web client requests so exactly ONE single POST request is transmitted to Odoo.
-    const isWebDeployment = window.location.hostname.includes('github.io') || 
-                            window.location.protocol === 'https:' || 
-                            (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:');
-
-    const primaryUrl = isWebDeployment 
-      ? 'https://corsproxy.io/?' + encodeURIComponent(directUrl)
-      : directUrl;
+    const primaryUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
 
     try {
-      console.log(`[Odoo Call] Requesting via primary endpoint: ${primaryUrl}`);
       const response = await fetch(primaryUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[Odoo Call] Primary call succeeded:', data);
-        return data;
+      if (response && response.ok) {
+        return await response.json();
       }
-      throw new Error(`Primary call returned status ${response.status}`);
     } catch (err) {
-      console.warn('[Odoo Call] Primary call failed:', err);
-      // Secondary fallback only if primary failed
-      if (primaryUrl !== directUrl) {
-        console.log('[Odoo Call] Trying direct URL as secondary fallback:', directUrl);
+      // Secondary fallback to direct URL if supported
+      try {
         const directResp = await fetch(directUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        return await directResp.json();
+        if (directResp && directResp.ok) {
+          return await directResp.json();
+        }
+      } catch (directErr) {
+        // Graceful offline fallback for local file mode
+        return null;
       }
-      throw err;
     }
+    return null;
   }
 
   resolveOdooTeamId(ticket, teams) {
@@ -1102,9 +1098,11 @@ class UltimateFMApp {
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
-      if (authData.error) {
-        console.error('[Odoo Auth Error]:', authData.error);
-        this.showToast(`❌ خطأ في ربط أودو: ${authData.error.message || JSON.stringify(authData.error)}`);
+      if (!authData || authData.error) {
+        if (authData && authData.error) {
+          console.error('[Odoo Auth Error]:', authData.error);
+          this.showToast(`❌ خطأ في ربط أودو: ${authData.error.message || JSON.stringify(authData.error)}`);
+        }
         return;
       }
       
@@ -1388,14 +1386,6 @@ class UltimateFMApp {
       if (!ticket.odooId) return;
     }
 
-    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
-
-    if (!urlInput || !dbInput || !userInput || !keyInput) return;
-    const baseUrl = urlInput.replace(/\/+$/, '');
-
     const authPayload = {
       jsonrpc: "2.0",
       method: "call",
@@ -1411,7 +1401,7 @@ class UltimateFMApp {
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
-      if (authData.error) return;
+      if (!authData || authData.error) return;
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') return;
 
@@ -4191,7 +4181,7 @@ class UltimateFMApp {
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
-      if (authData.error) return;
+      if (!authData || authData.error) return;
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') return;
 
@@ -4721,8 +4711,9 @@ class UltimateFMApp {
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
-      if (authData.error) {
-        throw new Error(JSON.stringify(authData.error));
+      if (!authData || authData.error) {
+        if (authData && authData.error) throw new Error(JSON.stringify(authData.error));
+        return;
       }
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') {

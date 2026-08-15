@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -7,8 +7,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ultimate FM">
   <meta name="theme-color" content="#20274f">
-  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="logo.png">
+  <script>
+    if (window.location.protocol.indexOf('http') === 0) {
+      var mLink = document.createElement('link');
+      mLink.rel = 'manifest';
+      mLink.href = 'manifest.json';
+      document.head.appendChild(mLink);
+    }
+  </script>
   <title>Ultimate FM - إدارة المدن الساحلية والمراكز التجارية</title>
   <meta name="description" content="تطبيق إدارة المرافق والمدن الساحلية والمراكز التجارية - المخطط الاستراتيجي المتكامل للتشغيل الهندسي، الحوكمة المالية، وتجربة الملاك.">
   <link rel="stylesheet" href="index.css">
@@ -29,12 +36,30 @@
       }).catch(function(e) {});
     }
 
-    // Global Top-Level Window Helper Functions for HTML Onclick Event Handlers
+    // Global Top-Level Window Helper Functions with Pending Action Queue
     var app = null;
     window.app = null;
-    function quickLogin(role) { if (window.app) window.app.quickLogin(role); }
-    function switchRole(role) { if (window.app) window.app.switchRole(role); }
-    function showRoleGrid() { if (window.app) window.app.showRoleGrid(); }
+    window._pendingRole = null;
+
+    function quickLogin(role) {
+      if (window.app && typeof window.app.quickLogin === 'function') {
+        window.app.quickLogin(role);
+      } else {
+        window._pendingRole = role;
+      }
+    }
+    function switchRole(role) {
+      if (window.app && typeof window.app.switchRole === 'function') {
+        window.app.switchRole(role);
+      } else {
+        window._pendingRole = role;
+      }
+    }
+    function showRoleGrid() {
+      if (window.app && typeof window.app.showRoleGrid === 'function') {
+        window.app.showRoleGrid();
+      }
+    }
     function openModal(id) { if (window.app) window.app.openModal(id); }
     function closeModal(id) { if (window.app) window.app.closeModal(id); }
     function handleLogin() { if (window.app) window.app.handleLogin(); }
@@ -47,37 +72,17 @@
     function handleApproveAndPay(id) { if (window.app) window.app.handleApproveAndPay(id); }
     function handleMeterRechargeSubmit() { if (window.app) window.app.handleMeterRechargeSubmit(); }
     function toggleViewMode() { if (window.app) window.app.toggleViewMode(); }
-    function executeLogin(role) { if (window.app) window.app.executeLogin(role); }
+    function executeLogin(role) {
+      if (window.app && typeof window.app.executeLogin === 'function') {
+        window.app.executeLogin(role);
+      } else {
+        window._pendingRole = role;
+      }
+    }
     function logout() { if (window.app) window.app.logout(); }
   </script>
 </head>
 <body>
-  <!-- App Splash Screen Disabled for Instant Load -->
-  <div class="splash-screen-overlay hidden" id="appSplashScreen" style="display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;">
-    <div class="splash-content">
-      <div class="splash-logo-box">
-        <img src="logo.png" alt="Ultimate FM Logo" class="splash-logo">
-      </div>
-      <h1 class="splash-title">Ultimate FM Solutions</h1>
-      <p class="splash-subtitle">إدارة المدن الساحلية والمراكز التجارية</p>
-      <div class="splash-loader">
-        <div class="splash-progress"></div>
-      </div>
-      <span class="splash-footer">Ultimate Code • Out of the Box Solutions</span>
-    </div>
-  </div>
-  <script>
-    setTimeout(function() {
-      var s = document.getElementById('appSplashScreen');
-      if (s) {
-        s.style.opacity = '0';
-        s.style.visibility = 'hidden';
-        s.style.pointerEvents = 'none';
-        setTimeout(function() { s.style.display = 'none'; }, 300);
-      }
-    }, 1400);
-  </script>
-
   <div class="app-wrapper">
     <!-- Main Content Area -->
     <main class="main-stage">
@@ -129,13 +134,13 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">اسم المستخدم / البريد الإلكتروني:</label>
-                <input type="text" id="loginEmailInput" class="form-control" placeholder="example@domain.com">
+                <label for="loginEmailInput" class="form-label">اسم المستخدم / البريد الإلكتروني:</label>
+                <input type="text" id="loginEmailInput" name="loginEmailInput" class="form-control" placeholder="example@domain.com">
               </div>
 
               <div class="form-group">
-                <label class="form-label">كلمة المرور:</label>
-                <input type="password" id="loginPasswordInput" class="form-control" placeholder="••••••••" value="123456">
+                <label for="loginPasswordInput" class="form-label">كلمة المرور:</label>
+                <input type="password" id="loginPasswordInput" name="loginPasswordInput" class="form-control" placeholder="••••••••" value="123456">
               </div>
 
               <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 8px;">
@@ -273,7 +278,7 @@
                       <div style="position: absolute; bottom: 0; right: -2px; background: #1b8f91; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 1.5px solid #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                         <i class="fa-solid fa-camera"></i>
                       </div>
-                      <input type="file" id="ownerAvatarFileInput" accept="image/*" style="display: none;" onchange="app.handleOwnerAvatarUpload(event)">
+                      <input type="file" id="ownerAvatarFileInput" name="ownerAvatarFileInput" accept="image/*" style="display: none;" onchange="app.handleOwnerAvatarUpload(event)">
                     </div>
 
                     <div>
@@ -369,8 +374,8 @@
                 </p>
 
                 <div class="form-group" style="margin-bottom: 10px;">
-                  <label class="form-label" style="font-weight: 700;">رقم لوحة السيارة:</label>
-                  <input type="text" id="lprPlateInput" class="form-control" placeholder="مثال: أ ج 1234" style="text-align: center; font-size: 1rem; font-weight: 700; width: 100%;">
+                  <label for="lprPlateInput" class="form-label" style="font-weight: 700;">رقم لوحة السيارة:</label>
+                  <input type="text" id="lprPlateInput" name="lprPlateInput" class="form-control" placeholder="مثال: أ ج 1234" style="text-align: center; font-size: 1rem; font-weight: 700; width: 100%;">
                 </div>
 
                 <!-- License Photo Upload Area (Front & Back) -->
@@ -382,7 +387,7 @@
                     <label for="lprLicenseFrontInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #1b8f91; color: #fff; cursor: pointer; border-radius: 6px;">
                       <i class="fa-solid fa-camera"></i> رفع / تصوير
                     </label>
-                    <input type="file" id="lprLicenseFrontInput" accept="image/*" style="display: none;" onchange="app.handleLicenseFrontPreview(event)">
+                    <input type="file" id="lprLicenseFrontInput" name="lprLicenseFrontInput" accept="image/*" style="display: none;" onchange="app.handleLicenseFrontPreview(event)">
                     <div id="lprFrontPreviewBox" style="margin-top: 6px; display: none;">
                       <img id="lprFrontPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #1b8f91;" src="" alt="Front Preview">
                       <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الوجه ✅</span>
@@ -396,7 +401,7 @@
                     <label for="lprLicenseBackInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #995789; color: #fff; cursor: pointer; border-radius: 6px;">
                       <i class="fa-solid fa-camera"></i> رفع / تصوير
                     </label>
-                    <input type="file" id="lprLicenseBackInput" accept="image/*" style="display: none;" onchange="app.handleLicenseBackPreview(event)">
+                    <input type="file" id="lprLicenseBackInput" name="lprLicenseBackInput" accept="image/*" style="display: none;" onchange="app.handleLicenseBackPreview(event)">
                     <div id="lprBackPreviewBox" style="margin-top: 6px; display: none;">
                       <img id="lprBackPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #995789;" src="" alt="Back Preview">
                       <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الظهر ✅</span>
@@ -505,10 +510,10 @@
 
                 <!-- Send Direct Message Box -->
                 <div style="background: rgba(32, 39, 79, 0.04); border: 1px solid rgba(32, 39, 79, 0.12); padding: 12px; border-radius: 10px; margin-bottom: 16px;">
-                  <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #20274f; margin-bottom: 6px; display: block;">
+                  <label for="ownerDirectMsgInput" class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #20274f; margin-bottom: 6px; display: block;">
                     <i class="fa-solid fa-paper-plane" style="color: #1b8f91;"></i> إرسال رسالة مباشرة للإدارة:
                   </label>
-                  <textarea id="ownerDirectMsgInput" class="form-control" placeholder="اكتب استفسارك أو رسالتك المباشرة للإدارة هنا..." rows="3" style="font-size: 0.78rem; margin-bottom: 8px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.2);"></textarea>
+                  <textarea id="ownerDirectMsgInput" name="ownerDirectMsgInput" class="form-control" placeholder="اكتب استفسارك أو رسالتك المباشرة للإدارة هنا..." rows="3" style="font-size: 0.78rem; margin-bottom: 8px; border-radius: 8px; border: 1px solid rgba(32, 39, 79, 0.2);"></textarea>
                   <button class="btn btn-primary" onclick="sendOwnerDirectMsgToOdoo()" style="width: 100%; font-size: 0.78rem; font-weight: 700; padding: 8px; height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
                     <i class="fa-solid fa-paper-plane"></i> إرسال الرسالة للإدارة بـ Odoo Chatter
                   </button>
@@ -733,20 +738,20 @@
                   <i class="fa-solid fa-wallet"></i> رصيد محفظة الدفع المتاحة: <span id="bookingWalletBalanceText">2500</span> ج.م
                 </div>
                 <div class="form-group" style="margin-bottom: 10px;">
-                  <label class="form-label">اختر النشاط / الملعب:</label>
-                  <select id="bookingAmenitySelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+                  <label for="bookingAmenitySelect" class="form-label">اختر النشاط / الملعب:</label>
+                  <select id="bookingAmenitySelect" name="bookingAmenitySelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
                     <option value="padel" data-price="250">🎾 ملعب بادل تنس (Padel) - 250 ج.م / ساعة</option>
                     <option value="football" data-price="150">⚽ ملعب كرة قدم خماسي - 150 ج.م / ساعة</option>
                   </select>
                 </div>
                 <div class="grid-2" style="gap: 8px; margin-bottom: 12px;">
                   <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">التاريخ:</label>
-                    <input type="date" id="bookingDateInput" class="form-control" style="font-size: 0.8rem; height: 38px;" value="2026-07-28">
+                    <label for="bookingDateInput" class="form-label">التاريخ:</label>
+                    <input type="date" id="bookingDateInput" name="bookingDateInput" class="form-control" style="font-size: 0.8rem; height: 38px;" value="2026-07-28">
                   </div>
                   <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">الوقت:</label>
-                    <select id="bookingTimeSelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+                    <label for="bookingTimeSelect" class="form-label">الوقت:</label>
+                    <select id="bookingTimeSelect" name="bookingTimeSelect" class="form-control" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
                       <option value="16:00">04:00 م - 05:00 م</option>
                       <option value="17:00">05:00 م - 06:00 م</option>
                       <option value="18:00">06:00 م - 07:00 م</option>
@@ -791,8 +796,8 @@
                     <span id="lblThemeSettings" style="font-size: 0.8rem; font-weight: 700; color: #ffffff;"><i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)</span>
                     <p id="descThemeSettings" style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">التحول لمظهر الألوان المظلم للأمان والراحة</p>
                   </div>
-                  <label class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px;">
-                    <input type="checkbox" id="themeToggleSwitch" onchange="app.toggleTheme(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                  <label for="engineerSpecialtySelect" class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px;">
+                    <input type="checkbox" id="themeToggleSwitch" name="themeToggleSwitch" onchange="app.toggleTheme(this.checked)" style="opacity: 0; width: 0; height: 0;">
                     <span class="slider-round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px;"></span>
                   </label>
                 </div>
@@ -804,7 +809,7 @@
                     <p id="descNotifySettings" style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات</p>
                   </div>
                   <label class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px;">
-                    <input type="checkbox" id="notifyToggleSwitch" checked style="opacity: 0; width: 0; height: 0;">
+                    <input type="checkbox" id="notifyToggleSwitch" name="notifyToggleSwitch" checked style="opacity: 0; width: 0; height: 0;">
                     <span class="slider-round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1b8f91; transition: .4s; border-radius: 22px;"></span>
                   </label>
                 </div>
@@ -839,7 +844,7 @@
               <!-- Engineer Specialty Switcher Dropdown -->
               <div style="margin-top: 12px; border-top: 1px solid var(--border-glass); padding-top: 10px;">
                 <label class="form-label">اختر التخصص الهندسي لمراجعة المرافق:</label>
-                <select class="form-control" id="engineerSpecialtySelect">
+                <select class="form-control" id="engineerSpecialtySelect" name="engineerSpecialtySelect">
                   <option value="infra">💧 مهندس المرافق الأساسية (RO / STP / المحولات / البيلارات)</option>
                   <option value="pools">🏊 مهندس البحيرات وحمامات السباحة والأنظمة المائية</option>
                   <option value="landscape">🌿 مهندس اللاندسكيب والحدائق والشبكات العامة</option>
@@ -934,7 +939,7 @@
                 يمكنك هنا طلب تنظيف لقطاع عام بالقرية (مثل المسبح الرئيسي، الشاطئ، اللاندسكيب، الممرات).
               </p>
               <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <select id="managerCleaningLocation" class="form-control" style="font-size: 0.8rem; height: 36px; padding: 4px 8px; background: var(--bg-card); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">
+                <select id="managerCleaningLocation" name="managerCleaningLocation" class="form-control" style="font-size: 0.8rem; height: 36px; padding: 4px 8px; background: var(--bg-card); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">
                   <option value="المسبح الرئيسي">المسبح الرئيسي (Main Pool)</option>
                   <option value="شاطئ البحيرة">شاطئ البحيرة (Resort Beach)</option>
                   <option value="ممرات المشاة">ممرات المشاة (Pedestrian Walkways)</option>
@@ -1457,8 +1462,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">نص التنبيه الفوري لجميع الملاك (Push Notification)</label>
-                <input type="text" class="form-control" id="broadcastMsgInput" value="تنبيه: صيانة مجدولة لمحطة المياه الفرعية زون 2 من 2:00 م إلى 4:00 م.">
+                <label for="broadcastMsgInput" class="form-label">نص التنبيه الفوري لجميع الملاك (Push Notification)</label>
+                <input type="text" class="form-control" id="broadcastMsgInput" name="broadcastMsgInput" value="تنبيه: صيانة مجدولة لمحطة المياه الفرعية زون 2 من 2:00 م إلى 4:00 م.">
               </div>
               <button class="btn btn-primary" id="btnSendBroadcast">
                 <i class="fa-solid fa-paper-plane"></i> إرسال التنبيه الفوري لحظياً
@@ -1466,11 +1471,11 @@
             </div>
 
             <!-- Hidden Odoo Configuration Elements (Kept for silent background sync) -->
-            <input type="hidden" id="odooUrlInput" value="https://edu-fm-uc.odoo.com">
-            <input type="hidden" id="odooDbInput" value="edu-fm-uc">
-            <input type="hidden" id="odooUserInput" value="fmhala6@gmail.com">
-            <input type="hidden" id="odooKeyInput" value="06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0">
-            <input type="hidden" id="odooOwnerNameInput" value="">
+            <input type="hidden" id="odooUrlInput" name="odooUrlInput" value="https://edu-fm-uc.odoo.com">
+            <input type="hidden" id="odooDbInput" name="odooDbInput" value="edu-fm-uc">
+            <input type="hidden" id="odooUserInput" name="odooUserInput" value="fmhala6@gmail.com">
+            <input type="hidden" id="odooKeyInput" name="odooKeyInput" value="06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0">
+            <input type="hidden" id="odooOwnerNameInput" name="odooOwnerNameInput" value="">
             <span id="odooStatusBadge" style="display: none;"></span>
             <span id="odooSyncTitle" style="display: none;"></span>
             <span id="odooSyncDesc" style="display: none;"></span>
@@ -1632,18 +1637,18 @@
       </p>
 
       <div class="form-group">
-        <label class="form-label">الاسم الكامل لمقدم الشكوى:</label>
-        <input type="text" id="complaintNameInput" class="form-control" placeholder="اسم مقدم الطلب">
+        <label for="complaintNameInput" class="form-label">الاسم الكامل لمقدم الشكوى:</label>
+        <input type="text" id="complaintNameInput" name="complaintNameInput" class="form-control" placeholder="اسم مقدم الطلب">
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الهاتف للتواصل والمتابعة:</label>
-        <input type="tel" id="complaintPhoneInput" class="form-control" placeholder="رقم الموبايل">
+        <label for="complaintPhoneInput" class="form-label">رقم الهاتف للتواصل والمتابعة:</label>
+        <input type="tel" id="complaintPhoneInput" name="complaintPhoneInput" class="form-control" placeholder="رقم الموبايل">
       </div>
 
       <div class="form-group">
-        <label class="form-label">تفاصيل المشكلة الأمنية أو البلاغ:</label>
-        <textarea id="complaintDetailsInput" class="form-control" rows="3" placeholder="اكتب ما حدث بدقة (مثال: إزعاج عند المسبح، ركن سيارة مخالف، إلخ)"></textarea>
+        <label for="complaintDetailsInput" class="form-label">تفاصيل المشكلة الأمنية أو البلاغ:</label>
+        <textarea id="complaintDetailsInput" name="complaintDetailsInput" class="form-control" rows="3" placeholder="اكتب ما حدث بدقة (مثال: إزعاج عند المسبح، ركن سيارة مخالف، إلخ)"></textarea>
       </div>
 
       <button class="btn btn-primary" onclick="submitSecurityComplaint()" style="width: 100%; margin-top: 10px;">
@@ -1662,18 +1667,18 @@
       </p>
 
       <div class="form-group">
-        <label class="form-label">الاسم الكامل:</label>
-        <input type="text" id="csNameInput" class="form-control" placeholder="اسم مقدم الطلب">
+        <label for="csNameInput" class="form-label">الاسم الكامل:</label>
+        <input type="text" id="csNameInput" name="csNameInput" class="form-control" placeholder="اسم مقدم الطلب">
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الموبايل للتواصل:</label>
-        <input type="tel" id="csPhoneInput" class="form-control" placeholder="رقم الموبايل">
+        <label for="csPhoneInput" class="form-label">رقم الموبايل للتواصل:</label>
+        <input type="tel" id="csPhoneInput" name="csPhoneInput" class="form-control" placeholder="رقم الموبايل">
       </div>
 
       <div class="form-group">
-        <label class="form-label">نوع الطلب:</label>
-        <select id="csTypeSelect" class="form-control">
+        <label for="csTypeSelect" class="form-label">نوع الطلب:</label>
+        <select id="csTypeSelect" name="csTypeSelect" class="form-control">
           <option value="شكوى عن الخدمات العامة بالقرية">شكوى عن الخدمات العامة بالقرية</option>
           <option value="مقترح لتطوير الخدمات والمشروع">مقترح لتطوير الخدمات والمشروع</option>
           <option value="استفسار عام لمكتب خدمة العملاء">استفسار عام لمكتب خدمة العملاء</option>
@@ -1681,8 +1686,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">تفاصيل الشكوى أو المقترح:</label>
-        <textarea id="csDetailsInput" class="form-control" rows="3" placeholder="اكتب تفاصيل الشكوى أو المقترح بدقة..."></textarea>
+        <label for="csDetailsInput" class="form-label">تفاصيل الشكوى أو المقترح:</label>
+        <textarea id="csDetailsInput" name="csDetailsInput" class="form-control" rows="3" placeholder="اكتب تفاصيل الشكوى أو المقترح بدقة..."></textarea>
       </div>
 
       <button class="btn btn-primary" onclick="submitComplaintSuggestion()" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #1b8f91 0%, #0f5b5d 100%); border: none;">
@@ -1701,18 +1706,18 @@
       </p>
 
       <div class="form-group">
-        <label class="form-label">الاسم الكامل للمالك:</label>
-        <input type="text" id="finNameInput" class="form-control" placeholder="اسم المالك">
+        <label for="finNameInput" class="form-label">الاسم الكامل للمالك:</label>
+        <input type="text" id="finNameInput" name="finNameInput" class="form-control" placeholder="اسم المالك">
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الموبايل للتواصل:</label>
-        <input type="tel" id="finPhoneInput" class="form-control" placeholder="رقم الموبايل">
+        <label for="finPhoneInput" class="form-label">رقم الموبايل للتواصل:</label>
+        <input type="tel" id="finPhoneInput" name="finPhoneInput" class="form-control" placeholder="رقم الموبايل">
       </div>
 
       <div class="form-group">
-        <label class="form-label">موضوع الاستفسار المالي:</label>
-        <select id="finTypeSelect" class="form-control">
+        <label for="finTypeSelect" class="form-label">موضوع الاستفسار المالي:</label>
+        <select id="finTypeSelect" name="finTypeSelect" class="form-control">
           <option value="استفسار عن وديعة الصيانة وعوائدها">استفسار عن وديعة الصيانة وعوائد الاستثمار</option>
           <option value="استفسار عن قسط سداد وتواريخ الاستحقاق">استفسار عن قسط سداد وتواريخ الاستحقاق</option>
           <option value="استفسار عن فروق التشغيل والصيانة السنوية">استفسار عن فروق التشغيل والصيانة السنوية</option>
@@ -1721,8 +1726,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">تفاصيل الاستفسار المالي:</label>
-        <textarea id="finDetailsInput" class="form-control" rows="3" placeholder="اكتب الاستفسار المالي المطلوب..."></textarea>
+        <label for="finDetailsInput" class="form-label">تفاصيل الاستفسار المالي:</label>
+        <textarea id="finDetailsInput" name="finDetailsInput" class="form-control" rows="3" placeholder="اكتب الاستفسار المالي المطلوب..."></textarea>
       </div>
 
       <button class="btn btn-primary" onclick="submitFinancialInquiry()" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #20274f 0%, #171d3d 100%); color: #d4af37; border: 1px solid #d4af37;">
@@ -1759,8 +1764,8 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">اختر وسيلة الدفع الإلكتروني:</label>
-          <select id="varPayMethodSelect" class="form-control">
+          <label for="varPayMethodSelect" class="form-label">اختر وسيلة الدفع الإلكتروني:</label>
+          <select id="varPayMethodSelect" name="varPayMethodSelect" class="form-control">
             <option value="بطاقة ائتمان (Visa / MasterCard)">بطاقة ائتمان (Visa / MasterCard)</option>
             <option value="Apple Pay / Google Pay">Apple Pay / Google Pay</option>
             <option value="محفظة كاش إلكترونية (Vodafone / CIB Cash)">محفظة كاش إلكترونية (Vodafone Cash / CIB)</option>
@@ -1768,13 +1773,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">اسم صاحب البطاقة:</label>
-          <input type="text" id="varCardNameInput" class="form-control" placeholder="الاسم المكتوب على البطاقة" value="OSAMA A SHAREEF">
+          <label for="varCardNameInput" class="form-label">اسم صاحب البطاقة:</label>
+          <input type="text" id="varCardNameInput" name="varCardNameInput" class="form-control" placeholder="الاسم المكتوب على البطاقة" value="OSAMA A SHAREEF">
         </div>
 
         <div class="form-group">
-          <label class="form-label">رقم البطاقة (16 رقم):</label>
-          <input type="text" id="varCardNumberInput" class="form-control" placeholder="**** **** **** 4921" value="4111 2222 3333 4921">
+          <label for="varCardNumberInput" class="form-label">رقم البطاقة (16 رقم):</label>
+          <input type="text" id="varCardNumberInput" name="varCardNumberInput" class="form-control" placeholder="**** **** **** 4921" value="4111 2222 3333 4921">
         </div>
 
         <button class="btn btn-primary" onclick="processVariancePayment()" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; font-size: 0.9rem; padding: 12px; font-weight: 800;">
@@ -1881,8 +1886,8 @@
       </div>
       
       <div class="form-group">
-        <label class="form-label">نوع الخدمة / التخصص</label>
-        <select class="form-control" id="ticketCategorySelect">
+        <label for="ticketCategorySelect" class="form-label">نوع الخدمة / التخصص</label>
+        <select class="form-control" id="ticketCategorySelect" name="ticketCategorySelect">
           <option value="سباكة">سباكة (Plumbing)</option>
           <option value="كهرباء">كهرباء (Electrical)</option>
           <option value="كهروميكانيك">تكييف وكهروميكانيك (HVAC)</option>
@@ -1891,8 +1896,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">درجة الأهمية والأولوية (Priority)</label>
-        <select class="form-control" id="ticketPrioritySelect">
+        <label for="ticketPrioritySelect" class="form-label">درجة الأهمية والأولوية (Priority)</label>
+        <select class="form-control" id="ticketPrioritySelect" name="ticketPrioritySelect">
           <option value="3">⭐⭐⭐ عاجل طارئ (Urgent - 3 Stars)</option>
           <option value="2" selected>⭐⭐ هام جداً (High - 2 Stars)</option>
           <option value="1">⭐ عادي (Normal - 1 Star)</option>
@@ -1900,13 +1905,13 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">وصف العطل بالتفصيل</label>
-        <textarea class="form-control" rows="3" id="ticketDescInput" placeholder="اكتب تفاصيل المشكلة ومكانها بالوحدة..."></textarea>
+        <label for="ticketDescInput" class="form-label">وصف العطل بالتفصيل</label>
+        <textarea class="form-control" rows="3" id="ticketDescInput" name="ticketDescInput" placeholder="اكتب تفاصيل المشكلة ومكانها بالوحدة..."></textarea>
       </div>
 
       <div class="form-group">
-        <label class="form-label">إرفاق صورة العطل (اختياري)</label>
-        <input type="file" class="form-control" accept="image/*" id="ticketPhotoInput">
+        <label for="ticketPhotoInput" class="form-label">إرفاق صورة العطل (اختياري)</label>
+        <input type="file" class="form-control" accept="image/*" id="ticketPhotoInput" name="ticketPhotoInput">
       </div>
 
       <button class="btn btn-primary" id="btnSubmitTicket">إرسال التذكرة لفريق خدمة العملاء</button>
@@ -1931,8 +1936,8 @@
       </div>
       
       <div class="form-group">
-        <label class="form-label">اختر نوع خدمة النظافة المطلوبة</label>
-        <select class="form-control" id="hkTypeSelect">
+        <label for="hkTypeSelect" class="form-label">اختر نوع خدمة النظافة المطلوبة</label>
+        <select class="form-control" id="hkTypeSelect" name="hkTypeSelect">
           <option value="نظافة خفيفة يومية / روتينية (Daily Express Cleaning)">🧹 نظافة خفيفة يومية / روتينية (Daily Express Cleaning)</option>
           <option value="نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)">✨ نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)</option>
           <option value="تنظيف التراس والحديقة والمساحات الخارجية (Outdoor Cleaning)">🌿 تنظيف التراس والحديقة والمساحات الخارجية (Outdoor)</option>
@@ -1942,8 +1947,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">توقيت التنفيذ المفضل</label>
-        <select class="form-control" id="hkSlotSelect">
+        <label for="hkSlotSelect" class="form-label">توقيت التنفيذ المفضل</label>
+        <select class="form-control" id="hkSlotSelect" name="hkSlotSelect">
           <option value="الفترة الصباحية (9 صباحاً - 12 ظهراً)">🌅 الفترة الصباحية (9 صباحاً - 12 ظهراً)</option>
           <option value="الفترة المسائية (1 ظهراً - 4 عصراً)">🌆 الفترة المسائية (1 ظهراً - 4 عصراً)</option>
           <option value="طلب عاجل فوراً">⚡ طلب عاجل فوراً</option>
@@ -1951,8 +1956,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">ملاحظات وتعليمات إضافية (اختياري)</label>
-        <textarea class="form-control" rows="3" id="hkNotesInput" placeholder="أدخل أي ملاحظات خاصة (مثال: يرجى التركيز على المطبخ والفرش، أو إحضار أدوات تطهير مخصصة)..."></textarea>
+        <label for="hkNotesInput" class="form-label">ملاحظات وتعليمات إضافية (اختياري)</label>
+        <textarea class="form-control" rows="3" id="hkNotesInput" name="hkNotesInput" placeholder="أدخل أي ملاحظات خاصة (مثال: يرجى التركيز على المطبخ والفرش، أو إحضار أدوات تطهير مخصصة)..."></textarea>
       </div>
 
       <button class="btn btn-primary" onclick="submitHousekeepingModalForm()" style="background: var(--brand-teal); border-color: var(--brand-teal);">
@@ -1979,8 +1984,8 @@
       </div>
       
       <div class="form-group">
-        <label class="form-label">اختر نوع خدمة اللاندسكيب والحدائق المطلوبة</label>
-        <select class="form-control" id="landscapeTypeSelect">
+        <label for="landscapeTypeSelect" class="form-label">اختر نوع خدمة اللاندسكيب والحدائق المطلوبة</label>
+        <select class="form-control" id="landscapeTypeSelect" name="landscapeTypeSelect">
           <option value="تقليم وقص الأشجار والنجيل (Lawn Mowing & Tree Trimming)">🌿 تقليم وقص الأشجار والنجيل والمسطحات الخضراء</option>
           <option value="صيانة وتصليح شبكات الري التلقائي (Irrigation Repair)">💧 صيانة وتصليح شبكات الري التلقائي والنوازل</option>
           <option value="تسميد ومكافحة آفات المزروعات (Pest Control & Fertilization)">🧪 تسميد ومكافحة آفات النباتات والأشجار</option>
@@ -1990,8 +1995,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">توقيت التنفيذ المفضل</label>
-        <select class="form-control" id="landscapeSlotSelect">
+        <label for="landscapeSlotSelect" class="form-label">توقيت التنفيذ المفضل</label>
+        <select class="form-control" id="landscapeSlotSelect" name="landscapeSlotSelect">
           <option value="الفترة الصباحية (8 صباحاً - 11 صباحاً)">🌅 الفترة الصباحية (8 صباحاً - 11 صباحاً)</option>
           <option value="الفترة المسائية (3 عصراً - 6 مساءً)">🌆 الفترة المسائية (3 عصراً - 6 مساءً)</option>
           <option value="طلب عاجل فوراً">⚡ طلب عاجل فوراً</option>
@@ -1999,8 +2004,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">ملاحظات وتفاصيل إضافية (اختياري)</label>
-        <textarea class="form-control" rows="3" id="landscapeNotesInput" placeholder="أدخل أي تفاصيل خاصة (مثال: قص نجيل حديقة المدخل الرئيسي، أو فحص تسريب شبكة الري التلقائي)..."></textarea>
+        <label for="landscapeNotesInput" class="form-label">ملاحظات وتفاصيل إضافية (اختياري)</label>
+        <textarea class="form-control" rows="3" id="landscapeNotesInput" name="landscapeNotesInput" placeholder="أدخل أي تفاصيل خاصة (مثال: قص نجيل حديقة المدخل الرئيسي، أو فحص تسريب شبكة الري التلقائي)..."></textarea>
       </div>
 
       <button class="btn btn-primary" onclick="submitLandscapingModalForm()" style="background: #16a34a; border-color: #16a34a;">
@@ -2016,8 +2021,8 @@
       <h3 style="margin-bottom: 16px; color: var(--accent-cyan);"><i class="fa-solid fa-boxes-stacked"></i> المخزن الذكي لقطع الغيار</h3>
       
       <div class="form-group" style="margin-bottom: 10px;">
-        <label class="form-label">اختر المخزن المستهدف:</label>
-        <select id="warehouseSelect" class="form-control" onchange="app.filterInventory()" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
+        <label for="warehouseSelect" class="form-label">اختر المخزن المستهدف:</label>
+        <select id="warehouseSelect" name="warehouseSelect" class="form-control" onchange="app.filterInventory()" style="font-size: 0.8rem; height: 38px; padding: 6px 12px;">
           <option value="all">🌐 جميع المخازن بالتطبيق</option>
           <option value="residential">🏡 مخزن الملاك السكني (قطع غيار تُباع وتُركب للملاك)</option>
           <option value="commercial">🏬 مخزن المستأجرين التجاريين (صيانة المحلات التجارية)</option>
@@ -2026,8 +2031,8 @@
       </div>
 
       <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label">البحث عن قطعة الغيار:</label>
-        <input type="text" class="form-control" id="inventorySearchInput" onkeyup="app.filterInventory()" placeholder="ابحث باسم قطعة الغيار أو تخصصها...">
+        <label for="inventorySearchInput" class="form-label">البحث عن قطعة الغيار:</label>
+        <input type="text" class="form-control" id="inventorySearchInput" name="inventorySearchInput" onkeyup="app.filterInventory()" placeholder="ابحث باسم قطعة الغيار أو تخصصها...">
       </div>
 
       <div class="list-group" id="inventoryResultsList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
@@ -2046,7 +2051,7 @@
         تم تحديد القطعة: <strong style="color: var(--text-main);" id="sigItemName">كارتدج تكييف شارب</strong> بسعر: <strong style="color: var(--primary-gold);" id="sigItemPrice">850 ج.م</strong>.
       </p>
 
-      <label class="form-label">توقيع المالك الإلكتروني على شاشة الفني</label>
+      <label for="form_field_1" class="form-label">توقيع المالك الإلكتروني على شاشة الفني</label>
       <canvas class="signature-box" id="sigCanvas"></canvas>
       
       <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -2145,15 +2150,15 @@
       
       <div class="form-group">
         <label class="form-label">ضغط فلاتر الأغشية (Membranes Pressure)</label>
-        <input type="text" class="form-control" value="62 PSI - طبيعي">
+        <input id="form_field_1" name="form_field_1" type="text" class="form-control" value="62 PSI - طبيعي">
       </div>
       <div class="form-group">
-        <label class="form-label">نسبة الملوحة المتبقية (TDS Level)</label>
-        <input type="text" class="form-control" value="120 PPM - مطابق للمواصفات">
+        <label for="form_field_2" class="form-label">نسبة الملوحة المتبقية (TDS Level)</label>
+        <input id="form_field_2" name="form_field_2" type="text" class="form-control" value="120 PPM - مطابق للمواصفات">
       </div>
       <div class="form-group">
-        <label class="form-label">مستوى الكلور المستثمر</label>
-        <input type="text" class="form-control" value="0.8 mg/L">
+        <label for="form_field_3" class="form-label">مستوى الكلور المستثمر</label>
+        <input id="form_field_3" name="form_field_3" type="text" class="form-control" value="0.8 mg/L">
       </div>
 
       <button class="btn btn-primary" id="btnSaveRoChecklist">اعتماد وحفظ تقرير الفحص اليومي</button>
@@ -2167,27 +2172,27 @@
       <h3 style="margin-bottom: 14px; color: var(--primary-gold);"><i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية</h3>
       
       <div class="form-group">
-        <label class="form-label">اختر العداد المراد شحنه</label>
-        <select class="form-control" id="meterTypeSelect">
+        <label for="meterTypeSelect" class="form-label">اختر العداد المراد شحنه</label>
+        <select class="form-control" id="meterTypeSelect" name="meterTypeSelect">
           <option value="electricity">⚡ عداد الكهرباء الذكي (#EL-104)</option>
           <option value="water">💧 عداد المياه الذكي (#WT-104)</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">اختر أو اكتب قيمة الشحن (بالجنيه المصري)</label>
+        <label for="form_field_4" class="form-label">اختر أو اكتب قيمة الشحن (بالجنيه المصري)</label>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
           <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 100">100 ج.م</button>
           <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 300">300 ج.م</button>
           <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 500">500 ج.م</button>
           <button class="btn" style="padding: 6px; font-size: 0.8rem;" onclick="document.getElementById('meterAmountInput').value = 1000">1000 ج.م</button>
         </div>
-        <input type="number" class="form-control" id="meterAmountInput" value="300" placeholder="أدخل المبلغ...">
+        <input type="number" class="form-control" id="meterAmountInput" name="meterAmountInput" value="300" placeholder="أدخل المبلغ...">
       </div>
 
       <div class="form-group">
         <label class="form-label">طريقة الدفع</label>
-        <select class="form-control">
+        <select id="form_field_4" name="form_field_4" class="form-control">
           <option value="card">💳 بطاقة ائتمان / ميزة / كارت بنكي</option>
           <option value="wallet">👛 محفظة المالك الإلكترونية</option>
           <option value="fawry">⚡ فورى / InstaPay</option>
@@ -2196,12 +2201,12 @@
 
       <!-- Credit Card Inputs Simulation -->
       <div id="creditCardInputsGroup" class="form-group" style="margin-top: 10px; border-top: 1px dashed rgba(27, 143, 145, 0.15); padding-top: 10px;">
-        <label class="form-label" style="font-weight: 700; color: var(--primary-gold);"><i class="fa-solid fa-credit-card"></i> بيانات الدفع الإلكتروني (بوابة Paymob / Fawry):</label>
-        <input type="text" class="form-control" placeholder="اسم صاحب الكارت" style="margin-bottom: 6px; font-size: 0.8rem;" value="Ahmed Mohamed">
-        <input type="text" class="form-control" placeholder="رقم الكارت (16 رقم)" style="margin-bottom: 6px; font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="5078 1204 8920 4012">
+        <label for="form_field_5" class="form-label" style="font-weight: 700; color: var(--primary-gold);"><i class="fa-solid fa-credit-card"></i> بيانات الدفع الإلكتروني (بوابة Paymob / Fawry):</label>
+        <input id="form_field_5" name="form_field_5" type="text" class="form-control" placeholder="اسم صاحب الكارت" style="margin-bottom: 6px; font-size: 0.8rem;" value="Ahmed Mohamed">
+        <input id="form_field_6" name="form_field_6" type="text" class="form-control" placeholder="رقم الكارت (16 رقم)" style="margin-bottom: 6px; font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="5078 1204 8920 4012">
         <div style="display: flex; gap: 6px;">
-          <input type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="12/29">
-          <input type="text" class="form-control" placeholder="CVV" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="123">
+          <input id="form_field_7" name="form_field_7" type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="12/29">
+          <input id="form_field_8" name="form_field_8" type="text" class="form-control" placeholder="CVV" style="font-size: 0.8rem; text-align: center; font-family: var(--font-number);" value="123">
         </div>
       </div>
 
@@ -2227,7 +2232,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" style="font-weight: 700; color: #20274f;">طريقة الدفع بكارت الفيزا / الماستركارد:</label>
+        <label for="form_field_13" class="form-label" style="font-weight: 700; color: #20274f;">طريقة الدفع بكارت الفيزا / الماستركارد:</label>
         
         <!-- Saved Card Option (Best Practice) -->
         <div style="border: 1px solid var(--primary-gold); background: rgba(212, 175, 55, 0.04); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
@@ -2239,7 +2244,7 @@
             </div>
           </div>
           <div style="width: 60px;">
-            <input type="password" class="form-control" id="savedCardCvvInput" placeholder="CVV" style="height: 30px; padding: 4px; font-size: 0.75rem; text-align: center;" value="123">
+            <input type="password" class="form-control" id="savedCardCvvInput" name="savedCardCvvInput" placeholder="CVV" style="height: 30px; padding: 4px; font-size: 0.75rem; text-align: center;" value="123">
           </div>
         </div>
 
@@ -2251,13 +2256,13 @@
           </div>
           
           <div id="newCardFieldsGroup" style="display: none; flex-direction: column; gap: 6px; margin-top: 4px;">
-            <input type="text" class="form-control" placeholder="رقم الكارت الجديد (16 رقم)" style="font-size: 0.75rem;">
+            <input id="form_field_9" name="form_field_9" type="text" class="form-control" placeholder="رقم الكارت الجديد (16 رقم)" style="font-size: 0.75rem;">
             <div style="display: flex; gap: 6px;">
-              <input type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.75rem; text-align: center;">
-              <input type="text" class="form-control" placeholder="CVV" style="font-size: 0.75rem; text-align: center;">
+              <input id="form_field_10" name="form_field_10" type="text" class="form-control" placeholder="MM/YY" style="font-size: 0.75rem; text-align: center;">
+              <input id="form_field_11" name="form_field_11" type="text" class="form-control" placeholder="CVV" style="font-size: 0.75rem; text-align: center;">
             </div>
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-muted);">
-              <input type="checkbox" checked style="accent-color: var(--primary-gold);">
+              <input id="form_field_12" name="form_field_12" type="checkbox" checked style="accent-color: var(--primary-gold);">
               <span>حفظ هذا الكارت في حسابي للدفع السريع لاحقاً</span>
             </div>
           </div>
@@ -2278,7 +2283,7 @@
       
       <div class="form-group">
         <label class="form-label">الجهة المطلوبة</label>
-        <select class="form-control">
+        <select id="form_field_13" name="form_field_13" class="form-control">
           <option value="all">🌊 الشاطئ الخاص والبحيرات وحمامات السباحة</option>
           <option value="beach">🏖 الشاطئ الرئيسي فقط</option>
           <option value="pools">🏊 حمامات السباحة والبحيرات فقط</option>
@@ -2286,13 +2291,13 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">عدد الأفراد المسموح لهم بالدخول</label>
-        <input type="number" class="form-control" value="4" min="1" max="10">
+        <label for="form_field_14" class="form-label">عدد الأفراد المسموح لهم بالدخول</label>
+        <input id="form_field_14" name="form_field_14" type="number" class="form-control" value="4" min="1" max="10">
       </div>
 
       <div class="form-group">
-        <label class="form-label">تاريخ الصلاحية</label>
-        <input type="date" class="form-control" value="2026-07-21">
+        <label for="form_field_15" class="form-label">تاريخ الصلاحية</label>
+        <input id="form_field_15" name="form_field_15" type="date" class="form-control" value="2026-07-21">
       </div>
 
       <button class="btn btn-primary" onclick="issueBeachPermit()">
@@ -2308,18 +2313,18 @@
       <h3 style="margin-bottom: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-id-card-clip"></i> تصريح عمل وتأمينات موظف تجاري</h3>
       
       <div class="form-group">
-        <label class="form-label">اسم الموظف الثلاثي</label>
-        <input type="text" class="form-control" placeholder="اسم الموظف..." id="staffNameInput">
+        <label for="staffNameInput" class="form-label">اسم الموظف الثلاثي</label>
+        <input type="text" class="form-control" placeholder="اسم الموظف..." id="staffNameInput" name="staffNameInput">
       </div>
 
       <div class="form-group">
-        <label class="form-label">الوظيفة داخل النشاط</label>
-        <input type="text" class="form-control" placeholder="مثال: شيف / كاشير / ويتر / صيانة..." id="staffJobInput">
+        <label for="staffJobInput" class="form-label">الوظيفة داخل النشاط</label>
+        <input type="text" class="form-control" placeholder="مثال: شيف / كاشير / ويتر / صيانة..." id="staffJobInput" name="staffJobInput">
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الملف التأميني بالدولة</label>
-        <input type="text" class="form-control" placeholder="مثال: #INS-80412" id="staffInsuranceInput">
+        <label for="staffInsuranceInput" class="form-label">رقم الملف التأميني بالدولة</label>
+        <input type="text" class="form-control" placeholder="مثال: #INS-80412" id="staffInsuranceInput" name="staffInsuranceInput">
       </div>
 
       <button class="btn btn-primary" onclick="submitStaffPermit()">
@@ -2335,18 +2340,18 @@
       <h3 style="margin-bottom: 14px; color: var(--primary-gold);" id="cargoModalTitle"><i class="fa-solid fa-truck"></i> تصريح سيارات بضائع وتوريد</h3>
       
       <div class="form-group">
-        <label class="form-label">نوع الشحنة / المنقولات</label>
-        <input type="text" class="form-control" placeholder="مثال: شحنة أغذية ومشروبات / معدات مطبخ..." id="cargoDescInput">
+        <label for="cargoDescInput" class="form-label">نوع الشحنة / المنقولات</label>
+        <input type="text" class="form-control" placeholder="مثال: شحنة أغذية ومشروبات / معدات مطبخ..." id="cargoDescInput" name="cargoDescInput">
       </div>
 
       <div class="form-group">
-        <label class="form-label">بيانات السيارة والسائق (رقم اللوحة والموبايل)</label>
-        <input type="text" class="form-control" placeholder="رقم اللوحة واسم السائق..." id="cargoDriverInput">
+        <label for="cargoDriverInput" class="form-label">بيانات السيارة والسائق (رقم اللوحة والموبايل)</label>
+        <input type="text" class="form-control" placeholder="رقم اللوحة واسم السائق..." id="cargoDriverInput" name="cargoDriverInput">
       </div>
 
       <div class="form-group">
-        <label class="form-label">موعد ومخرج الدخول / الخروج</label>
-        <select class="form-control" id="cargoGateSelect">
+        <label for="cargoGateSelect" class="form-label">موعد ومخرج الدخول / الخروج</label>
+        <select class="form-control" id="cargoGateSelect" name="cargoGateSelect">
           <option value="gate1">🚛 بوابة البضائع الرئيسية (06:00 ص - 10:00 ص)</option>
           <option value="gate2">🚚 بوابة المول والخدمات خلفية</option>
         </select>
@@ -2413,23 +2418,23 @@
       </p>
 
       <div class="form-group">
-        <label class="form-label">الاسم الكامل:</label>
-        <input type="text" id="newUserNameInput" class="form-control" placeholder="مثال: محمد صلاح">
+        <label for="newUserNameInput" class="form-label">الاسم الكامل:</label>
+        <input type="text" id="newUserNameInput" name="newUserNameInput" class="form-control" placeholder="مثال: محمد صلاح">
       </div>
 
       <div class="form-group">
-        <label class="form-label">البريد الإلكتروني (الدخول):</label>
-        <input type="email" id="newUserEmailInput" class="form-control" placeholder="sales@domain.com">
+        <label for="newUserEmailInput" class="form-label">البريد الإلكتروني (الدخول):</label>
+        <input type="email" id="newUserEmailInput" name="newUserEmailInput" class="form-control" placeholder="sales@domain.com">
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الموبايل:</label>
-        <input type="tel" id="newUserPhoneInput" class="form-control" placeholder="010XXXXXXXX">
+        <label for="newUserPhoneInput" class="form-label">رقم الموبايل:</label>
+        <input type="tel" id="newUserPhoneInput" name="newUserPhoneInput" class="form-control" placeholder="010XXXXXXXX">
       </div>
 
       <div class="form-group">
-        <label class="form-label">الدور الوظيفي والصلاحيات:</label>
-        <select id="newUserRoleSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
+        <label for="newUserRoleSelect" class="form-label">الدور الوظيفي والصلاحيات:</label>
+        <select id="newUserRoleSelect" name="newUserRoleSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
           <option value="homeowner">مالك وحدة سكنية</option>
           <option value="tenant">مستأجر سكني</option>
           <option value="technician">فني صيانة ميداني</option>
@@ -2453,13 +2458,13 @@
       </p>
 
       <div class="form-group">
-        <label class="form-label">اسم فرد العائلة الكامل:</label>
-        <input type="text" id="familyMemberNameInput" class="form-control" placeholder="مثال: ياسمين أسامة">
+        <label for="familyMemberNameInput" class="form-label">اسم فرد العائلة الكامل:</label>
+        <input type="text" id="familyMemberNameInput" name="familyMemberNameInput" class="form-control" placeholder="مثال: ياسمين أسامة">
       </div>
 
       <div class="form-group">
-        <label class="form-label">الصلة / القرابة:</label>
-        <select id="familyMemberRelationSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
+        <label for="familyMemberRelationSelect" class="form-label">الصلة / القرابة:</label>
+        <select id="familyMemberRelationSelect" name="familyMemberRelationSelect" class="form-control" style="height: 38px; padding: 6px 12px; font-size: 0.8rem;">
           <option value="father">أب</option>
           <option value="mother">أم</option>
           <option value="brother">أخ</option>
@@ -2470,18 +2475,18 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">رقم الموبايل (لتسجيل الدخول):</label>
-        <input type="tel" id="familyMemberPhoneInput" class="form-control" placeholder="010XXXXXXXX">
+        <label for="familyMemberPhoneInput" class="form-label">رقم الموبايل (لتسجيل الدخول):</label>
+        <input type="tel" id="familyMemberPhoneInput" name="familyMemberPhoneInput" class="form-control" placeholder="010XXXXXXXX">
       </div>
 
       <div class="form-group">
-        <label class="form-label">البريد الإلكتروني (إجباري لإنشاء حساب فرد الأسرة):</label>
-        <input type="email" id="familyMemberEmailInput" class="form-control" placeholder="example@domain.com" required>
+        <label for="familyMemberEmailInput" class="form-label">البريد الإلكتروني (إجباري لإنشاء حساب فرد الأسرة):</label>
+        <input type="email" id="familyMemberEmailInput" name="familyMemberEmailInput" class="form-control" placeholder="example@domain.com" required>
       </div>
 
       <!-- National ID Photo Upload Area (Front & Back) -->
       <div style="margin-top: 10px; margin-bottom: 12px;">
-        <label class="form-label" style="font-weight: 700;">صور البطاقة الشخصية للفرد (وجه وظهر):</label>
+        <label for="familyMemberIdFrontInput" class="form-label" style="font-weight: 700;">صور البطاقة الشخصية للفرد (وجه وظهر):</label>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
           <!-- Front ID Box -->
           <div style="border: 2px dashed rgba(27, 143, 145, 0.35); border-radius: 10px; padding: 10px 6px; text-align: center; background: rgba(27, 143, 145, 0.04); position: relative;">
@@ -2490,7 +2495,7 @@
             <label for="familyMemberIdFrontInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #1b8f91; color: #fff; cursor: pointer; border-radius: 6px;">
               <i class="fa-solid fa-camera"></i> رفع / تصوير
             </label>
-            <input type="file" id="familyMemberIdFrontInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdFrontPreview(event)">
+            <input type="file" id="familyMemberIdFrontInput" name="familyMemberIdFrontInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdFrontPreview(event)">
             <div id="familyIdFrontPreviewBox" style="margin-top: 6px; display: none;">
               <img id="familyIdFrontPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #1b8f91;" src="" alt="Front ID Preview">
               <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الوجه ✅</span>
@@ -2504,7 +2509,7 @@
             <label for="familyMemberIdBackInput" class="btn btn-sm" style="margin-top: 6px; font-size: 0.65rem; padding: 4px 8px; background: #995789; color: #fff; cursor: pointer; border-radius: 6px;">
               <i class="fa-solid fa-camera"></i> رفع / تصوير
             </label>
-            <input type="file" id="familyMemberIdBackInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdBackPreview(event)">
+            <input type="file" id="familyMemberIdBackInput" name="familyMemberIdBackInput" accept="image/*" style="display: none;" onchange="app.handleFamilyIdBackPreview(event)">
             <div id="familyIdBackPreviewBox" style="margin-top: 6px; display: none;">
               <img id="familyIdBackPreviewImg" style="max-height: 55px; max-width: 100%; border-radius: 6px; border: 1px solid #995789;" src="" alt="Back ID Preview">
               <span class="badge badge-success" style="font-size: 0.55rem; display: block; margin-top: 2px;">تم رفع الظهر ✅</span>
@@ -2544,18 +2549,9 @@
     </div>
   </div>
 
-  <!-- Global Fallback Event Handler Registration -->
-  <script>
-    window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role); };
-    window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
-    window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
-    window.openModal = function(id) { if (window.app) window.app.openModal(id); };
-    window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
-    window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
-  </script>
-
-  <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=97.0"></script>
+  <!-- Core JavaScript -->
+  <script src="app.js"></script>
 </body>
 </html>
+
 

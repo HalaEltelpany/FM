@@ -469,6 +469,7 @@ header.global-header {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 .phone-notch .camera-lens {
@@ -507,6 +508,7 @@ header.global-header {
   left: 0;
   right: 0;
   z-index: 90;
+  pointer-events: none;
 }
 
 .phone-simulator.full-width .phone-status-bar,
