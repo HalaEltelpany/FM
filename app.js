@@ -1,4 +1,4 @@
-﻿/* 
+/* 
   Ultimate FM - Application JavaScript Logic
   Coastal Cities & Commercial Malls Facility Management System
 */
@@ -5492,7 +5492,7 @@ class UltimateFMApp {
 
 // Global App Instance
 window.app = new UltimateFMApp();
-const app = window.app;
+var app = window.app;
 
 window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role); };
 window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
