@@ -69,8 +69,15 @@
     function setManagerFilter(f) { if (window.app) window.app.setManagerFilter(f); }
     function setTechTaskFilter(f) { if (window.app) window.app.setTechTaskFilter(f); }
     function handleManagerFieldIncidentSubmit() { if (window.app) window.app.handleManagerFieldIncidentSubmit(); }
+    function openManagerNewTicketModal() { if (window.app) window.app.openManagerNewTicketModal(); }
+    function updateManagerTechsBySpecialty() { if (window.app) window.app.updateManagerTechsBySpecialty(); }
+    function submitManagerDirectTicket() { if (window.app) window.app.submitManagerDirectTicket(); }
     function openCancelTicketModal(id) { if (window.app) window.app.openCancelTicketModal(id); }
     function confirmCancelTicket() { if (window.app) window.app.confirmCancelTicket(); }
+    function openHousekeepingModal(role) { if (window.app) window.app.openHousekeepingModal(role); }
+    function submitHousekeepingModalForm() { if (window.app) window.app.submitHousekeepingModalForm(); }
+    function openLandscapingModal(role) { if (window.app) window.app.openLandscapingModal(role); }
+    function submitLandscapingModalForm() { if (window.app) window.app.submitLandscapingModalForm(); }
     function handleOwnerAvatarUpload(e) { if (window.app) window.app.handleOwnerAvatarUpload(e); }
     function assignTechnician(id, selectId) { if (window.app) window.app.assignTechnician(id, selectId); }
     function completeTicket(id, fileId) { if (window.app) window.app.completeTicket(id, fileId); }
@@ -544,7 +551,7 @@
             <div class="homeowner-tab-content" id="tabTicketsHomeowner" style="display: none;">
               <!-- Maintenance, Housekeeping & Landscaping Service Request Buttons -->
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px;">
-                <button class="btn" id="btnNewMaintenanceTicket" style="margin: 0; font-size: 0.68rem; height: 42px; padding: 0 2px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #1c2140; border: 1px solid #1c2140; box-shadow: 0 4px 12px rgba(28, 33, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap;">
+                <button class="btn" id="btnNewMaintenanceTicket" onclick="openModal('modalNewTicket')" style="margin: 0; font-size: 0.68rem; height: 42px; padding: 0 2px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #1c2140; border: 1px solid #1c2140; box-shadow: 0 4px 12px rgba(28, 33, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap;">
                   <i class="fa-solid fa-wrench"></i> طلب صيانة داخلية
                 </button>
                 <button class="btn" id="btnHomeownerHk" onclick="openHousekeepingModal('owner')" style="margin: 0; font-size: 0.68rem; height: 42px; padding: 0 2px; border-radius: 12px; font-weight: 700; color: #ffffff; background: #82406e; border: 1px solid #82406e; box-shadow: 0 4px 12px rgba(130, 64, 110, 0.25); display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap;">
@@ -847,13 +854,15 @@
                 <span class="badge badge-info"><i class="fa-solid fa-circle-check"></i> شفت النهار</span>
               </div>
 
-              <!-- Engineer Specialty Switcher Dropdown -->
+              <!-- Engineer Specialty Switcher Dropdown (5 Core Engineering Teams) -->
               <div style="margin-top: 12px; border-top: 1px solid var(--border-glass); padding-top: 10px;">
-                <label class="form-label">اختر التخصص الهندسي لمراجعة المرافق:</label>
-                <select class="form-control" id="engineerSpecialtySelect" name="engineerSpecialtySelect">
-                  <option value="infra">💧 مهندس المرافق الأساسية (RO / STP / المحولات / البيلارات)</option>
-                  <option value="pools">🏊 مهندس البحيرات وحمامات السباحة والأنظمة المائية</option>
-                  <option value="landscape">🌿 مهندس اللاندسكيب والحدائق والشبكات العامة</option>
+                <label for="engineerSpecialtySelect" class="form-label" style="font-weight: 700;">اختر الفريق / التخصص الهندسي المشرف:</label>
+                <select class="form-control" id="engineerSpecialtySelect" name="engineerSpecialtySelect" style="font-size: 0.78rem; font-weight: 600;">
+                  <option value="mep">❄️ فريق الكهروميكانيك والتكييف والمحطات (MEP Team)</option>
+                  <option value="fls">🔥 فريق أنظمة السلامة ومكافحة الحريق (FLS Team)</option>
+                  <option value="electrical">⚡ فريق الكهرباء والطاقة والمحولات (Electrical Team)</option>
+                  <option value="landscape">🌿 فريق اللاندسكيب والزراعة وشبكات الري (Landscape Team)</option>
+                  <option value="civil">🏗️ فريق المدني والهياكل الإنشائية والتشطيبات (Civil Structure Team)</option>
                 </select>
               </div>
             </div>
@@ -925,20 +934,6 @@
               </div>
             </div>
             
-            <!-- Executive Manager Profile Header -->
-            <div class="card gold-border" style="background: linear-gradient(135deg, #1c2140 0%, #2a3363 100%); color: #ffffff;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <span style="font-size: 0.7rem; color: #d4af37; font-weight: 700; text-transform: uppercase;">
-                    <i class="fa-solid fa-user-shield"></i> لوحة قيادة العمليات والتشغيل
-                  </span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #ffffff; margin-top: 2px;">المهندس / أيمن السعيد</h2>
-                  <p style="font-size: 0.75rem; color: #93c5fd; margin: 0;">مدير عام قطاع الصيانة والمرافق العامة</p>
-                </div>
-                <span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-circle"></i> شفت التشغيل الميداني</span>
-              </div>
-            </div>
-
             <!-- Manager Shift KPI Performance Matrix (تقييم أداء الشفت لمدير الصيانة) -->
             <div class="card" style="padding: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -970,54 +965,16 @@
                 <!-- 4. SLA Dispatch Speed Rate -->
                 <div style="background: rgba(27, 143, 145, 0.06); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
                   <div style="font-size: 0.65rem; color: #0f766e; font-weight: 700;">🎯 معدل سرعة الإسناد (SLA)</div>
-                  <div style="font-size: 1.05rem; font-weight: 900; color: #0f766e;" id="managerKpiSlaRate">98% ممتاز</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #0f766e;" id="managerKpiSlaRate">98%</div>
                 </div>
               </div>
             </div>
 
-            <!-- Field Quick Incident Creation (إصدار بلاغ فوري للأماكن والمرافق العامة أثناء الجولة الميدانية) -->
-            <div class="card" style="border-right: 4px solid #d4af37;">
-              <div class="card-header" style="margin-bottom: 6px;">
-                <span class="card-title" style="font-size: 0.82rem; font-weight: 800; color: #20274f;">
-                  <i class="fa-solid fa-helmet-safety" style="color: #d4af37;"></i> إصدار أمر عمل ميداني للمرافق العامة (جولة الموقع)
-                </span>
-              </div>
-              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">
-                رصد عطل بالأماكن العامة (أعمدة إنارة، مسابح، ممرات، لاندسكيب، مضخات) وتكليف الفني فوراً:
-              </p>
-              
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div class="grid-2" style="gap: 6px;">
-                  <div>
-                    <label for="managerFieldFacilitySelect" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">الموقع / المرفق العام:</label>
-                    <select id="managerFieldFacilitySelect" name="managerFieldFacilitySelect" class="form-control" style="font-size: 0.75rem; padding: 6px 8px;">
-                      <option value="أعمدة إنارة وممرات المشاة">💡 أعمدة الإنارة وممرات المشاة</option>
-                      <option value="المسبح الرئيسي والبحيرة">🏊 المسبح الرئيسي والبحيرة</option>
-                      <option value="محطة مياه الشرب RO ومحطة STP">💧 محطات المياه والمعالجة</option>
-                      <option value="شبكات ري الحدائق واللاندسكيب">🌿 شبكات الري والمساحات الخضراء</option>
-                      <option value="المول التجاري والأماكن الخدمية">🏬 المول التجاري والأماكن الخدمية</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="managerFieldTechSelect" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">إسناد مباشر للفني:</label>
-                    <select id="managerFieldTechSelect" name="managerFieldTechSelect" class="form-control" style="font-size: 0.75rem; padding: 6px 8px;">
-                      <option value="أحمد علي">⚡ أحمد علي (فني كهرباء)</option>
-                      <option value="كريم حسن">❄️ كريم حسن (فني تكييف وميكانيكا)</option>
-                      <option value="مينا جرجس">🔧 مينا جرجس (فني سباكة وشبكات)</option>
-                      <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label for="managerFieldProblemDetails" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">وصف العطل المطلوب إصلاحه:</label>
-                  <input type="text" id="managerFieldProblemDetails" name="managerFieldProblemDetails" class="form-control" placeholder="مثال: عمود إنارة مطفأ أمام زون الشمال قرب فيلا 104" style="font-size: 0.75rem;">
-                </div>
-
-                <button class="btn btn-primary" id="btnCreateManagerFieldIncident" onclick="handleManagerFieldIncidentSubmit()" style="font-size: 0.78rem; padding: 8px; width: 100%; font-weight: 700;">
-                  <i class="fa-solid fa-paper-plane"></i> إصدار أمر الصيانة وإرساله فوراً لشاشة الفني وأودو
-                </button>
-              </div>
+            <!-- Manager Direct Work Order & Technician Assignment Action -->
+            <div style="margin-bottom: 12px;">
+              <button class="btn btn-primary" id="btnManagerDirectWorkOrder" onclick="openManagerNewTicketModal()" style="margin: 0; font-size: 0.82rem; height: 44px; width: 100%; border-radius: 12px; font-weight: 700; color: #ffffff; background: #1c2140; border: 1px solid #1c2140; box-shadow: 0 4px 12px rgba(28, 33, 64, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                <i class="fa-solid fa-bolt" style="color: #d4af37;"></i> إصدار أمر عمل وتكليف فني مباشر
+              </button>
             </div>
 
             <!-- Incoming Orders Stream & Multi-Source Filtering -->
@@ -1994,15 +1951,15 @@
     </div>
   </div>
 
-  <!-- 1. New Ticket Modal -->
+  <!-- 1. New Ticket Modal (Navy #1c2140) -->
   <div class="modal-overlay" id="modalNewTicket">
-    <div class="modal-card">
+    <div class="modal-card" style="border-top: 5px solid #1c2140;">
       <button class="modal-close" onclick="closeModal('modalNewTicket')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 12px; color: var(--primary-gold);"><i class="fa-solid fa-wrench"></i> تقديم طلب صيانة جديدة</h3>
+      <h3 style="margin-bottom: 12px; color: #1c2140;"><i class="fa-solid fa-wrench" style="color: #d4af37;"></i> تقديم طلب صيانة جديدة</h3>
       
       <!-- Applicant Identity Summary Badge -->
-      <div style="background: rgba(32, 39, 79, 0.06); border: 1px solid rgba(32, 39, 79, 0.12); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
-        <div style="font-weight: 700; color: var(--primary-gold); margin-bottom: 4px;">
+      <div style="background: rgba(28, 33, 64, 0.05); border: 1px solid rgba(28, 33, 64, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: #1c2140; margin-bottom: 4px;">
           <i class="fa-solid fa-address-card"></i> بيانات صاحب البلاغ المسجلة تلقائياً:
         </div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -2014,7 +1971,7 @@
       </div>
       
       <div class="form-group">
-        <label for="ticketCategorySelect" class="form-label">نوع الخدمة / التخصص</label>
+        <label for="ticketCategorySelect" class="form-label" style="font-weight: 700;">نوع الخدمة / التخصص</label>
         <select class="form-control" id="ticketCategorySelect" name="ticketCategorySelect">
           <option value="سباكة">سباكة (Plumbing)</option>
           <option value="كهرباء">كهرباء (Electrical)</option>
@@ -2024,7 +1981,7 @@
       </div>
 
       <div class="form-group">
-        <label for="ticketPrioritySelect" class="form-label">درجة الأهمية والأولوية (Priority)</label>
+        <label for="ticketPrioritySelect" class="form-label" style="font-weight: 700;">درجة الأهمية والأولوية (Priority)</label>
         <select class="form-control" id="ticketPrioritySelect" name="ticketPrioritySelect">
           <option value="3">⭐⭐⭐ عاجل طارئ (Urgent - 3 Stars)</option>
           <option value="2" selected>⭐⭐ هام جداً (High - 2 Stars)</option>
@@ -2033,28 +1990,30 @@
       </div>
 
       <div class="form-group">
-        <label for="ticketDescInput" class="form-label">وصف العطل بالتفصيل</label>
+        <label for="ticketDescInput" class="form-label" style="font-weight: 700;">وصف العطل بالتفصيل</label>
         <textarea class="form-control" rows="3" id="ticketDescInput" name="ticketDescInput" placeholder="اكتب تفاصيل المشكلة ومكانها بالوحدة..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="ticketPhotoInput" class="form-label">إرفاق صورة العطل (اختياري)</label>
+        <label for="ticketPhotoInput" class="form-label" style="font-weight: 700;">إرفاق صورة العطل (اختياري)</label>
         <input type="file" class="form-control" accept="image/*" id="ticketPhotoInput" name="ticketPhotoInput">
       </div>
 
-      <button class="btn btn-primary" id="btnSubmitTicket">إرسال التذكرة لفريق خدمة العملاء</button>
+      <button class="btn btn-primary" id="btnSubmitTicket" style="background: #1c2140; border-color: #1c2140; color: #ffffff; width: 100%; font-weight: 700; height: 42px;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال التذكرة لفريق خدمة العملاء وأودو
+      </button>
     </div>
   </div>
 
-  <!-- 1.5 Housekeeping Request Modal with Specialized Options & Notes -->
+  <!-- 1.5 Housekeeping Request Modal (Mauve / Royal Plum #82406e) -->
   <div class="modal-overlay" id="modalHousekeepingRequest">
-    <div class="modal-card">
+    <div class="modal-card" style="border-top: 5px solid #82406e;">
       <button class="modal-close" onclick="closeModal('modalHousekeepingRequest')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 12px; color: var(--brand-teal);"><i class="fa-solid fa-broom"></i> طلب خدمة النظافة والهاوس كيبينج</h3>
+      <h3 style="margin-bottom: 12px; color: #82406e;"><i class="fa-solid fa-broom" style="color: #82406e;"></i> طلب خدمة النظافة والهاوس كيبينج</h3>
       
       <!-- Applicant Info Summary Badge -->
-      <div style="background: rgba(27, 143, 145, 0.08); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
-        <div style="font-weight: 700; color: var(--brand-teal); margin-bottom: 4px;">
+      <div style="background: rgba(130, 64, 110, 0.06); border: 1px solid rgba(130, 64, 110, 0.25); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: #82406e; margin-bottom: 4px;">
           <i class="fa-solid fa-house-user"></i> بيانات طالب خدمة النظافة:
         </div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -2064,7 +2023,7 @@
       </div>
       
       <div class="form-group">
-        <label for="hkTypeSelect" class="form-label">اختر نوع خدمة النظافة المطلوبة</label>
+        <label for="hkTypeSelect" class="form-label" style="font-weight: 700;">اختر نوع خدمة النظافة المطلوبة</label>
         <select class="form-control" id="hkTypeSelect" name="hkTypeSelect">
           <option value="نظافة خفيفة يومية / روتينية (Daily Express Cleaning)">🧹 نظافة خفيفة يومية / روتينية (Daily Express Cleaning)</option>
           <option value="نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)">✨ نظافة عميقة وشاملة للفيلا والفرش (Deep Cleaning)</option>
@@ -2075,7 +2034,7 @@
       </div>
 
       <div class="form-group">
-        <label for="hkSlotSelect" class="form-label">توقيت التنفيذ المفضل</label>
+        <label for="hkSlotSelect" class="form-label" style="font-weight: 700;">توقيت التنفيذ المفضل</label>
         <select class="form-control" id="hkSlotSelect" name="hkSlotSelect">
           <option value="الفترة الصباحية (9 صباحاً - 12 ظهراً)">🌅 الفترة الصباحية (9 صباحاً - 12 ظهراً)</option>
           <option value="الفترة المسائية (1 ظهراً - 4 عصراً)">🌆 الفترة المسائية (1 ظهراً - 4 عصراً)</option>
@@ -2084,25 +2043,25 @@
       </div>
 
       <div class="form-group">
-        <label for="hkNotesInput" class="form-label">ملاحظات وتعليمات إضافية (اختياري)</label>
+        <label for="hkNotesInput" class="form-label" style="font-weight: 700;">ملاحظات وتعليمات إضافية (اختياري)</label>
         <textarea class="form-control" rows="3" id="hkNotesInput" name="hkNotesInput" placeholder="أدخل أي ملاحظات خاصة (مثال: يرجى التركيز على المطبخ والفرش، أو إحضار أدوات تطهير مخصصة)..."></textarea>
       </div>
 
-      <button class="btn btn-primary" onclick="submitHousekeepingModalForm()" style="background: var(--brand-teal); border-color: var(--brand-teal);">
+      <button class="btn btn-primary" onclick="submitHousekeepingModalForm()" style="background: #82406e; border-color: #82406e; color: #ffffff; width: 100%; font-weight: 700; height: 42px;">
         <i class="fa-solid fa-paper-plane"></i> تأكيد وإرسال طلب النظافة لـ Odoo
       </button>
     </div>
   </div>
 
-  <!-- 1.6 Landscaping & Garden Maintenance Request Modal -->
+  <!-- 1.6 Landscaping & Garden Maintenance Request Modal (Teal / Ocean Emerald #1b8f91) -->
   <div class="modal-overlay" id="modalLandscapingRequest">
-    <div class="modal-card">
+    <div class="modal-card" style="border-top: 5px solid #1b8f91;">
       <button class="modal-close" onclick="closeModal('modalLandscapingRequest')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 12px; color: #16a34a;"><i class="fa-solid fa-seedling"></i> طلب خدمة اللاندسكيب وصيانة الحدائق</h3>
+      <h3 style="margin-bottom: 12px; color: #1b8f91;"><i class="fa-solid fa-seedling" style="color: #1b8f91;"></i> طلب خدمة اللاندسكيب وصيانة الحدائق</h3>
       
       <!-- Applicant Info Summary Badge -->
-      <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
-        <div style="font-weight: 700; color: #16a34a; margin-bottom: 4px;">
+      <div style="background: rgba(27, 143, 145, 0.06); border: 1px solid rgba(27, 143, 145, 0.25); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: #1b8f91; margin-bottom: 4px;">
           <i class="fa-solid fa-house-user"></i> بيانات طالب خدمة اللاندسكيب:
         </div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -2112,7 +2071,7 @@
       </div>
       
       <div class="form-group">
-        <label for="landscapeTypeSelect" class="form-label">اختر نوع خدمة اللاندسكيب والحدائق المطلوبة</label>
+        <label for="landscapeTypeSelect" class="form-label" style="font-weight: 700;">اختر نوع خدمة اللاندسكيب والحدائق المطلوبة</label>
         <select class="form-control" id="landscapeTypeSelect" name="landscapeTypeSelect">
           <option value="تقليم وقص الأشجار والنجيل (Lawn Mowing & Tree Trimming)">🌿 تقليم وقص الأشجار والنجيل والمسطحات الخضراء</option>
           <option value="صيانة وتصليح شبكات الري التلقائي (Irrigation Repair)">💧 صيانة وتصليح شبكات الري التلقائي والنوازل</option>
@@ -2123,7 +2082,7 @@
       </div>
 
       <div class="form-group">
-        <label for="landscapeSlotSelect" class="form-label">توقيت التنفيذ المفضل</label>
+        <label for="landscapeSlotSelect" class="form-label" style="font-weight: 700;">توقيت التنفيذ المفضل</label>
         <select class="form-control" id="landscapeSlotSelect" name="landscapeSlotSelect">
           <option value="الفترة الصباحية (8 صباحاً - 11 صباحاً)">🌅 الفترة الصباحية (8 صباحاً - 11 صباحاً)</option>
           <option value="الفترة المسائية (3 عصراً - 6 مساءً)">🌆 الفترة المسائية (3 عصراً - 6 مساءً)</option>
@@ -2132,11 +2091,11 @@
       </div>
 
       <div class="form-group">
-        <label for="landscapeNotesInput" class="form-label">ملاحظات وتفاصيل إضافية (اختياري)</label>
+        <label for="landscapeNotesInput" class="form-label" style="font-weight: 700;">ملاحظات وتفاصيل إضافية (اختياري)</label>
         <textarea class="form-control" rows="3" id="landscapeNotesInput" name="landscapeNotesInput" placeholder="أدخل أي تفاصيل خاصة (مثال: قص نجيل حديقة المدخل الرئيسي، أو فحص تسريب شبكة الري التلقائي)..."></textarea>
       </div>
 
-      <button class="btn btn-primary" onclick="submitLandscapingModalForm()" style="background: #16a34a; border-color: #16a34a;">
+      <button class="btn btn-primary" onclick="submitLandscapingModalForm()" style="background: #1b8f91; border-color: #1b8f91; color: #ffffff; width: 100%; font-weight: 700; height: 42px;">
         <i class="fa-solid fa-paper-plane"></i> تأكيد وإرسال طلب اللاندسكيب لـ Odoo
       </button>
     </div>
@@ -2670,6 +2629,69 @@
           <div style="font-size: 0.85rem; font-weight: 800; color: #0f172a; margin-top: 2px;">يرجى التواصل مع الاداره للأهميه</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 13.5 Manager Direct Work Order & Tech Assignment Modal -->
+  <div class="modal-overlay" id="modalManagerNewTicket">
+    <div class="modal-card" style="border-top: 5px solid #1c2140;">
+      <button class="modal-close" onclick="closeModal('modalManagerNewTicket')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #1c2140; font-size: 0.95rem;">
+        <i class="fa-solid fa-bolt" style="color: #d4af37;"></i> إصدار أمر عمل وتكليف فني مباشر
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+        إصدار أمر عمل فوري وتكليفه للفني المتاح مع توضيح مكان المشكلة والصورة لتظهر فوراً على شاشة الفني.
+      </p>
+
+      <!-- 1. Select Specialty First -->
+      <div class="form-group">
+        <label for="mgrTicketCategorySelect" class="form-label" style="font-weight: 800; color: #1c2140;">
+          <i class="fa-solid fa-wrench" style="color: #d4af37;"></i> 1. اختر نوع وتخصص الصيانة أولاً:
+        </label>
+        <select id="mgrTicketCategorySelect" name="mgrTicketCategorySelect" class="form-control" onchange="updateManagerTechsBySpecialty()" style="font-size: 0.82rem; font-weight: 700; border: 1.5px solid #1c2140;">
+          <option value="كهروميكانيك">❄️ كهروميكانيك وتكييف (MEP)</option>
+          <option value="سباكة">🔧 سباكة وشبكات مياه ومضخات</option>
+          <option value="كهرباء">⚡ كهرباء وإنارة وطاقة</option>
+          <option value="نجارة">🚪 نجارة وأبواب وديكور</option>
+          <option value="صيانة عامة">🏢 مرافق وصيانة عامة</option>
+        </select>
+      </div>
+
+      <!-- 2. Dynamically Filtered Technicians for Selected Specialty -->
+      <div class="form-group">
+        <label for="mgrTicketTechSelect" class="form-label" style="font-weight: 800; color: #0284c7;">
+          <i class="fa-solid fa-helmet-safety"></i> 2. الفني المكلف بالمهمة:
+        </label>
+        <select id="mgrTicketTechSelect" name="mgrTicketTechSelect" class="form-control" style="font-size: 0.8rem; font-weight: 700; border: 1.5px solid #0284c7; background: #f0f9ff;">
+          <option value="كريم حسن">كريم حسن (فني أول تكييف وكهروميكانيك)</option>
+          <option value="سامح فوزي">سامح فوزي (فني صيانة تكييف وتبريد)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="mgrTicketLocationInput" class="form-label" style="font-weight: 800; color: #20274f;">
+          <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> الموقع / المكان بالتفصيل (ليتوجه إليه الفني فوراً):
+        </label>
+        <input type="text" id="mgrTicketLocationInput" name="mgrTicketLocationInput" class="form-control" placeholder="مثال: أمام فيلا 104 زون 1، أو غرفة طلمبات المسبح، أو ممشى البحيرة..." style="font-size: 0.78rem; font-weight: 600;">
+      </div>
+
+      <div class="form-group">
+        <label for="mgrTicketDetailsInput" class="form-label" style="font-weight: 700;">وصف العطل وتوجيهات المدير للفني:</label>
+        <textarea id="mgrTicketDetailsInput" name="mgrTicketDetailsInput" class="form-control" rows="2" placeholder="اكتب تفاصيل العطل والمطلوب من الفني تنفيذه بدقة..." style="font-size: 0.78rem;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="mgrTicketPhotoInput" class="form-label" style="font-weight: 700;">
+          <i class="fa-solid fa-camera"></i> إرفاق صورة العطل (لتظهر في شاشة الفني قبل الذهاب):
+        </label>
+        <input type="file" accept="image/*" id="mgrTicketPhotoInput" name="mgrTicketPhotoInput" class="form-control" style="font-size: 0.75rem;">
+      </div>
+
+      <button class="btn btn-primary" onclick="submitManagerDirectTicket()" style="width: 100%; margin-top: 10px; font-size: 0.82rem; font-weight: 700; height: 42px; background: #1c2140; border-color: #1c2140; color: #ffffff;">
+        <i class="fa-solid fa-paper-plane"></i> إصدار أمر العمل وتوجيهه لشاشة الفني وأودو
+      </button>
+    </div>
+  </div>
 
   <!-- 14. Manager Ticket Cancellation Modal with Mandatory Reason -->
   <div class="modal-overlay" id="modalManagerCancelTicket">

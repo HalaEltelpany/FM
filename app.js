@@ -270,16 +270,7 @@ class UltimateFMApp {
       });
     });
 
-    // Dynamic Click Listeners on 10 Role Block Cards Grid
-    const blockCards = document.querySelectorAll('.role-block-card');
-    blockCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const role = card.getAttribute('data-role');
-        if (role) {
-          this.quickLogin(role);
-        }
-      });
-    });
+    // Role block cards already have inline onclick handlers in index.html
 
     // View Mode Toggle (Mobile Simulator Frame vs Fullscreen)
     const toggleViewBtn = document.getElementById('toggleViewModeBtn');
@@ -1224,39 +1215,83 @@ class UltimateFMApp {
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
 
-      // Standard Helpdesk Ticket payload using valid stored Odoo fields
-      const helpdeskFields = {
-        name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
-        description: cleanDescription,
-        priority: String(ticket.priority || '2')
-      };
+      // Dual-Architecture: Engineers & Manager go to Odoo Maintenance module (maintenance.request), Residents go to Helpdesk (helpdesk.ticket)
+      const isEngineerOrManager = ticket.requester === 'engineer' || ticket.requester === 'manager';
+      let targetModel = isEngineerOrManager ? "maintenance.request" : "helpdesk.ticket";
+      let createPayload = null;
 
-      if (partnerId) {
-        helpdeskFields.partner_id = partnerId;
+      if (isEngineerOrManager) {
+        const maintenanceFields = {
+          name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
+          description: cleanDescription,
+          priority: String(ticket.priority || '2'),
+          maintenance_type: 'corrective'
+        };
+        createPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [dbInput, uid, keyInput, "maintenance.request", "create", [maintenanceFields]]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+      } else {
+        const helpdeskFields = {
+          name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
+          description: cleanDescription,
+          priority: String(ticket.priority || '2')
+        };
+        if (partnerId) {
+          helpdeskFields.partner_id = partnerId;
+        }
+        if (resolvedTeamId) {
+          helpdeskFields.team_id = resolvedTeamId;
+        }
+        createPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [helpdeskFields]]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
       }
-      if (resolvedTeamId) {
-        helpdeskFields.team_id = resolvedTeamId;
+
+      console.log(`[Odoo Sync] Creating ticket under model [${targetModel}]`);
+      let odooCreateData = await this.callOdoo(baseUrl, createPayload);
+
+      // Fallback: if maintenance.request fails, fallback to helpdesk.ticket
+      if ((!odooCreateData || odooCreateData.error) && targetModel === "maintenance.request") {
+        console.warn('[Odoo Sync] Maintenance request create error, fallback to helpdesk.ticket:', odooCreateData?.error);
+        targetModel = "helpdesk.ticket";
+        const fallbackFields = {
+          name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
+          description: cleanDescription,
+          priority: String(ticket.priority || '2')
+        };
+        if (partnerId) fallbackFields.partner_id = partnerId;
+        createPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [fallbackFields]]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        odooCreateData = await this.callOdoo(baseUrl, createPayload);
       }
 
-      const createPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [helpdeskFields]]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-
-      console.log('[Odoo Sync] Creating ticket exclusively in helpdesk.ticket with team_id:', resolvedTeamId);
-      const helpdeskData = await this.callOdoo(baseUrl, createPayload);
-
-      if (helpdeskData && !helpdeskData.error && helpdeskData.result) {
-        const ticketIdInOdoo = helpdeskData.result;
-        console.log('[Odoo Sync Success] Ticket registered under helpdesk.ticket. ID:', ticketIdInOdoo);
+      if (odooCreateData && !odooCreateData.error && odooCreateData.result) {
+        const ticketIdInOdoo = odooCreateData.result;
+        console.log(`[Odoo Sync Success] Ticket registered under ${targetModel}. ID:`, ticketIdInOdoo);
         ticket.odooId = ticketIdInOdoo;
-        ticket.odooModel = "helpdesk.ticket";
+        ticket.odooModel = targetModel;
         this.saveTicketsToStorage();
 
         // Step 3: Attach problem photo to ticket in Odoo as ir.attachment
@@ -1289,7 +1324,7 @@ class UltimateFMApp {
                     [{
                       name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
                       datas: base64Content,
-                      res_model: "helpdesk.ticket",
+                      res_model: targetModel,
                       res_id: ticketIdInOdoo
                     }]
                   ]
@@ -1789,9 +1824,9 @@ class UltimateFMApp {
 
       // Emaar 4-step Progress Tracker Calculation
       let step = 1;
-      if (['تم إسناد الفني', 'قيد الفحص الميداني', 'جاري المراجعة'].includes(tk.status)) step = 2;
-      else if (['انتظار دفع المالك', 'تم الدفع - جاري التركيب'].includes(tk.status)) step = 3;
-      else if (['تم الانتهاء', 'تم الحل', 'تم الإغلاق', 'Done', 'Solved', 'تم السداد'].includes(tk.status)) step = 4;
+      if (['تم التعيين للفني', 'تم إسناد الفني', 'قيد الفحص الميداني', 'جاري العمل', 'جاري المراجعة', 'In Progress'].includes(tk.status)) step = 2;
+      else if (['انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'On Hold', 'بانتظار قطع الغيار'].includes(tk.status)) step = 3;
+      else if (['تم الانتهاء', 'تم الحل', 'تم الإغلاق', 'Done', 'Solved', 'تم السداد', 'مكتمل'].includes(tk.status)) step = 4;
 
       const progressPercent = step === 1 ? 25 : (step === 2 ? 50 : (step === 3 ? 75 : 100));
       const progressColor = step === 4 ? '#10b981' : (step === 3 && tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140');
@@ -1934,11 +1969,11 @@ class UltimateFMApp {
 
       if (elKpiSlaRate) {
         if (allMgrTks.length === 0) {
-          elKpiSlaRate.innerText = '100% ممتاز';
+          elKpiSlaRate.innerText = '100%';
         } else {
           const fastDispatches = assignedTks.filter(t => (t.dispatchMins || 1) <= 15).length;
           const rate = Math.round((fastDispatches / Math.max(1, assignedTks.length)) * 100);
-          elKpiSlaRate.innerText = `${rate}% ${rate >= 85 ? 'ممتاز' : (rate >= 70 ? 'جيد' : 'يحتاج تسريع')}`;
+          elKpiSlaRate.innerText = `${rate}%`;
         }
       }
 
@@ -2201,11 +2236,11 @@ class UltimateFMApp {
 
       if (elTechSlaRate) {
         if (allTechTks.length === 0) {
-          elTechSlaRate.innerText = '100% ممتاز';
+          elTechSlaRate.innerText = '100%';
         } else {
           const onTimeCount = completedTechTks.length + activeTechTks.filter(t => (t.dispatchMins || 1) <= 45).length;
           const rate = Math.round((onTimeCount / Math.max(1, allTechTks.length)) * 100);
-          elTechSlaRate.innerText = `${rate}% ${rate >= 85 ? 'ممتاز' : 'جيد'}`;
+          elTechSlaRate.innerText = `${rate}%`;
         }
       }
 
@@ -2661,49 +2696,138 @@ class UltimateFMApp {
     this.renderTickets();
   }
 
-  async handleManagerFieldIncidentSubmit() {
-    const facilitySelect = document.getElementById('managerFieldFacilitySelect');
-    const techSelect = document.getElementById('managerFieldTechSelect');
-    const detailsInput = document.getElementById('managerFieldProblemDetails');
+  updateManagerTechsBySpecialty() {
+    const catSelect = document.getElementById('mgrTicketCategorySelect');
+    const techSelect = document.getElementById('mgrTicketTechSelect');
+    if (!catSelect || !techSelect) return;
 
-    const facility = facilitySelect ? facilitySelect.value : 'المرافق العامة';
-    const techName = techSelect ? techSelect.value : 'أحمد علي';
-    const details = (detailsInput && detailsInput.value.trim()) ? detailsInput.value.trim() : `صيانة ومعاينة ميدانية في: ${facility}`;
-
-    const newTk = {
-      id: Math.floor(1000 + Math.random() * 9000),
-      title: `عطل مرافق: ${facility}`,
-      category: 'صيانة مرافق عامة',
-      details: details,
-      location: facility,
-      requester: 'manager',
-      requesterName: 'م. أيمن السعيد (مدير الصيانة)',
-      status: 'تم التعيين للفني',
-      bgClass: 'badge-info',
-      assignedTech: techName,
-      priority: '3',
-      createdAt: new Date().toISOString(),
-      dispatchedAt: new Date().toISOString(),
-      dispatchMins: 1,
-      photoBefore: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=150'
+    const selectedCategory = catSelect.value || 'كهروميكانيك';
+    
+    // Technicians database grouped by specialty with live availability status
+    const techDatabase = {
+      'كهروميكانيك': [
+        { name: 'كريم حسن', title: 'فني أول تكييف وكهروميكانيك', status: 'متاح الآن 🟢', available: true },
+        { name: 'سامح فوزي', title: 'فني صيانة تكييف وتبريد', status: 'متاح الآن 🟢', available: true },
+        { name: 'محمود إبراهيم', title: 'فني محطات وضواغط MEP', status: 'مشغول بمهمة 🟡', available: false }
+      ],
+      'سباكة': [
+        { name: 'مينا جرجس', title: 'فني أول سباكة وشبكات مياه', status: 'متاح الآن 🟢', available: true },
+        { name: 'طارق عبد الله', title: 'فني محطات معالجة وصحي', status: 'متاح الآن 🟢', available: true },
+        { name: 'ياسر النجار', title: 'فني طلمبات ومحابس رئيسية', status: 'متاح الآن 🟢', available: true }
+      ],
+      'كهرباء': [
+        { name: 'أحمد علي', title: 'فني أول كهرباء وطاقة ولوحات', status: 'متاح الآن 🟢', available: true },
+        { name: 'محمد الشناوي', title: 'فني شبكات إنارة ومحولات', status: 'متاح الآن 🟢', available: true },
+        { name: 'خالد مصطفى', title: 'فني مولدات طوارئ وبيلارات', status: 'متاح الآن 🟢', available: true }
+      ],
+      'نجارة': [
+        { name: 'عبد الرحمن سمير', title: 'فني نجارة وديكور وأقفال', status: 'متاح الآن 🟢', available: true },
+        { name: 'حسام حسني', title: 'فني ألمونيتال وأبواب زجاجية', status: 'متاح الآن 🟢', available: true }
+      ],
+      'صيانة عامة': [
+        { name: 'كريم حسن', title: 'فني تشغيل ومرافق عامة', status: 'متاح الآن 🟢', available: true },
+        { name: 'أحمد علي', title: 'فني كهرباء ومرافق عامة', status: 'متاح الآن 🟢', available: true },
+        { name: 'مينا جرجس', title: 'فني شبكات ومرافق عامة', status: 'متاح الآن 🟢', available: true },
+        { name: 'سعيد محمود', title: 'فني لاندسكيب وري عام', status: 'متاح الآن 🟢', available: true }
+      ]
     };
 
-    this.tickets.unshift(newTk);
-    this.saveTicketsToStorage();
-    this.renderTickets();
+    const list = techDatabase[selectedCategory] || techDatabase['كهروميكانيك'];
+    techSelect.innerHTML = '';
+    list.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.name;
+      opt.textContent = `${t.name} (${t.title})`;
+      techSelect.appendChild(opt);
+    });
+  }
 
+  openManagerNewTicketModal() {
+    const locInput = document.getElementById('mgrTicketLocationInput');
+    const detailsInput = document.getElementById('mgrTicketDetailsInput');
+    const photoInput = document.getElementById('mgrTicketPhotoInput');
+    if (locInput) locInput.value = '';
     if (detailsInput) detailsInput.value = '';
+    if (photoInput) photoInput.value = '';
+    
+    // Auto populate technicians list for the default selected specialty
+    this.updateManagerTechsBySpecialty();
+    this.openModal('modalManagerNewTicket');
+  }
 
-    this.showToast(`✅ تم إصدار أمر العمل الميداني بنجاح!\nالموقع: ${facility}\nالفني المكلف: ${techName}\nتم توجيهه لشاشة الفني وأودو.`);
+  async submitManagerDirectTicket() {
+    const categorySelect = document.getElementById('mgrTicketCategorySelect');
+    const locationInput = document.getElementById('mgrTicketLocationInput');
+    const detailsInput = document.getElementById('mgrTicketDetailsInput');
+    const techSelect = document.getElementById('mgrTicketTechSelect');
 
-    // Sync to Odoo
-    try {
-      await this.syncTicketToOdoo(newTk, '01221122334', 'م. أيمن السعيد (مدير الصيانة)');
+    const category = categorySelect ? categorySelect.value : 'صيانة عامة';
+    const location = (locationInput && locationInput.value.trim()) ? locationInput.value.trim() : 'الموقع العام بالقرية';
+    const details = (detailsInput && detailsInput.value.trim()) ? detailsInput.value.trim() : `طلب صيانة ${category} في ${location}`;
+    const photoInput = document.getElementById('mgrTicketPhotoInput');
+    
+    // Category Fallbacks
+    const fallbacks = {
+      'كهروميكانيك': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300',
+      'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300',
+      'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=300',
+      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=300',
+      'صيانة عامة': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300'
+    };
+
+    let photoUrl = fallbacks[category] || fallbacks['صيانة عامة'];
+
+    const proceed = async (finalPhoto) => {
+      const newTk = {
+        id: Math.floor(1000 + Math.random() * 9000),
+        title: `أمر عمل ${category} - ${location}`,
+        category: category,
+        details: details,
+        location: location,
+        requester: 'manager',
+        requesterName: 'مدير الصيانة الميدانية',
+        status: 'تم التعيين للفني',
+        bgClass: 'badge-info',
+        assignedTech: techName,
+        priority: '3',
+        createdAt: new Date().toISOString(),
+        dispatchedAt: new Date().toISOString(),
+        dispatchMins: 1,
+        photoBefore: finalPhoto
+      };
+
+      this.tickets.unshift(newTk);
       this.saveTicketsToStorage();
       this.renderTickets();
-    } catch (e) {
-      console.warn('[Manager Incident Sync Error]', e);
+      this.closeModal('modalManagerNewTicket');
+
+      if (locInput) locInput.value = '';
+      if (detailsInput) detailsInput.value = '';
+      if (photoInput) photoInput.value = '';
+
+      this.showToast(`⚡ تم إصدار أمر العمل وتكليف الفني (${techName}) بنجاح!\nالموقع: ${location}\nتم التوجيه فوراً لشاشة الفني وأودو.`);
+
+      // Sync to Odoo (Maintenance Module)
+      try {
+        await this.syncTicketToOdoo(newTk, '01221122334', 'مدير الصيانة');
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      } catch (e) {
+        console.warn('[Manager Direct Ticket Sync Error]', e);
+      }
+    };
+
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => proceed(e.target.result);
+      reader.readAsDataURL(photoInput.files[0]);
+    } else {
+      proceed(photoUrl);
     }
+  }
+
+  async handleManagerFieldIncidentSubmit() {
+    return this.submitManagerDirectTicket();
   }
 
   openCancelTicketModal(ticketId) {
@@ -4445,6 +4569,10 @@ class UltimateFMApp {
   }
 
   executeLogin(role) {
+    if (this._isLoggingIn) return;
+    this._isLoggingIn = true;
+    setTimeout(() => { this._isLoggingIn = false; }, 400);
+
     this.switchRole(role);
     if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
       this.switchHomeownerTab('home');
@@ -5864,6 +5992,15 @@ window.setTechTaskFilter = function(filterState) { if (window.app) window.app.se
 window.handleManagerFieldIncidentSubmit = function() { if (window.app) window.app.handleManagerFieldIncidentSubmit(); };
 window.openCancelTicketModal = function(ticketId) { if (window.app) window.app.openCancelTicketModal(ticketId); };
 window.confirmCancelTicket = function() { if (window.app) window.app.confirmCancelTicket(); };
+window.openHousekeepingModal = function(role) { if (window.app) window.app.openHousekeepingModal(role); };
+window.submitHousekeepingModalForm = function() { if (window.app) window.app.submitHousekeepingModalForm(); };
+window.openLandscapingModal = function(role) { if (window.app) window.app.openLandscapingModal(role); };
+window.submitLandscapingModalForm = function() { if (window.app) window.app.submitLandscapingModalForm(); };
+window.requestHousekeeping = function(role, type, slot, notes) { if (window.app) window.app.requestHousekeeping(role, type, slot, notes); };
+window.requestLandscaping = function(role, type, slot, notes) { if (window.app) window.app.requestLandscaping(role, type, slot, notes); };
+window.openManagerNewTicketModal = function() { if (window.app) window.app.openManagerNewTicketModal(); };
+window.updateManagerTechsBySpecialty = function() { if (window.app) window.app.updateManagerTechsBySpecialty(); };
+window.submitManagerDirectTicket = function() { if (window.app) window.app.submitManagerDirectTicket(); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());
