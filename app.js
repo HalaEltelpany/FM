@@ -1319,13 +1319,32 @@ class UltimateFMApp {
 
   resolveOdooStageId(status) {
     if (!status) return 1;
-    const s = String(status).trim();
+    const s = String(status).toLowerCase()
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .trim();
 
-    if (s.includes('جديد') || s === 'New') return 1;
-    if (s.includes('تعيين') || s.includes('جاري') || s.includes('معاينة') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s === 'In Progress') return 2;
-    if (s.includes('قطع') || s.includes('غيار') || s.includes('معلق') || s.includes('انتظار') || s === 'On Hold') return 3;
-    if (s.includes('انهاء') || s.includes('انتهى') || s.includes('مكتمل') || s.includes('حل') || s.includes('تمت') || s === 'Solved') return 4;
-    if (s.includes('ملغي') || s === 'Cancelled') return 5;
+    // 1. Solved / Completed (Stage 4)
+    if (s.includes('انته') || s.includes('انتهاء') || s.includes('منته') || s.includes('مكتمل') || s.includes('تم الحل') || s.includes('حل') || s.includes('مغلق') || s.includes('تم') || s === 'solved' || s === 'completed' || s === 'closed') {
+      return 4;
+    }
+    // 2. On Hold (Stage 3)
+    if (s.includes('قطع') || s.includes('غيار') || s.includes('معلق') || s.includes('انتظار') || s.includes('hold')) {
+      return 3;
+    }
+    // 3. Cancelled (Stage 5)
+    if (s.includes('ملغي') || s.includes('الغاء') || s.includes('cancel')) {
+      return 5;
+    }
+    // 4. In Progress (Stage 2)
+    if (s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('progress')) {
+      return 2;
+    }
+    // 5. New (Stage 1)
+    if (s.includes('جديد') || s.includes('new')) {
+      return 1;
+    }
 
     return 2;
   }
@@ -1479,6 +1498,10 @@ class UltimateFMApp {
         description: updatedDesc,
         stage_id: targetStageId
       };
+
+      if (ticket.assignedTech) {
+        writeFields.user_id = uid;
+      }
 
       const writePayload = {
         jsonrpc: "2.0",
@@ -1812,9 +1835,13 @@ class UltimateFMApp {
     // Render Homeowner Tickets list & Update Category Counters (Emaar App Active vs Completed History Separation)
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
-      const homeownerTks = this.tickets.filter(tk => tk.requester === 'homeowner' && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
+      const homeownerTks = this.tickets.filter(tk => (tk.requester === 'homeowner' || tk.requester === 'owner' || !tk.requester) && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
 
-      const isCompletedStatus = (st) => ['تم الانتهاء', 'تم الإغلاق', 'Done', 'Solved', 'تم الحل', 'تم السداد'].includes(st);
+      const isCompletedStatus = (st) => {
+        if (!st) return false;
+        const s = String(st).toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+        return s.includes('انته') || s.includes('مكتمل') || s.includes('مغلق') || s.includes('حل') || s.includes('done') || s.includes('solved') || s.includes('closed') || s.includes('سداد');
+      };
 
       const activeTks = homeownerTks.filter(t => !isCompletedStatus(t.status));
       const completedTks = homeownerTks.filter(t => isCompletedStatus(t.status));
@@ -1887,16 +1914,196 @@ class UltimateFMApp {
       }
     }
 
-    // Render Financial Inquiries list in Tab 3 (Financials Tab)
-    const finInquiriesList = document.getElementById('financialInquiriesList');
-    if (finInquiriesList) {
-      const finTks = this.tickets.filter(tk => tk.category && (tk.category.includes('حسابات') || tk.category.includes('مالي')));
-      finInquiriesList.innerHTML = '';
-      if (finTks.length === 0) {
-        finInquiriesList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد استفسارات مالية حالية. اضغط الزر أعلاه لإرسال استفسار مالي جديد.</div>`;
+    // Render Maintenance Manager Stream & Live Shift KPIs
+    const managerList = document.getElementById('managerOrdersList');
+    if (managerList) {
+      const allMgrTks = this.tickets.filter(tk => !tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي')));
+      
+      const pendingTks = allMgrTks.filter(tk => tk.status === 'جديد' || !tk.assignedTech);
+      const assignedTks = allMgrTks.filter(tk => tk.assignedTech);
+
+      // 1. Update Shift KPIs
+      const elKpiTotal = document.getElementById('managerKpiTotal');
+      const elKpiAssigned = document.getElementById('managerKpiAssigned');
+      const elKpiPending = document.getElementById('managerKpiPending');
+      const elKpiSlaRate = document.getElementById('managerKpiSlaRate');
+
+      if (elKpiTotal) elKpiTotal.innerText = allMgrTks.length;
+      if (elKpiAssigned) elKpiAssigned.innerText = assignedTks.length;
+      if (elKpiPending) elKpiPending.innerText = pendingTks.length;
+
+      if (elKpiSlaRate) {
+        if (allMgrTks.length === 0) {
+          elKpiSlaRate.innerText = '100% ممتاز';
+        } else {
+          const fastDispatches = assignedTks.filter(t => (t.dispatchMins || 1) <= 15).length;
+          const rate = Math.round((fastDispatches / Math.max(1, assignedTks.length)) * 100);
+          elKpiSlaRate.innerText = `${rate}% ${rate >= 85 ? 'ممتاز' : (rate >= 70 ? 'جيد' : 'يحتاج تسريع')}`;
+        }
+      }
+
+      const badge = document.getElementById('managerInboxBadge');
+      if (badge) badge.innerText = `${pendingTks.length} بانتظار الإسناد`;
+
+      // 2. Filter Manager Orders by Source (all, owner, engineer, public)
+      const currentMgrFilter = this._managerFilter || 'all';
+      let filteredTks = allMgrTks;
+
+      if (currentMgrFilter === 'owner') {
+        filteredTks = allMgrTks.filter(t => t.requester === 'homeowner' || t.requester === 'owner' || t.requester === 'tenant' || !t.requester);
+      } else if (currentMgrFilter === 'engineer') {
+        filteredTks = allMgrTks.filter(t => t.requester === 'engineer' || (t.category && (t.category.includes('تفتيش') || t.category.includes('مرافق'))));
+      } else if (currentMgrFilter === 'public') {
+        filteredTks = allMgrTks.filter(t => t.requester === 'manager' || t.requester === 'public' || (t.category && (t.category.includes('عامة') || t.category.includes('لاند'))));
+      }
+
+      // Update Filter Button Styles
+      ['mgrFilterAll', 'mgrFilterOwner', 'mgrFilterEngineer', 'mgrFilterPublic'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          const btnFilter = btnId.replace('mgrFilter', '').toLowerCase();
+          if (btnFilter === currentMgrFilter) {
+            btn.style.background = '#20274f';
+            btn.style.color = '#ffffff';
+          } else {
+            btn.style.background = 'transparent';
+            btn.style.color = '#20274f';
+          }
+        }
+      });
+
+      managerList.innerHTML = '';
+      if (filteredTks.length === 0) {
+        managerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">لا توجد بلاغات تطابق هذا الفلتر حالياً</div>';
       } else {
-        finTks.forEach(tk => {
-          finInquiriesList.innerHTML += getTicketHtml(tk);
+        filteredTks.forEach(tk => {
+          const createDate = tk.createdAt ? new Date(tk.createdAt) : new Date();
+          const elapsedMins = Math.max(1, Math.round((Date.now() - createDate) / 60000));
+          
+          // Ticket Source Badge & Styling
+          let sourceBadgeHtml = '';
+          let borderAccent = '#1b8f91';
+
+          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('تفتيش'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> تفتيش مهندس الموقع</span>`;
+            borderAccent = '#f59e0b';
+          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('عامة'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> بلاغ مرافق عامة</span>`;
+            borderAccent = '#20274f';
+          } else {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #1b8f91 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> طلب مالك (فيلا 104)</span>`;
+            borderAccent = '#1b8f91';
+          }
+
+          // Manager SLA Speed Indicator
+          let slaBadgeHtml = '';
+          if (tk.assignedTech) {
+            const dMins = tk.dispatchMins || 1;
+            if (dMins <= 15) {
+              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-bolt"></i> إسناد فوري: ${dMins}د (SLA مثالي)</span>`;
+            } else {
+              slaBadgeHtml = `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-clock"></i> إسناد خلال: ${dMins}د</span>`;
+            }
+          } else {
+            if (elapsedMins <= 15) {
+              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-stopwatch"></i> بانتظار الإسناد: منذ ${elapsedMins}د (&lt; 15د)</span>`;
+            } else {
+              slaBadgeHtml = `<span class="badge" style="background: #ef4444; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-triangle-exclamation"></i> تأخر في الإسناد: ${elapsedMins}د</span>`;
+            }
+          }
+
+          // Distinct Color Themes: New (Yellow), In Progress (Blue), Solved (Green), Cancelled (Red)
+          const isNewTicket = (tk.status === 'جديد' || tk.status === 'New');
+          const isCancelled = (tk.status === 'ملغي' || tk.status === 'Cancelled');
+          const isSolved = (tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+          const isInProgress = !isNewTicket && !isCancelled && !isSolved;
+
+          let cardStyle = `flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 12px; padding: 14px; border-radius: 12px; box-shadow: var(--shadow-sm);`;
+          let statusBadgeClass = 'badge-info';
+
+          if (isNewTicket) {
+            // 🟡 NEW = Yellow
+            cardStyle += ` background: #fffdf5; border: 1.5px solid #f59e0b; border-left: 6px solid #d97706; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);`;
+            statusBadgeClass = 'badge-warning';
+          } else if (isCancelled) {
+            // 🔴 CANCELLED = Red
+            cardStyle += ` background: #fef2f2; border: 1.5px solid #ef4444; border-left: 6px solid #dc2626; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.12);`;
+            statusBadgeClass = 'badge-danger';
+          } else if (isSolved) {
+            // 🟢 SOLVED = Green
+            cardStyle += ` background: #f0fdf4; border: 1.5px solid #10b981; border-left: 6px solid #059669; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);`;
+            statusBadgeClass = 'badge-success';
+          } else {
+            // 🔵 IN PROGRESS = Blue
+            cardStyle += ` background: #f0f9ff; border: 1.5px solid #0284c7; border-left: 6px solid #0369a1; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);`;
+            statusBadgeClass = 'badge-info';
+          }
+
+          // Action: Dispatch / Assigned Info / Cancelled Info
+          let actionHtml = '';
+          if (isCancelled) {
+            actionHtml = `
+              <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; color: #991b1b; margin-top: 8px;">
+                <div style="font-weight: 800; display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                  <i class="fa-solid fa-ban"></i> تم إلغاء البلاغ بواسطة: م. أيمن السعيد (مدير الصيانة)
+                </div>
+                <div><b>سبب الإلغاء:</b> ${tk.cancelReason || 'تذكرة مكررة'}</div>
+                ${tk.cancelNotes ? `<div style="font-size: 0.68rem; color: #b91c1c; margin-top: 2px;"><b>ملاحظات:</b> ${tk.cancelNotes}</div>` : ''}
+              </div>
+            `;
+          } else if (isNewTicket) {
+            actionHtml = `
+              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); padding: 10px 12px; border-radius: 8px; margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 0.75rem; font-weight: 800; color: #b45309;"><i class="fa-solid fa-user-gear"></i> إسناد فوري للفني وتكليفه بالمهمة:</span>
+                  <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
+                    <i class="fa-solid fa-ban"></i> إلغاء البلاغ
+                  </button>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <select class="form-control" style="flex: 1; padding: 6px 8px; font-size: 0.75rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700;" id="assignTechSelect_${tk.id}">
+                    <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
+                    <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
+                    <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
+                    <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                  </select>
+                  <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.75rem; white-space: nowrap; margin: 0; font-weight: 800; background: #20274f;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                    <i class="fa-solid fa-paper-plane"></i> إسناد للفني
+                  </button>
+                </div>
+              </div>
+            `;
+          } else {
+            actionHtml = `
+              <div style="background: #ffffff; border: 1px solid #10b981; padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; color: #0f172a; margin-top: 8px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: 700; color: #065f46;">
+                  <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإسناد للفني: <strong>${tk.assignedTech}</strong>
+                  <span style="font-size: 0.65rem; color: #64748b; margin-right: 6px;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
+                </div>
+                <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
+                  <i class="fa-solid fa-ban"></i> إلغاء
+                </button>
+              </div>
+            `;
+          }
+
+          managerList.innerHTML += `
+            <div class="ticket-item" style="${cardStyle}">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  ${sourceBadgeHtml}
+                  ${isNewTicket ? `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-weight: 800; font-size: 0.62rem;"><i class="fa-solid fa-star"></i> جديد</span>` : ''}
+                </div>
+                ${slaBadgeHtml}
+              </div>
+              <h4 style="font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-top: 6px;">${tk.title}</h4>
+              <p style="font-size: 0.72rem; color: #64748b; margin: 0;">
+                التخصص: <b>${tk.category || 'عام'}</b> • كود البلاغ: <b>#${tk.id}</b> • الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; display: inline-block; font-weight: 700;">${tk.status}</span>
+              </p>
+              ${tk.details ? `<div style="font-size: 0.72rem; color: #334155; background: ${isNewTicket ? '#fff8e6' : '#f8fafc'}; padding: 6px 8px; border-radius: 6px; margin-top: 4px; border: 1px dashed rgba(32,39,79,0.1);"><b>الوصف:</b> ${tk.details}</div>` : ''}
+              ${actionHtml}
+            </div>
+          `;
         });
       }
     }
@@ -1940,7 +2147,7 @@ class UltimateFMApp {
       const badge = document.getElementById('engineerTicketCountBadge');
       if (badge) badge.innerText = `${engTks.length} نشطة`;
       engList.innerHTML = '';
-      if (engTks.length === 0) {
+      if (engList.length === 0) {
         engList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 10px;">لا توجد بلاغات حالية</div>';
       } else {
         engTks.forEach(tk => {
@@ -2042,80 +2249,197 @@ class UltimateFMApp {
       }
     }
 
+    // 6. Technician View - Compact Stream, Precise Locations & Daily KPIs
     const techList = document.getElementById('techTasksContainer');
     if (techList) {
-      const techTks = this.tickets.filter(tk => tk.assignedTech === 'كريم حسن' && ['تم التعيين للفني', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب'].includes(tk.status));
+      const allTechTks = this.tickets.filter(tk => tk.assignedTech === 'كريم حسن');
+      const activeTechTks = allTechTks.filter(tk => ['تم التعيين للفني', 'جاري العمل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'قيد الفحص الميداني'].includes(tk.status));
+      const completedTechTks = allTechTks.filter(tk => tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+
+      // 1. Update Daily Technician KPIs
+      const elTechTotal = document.getElementById('techKpiTotal');
+      const elTechCompleted = document.getElementById('techKpiCompleted');
+      const elTechActive = document.getElementById('techKpiActive');
+      const elTechSlaRate = document.getElementById('techKpiSlaRate');
+
+      if (elTechTotal) elTechTotal.innerText = allTechTks.length;
+      if (elTechCompleted) elTechCompleted.innerText = completedTechTks.length;
+      if (elTechActive) elTechActive.innerText = activeTechTks.length;
+
+      if (elTechSlaRate) {
+        if (allTechTks.length === 0) {
+          elTechSlaRate.innerText = '100% ممتاز';
+        } else {
+          const onTimeCount = completedTechTks.length + activeTechTks.filter(t => (t.dispatchMins || 1) <= 45).length;
+          const rate = Math.round((onTimeCount / Math.max(1, allTechTks.length)) * 100);
+          elTechSlaRate.innerText = `${rate}% ${rate >= 85 ? 'ممتاز' : 'جيد'}`;
+        }
+      }
+
       const badge = document.getElementById('techAssignedBadge');
-      if (badge) badge.innerText = `${techTks.length} مهمة نشطة`;
+      if (badge) badge.innerText = `${activeTechTks.length} مهام جارية`;
+
+      // 2. Filter Technician Tasks (active, completed, owner, public)
+      const currentTechFilter = this._techFilter || 'active';
+      let filteredTechTks = activeTechTks;
+
+      if (currentTechFilter === 'completed') {
+        filteredTechTks = completedTechTks;
+      } else if (currentTechFilter === 'owner') {
+        filteredTechTks = allTechTks.filter(t => t.requester === 'homeowner' || t.requester === 'owner' || t.requester === 'tenant' || !t.requester);
+      } else if (currentTechFilter === 'public') {
+        filteredTechTks = allTechTks.filter(t => t.requester === 'manager' || t.requester === 'public' || t.requester === 'engineer' || (t.category && (t.category.includes('عامة') || t.category.includes('تفتيش'))));
+      }
+
+      // Update Filter Button Styles
+      ['techFilterActive', 'techFilterCompleted', 'techFilterOwner', 'techFilterPublic'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          const btnFilter = btnId.replace('techFilter', '').toLowerCase();
+          if (btnFilter === currentTechFilter) {
+            btn.style.background = '#20274f';
+            btn.style.color = '#ffffff';
+          } else {
+            btn.style.background = 'transparent';
+            btn.style.color = '#20274f';
+          }
+        }
+      });
+
       techList.innerHTML = '';
-      if (techTks.length === 0) {
-        techList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد مهام نشطة حالياً للبحث</div>';
+      if (filteredTechTks.length === 0) {
+        techList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">
+          ${currentTechFilter === 'completed' ? 'لا توجد مهام مكتملة بالسجل حتى الآن' : 'لا توجد مهام جارية حالياً'}
+        </div>`;
       } else {
-        techTks.forEach(tk => {
+        filteredTechTks.forEach(tk => {
+          const isDone = (tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+
+          // Determine Source & Precise Location
+          let sourceBadgeHtml = '';
+          let locationDetailsHtml = '';
+          let borderAccent = '#0284c7';
+
+          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('تفتيش'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> تفتيش هندسي</span>`;
+            borderAccent = '#f59e0b';
+            locationDetailsHtml = `
+              <div style="background: #fffbeb; border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #92400e; margin: 4px 0;">
+                <div><b>📍 الموقع:</b> مرحلة Phase 2 • زون المباني B • عمارة 12 / شقة 302</div>
+                <div><b>👷 المشرف:</b> م. حسام الدين (مهندس الموقع)</div>
+              </div>
+            `;
+          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('عامة'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> مرفق عام للقرية</span>`;
+            borderAccent = '#20274f';
+            locationDetailsHtml = `
+              <div style="background: rgba(32, 39, 79, 0.04); border: 1px solid rgba(32, 39, 79, 0.12); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #1e293b; margin: 4px 0;">
+                <div><b>📍 الموقع:</b> ${tk.location || 'المسبح الرئيسي والبحيرة'} • زون الشاطئ واللاندسكيب</div>
+                <div><b>🛡️ المشرف:</b> م. أيمن السعيد (مدير الصيانة)</div>
+              </div>
+            `;
+          } else {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #0f766e !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> وحدة مالك خاصة</span>`;
+            borderAccent = '#1b8f91';
+            locationDetailsHtml = `
+              <div style="background: #f0fdfa; border: 1px solid rgba(27, 143, 145, 0.25); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #115e59; margin: 4px 0;">
+                <div><b>📍 الموقع:</b> زون 1 - مارينا فيو • نوع الوحدة: فيلا مستقلة • رقم الوحدة: <b>فيلا 104</b></div>
+                <div><b>👤 العميل:</b> أ. محمد عبد الرحمن (هاتف: 01001234567)</div>
+              </div>
+            `;
+          }
+
           let innerTechHtml = '';
 
-          if (tk.status === 'تم التعيين للفني') {
+          if (isDone) {
+            // Completed Compact View
             innerTechHtml = `
-              <!-- Basic Check-in photo -->
-              <div style="display: flex; gap: 8px; align-items: center; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 8px;">
-                <img src="${tk.photoBefore}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15);">
-                <div>
-                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">صورة العطل المعتمدة:</span>
-                  <span style="font-size: 0.7rem; color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> يمنع عمل أي مهمة جانبية غير الصورة!</span>
+              <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 8px 12px; border-radius: 8px; font-size: 0.73rem; color: #166534; margin-top: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 800;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإصلاح والإغلاق بنجاح</span>
+                  <span style="font-size: 0.65rem; color: #15803d; font-weight: 700;">مدة الحل: ${tk.resolutionTime || '22 دقيقة'}</span>
+                </div>
+                ${tk.photoAfter ? `
+                  <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                    <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1;" title="قبل">
+                    <i class="fa-solid fa-arrow-left" style="color: #10b981; font-size: 0.75rem;"></i>
+                    <img src="${tk.photoAfter}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #86efac;" title="بعد الإصلاح">
+                    <span style="font-size: 0.68rem; color: #15803d;">تم توثيق صورة العطل وصورة الإصلاح بأودو</span>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          } else if (tk.status === 'تم التعيين للفني' || tk.status === 'جاري العمل') {
+            innerTechHtml = `
+              <!-- Compact Problem Details -->
+              <div style="display: flex; gap: 8px; align-items: center; background: #f8fafc; padding: 6px 8px; border-radius: 8px; margin-top: 4px; border: 1px solid #e2e8f0;">
+                <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1;">
+                <div style="flex: 1;">
+                  <div style="font-size: 0.72rem; color: #334155; font-weight: 600;">${tk.details || tk.title}</div>
+                  <div style="font-size: 0.65rem; color: #64748b;">⏱️ SLA المستهدف للإصلاح: 45 دقيقة</div>
                 </div>
               </div>
 
-              <!-- Option A: Simple Fix -->
-              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; margin-top: 4px;">
-                <span style="font-size: 0.72rem; font-weight: 700; color: #10b981; display: block; margin-bottom: 4px;">الخيار الأول: العطل بسيط (تصلح بدون قطع غيار):</span>
-                <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
-                <button class="btn btn-success" style="width: 100%; font-size: 0.78rem; padding: 8px; margin-top:0;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                  <i class="fa-solid fa-circle-check"></i> تم الإصلاح عادي وإغلاق التذكرة
-                </button>
-              </div>
+              <!-- Streamlined Action: Option 1 (Simple Fix) & Option 2 (Needs Part) -->
+              <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+                <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px 10px; border-radius: 8px;">
+                  <div style="font-size: 0.72rem; font-weight: 800; color: #065f46; margin-bottom: 4px;">
+                    <i class="fa-solid fa-wrench"></i> خيار 1: إصلاح مباشر (عطل بسيط بدون قطع غيار)
+                  </div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 6px; font-size: 0.7rem; flex: 1;">
+                    <button class="btn btn-success" style="padding: 6px 12px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 800;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                      <i class="fa-solid fa-circle-check"></i> تم الإصلاح
+                    </button>
+                  </div>
+                </div>
 
-              <!-- Option B: Needs Part -->
-              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; margin-top: 6px;">
-                <span style="font-size: 0.72rem; font-weight: 700; color: var(--primary-gold); display: block; margin-bottom: 4px;">الخيار الثاني: العطل يتطلب قطعة غيار تالفة:</span>
-                <input type="file" id="techPhotoDamaged_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
-                <button class="btn btn-warning" style="width: 100%; font-size: 0.78rem; padding: 8px; margin-top:0;" onclick="app.technicianRequestPart('${tk.id}', 'techPhotoDamaged_${tk.id}')">
-                  <i class="fa-solid fa-boxes-stacked"></i> تصوير القطعة والبحث بالمخزن
-                </button>
+                <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); padding: 8px 10px; border-radius: 8px;">
+                  <div style="font-size: 0.72rem; font-weight: 800; color: #b45309; margin-bottom: 4px;">
+                    <i class="fa-solid fa-boxes-stacked"></i> خيار 2: يتطلب قطعة غيار تالفة من المخزن
+                  </div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="file" id="techPhotoDamaged_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 6px; font-size: 0.7rem; flex: 1;">
+                    <button class="btn btn-warning" style="padding: 6px 12px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 800;" onclick="app.technicianRequestPart('${tk.id}', 'techPhotoDamaged_${tk.id}')">
+                      <i class="fa-solid fa-camera"></i> طلب قطعة
+                    </button>
+                  </div>
+                </div>
               </div>
             `;
           } else if (tk.status === 'انتظار دفع المالك') {
             innerTechHtml = `
-              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #fcd34d;">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> <strong>بانتظار إتمام الدفع من شاشة المالك:</strong>
-                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
-                  تم طلب قطعة [<strong>${tk.partName}</strong>] بسعر <strong>${tk.partPrice} ج.م</strong> وتوقيع المالك بالموافقة. يرجى الانتظار حتى سداد القيمة من تطبيق العميل للبدء في التركيب.
-                </p>
+              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 8px 10px; border-radius: 8px; font-size: 0.72rem; color: #92400e; margin-top: 6px;">
+                <div style="font-weight: 800; margin-bottom: 2px;"><i class="fa-solid fa-hourglass-half"></i> بانتظار سداد المالك لقيمة القطعة (${tk.partPrice || 350} ج.م)</div>
+                <div>تم إرسال إشعار الدفع لتطبيق المالك (فيلا 104)، سيبدأ التركيب فور السداد.</div>
               </div>
             `;
           } else if (tk.status === 'تم الدفع - جاري التركيب') {
             innerTechHtml = `
-              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #6ee7b7; margin-bottom: 8px;">
-                <i class="fa-solid fa-circle-check"></i> <strong>تم الدفع بنجاح!</strong>
-                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
-                  يرجى صرف قطعة [<strong>${tk.partName}</strong>] من المخزن وتركيبها بالوحدة، ثم إرفاق صورة الإصلاح بعد التركيب.
-                </p>
+              <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 8px 10px; border-radius: 8px; font-size: 0.72rem; color: #166534; margin-top: 6px;">
+                <div style="font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم سداد قيمة القطعة [${tk.partName || 'محبس نحاس'}]!</div>
+                <div>يرجى استلام القطعة من المخزن وتركيبها، ثم إرفاق صورة بعد التركيب:</div>
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 6px;">
+                  <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 6px; font-size: 0.7rem; flex: 1;">
+                  <button class="btn btn-success" style="padding: 6px 12px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 800;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                    <i class="fa-solid fa-check"></i> إنهاء المهمة
+                  </button>
+                </div>
               </div>
-              <div style="margin-top: 4px;">
-                <label class="form-label" style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إرفاق صورة بعد التركيب والإصلاح:</label>
-                <input type="file" id="techPhotoAfter_${tk.id}" class="form-control" accept="image/*" style="padding: 4px 8px; font-size: 0.72rem; margin-bottom: 6px;">
-              </div>
-              <button class="btn btn-success" style="width:100%; padding: 8px; font-size: 0.78rem; margin-top:0;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                <i class="fa-solid fa-check"></i> تم التركيب وإنهاء المهمة بالكامل
-              </button>
             `;
           }
 
           techList.innerHTML += `
-            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#f59e0b' : 'rgba(32,39,79,0.15)')};">
-              <div style="display: flex; justify-content: space-between;">
-                <h4 style="font-size: 0.88rem; font-weight: 700;">${tk.title}</h4>
-                <span class="badge ${tk.bgClass}">#${tk.id}</span>
+            <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 10px; padding: 12px; border-radius: 10px; background: #ffffff; border: 1px solid rgba(32,39,79,0.08); border-left: 5px solid ${isDone ? '#10b981' : borderAccent}; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  ${sourceBadgeHtml}
+                  <span class="badge ${isDone ? 'badge-success' : 'badge-info'}" style="font-size: 0.62rem;">${tk.status}</span>
+                </div>
+                <span style="font-size: 0.65rem; color: #64748b; font-weight: 700;">#${tk.id}</span>
               </div>
+              <h4 style="font-size: 0.88rem; font-weight: 800; color: #1e293b; margin-top: 4px;">${tk.title}</h4>
+              ${locationDetailsHtml}
               ${innerTechHtml}
             </div>
           `;
@@ -2391,6 +2715,114 @@ class UltimateFMApp {
           `;
         });
       }
+    }
+  }
+
+  setManagerFilter(filterState) {
+    this._managerFilter = filterState || 'all';
+    this.renderTickets();
+  }
+
+  setTechTaskFilter(filterState) {
+    this._techFilter = filterState || 'active';
+    this.renderTickets();
+  }
+
+  async handleManagerFieldIncidentSubmit() {
+    const facilitySelect = document.getElementById('managerFieldFacilitySelect');
+    const techSelect = document.getElementById('managerFieldTechSelect');
+    const detailsInput = document.getElementById('managerFieldProblemDetails');
+
+    const facility = facilitySelect ? facilitySelect.value : 'المرافق العامة';
+    const techName = techSelect ? techSelect.value : 'أحمد علي';
+    const details = (detailsInput && detailsInput.value.trim()) ? detailsInput.value.trim() : `صيانة ومعاينة ميدانية في: ${facility}`;
+
+    const newTk = {
+      id: Math.floor(1000 + Math.random() * 9000),
+      title: `عطل مرافق: ${facility}`,
+      category: 'صيانة مرافق عامة',
+      details: details,
+      location: facility,
+      requester: 'manager',
+      requesterName: 'م. أيمن السعيد (مدير الصيانة)',
+      status: 'تم التعيين للفني',
+      bgClass: 'badge-info',
+      assignedTech: techName,
+      priority: '3',
+      createdAt: new Date().toISOString(),
+      dispatchedAt: new Date().toISOString(),
+      dispatchMins: 1,
+      photoBefore: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=150'
+    };
+
+    this.tickets.unshift(newTk);
+    this.saveTicketsToStorage();
+    this.renderTickets();
+
+    if (detailsInput) detailsInput.value = '';
+
+    this.showToast(`✅ تم إصدار أمر العمل الميداني بنجاح!\nالموقع: ${facility}\nالفني المكلف: ${techName}\nتم توجيهه لشاشة الفني وأودو.`);
+
+    // Sync to Odoo
+    try {
+      await this.syncTicketToOdoo(newTk, '01221122334', 'م. أيمن السعيد (مدير الصيانة)');
+      this.saveTicketsToStorage();
+      this.renderTickets();
+    } catch (e) {
+      console.warn('[Manager Incident Sync Error]', e);
+    }
+  }
+
+  openCancelTicketModal(ticketId) {
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    const infoBox = document.getElementById('cancelTicketInfoBox');
+    const targetInput = document.getElementById('cancelTargetTicketId');
+
+    if (infoBox) {
+      infoBox.innerHTML = `
+        <div style="font-weight: 800; margin-bottom: 2px;">#${tk.id} - ${tk.title}</div>
+        <div style="font-size: 0.7rem; color: #7f1d1d;">طالب الخدمة: ${tk.requesterName || tk.requester || 'مالك الوحدة'} • الحالة الحالية: ${tk.status}</div>
+      `;
+    }
+    if (targetInput) targetInput.value = tk.id;
+
+    this.openModal('modalManagerCancelTicket');
+  }
+
+  async confirmCancelTicket() {
+    const targetInput = document.getElementById('cancelTargetTicketId');
+    const reasonSelect = document.getElementById('cancelReasonSelect');
+    const notesInput = document.getElementById('cancelNotesInput');
+
+    const ticketId = targetInput ? targetInput.value : '';
+    const reason = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
+    const notes = (notesInput && notesInput.value.trim()) ? notesInput.value.trim() : '';
+
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    tk.status = 'ملغي';
+    tk.bgClass = 'badge-danger';
+    tk.cancelReason = reason;
+    tk.cancelNotes = notes;
+    tk.cancelledBy = 'م. أيمن السعيد (مدير الصيانة)';
+    tk.cancelledAt = new Date().toISOString();
+
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.closeModal('modalManagerCancelTicket');
+
+    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} بنجاح!\nالسبب: ${reason}\nتم توثيق الإلغاء ونقله لأودو.`);
+
+    // Sync Cancellation to Odoo (Stage 5 = Cancelled + Chatter Log)
+    try {
+      await this.syncTicketUpdateToOdoo(tk);
+      this.saveTicketsToStorage();
+      this.renderTickets();
+    } catch (err) {
+      console.warn('[Odoo Cancel Sync Error]:', err);
     }
   }
 
@@ -5493,6 +5925,12 @@ window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
 window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
 window.setLanguage = function(lang) { if (window.app) window.app.setLanguage(lang); };
 window.switchHomeownerTab = function(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); };
+window.setEmaarTicketFilter = function(filterState) { if (window.app) window.app.setEmaarTicketFilter(filterState); };
+window.setManagerFilter = function(filterState) { if (window.app) window.app.setManagerFilter(filterState); };
+window.setTechTaskFilter = function(filterState) { if (window.app) window.app.setTechTaskFilter(filterState); };
+window.handleManagerFieldIncidentSubmit = function() { if (window.app) window.app.handleManagerFieldIncidentSubmit(); };
+window.openCancelTicketModal = function(ticketId) { if (window.app) window.app.openCancelTicketModal(ticketId); };
+window.confirmCancelTicket = function() { if (window.app) window.app.confirmCancelTicket(); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());

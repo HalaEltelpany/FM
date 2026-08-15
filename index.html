@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -65,6 +65,12 @@
     function handleLogin() { if (window.app) window.app.handleLogin(); }
     function setLanguage(lang) { if (window.app) window.app.setLanguage(lang); }
     function switchHomeownerTab(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); }
+    function setEmaarTicketFilter(f) { if (window.app) window.app.setEmaarTicketFilter(f); }
+    function setManagerFilter(f) { if (window.app) window.app.setManagerFilter(f); }
+    function setTechTaskFilter(f) { if (window.app) window.app.setTechTaskFilter(f); }
+    function handleManagerFieldIncidentSubmit() { if (window.app) window.app.handleManagerFieldIncidentSubmit(); }
+    function openCancelTicketModal(id) { if (window.app) window.app.openCancelTicketModal(id); }
+    function confirmCancelTicket() { if (window.app) window.app.confirmCancelTicket(); }
     function handleOwnerAvatarUpload(e) { if (window.app) window.app.handleOwnerAvatarUpload(e); }
     function assignTechnician(id, selectId) { if (window.app) window.app.assignTechnician(id, selectId); }
     function completeTicket(id, fileId) { if (window.app) window.app.completeTicket(id, fileId); }
@@ -912,54 +918,127 @@
           <div class="view-panel" id="viewManager">
             <div class="sticky-view-header">
               <button class="btn btn-sm" onclick="showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
-                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+                <i class="fa-solid fa-arrow-right"></i> العودة للأدوار
               </button>
-              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-users-gear"></i> <span>إدارة الصيانة</span>
+              <div style="font-size: 0.72rem; font-weight: 800; color: #1b8f91; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-users-gear"></i> <span>إدارة الصيانة والتشغيل الميداني</span>
               </div>
             </div>
             
-            <div class="card gold-border">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+            <!-- Executive Manager Profile Header -->
+            <div class="card gold-border" style="background: linear-gradient(135deg, #1c2140 0%, #2a3363 100%); color: #ffffff;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                  <span style="font-size: 0.75rem; color: var(--text-muted);">قسم إدارة وتوزيع الصيانة</span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800;">المهندس / أيمن السعيد (مدير الصيانة)</h2>
-                  <p style="font-size: 0.75rem; color: var(--primary-gold);">استقبال وتخصيص البلاغات للفنيين المتاحين</p>
+                  <span style="font-size: 0.7rem; color: #d4af37; font-weight: 700; text-transform: uppercase;">
+                    <i class="fa-solid fa-user-shield"></i> لوحة قيادة العمليات والتشغيل
+                  </span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #ffffff; margin-top: 2px;">المهندس / أيمن السعيد</h2>
+                  <p style="font-size: 0.75rem; color: #93c5fd; margin: 0;">مدير عام قطاع الصيانة والمرافق العامة</p>
                 </div>
-                <span class="badge badge-success"><i class="fa-solid fa-signal"></i> متصل الأن</span>
+                <span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-circle"></i> شفت التشغيل الميداني</span>
               </div>
             </div>
 
-            <!-- Housekeeping Request Card for Manager -->
-            <div class="card" style="margin-top: 16px;">
-              <div class="card-header">
-                <span class="card-title" id="managerHkTitle"><i class="fa-solid fa-broom"></i> طلب نظافة للأماكن العامة</span>
+            <!-- Manager Shift KPI Performance Matrix (تقييم أداء الشفت لمدير الصيانة) -->
+            <div class="card" style="padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.78rem; font-weight: 800; color: #20274f;">
+                  <i class="fa-solid fa-chart-line" style="color: #d4af37;"></i> مؤشرات أداء الشفت لمدير الصيانة (KPIs)
+                </span>
+                <span class="badge badge-info" style="font-size: 0.62rem;" id="managerSlaTargetBadge">المستهدف: &lt; 15 دقيقة للتوزيع</span>
               </div>
-              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;" id="managerHkDesc">
-                يمكنك هنا طلب تنظيف لقطاع عام بالقرية (مثل المسبح الرئيسي، الشاطئ، اللاندسكيب، الممرات).
+
+              <div class="grid-2" style="gap: 8px;">
+                <!-- 1. Total Received -->
+                <div style="background: rgba(32, 39, 79, 0.04); border: 1px solid rgba(32, 39, 79, 0.1); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">📥 إجمالي الوارد للشفت</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #20274f;" id="managerKpiTotal">0</div>
+                </div>
+
+                <!-- 2. Dispatched / Assigned -->
+                <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">⚡ تم التوزيع للفنيين</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #059669;" id="managerKpiAssigned">0</div>
+                </div>
+
+                <!-- 3. Pending Assignment -->
+                <div style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #d97706; font-weight: 700;">⏳ قيد الإسناد والانتظار</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #d97706;" id="managerKpiPending">0</div>
+                </div>
+
+                <!-- 4. SLA Dispatch Speed Rate -->
+                <div style="background: rgba(27, 143, 145, 0.06); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #0f766e; font-weight: 700;">🎯 معدل سرعة الإسناد (SLA)</div>
+                  <div style="font-size: 1.05rem; font-weight: 900; color: #0f766e;" id="managerKpiSlaRate">98% ممتاز</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Field Quick Incident Creation (إصدار بلاغ فوري للأماكن والمرافق العامة أثناء الجولة الميدانية) -->
+            <div class="card" style="border-right: 4px solid #d4af37;">
+              <div class="card-header" style="margin-bottom: 6px;">
+                <span class="card-title" style="font-size: 0.82rem; font-weight: 800; color: #20274f;">
+                  <i class="fa-solid fa-helmet-safety" style="color: #d4af37;"></i> إصدار أمر عمل ميداني للمرافق العامة (جولة الموقع)
+                </span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">
+                رصد عطل بالأماكن العامة (أعمدة إنارة، مسابح، ممرات، لاندسكيب، مضخات) وتكليف الفني فوراً:
               </p>
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <select id="managerCleaningLocation" name="managerCleaningLocation" class="form-control" style="font-size: 0.8rem; height: 36px; padding: 4px 8px; background: var(--bg-card); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">
-                  <option value="المسبح الرئيسي">المسبح الرئيسي (Main Pool)</option>
-                  <option value="شاطئ البحيرة">شاطئ البحيرة (Resort Beach)</option>
-                  <option value="ممرات المشاة">ممرات المشاة (Pedestrian Walkways)</option>
-                  <option value="مبنى الإدارة">مبنى الإدارة (Administration Building)</option>
-                </select>
-                <button class="btn btn-primary" id="btnManagerHkSubmit" onclick="openHousekeepingModal('manager')" style="font-size: 0.8rem; white-space: nowrap; height: 36px; line-height: 1; display: flex; align-items: center; gap: 4px;">
-                  <i class="fa-solid fa-paper-plane"></i> إرسال الطلب
+              
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="grid-2" style="gap: 6px;">
+                  <div>
+                    <label for="managerFieldFacilitySelect" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">الموقع / المرفق العام:</label>
+                    <select id="managerFieldFacilitySelect" name="managerFieldFacilitySelect" class="form-control" style="font-size: 0.75rem; padding: 6px 8px;">
+                      <option value="أعمدة إنارة وممرات المشاة">💡 أعمدة الإنارة وممرات المشاة</option>
+                      <option value="المسبح الرئيسي والبحيرة">🏊 المسبح الرئيسي والبحيرة</option>
+                      <option value="محطة مياه الشرب RO ومحطة STP">💧 محطات المياه والمعالجة</option>
+                      <option value="شبكات ري الحدائق واللاندسكيب">🌿 شبكات الري والمساحات الخضراء</option>
+                      <option value="المول التجاري والأماكن الخدمية">🏬 المول التجاري والأماكن الخدمية</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="managerFieldTechSelect" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">إسناد مباشر للفني:</label>
+                    <select id="managerFieldTechSelect" name="managerFieldTechSelect" class="form-control" style="font-size: 0.75rem; padding: 6px 8px;">
+                      <option value="أحمد علي">⚡ أحمد علي (فني كهرباء)</option>
+                      <option value="كريم حسن">❄️ كريم حسن (فني تكييف وميكانيكا)</option>
+                      <option value="مينا جرجس">🔧 مينا جرجس (فني سباكة وشبكات)</option>
+                      <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="managerFieldProblemDetails" style="font-size: 0.68rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 2px;">وصف العطل المطلوب إصلاحه:</label>
+                  <input type="text" id="managerFieldProblemDetails" name="managerFieldProblemDetails" class="form-control" placeholder="مثال: عمود إنارة مطفأ أمام زون الشمال قرب فيلا 104" style="font-size: 0.75rem;">
+                </div>
+
+                <button class="btn btn-primary" id="btnCreateManagerFieldIncident" onclick="handleManagerFieldIncidentSubmit()" style="font-size: 0.78rem; padding: 8px; width: 100%; font-weight: 700;">
+                  <i class="fa-solid fa-paper-plane"></i> إصدار أمر الصيانة وإرساله فوراً لشاشة الفني وأودو
                 </button>
               </div>
             </div>
 
-            <!-- Incoming Orders Stream (From Engineers + Customers) -->
+            <!-- Incoming Orders Stream & Multi-Source Filtering -->
             <div class="card">
-              <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-inbox"></i> طلبات الصيانة الواردة</span>
-                <span class="badge badge-warning" id="managerInboxBadge">0 بلاغات بانتظار التخصيص</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="card-title" style="font-size: 0.85rem; font-weight: 800; color: #20274f;">
+                  <i class="fa-solid fa-inbox" style="color: #1b8f91;"></i> سجل بلاغات وطلبات الصيانة الواردة
+                </span>
+                <span class="badge badge-warning" id="managerInboxBadge" style="font-size: 0.65rem;">0 بانتظار الإسناد</span>
+              </div>
+
+              <!-- Filter Source Segmented Control -->
+              <div style="display: flex; gap: 4px; background: rgba(32, 39, 79, 0.06); padding: 3px; border-radius: 8px; margin-bottom: 10px; overflow-x: auto;">
+                <button class="btn btn-sm" id="mgrFilterAll" onclick="setManagerFilter('all')" style="flex: 1; margin: 0; padding: 5px 4px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: #20274f; color: #ffffff;">الكل</button>
+                <button class="btn btn-sm" id="mgrFilterOwner" onclick="setManagerFilter('owner')" style="flex: 1; margin: 0; padding: 5px 4px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f;">🏡 الملاك</button>
+                <button class="btn btn-sm" id="mgrFilterEngineer" onclick="setManagerFilter('engineer')" style="flex: 1; margin: 0; padding: 5px 4px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f;">👷 المهندسين</button>
+                <button class="btn btn-sm" id="mgrFilterPublic" onclick="setManagerFilter('public')" style="flex: 1; margin: 0; padding: 5px 4px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f;">🏛️ المرافق العامة</button>
               </div>
 
               <div class="list-group" id="managerOrdersList">
-                <!-- Renders Dynamically -->
+                <!-- Renders Dynamically with Rich Distinction and High Contrast -->
               </div>
             </div>
 
@@ -971,33 +1050,82 @@
           <div class="view-panel" id="viewTechnician">
             <div class="sticky-view-header">
               <button class="btn btn-sm" onclick="showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
-                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+                <i class="fa-solid fa-arrow-right"></i> العودة للأدوار
               </button>
-              <div style="font-size: 0.72rem; font-weight: 800; color: var(--brand-teal); display: flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-wrench"></i> <span>الفني الميداني</span>
+              <div style="font-size: 0.72rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-screwdriver-wrench"></i> <span>فريق التنفيذ الميداني</span>
               </div>
             </div>
             
-            <div class="card gold-border">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+            <!-- Technician Profile Header -->
+            <div class="card gold-border" style="background: linear-gradient(135deg, #1c2140 0%, #1e3a5f 100%); color: #ffffff;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                  <span style="font-size: 0.75rem; color: var(--text-muted);">الفني الميداني المنفذ</span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800;">الفني / كريم حسن</h2>
-                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">تخصص: تكييف وكهروميكانيك • حالة: متاح</p>
+                  <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; text-transform: uppercase;">
+                    <i class="fa-solid fa-id-badge"></i> فني أول تشغيل وصيانة
+                  </span>
+                  <h2 style="font-size: 1.1rem; font-weight: 800; color: #ffffff; margin-top: 2px;">الفني / كريم حسن</h2>
+                  <p style="font-size: 0.73rem; color: #cbd5e1; margin: 0;">تخصص: تكييف وكهروميكانيك • كود: #TECH-104</p>
                 </div>
-                <span class="badge badge-success"><i class="fa-solid fa-wrench"></i> جاهز للمهام</span>
+                <span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-bolt"></i> جاهز ميدانياً</span>
               </div>
             </div>
 
-            <!-- Assigned Tasks from Maintenance Manager -->
+            <!-- Technician Daily Performance & SLA Matrix (مؤشرات أداء الفني اليومية) -->
+            <div class="card" style="padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.78rem; font-weight: 800; color: #20274f;">
+                  <i class="fa-solid fa-chart-pie" style="color: #0284c7;"></i> مؤشرات أداء الفني اليوم (Daily KPIs)
+                </span>
+                <span class="badge badge-info" style="font-size: 0.62rem;">المستهدف: &lt; 45 دقيقة للإصلاح</span>
+              </div>
+
+              <div class="grid-2" style="gap: 8px;">
+                <!-- 1. Total Assigned Today -->
+                <div style="background: rgba(32, 39, 79, 0.04); border: 1px solid rgba(32, 39, 79, 0.1); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">📋 إجمالي مهام اليوم</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #20274f;" id="techKpiTotal">0</div>
+                </div>
+
+                <!-- 2. Completed -->
+                <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">✅ تم إنجازها بنجاح</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #059669;" id="techKpiCompleted">0</div>
+                </div>
+
+                <!-- 3. Active Tasks -->
+                <div style="background: rgba(2, 132, 199, 0.06); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #0284c7; font-weight: 700;">⚡ مهام جارية الآن</div>
+                  <div style="font-size: 1.15rem; font-weight: 900; color: #0284c7;" id="techKpiActive">0</div>
+                </div>
+
+                <!-- 4. SLA Resolution Rate -->
+                <div style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 8px 10px; text-align: center;">
+                  <div style="font-size: 0.65rem; color: #d97706; font-weight: 700;">🎯 جودة الـ SLA المستهدف</div>
+                  <div style="font-size: 1.05rem; font-weight: 900; color: #d97706;" id="techKpiSlaRate">95% ممتاز</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Technician Tasks Feed & Filters -->
             <div class="card">
-              <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-list-check"></i> المهمة الحالية الموجهة من مدير الصيانة</span>
-                <span class="badge badge-warning" id="techAssignedBadge">0 مهمة نشطة</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="card-title" style="font-size: 0.85rem; font-weight: 800; color: #20274f;">
+                  <i class="fa-solid fa-list-check" style="color: #0284c7;"></i> جدول وأوامر العمل الميداني
+                </span>
+                <span class="badge badge-info" id="techAssignedBadge" style="font-size: 0.65rem;">0 مهام جارية</span>
+              </div>
+
+              <!-- Filter Tabs: Active Tasks vs Completed History vs Sources -->
+              <div style="display: flex; gap: 4px; background: rgba(32, 39, 79, 0.06); padding: 3px; border-radius: 8px; margin-bottom: 10px; overflow-x: auto;">
+                <button class="btn btn-sm" id="techFilterActive" onclick="setTechTaskFilter('active')" style="flex: 1; margin: 0; padding: 5px 6px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: #20274f; color: #ffffff; white-space: nowrap;">⚡ المهام الجارية</button>
+                <button class="btn btn-sm" id="techFilterCompleted" onclick="setTechTaskFilter('completed')" style="flex: 1; margin: 0; padding: 5px 6px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f; white-space: nowrap;">✅ سجل المنتهية</button>
+                <button class="btn btn-sm" id="techFilterOwner" onclick="setTechTaskFilter('owner')" style="flex: 1; margin: 0; padding: 5px 6px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f; white-space: nowrap;">🏡 وحدات الملاك</button>
+                <button class="btn btn-sm" id="techFilterPublic" onclick="setTechTaskFilter('public')" style="flex: 1; margin: 0; padding: 5px 6px; font-size: 0.68rem; font-weight: 700; border-radius: 6px; background: transparent; color: #20274f; white-space: nowrap;">🏛️ المرافق العامة</button>
               </div>
 
               <div class="list-group" id="techTasksContainer">
-                <!-- Renders Dynamically -->
+                <!-- Renders Dynamically with Compact Layout and Precise Location Badges -->
               </div>
             </div>
 
@@ -2543,9 +2671,47 @@
         </div>
       </div>
 
-      <button class="btn btn-secondary" onclick="closeModal('modalAllManagementMessages')" style="width: 100%; margin-top: 14px;">
-        إغلاق النافذة
-      </button>
+  <!-- 14. Manager Ticket Cancellation Modal with Mandatory Reason -->
+  <div class="modal-overlay" id="modalManagerCancelTicket">
+    <div class="modal-card" style="border-top: 4px solid #ef4444;">
+      <button class="modal-close" onclick="closeModal('modalManagerCancelTicket')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #dc2626; font-size: 0.95rem;">
+        <i class="fa-solid fa-ban"></i> إلغاء بلاغ الصيانة (صلاحية مدير الصيانة)
+      </h3>
+      <p style="font-size: 0.73rem; color: var(--text-muted); margin-bottom: 12px;">
+        الصلاحية الحصرية لمدير الصيانة لإلغاء البلاغات المكررة أو المنتهية مسبقاً، وسيتم توثيق الإلغاء والسبب تلقائياً في سجلات أودو.
+      </p>
+
+      <div id="cancelTicketInfoBox" style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.75rem; color: #991b1b;">
+        <!-- Dynamic Target Ticket Info -->
+      </div>
+
+      <input type="hidden" id="cancelTargetTicketId" value="">
+
+      <div class="form-group">
+        <label for="cancelReasonSelect" class="form-label" style="font-weight: 700; color: #20274f;">سبب الإلغاء الإجباري:</label>
+        <select id="cancelReasonSelect" name="cancelReasonSelect" class="form-control" style="font-size: 0.78rem; font-weight: 600; padding: 8px;">
+          <option value="تذكرة مكررة (Duplicate Ticket) - تم تقديم بلاغ سابق لنفس العطل">🔁 تذكرة مكررة (Duplicate Ticket) - تم تقديم بلاغ سابق لنفس العطل</option>
+          <option value="المشكلة تم حلها مسبقاً (Already Resolved) - تم الإصلاح بالفعل وقام العميل بتكرار الطلب">✅ المشكلة تم حلها مسبقاً (Already Resolved) - تم الإصلاح بالفعل</option>
+          <option value="بيانات غير مكتملة أو بلاغ خاطئ (Invalid / Incomplete Data)">⚠️ بيانات غير مكتملة أو بلاغ خاطئ</option>
+          <option value="سوء استخدام خارج نطاق التغطية والضمان (Out of Scope)">❌ خارج نطاق التغطية وضمان القرية</option>
+          <option value="تم الإلغاء بناءً على طلب العميل المباشر (Cancelled per Resident Request)">👤 تم الإلغاء بناءً على طلب العميل المباشر</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="cancelNotesInput" class="form-label" style="font-weight: 700; color: #20274f;">ملاحظات وتوجيهات المدير (اختياري):</label>
+        <textarea id="cancelNotesInput" name="cancelNotesInput" class="form-control" rows="2" placeholder="اكتب تفاصيل إضافية عن سبب إلغاء البلاغ لتوثيقها في أودو..." style="font-size: 0.75rem;"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 14px;">
+        <button class="btn btn-secondary" onclick="closeModal('modalManagerCancelTicket')" style="flex: 1; margin: 0; font-size: 0.78rem;">
+          تراجع
+        </button>
+        <button class="btn btn-danger" onclick="confirmCancelTicket()" style="flex: 2; margin: 0; font-size: 0.78rem; font-weight: 700;">
+          <i class="fa-solid fa-ban"></i> تأكيد الإلغاء والمزامنة مع أودو
+        </button>
+      </div>
     </div>
   </div>
 
