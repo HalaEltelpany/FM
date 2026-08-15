@@ -61,35 +61,8 @@ class UltimateFMApp {
     this.commElecBalance = 1450.00; // Commercial Electricity
     this.commWaterBalance = 820.00; // Commercial Water
     
-    // Sample state data
-    this.tickets = [
-      { 
-        id: 'TK-8041', 
-        title: 'صيانة تكييف الماستر بالفيلا', 
-        category: 'كهروميكانيك', 
-        status: 'جديد', 
-        bgClass: 'badge-warning', 
-        requester: 'homeowner', 
-        assignedTech: '',
-        photoBefore: 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
-        photoAfter: '',
-        createdAt: new Date(Date.now() - 3600000), // 1 hour ago
-        resolutionTime: ''
-      },
-      { 
-        id: 'TK-7930', 
-        title: 'تسريب في محبس سباكة المطبخ', 
-        category: 'سباكة', 
-        status: 'جديد', 
-        bgClass: 'badge-warning', 
-        requester: 'homeowner', 
-        assignedTech: '',
-        photoBefore: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
-        photoAfter: '',
-        createdAt: new Date(Date.now() - 7200000), // 2 hours ago
-        resolutionTime: ''
-      }
-    ];
+    // Initial state data (Clean empty list for testing)
+    this.tickets = [];
 
     // Initial access & logistics permits list
     this.permits = [
@@ -2740,6 +2713,15 @@ class UltimateFMApp {
       opt.textContent = `${t.name} (${t.title})`;
       techSelect.appendChild(opt);
     });
+  }
+
+  clearManagerTicketsHistory() {
+    this.tickets = [];
+    safeStorage.removeItem('app_tickets');
+    safeStorage.removeItem('fm_tickets_v1');
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.showToast('🗑️ تم تفريغ وتصفير سجل البلاغات بنجاح للبدء بتجربة نظيفة!');
   }
 
   openManagerNewTicketModal() {
@@ -6001,6 +5983,7 @@ window.requestLandscaping = function(role, type, slot, notes) { if (window.app) 
 window.openManagerNewTicketModal = function() { if (window.app) window.app.openManagerNewTicketModal(); };
 window.updateManagerTechsBySpecialty = function() { if (window.app) window.app.updateManagerTechsBySpecialty(); };
 window.submitManagerDirectTicket = function() { if (window.app) window.app.submitManagerDirectTicket(); };
+window.clearManagerTicketsHistory = function() { if (window.app) window.app.clearManagerTicketsHistory(); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());

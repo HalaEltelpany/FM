@@ -72,6 +72,7 @@
     function openManagerNewTicketModal() { if (window.app) window.app.openManagerNewTicketModal(); }
     function updateManagerTechsBySpecialty() { if (window.app) window.app.updateManagerTechsBySpecialty(); }
     function submitManagerDirectTicket() { if (window.app) window.app.submitManagerDirectTicket(); }
+    function clearManagerTicketsHistory() { if (window.app) window.app.clearManagerTicketsHistory(); }
     function openCancelTicketModal(id) { if (window.app) window.app.openCancelTicketModal(id); }
     function confirmCancelTicket() { if (window.app) window.app.confirmCancelTicket(); }
     function openHousekeepingModal(role) { if (window.app) window.app.openHousekeepingModal(role); }
@@ -983,7 +984,12 @@
                 <span class="card-title" style="font-size: 0.85rem; font-weight: 800; color: #20274f;">
                   <i class="fa-solid fa-inbox" style="color: #1b8f91;"></i> سجل بلاغات وطلبات الصيانة الواردة
                 </span>
-                <span class="badge badge-warning" id="managerInboxBadge" style="font-size: 0.65rem;">0 بانتظار الإسناد</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <button class="btn btn-sm" onclick="clearManagerTicketsHistory()" title="تفريغ جميع البلاغات للبدء بتجربة جديدة" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.62rem; padding: 3px 8px; font-weight: 700; width: auto; margin: 0; border-radius: 6px; cursor: pointer;">
+                    <i class="fa-solid fa-trash-can"></i> تفريغ السجل
+                  </button>
+                  <span class="badge badge-warning" id="managerInboxBadge" style="font-size: 0.65rem;">0 بانتظار الإسناد</span>
+                </div>
               </div>
 
               <!-- Filter Source Segmented Control -->
