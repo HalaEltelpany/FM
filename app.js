@@ -1,12 +1,50 @@
-/* 
+﻿/* 
   Ultimate FM - Application JavaScript Logic
   Coastal Cities & Commercial Malls Facility Management System
 */
 
+// Bulletproof LocalStorage Polyfill & Fallback for file:// and restricted origins
+const _memStorage = {};
+const safeStorage = {
+  getItem: function(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.safeStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn('[Storage Polyfill] localStorage access restricted:', e);
+    }
+    return _memStorage[key] || null;
+  },
+  setItem: function(key, val) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.safeStorage.setItem(key, val);
+        return;
+      }
+    } catch (e) {
+      console.warn('[Storage Polyfill] localStorage write restricted:', e);
+    }
+    _memStorage[key] = String(val);
+  },
+  removeItem: function(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.safeStorage.removeItem(key);
+        return;
+      }
+    } catch (e) {
+      console.warn('[Storage Polyfill] localStorage remove restricted:', e);
+    }
+    delete _memStorage[key];
+  }
+};
+
+
 class UltimateFMApp {
   constructor() {
     this.currentRole = 'homeowner';
-    this.currentLang = localStorage.getItem('app_lang') || 'ar';
+    this.currentLang = safeStorage.getItem('app_lang') || 'ar';
     this.isFullWidth = false;
     this.qrTimer = 30;
     this.qrInterval = null;
@@ -75,24 +113,24 @@ class UltimateFMApp {
 
     // Hardcoded Odoo Connection Config (Supports new Odoo.sh database!)
     this.odooConfig = {
-      url: localStorage.getItem('odoo_url') || 'https://ultimatecode-2019-fm-main-35713278.dev.odoo.com',
-      db: localStorage.getItem('odoo_db') || 'ultimatecode-2019-fm-main-35713278',
-      user: localStorage.getItem('odoo_user') || 'fmhala6@gmail.com',
-      key: localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
+      url: safeStorage.getItem('odoo_url') || 'https://ultimatecode-2019-fm-main-35713278.dev.odoo.com',
+      db: safeStorage.getItem('odoo_db') || 'ultimatecode-2019-fm-main-35713278',
+      user: safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com',
+      key: safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
     };
 
     // Prepopulate Local Storage silently from configuration values
-    localStorage.setItem('odoo_url', this.odooConfig.url);
-    localStorage.setItem('odoo_db', this.odooConfig.db);
-    localStorage.setItem('odoo_user', this.odooConfig.user);
-    localStorage.setItem('odoo_key', this.odooConfig.key);
+    safeStorage.setItem('odoo_url', this.odooConfig.url);
+    safeStorage.setItem('odoo_db', this.odooConfig.db);
+    safeStorage.setItem('odoo_user', this.odooConfig.user);
+    safeStorage.setItem('odoo_key', this.odooConfig.key);
 
     // Clear old cached test names if matching fmhala
-    if (localStorage.getItem('odoo_owner_name') === 'fmhala' || localStorage.getItem('odoo_owner_name') === 'Fmhala') {
-      localStorage.removeItem('odoo_owner_name');
+    if (safeStorage.getItem('odoo_owner_name') === 'fmhala' || safeStorage.getItem('odoo_owner_name') === 'Fmhala') {
+      safeStorage.removeItem('odoo_owner_name');
     }
-    if (localStorage.getItem('odoo_user') === 'fmhala@domain.com' || localStorage.getItem('odoo_user') === 'admin@domain.com') {
-      localStorage.removeItem('odoo_user');
+    if (safeStorage.getItem('odoo_user') === 'fmhala@domain.com' || safeStorage.getItem('odoo_user') === 'admin@domain.com') {
+      safeStorage.removeItem('odoo_user');
     }
 
     // 3 Warehouses Inventory List (Residential, Commercial, Assets)
@@ -393,7 +431,7 @@ class UltimateFMApp {
 
   showRoleGrid() {
     this.currentRole = 'login';
-    localStorage.removeItem('active_session_role');
+    safeStorage.removeItem('active_session_role');
 
     // Hide ALL view panels explicitly
     document.querySelectorAll('.view-panel').forEach(panel => {
@@ -756,11 +794,11 @@ class UltimateFMApp {
     const name = document.getElementById('odooOwnerNameInput')?.value || '';
     const key = document.getElementById('odooKeyInput')?.value || '';
 
-    if (url) localStorage.setItem('odoo_url', url);
-    if (db) localStorage.setItem('odoo_db', db);
-    if (user) localStorage.setItem('odoo_user', user);
-    if (name) localStorage.setItem('odoo_owner_name', name);
-    if (key) localStorage.setItem('odoo_key', key);
+    if (url) safeStorage.setItem('odoo_url', url);
+    if (db) safeStorage.setItem('odoo_db', db);
+    if (user) safeStorage.setItem('odoo_user', user);
+    if (name) safeStorage.setItem('odoo_owner_name', name);
+    if (key) safeStorage.setItem('odoo_key', key);
 
     this.updateHomeownerNameUI();
     this.fetchOdooOwnerName();
@@ -771,7 +809,7 @@ class UltimateFMApp {
 
   saveTicketsToStorage() {
     try {
-      localStorage.setItem('app_tickets', JSON.stringify(this.tickets));
+      safeStorage.setItem('app_tickets', JSON.stringify(this.tickets));
     } catch (e) {
       console.warn('Could not save tickets to localStorage', e);
     }
@@ -779,7 +817,7 @@ class UltimateFMApp {
 
   loadTicketsFromStorage() {
     try {
-      const stored = localStorage.getItem('app_tickets');
+      const stored = safeStorage.getItem('app_tickets');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -792,10 +830,10 @@ class UltimateFMApp {
   }
 
   async syncTicketsFromOdoo() {
-    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = document.getElementById('odooUrlInput')?.value || safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = document.getElementById('odooKeyInput')?.value || safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -910,10 +948,10 @@ class UltimateFMApp {
     this.complaints = [];
     this.housekeepingRequests = [];
     this.permits = [];
-    localStorage.removeItem('fm_tickets_v1');
-    localStorage.removeItem('fm_complaints_v1');
-    localStorage.removeItem('fm_permits_v1');
-    localStorage.removeItem('fm_housekeeping_v1');
+    safeStorage.removeItem('fm_tickets_v1');
+    safeStorage.removeItem('fm_complaints_v1');
+    safeStorage.removeItem('fm_permits_v1');
+    safeStorage.removeItem('fm_housekeeping_v1');
     this.saveTicketsToStorage();
     this.renderTickets();
     this.showToast('🧹 تم تصفير ومسح جميع التذاكر والبلاغات المحلية بنجاح!\nتم ضبط التطبيق بـ 0 طلبات نشطة والمزامنة مع أودو.');
@@ -1035,10 +1073,10 @@ class UltimateFMApp {
     }
     ticket._odooSynced = true;
 
-    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = document.getElementById('odooUrlInput')?.value || safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = document.getElementById('odooKeyInput')?.value || safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) {
       console.log('[Odoo Sync] Missing connection credentials.');
@@ -1085,7 +1123,7 @@ class UltimateFMApp {
       let emailAddress = 'fmhala6@gmail.com';
       let unitNum = 'فيلا 104 - زون الشمال';
 
-      const customName = localStorage.getItem('odoo_owner_name');
+      const customName = safeStorage.getItem('odoo_owner_name');
       if (customName && customName.trim()) {
         fullName = customName;
       }
@@ -1297,10 +1335,10 @@ class UltimateFMApp {
   async syncTicketUpdateToOdoo(ticket) {
     if (!ticket) return;
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
 
@@ -1350,10 +1388,10 @@ class UltimateFMApp {
       if (!ticket.odooId) return;
     }
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -1413,7 +1451,7 @@ class UltimateFMApp {
       let emailAddress = 'fmhala6@gmail.com';
       let unitNum = 'فيلا 104 - زون الشمال';
 
-      const customName = localStorage.getItem('odoo_owner_name');
+      const customName = safeStorage.getItem('odoo_owner_name');
       if (customName && customName.trim()) {
         fullName = customName;
       }
@@ -2771,8 +2809,8 @@ class UltimateFMApp {
 
     // Strategy 2: Search partner by email or name
     try {
-      const userEmail = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-      const customName = localStorage.getItem('odoo_owner_name') || 'أسامة';
+      const userEmail = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+      const customName = safeStorage.getItem('odoo_owner_name') || 'أسامة';
       const searchPayload = {
         jsonrpc: "2.0",
         method: "call",
@@ -2799,10 +2837,10 @@ class UltimateFMApp {
   }
 
   async syncFamilyMemberToOdoo(name, relation, phone, email, idFrontBase64, idBackBase64) {
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -3089,10 +3127,10 @@ class UltimateFMApp {
   }
 
   async fetchOwnerChatterMessagesFromOdoo() {
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -3191,10 +3229,10 @@ class UltimateFMApp {
     const msgText = input.value.trim();
     input.value = '';
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     try {
       const authPayload = {
@@ -3240,7 +3278,7 @@ class UltimateFMApp {
   }
 
   loadSavedOwnerAvatar() {
-    const saved = localStorage.getItem('owner_avatar_img');
+    const saved = safeStorage.getItem('owner_avatar_img');
     if (saved) {
       const imgEl = document.getElementById('ownerHeaderAvatarImg');
       if (imgEl) imgEl.src = saved;
@@ -3257,7 +3295,7 @@ class UltimateFMApp {
       const imgEl = document.getElementById('ownerHeaderAvatarImg');
       if (imgEl) imgEl.src = base64;
 
-      localStorage.setItem('owner_avatar_img', base64);
+      safeStorage.setItem('owner_avatar_img', base64);
       this.showToast('✅ تم رفع وتحديث صورة المالك الشخصية بنجاح (مطابق لتطبيق إعمار)!');
 
       // Sync avatar photo to Odoo res.partner (image_1920)
@@ -3270,10 +3308,10 @@ class UltimateFMApp {
     if (!base64Data) return;
     const cleanBase64 = base64Data.replace(/^data:image\/\w+;base64,/, '');
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     try {
       const authPayload = {
@@ -3324,7 +3362,7 @@ class UltimateFMApp {
     let name = 'أسامة أحمد محمد الشريف';
     let unit = 'فيلا 104 - زون الساحل الشمالي';
 
-    const customName = localStorage.getItem('odoo_owner_name');
+    const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) name = customName;
 
     if (role === 'tenant') {
@@ -3368,7 +3406,7 @@ class UltimateFMApp {
     let name = 'أسامة أحمد محمد الشريف';
     let unit = 'فيلا 104 - زون الساحل الشمالي';
 
-    const customName = localStorage.getItem('odoo_owner_name');
+    const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) name = customName;
 
     if (role === 'tenant') {
@@ -3417,7 +3455,7 @@ class UltimateFMApp {
     let requesterName = isEn ? 'Owner (Osama Ahmed)' : 'المالك (أسامة أحمد)';
     let type = customType || 'تقليم وقص الأشجار والنجيل';
 
-    const customName = localStorage.getItem('odoo_owner_name');
+    const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) requesterName = customName;
 
     if (role === 'tenant') {
@@ -3471,7 +3509,7 @@ class UltimateFMApp {
     let emailAddress = 'fmhala6@gmail.com';
     let unitNum = 'فيلا 104 - زون الساحل الشمالي';
 
-    const customName = localStorage.getItem('odoo_owner_name');
+    const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) fullName = customName;
 
     if (this.currentRole === 'tenant') {
@@ -3763,10 +3801,10 @@ class UltimateFMApp {
     const targetResId = parseInt(odooId);
     if (isNaN(targetResId) || targetResId <= 0) return [];
 
-    const urlInput = document.getElementById('odooUrlInput')?.value || localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = document.getElementById('odooDbInput')?.value || localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = document.getElementById('odooUserInput')?.value || localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = document.getElementById('odooKeyInput')?.value || localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = document.getElementById('odooUrlInput')?.value || safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = document.getElementById('odooDbInput')?.value || safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = document.getElementById('odooUserInput')?.value || safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = document.getElementById('odooKeyInput')?.value || safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return [];
 
@@ -4073,7 +4111,7 @@ class UltimateFMApp {
     }
 
     // Save active session
-    localStorage.setItem('active_session_role', role);
+    safeStorage.setItem('active_session_role', role);
 
     this.showToast(`🔑 تم فتح شاشة [${this.getRoleArabicName(role)}] بنجاح!`);
   }
@@ -4098,11 +4136,11 @@ class UltimateFMApp {
     return map[role] || role;
   }
   loadOdooFields() {
-    const url = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const db = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const user = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const key = localStorage.getItem('odoo_key') || '';
-    const name = localStorage.getItem('odoo_owner_name') || '';
+    const url = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const db = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const user = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const key = safeStorage.getItem('odoo_key') || '';
+    const name = safeStorage.getItem('odoo_owner_name') || '';
 
     const urlInput = document.getElementById('odooUrlInput');
     const dbInput = document.getElementById('odooDbInput');
@@ -4121,7 +4159,7 @@ class UltimateFMApp {
     const el = document.getElementById('homeownerNameText');
     if (!el) return;
 
-    const customName = localStorage.getItem('odoo_owner_name');
+    const customName = safeStorage.getItem('odoo_owner_name');
 
     if (customName && customName.trim()) {
       el.innerText = customName;
@@ -4131,10 +4169,10 @@ class UltimateFMApp {
   }
 
   async fetchOdooOwnerName() {
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!userInput || !keyInput) return;
 
@@ -4179,7 +4217,7 @@ class UltimateFMApp {
       if (readData && readData.result && readData.result[0]) {
         const odooName = readData.result[0].name;
         if (odooName) {
-          localStorage.setItem('odoo_owner_name', odooName);
+          safeStorage.setItem('odoo_owner_name', odooName);
           this.updateHomeownerNameUI();
           const input = document.getElementById('odooOwnerNameInput');
           if (input) input.value = odooName;
@@ -4317,10 +4355,10 @@ class UltimateFMApp {
   }
 
   async syncCarPlateToOdooPartner(plate, frontBase64, backBase64) {
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
@@ -4627,10 +4665,10 @@ class UltimateFMApp {
     };
     const roleArabic = roleMap[userRole] || userRole;
 
-    const urlInput = localStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = localStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = localStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = localStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
 
     // Render it locally first for immediate visual success feedback
     const list = document.getElementById('adminUserList');
@@ -4795,7 +4833,7 @@ class UltimateFMApp {
 
   applyLanguageUI() {
     // Save language configuration
-    localStorage.setItem('app_lang', this.currentLang);
+    safeStorage.setItem('app_lang', this.currentLang);
 
     // Toggle simulator orientation direction (RTL / LTR)
     const simulator = document.getElementById('phoneSimulator');
@@ -4920,7 +4958,7 @@ class UltimateFMApp {
     }
 
     // Set theme switch state on load
-    const savedThemeDark = localStorage.getItem('app_theme_dark') === 'true';
+    const savedThemeDark = safeStorage.getItem('app_theme_dark') === 'true';
     const themeSwitch = document.getElementById('themeToggleSwitch');
     if (themeSwitch) {
       themeSwitch.checked = savedThemeDark;
@@ -4992,7 +5030,7 @@ class UltimateFMApp {
         simulator.classList.remove('dark-theme');
       }
     }
-    localStorage.setItem('app_theme_dark', isDark ? 'true' : 'false');
+    safeStorage.setItem('app_theme_dark', isDark ? 'true' : 'false');
   }
 
   translateStaticTexts() {
@@ -5470,3 +5508,4 @@ if (document.readyState === 'loading') {
 } else {
   window.app.init();
 }
+
