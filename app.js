@@ -5453,11 +5453,20 @@ class UltimateFMApp {
 }
 
 // Global App Instance
-const app = new UltimateFMApp();
-window.app = app;
+window.app = new UltimateFMApp();
+const app = window.app;
+
+window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role); };
+window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
+window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
+window.openModal = function(id) { if (window.app) window.app.openModal(id); };
+window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
+window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
+window.setLanguage = function(lang) { if (window.app) window.app.setLanguage(lang); };
+window.switchHomeownerTab = function(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); };
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => app.init());
+  document.addEventListener('DOMContentLoaded', () => window.app.init());
 } else {
-  app.init();
+  window.app.init();
 }

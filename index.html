@@ -2523,7 +2523,17 @@
     </div>
   </div>
 
+  <!-- Global Fallback Event Handler Registration -->
+  <script>
+    window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role); };
+    window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
+    window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
+    window.openModal = function(id) { if (window.app) window.app.openModal(id); };
+    window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
+    window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
+  </script>
+
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=94.0"></script>
+  <script src="app.js?v=95.0"></script>
 </body>
 </html>
