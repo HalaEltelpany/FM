@@ -2899,13 +2899,9 @@ class UltimateFMApp {
     if (!tk) return;
 
     const fileInput = document.getElementById(fileInputId);
-    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
-      this.showToast('⚠️ يجب إرفاق صورة العطل بعد الإصلاح أولاً لإغلاق التذكرة بنظام الـ SLA للمحاسبة!');
-      return;
-    }
+    let afterPhoto = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300';
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    const proceed = (finalPhoto) => {
       const now = new Date();
       tk.resolvedAt = now;
       const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
@@ -2913,7 +2909,7 @@ class UltimateFMApp {
       
       tk.status = 'تم الانتهاء';
       tk.bgClass = 'badge-success';
-      tk.photoAfter = e.target.result;
+      tk.photoAfter = finalPhoto;
       tk.totalResolutionMins = totalMins;
 
       // SLA Metric Evaluation (Target: <= 30 mins, Max: <= 60 mins)
@@ -2937,7 +2933,14 @@ class UltimateFMApp {
       // Sync update to Odoo
       this.syncTicketUpdateToOdoo(tk);
     };
-    reader.readAsDataURL(fileInput.files[0]);
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => proceed(e.target.result);
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      proceed(afterPhoto);
+    }
   }
 
   requestPermit(requester, type) {
@@ -3053,20 +3056,23 @@ class UltimateFMApp {
 
   technicianRequestPart(ticketId, fileInputId) {
     const fileInput = document.getElementById(fileInputId);
-    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
-      this.showToast('⚠️ يرجى إرفاق وصورة قطعة الغيار التالفة أولاً!');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.uploadedDamagedPhoto = e.target.result;
+    let damagedPhoto = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300';
+    
+    const proceed = (photoData) => {
+      this.uploadedDamagedPhoto = photoData;
       this.activeAuditTicketId = ticketId;
       this.openModal('modalInventory');
       this.filterInventory();
-      this.showToast('🔍 تم تحميل صورة القطعة التالفة! يرجى تحديد قطعة الغيار البديلة من المخزن.');
+      this.showToast('🔍 تم تجهيز طلب قطعة الغيار! يرجى تحديد القطعة المطلوبة من المخزن.');
     };
-    reader.readAsDataURL(fileInput.files[0]);
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => proceed(e.target.result);
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      proceed(damagedPhoto);
+    }
   }
 
   openSparePartPaymentModal(ticketId) {
@@ -3170,10 +3176,7 @@ class UltimateFMApp {
       return;
     }
 
-    if (!email || !email.includes('@')) {
-      this.showToast('⚠️ يرجى إدخال بريد إلكتروني صحيح لإصدار حساب التطبيق وفرد الأسرة!');
-      return;
-    }
+    const finalEmail = (email && email.includes('@')) ? email : `family_${phone.replace(/[^0-9]/g, '') || 'member'}@village.com`;
 
     const idFrontData = this.familyIdFrontBase64 || null;
     const idBackData = this.familyIdBackBase64 || null;
@@ -5983,7 +5986,23 @@ window.requestLandscaping = function(role, type, slot, notes) { if (window.app) 
 window.openManagerNewTicketModal = function() { if (window.app) window.app.openManagerNewTicketModal(); };
 window.updateManagerTechsBySpecialty = function() { if (window.app) window.app.updateManagerTechsBySpecialty(); };
 window.submitManagerDirectTicket = function() { if (window.app) window.app.submitManagerDirectTicket(); };
+window.handleNewTicketSubmit = function() { if (window.app) window.app.handleNewTicketSubmit(); };
 window.clearManagerTicketsHistory = function() { if (window.app) window.app.clearManagerTicketsHistory(); };
+window.registerLprPlate = function() { if (window.app) window.app.registerLprPlate(); };
+window.handleLicenseFrontPreview = function(e) { if (window.app) window.app.handleLicenseFrontPreview(e); };
+window.handleLicenseBackPreview = function(e) { if (window.app) window.app.handleLicenseBackPreview(e); };
+window.submitFamilyMember = function() { if (window.app) window.app.submitFamilyMember(); };
+window.handleFamilyIdFrontPreview = function(e) { if (window.app) window.app.handleFamilyIdFrontPreview(e); };
+window.handleFamilyIdBackPreview = function(e) { if (window.app) window.app.handleFamilyIdBackPreview(e); };
+window.openSecurityComplaintModal = function() { if (window.app) window.app.openSecurityComplaintModal(); };
+window.submitSecurityComplaint = function() { if (window.app) window.app.submitSecurityComplaint(); };
+window.openComplaintSuggestionModal = function() { if (window.app) window.app.openComplaintSuggestionModal(); };
+window.submitComplaintSuggestion = function() { if (window.app) window.app.submitComplaintSuggestion(); };
+window.technicianRequestPart = function(id, fileId) { if (window.app) window.app.technicianRequestPart(id, fileId); };
+window.completeTicket = function(id, fileId) { if (window.app) window.app.completeTicket(id, fileId); };
+window.openSparePartPaymentModal = function(id) { if (window.app) window.app.openSparePartPaymentModal(id); };
+window.confirmSparePartPayment = function() { if (window.app) window.app.confirmSparePartPayment(); };
+window.sendOwnerDirectMsgToOdoo = function() { if (window.app) window.app.sendOwnerDirectMsgToOdoo(); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());

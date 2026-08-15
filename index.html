@@ -72,6 +72,7 @@
     function openManagerNewTicketModal() { if (window.app) window.app.openManagerNewTicketModal(); }
     function updateManagerTechsBySpecialty() { if (window.app) window.app.updateManagerTechsBySpecialty(); }
     function submitManagerDirectTicket() { if (window.app) window.app.submitManagerDirectTicket(); }
+    function handleNewTicketSubmit() { if (window.app) window.app.handleNewTicketSubmit(); }
     function clearManagerTicketsHistory() { if (window.app) window.app.clearManagerTicketsHistory(); }
     function openCancelTicketModal(id) { if (window.app) window.app.openCancelTicketModal(id); }
     function confirmCancelTicket() { if (window.app) window.app.confirmCancelTicket(); }
@@ -82,10 +83,20 @@
     function handleOwnerAvatarUpload(e) { if (window.app) window.app.handleOwnerAvatarUpload(e); }
     function assignTechnician(id, selectId) { if (window.app) window.app.assignTechnician(id, selectId); }
     function completeTicket(id, fileId) { if (window.app) window.app.completeTicket(id, fileId); }
+    function technicianRequestPart(id, fileId) { if (window.app) window.app.technicianRequestPart(id, fileId); }
     function payForSparePart(id) { if (window.app) window.app.payForSparePart(id); }
     function handleApproveAndPay(id) { if (window.app) window.app.handleApproveAndPay(id); }
     function handleMeterRechargeSubmit() { if (window.app) window.app.handleMeterRechargeSubmit(); }
     function toggleViewMode() { if (window.app) window.app.toggleViewMode(); }
+    function registerLprPlate() { if (window.app) window.app.registerLprPlate(); }
+    function submitFamilyMember() { if (window.app) window.app.submitFamilyMember(); }
+    function openSecurityComplaintModal() { if (window.app) window.app.openSecurityComplaintModal(); }
+    function submitSecurityComplaint() { if (window.app) window.app.submitSecurityComplaint(); }
+    function openComplaintSuggestionModal() { if (window.app) window.app.openComplaintSuggestionModal(); }
+    function submitComplaintSuggestion() { if (window.app) window.app.submitComplaintSuggestion(); }
+    function sendOwnerDirectMsgToOdoo() { if (window.app) window.app.sendOwnerDirectMsgToOdoo(); }
+    function openSparePartPaymentModal(id) { if (window.app) window.app.openSparePartPaymentModal(id); }
+    function confirmSparePartPayment() { if (window.app) window.app.confirmSparePartPayment(); }
     function executeLogin(role) {
       if (window.app && typeof window.app.executeLogin === 'function') {
         window.app.executeLogin(role);
@@ -2005,7 +2016,7 @@
         <input type="file" class="form-control" accept="image/*" id="ticketPhotoInput" name="ticketPhotoInput">
       </div>
 
-      <button class="btn btn-primary" id="btnSubmitTicket" style="background: #1c2140; border-color: #1c2140; color: #ffffff; width: 100%; font-weight: 700; height: 42px;">
+      <button class="btn btn-primary" id="btnSubmitTicket" onclick="handleNewTicketSubmit()" style="background: #1c2140; border-color: #1c2140; color: #ffffff; width: 100%; font-weight: 700; height: 42px; cursor: pointer;">
         <i class="fa-solid fa-paper-plane"></i> إرسال التذكرة لفريق خدمة العملاء وأودو
       </button>
     </div>
