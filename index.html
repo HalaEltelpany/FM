@@ -132,7 +132,7 @@
             <div class="role-square-grid">
               
               <!-- 1. Homeowner Block (Teal) -->
-              <div class="role-block-card teal-block" onclick="app.quickLogin('owner')">
+              <div class="role-block-card teal-block" data-role="owner" onclick="app.quickLogin('owner')">
                 <div class="block-icon">
                   <i class="fa-solid fa-house-user"></i>
                 </div>
@@ -141,7 +141,7 @@
               </div>
 
               <!-- 1b. Family Member Block (Mauve) -->
-              <div class="role-block-card mauve-block" onclick="app.quickLogin('family')">
+              <div class="role-block-card mauve-block" data-role="family" onclick="app.quickLogin('family')">
                 <div class="block-icon">
                   <i class="fa-solid fa-people-roof"></i>
                 </div>
@@ -150,7 +150,7 @@
               </div>
 
               <!-- 2. Field Engineer Block (Mauve) -->
-              <div class="role-block-card mauve-block" onclick="app.quickLogin('engineer')">
+              <div class="role-block-card mauve-block" data-role="engineer" onclick="app.quickLogin('engineer')">
                 <div class="block-icon">
                   <i class="fa-solid fa-user-gear"></i>
                 </div>
@@ -159,7 +159,7 @@
               </div>
 
               <!-- 3. Maintenance Manager Block (Navy) -->
-              <div class="role-block-card navy-block" onclick="app.quickLogin('manager')">
+              <div class="role-block-card navy-block" data-role="manager" onclick="app.quickLogin('manager')">
                 <div class="block-icon">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
@@ -168,7 +168,7 @@
               </div>
 
               <!-- 4. Field Technician Block (Teal) -->
-              <div class="role-block-card teal-block" onclick="app.quickLogin('technician')">
+              <div class="role-block-card teal-block" data-role="technician" onclick="app.quickLogin('technician')">
                 <div class="block-icon">
                   <i class="fa-solid fa-helmet-safety"></i>
                 </div>
@@ -177,7 +177,7 @@
               </div>
 
               <!-- 5. Residential Tenant Block (Mauve) -->
-              <div class="role-block-card mauve-block" onclick="app.quickLogin('tenant')">
+              <div class="role-block-card mauve-block" data-role="tenant" onclick="app.quickLogin('tenant')">
                 <div class="block-icon">
                   <i class="fa-solid fa-key"></i>
                 </div>
@@ -186,7 +186,7 @@
               </div>
 
               <!-- 6. Commercial Tenant Block (Navy) -->
-              <div class="role-block-card navy-block" onclick="app.quickLogin('commercial')">
+              <div class="role-block-card navy-block" data-role="commercial" onclick="app.quickLogin('commercial')">
                 <div class="block-icon">
                   <i class="fa-solid fa-store"></i>
                 </div>
@@ -195,7 +195,7 @@
               </div>
 
               <!-- 7. Security Gates Officer Block -->
-              <div class="role-block-card navy-block" onclick="app.quickLogin('security')">
+              <div class="role-block-card navy-block" data-role="security" onclick="app.quickLogin('security')">
                 <div class="block-icon" style="color: #ffffff;">
                   <i class="fa-solid fa-user-shield"></i>
                 </div>
@@ -204,7 +204,7 @@
               </div>
 
               <!-- 8. Admin Executive Block -->
-              <div class="role-block-card admin-block" onclick="app.quickLogin('admin')">
+              <div class="role-block-card admin-block" data-role="admin" onclick="app.quickLogin('admin')">
                 <div class="block-icon" style="color: #d4af37;">
                   <i class="fa-solid fa-chart-line"></i>
                 </div>
@@ -213,7 +213,7 @@
               </div>
 
               <!-- 9. Housekeeping Block -->
-              <div class="role-block-card teal-block" onclick="app.quickLogin('housekeeping')">
+              <div class="role-block-card teal-block" data-role="housekeeping" onclick="app.quickLogin('housekeeping')">
                 <div class="block-icon">
                   <i class="fa-solid fa-broom"></i>
                 </div>
@@ -2524,6 +2524,6 @@
   </div>
 
   <!-- Core JavaScript with cache buster -->
-  <script src="app.js?v=93.0"></script>
+  <script src="app.js?v=94.0"></script>
 </body>
 </html>

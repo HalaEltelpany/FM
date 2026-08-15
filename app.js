@@ -226,6 +226,17 @@ class UltimateFMApp {
       });
     });
 
+    // Dynamic Click Listeners on 10 Role Block Cards Grid
+    const blockCards = document.querySelectorAll('.role-block-card');
+    blockCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const role = card.getAttribute('data-role');
+        if (role) {
+          this.quickLogin(role);
+        }
+      });
+    });
+
     // View Mode Toggle (Mobile Simulator Frame vs Fullscreen)
     const toggleViewBtn = document.getElementById('toggleViewModeBtn');
     if (toggleViewBtn) {
