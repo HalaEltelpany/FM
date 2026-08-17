@@ -1937,7 +1937,17 @@ class UltimateFMApp {
     // Render Homeowner Tickets list & Update Category Counters (Emaar App Active vs Completed History Separation)
     const homeownerList = document.getElementById('homeownerTicketsList');
     if (homeownerList) {
-      const homeownerTks = this.tickets.filter(tk => (tk.requester === 'homeowner' || tk.requester === 'owner' || !tk.requester) && (!tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي'))));
+      const isPureHomeownerMaintenance = (tk) => {
+        if (!tk) return false;
+        const cat = String(tk.category || '').toLowerCase();
+        const title = String(tk.title || '').toLowerCase();
+        // Exclude financial, accounting, security permits, and gate passes from maintenance list
+        if (cat.includes('حسابات') || cat.includes('مالي') || cat.includes('تصريح') || cat.includes('بوابات') || cat.includes('أمن')) return false;
+        if (title.includes('تصريح دخول') || title.includes('بوابات أمني')) return false;
+        return true;
+      };
+
+      const homeownerTks = this.tickets.filter(tk => (tk.requester === 'homeowner' || tk.requester === 'owner' || !tk.requester) && isPureHomeownerMaintenance(tk));
 
       const isCompletedStatus = (st) => {
         if (!st) return false;
