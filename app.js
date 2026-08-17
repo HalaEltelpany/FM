@@ -68,7 +68,8 @@ class UltimateFMApp {
     this.housekeepingRequests = [];
     this.landscapingRequests = [];
 
-    // Wipe cached records
+    // Wipe cached records on startup for 100% fresh clean state
+    safeStorage.removeItem('app_tickets');
     safeStorage.removeItem('fm_tickets');
     safeStorage.removeItem('fm_complaints');
     safeStorage.removeItem('fm_housekeeping');

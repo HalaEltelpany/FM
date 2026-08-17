@@ -828,6 +828,19 @@
                     <span class="slider-round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1b8f91; transition: .4s; border-radius: 22px;"></span>
                   </label>
                 </div>
+
+                <!-- 4. System Clear & Cache Reset Option -->
+                <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); padding: 14px; border-radius: 8px; margin-top: 15px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-trash-can"></i> تنظيف وتصفير سجلات النظام</span>
+                  </div>
+                  <p style="font-size: 0.68rem; color: var(--text-muted); margin: 0 0 10px 0;">
+                    مسح كافة البلاغات والتذاكر والبيانات المحفوظة في ذاكرة هذا الجهاز للبدء بتجربة جديدة ونظيفة 100%.
+                  </p>
+                  <button class="btn btn-danger" onclick="clearAllSystemRecords()" style="width: 100%; font-size: 0.78rem; font-weight: 700; height: 38px; background: #ef4444; border-color: #ef4444; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-broom"></i> تصفير وتنظيف جميع سجلات النظام
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -8945,6 +8958,7 @@ if (document.readyState === 'loading') {
 </script>
 </body>
 </html>
+
 
 
 
