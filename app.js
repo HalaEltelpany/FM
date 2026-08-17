@@ -840,6 +840,8 @@ class UltimateFMApp {
       if (readData && readData.result && Array.isArray(readData.result)) {
         console.log('[Odoo Sync Read] Retrieved tickets count:', readData.result.length);
         
+        const odooIdsSet = new Set(readData.result.map(r => String(r.id)));
+
         if (readData.result.length === 0) {
           // Odoo backend has 0 tickets (User deleted all tickets in Odoo) -> wipe local tickets
           this.tickets = [];
@@ -847,6 +849,16 @@ class UltimateFMApp {
           this.renderTickets();
           return;
         }
+
+        // Strict Prune: Remove any local tickets that were deleted from Odoo
+        this.tickets = this.tickets.filter(t => {
+          if (t.odooId && !odooIdsSet.has(String(t.odooId))) return false;
+          if (String(t.id).startsWith('TK-OD-')) {
+            const rawId = String(t.id).replace('TK-OD-', '');
+            if (!odooIdsSet.has(rawId)) return false;
+          }
+          return true;
+        });
 
         readData.result.forEach(rec => {
           const recOdooIdStr = String(rec.id);
@@ -872,7 +884,7 @@ class UltimateFMApp {
             return;
           }
 
-          // 3. Otherwise, if it's a completely new ticket created directly in Odoo backend, push it as a new ticket
+          // 3. Otherwise, if it's a ticket in Odoo, sync it into the app
           const rawDate = rec.create_date ? new Date(rec.create_date.replace(' ', 'T') + 'Z') : new Date();
           const dateStr = rawDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
           const timeStr = rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
