@@ -81,19 +81,19 @@ class UltimateFMApp {
     // Initialize payment wallet balance
     this.ownerWalletBalance = 2500;
 
-    // Hardcoded Odoo Connection Config (Supports new Odoo.sh database!)
+    // Hardcoded Odoo Connection Config (Active Live Database edu-fm-uc)
     this.odooConfig = {
-      url: safeStorage.getItem('odoo_url') || 'https://ultimatecode-2019-fm-main-35713278.dev.odoo.com',
-      db: safeStorage.getItem('odoo_db') || 'ultimatecode-2019-fm-main-35713278',
-      user: safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com',
-      key: safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
+      url: 'https://edu-fm-uc.odoo.com',
+      db: 'edu-fm-uc',
+      user: 'fmhala6@gmail.com',
+      key: '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0'
     };
 
-    // Prepopulate Local Storage silently from configuration values
-    safeStorage.setItem('odoo_url', this.odooConfig.url);
-    safeStorage.setItem('odoo_db', this.odooConfig.db);
-    safeStorage.setItem('odoo_user', this.odooConfig.user);
-    safeStorage.setItem('odoo_key', this.odooConfig.key);
+    // Ensure Local Storage is always locked to the active live database
+    safeStorage.setItem('odoo_url', 'https://edu-fm-uc.odoo.com');
+    safeStorage.setItem('odoo_db', 'edu-fm-uc');
+    safeStorage.setItem('odoo_user', 'fmhala6@gmail.com');
+    safeStorage.setItem('odoo_key', '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0');
 
     // Clear old cached test names if matching fmhala
     if (safeStorage.getItem('odoo_owner_name') === 'fmhala' || safeStorage.getItem('odoo_owner_name') === 'Fmhala') {
@@ -968,35 +968,47 @@ class UltimateFMApp {
   }
 
   async callOdoo(baseUrl, payload) {
-    const directUrl = `${baseUrl}/jsonrpc`;
-    const primaryUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
+    const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
+    const directUrl = `${cleanBase}/jsonrpc`;
 
+    // 1. Direct Call (Primary - Fastest & 100% Reliable for Odoo JSON-RPC)
     try {
-      const response = await fetch(primaryUrl, {
+      const response = await fetch(directUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (response && response.ok) {
-        return await response.json();
+        const data = await response.json();
+        if (data) return data;
       }
-    } catch (err) {
-      // Secondary fallback to direct URL if supported
+    } catch (directErr) {
+      console.warn('[Odoo Direct Call Failed, trying Proxies...]:', directErr);
+    }
+
+    // 2. Secondary Proxies if Direct had CORS restrictions in special browser environments
+    const proxyList = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`,
+      `https://corsproxy.io/?${encodeURIComponent(directUrl)}`
+    ];
+
+    for (const pUrl of proxyList) {
       try {
-        const directResp = await fetch(directUrl, {
+        const pResp = await fetch(pUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (directResp && directResp.ok) {
-          return await directResp.json();
+        if (pResp && pResp.ok) {
+          const pData = await pResp.json();
+          if (pData) return pData;
         }
-      } catch (directErr) {
-        // Graceful offline fallback for local file mode
-        return null;
+      } catch (pErr) {
+        console.warn(`[Proxy ${pUrl} failed]:`, pErr);
       }
     }
+
     return null;
   }
 
@@ -2969,33 +2981,63 @@ class UltimateFMApp {
     }
   }
 
-  requestPermit(requester, type) {
-    const defaultDetails = requester === 'commercial' 
-      ? 'شاحنة توريد لوجستي للمحل' 
-      : (requester === 'tenant' ? 'ضيف زائر لشاليه 402' : 'زائر مؤقت للوحدة الساحلية');
-      
-    const details = prompt('يرجى إدخال تفاصيل التصريح والأسماء (مثال: اسم الضيف أو رقم لوحة السيارة):', defaultDetails);
-    if (details === null) return; // user cancelled
+  openPermitModal(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+    const roleInput = document.getElementById('permitRequesterRole');
+    const typeInput = document.getElementById('permitTypeInput');
+    const titleEl = document.getElementById('permitModalTitle');
+    const nameInput = document.getElementById('permitVisitorNameInput');
+    const phoneInput = document.getElementById('permitVisitorPhoneInput');
+    const plateInput = document.getElementById('permitPlateNumInput');
+
+    if (roleInput) roleInput.value = requester;
+    if (typeInput) typeInput.value = type;
+    if (titleEl) titleEl.innerText = `طلب ${type}`;
+    if (nameInput) nameInput.value = '';
+    if (phoneInput) phoneInput.value = '';
+    if (plateInput) plateInput.value = '';
+
+    this.openModal('modalRequestPermit');
+  }
+
+  requestPermit(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+    this.openPermitModal(requester, type);
+  }
+
+  submitPermitModal() {
+    const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
+    const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
+    const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
+    const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
+    const plate = document.getElementById('permitPlateNumInput')?.value || '';
+    const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+
+    if (!visitorName.trim()) {
+      this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
+      return;
+    }
+
+    const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
 
     const newPermit = {
       id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
       type: type,
       category: 'تصريح دخول بوابات أمني',
-      title: `تصريح دخول بوابات: ${type}`,
+      title: `${type}: ${visitorName}`,
       status: 'تحت المراجعة',
       bgClass: 'badge-warning',
-      requester: requester,
-      details: details || defaultDetails,
+      requester: role,
+      details: detailsStr,
       qrCode: ''
     };
 
     this.permits.unshift(newPermit);
     this.renderTickets();
-    this.showToast(`✅ تم تقديم طلب التصريح رقم #${newPermit.id} بنجاح!\nالطلب قيد المراجعة حالياً من قبل فريق الأمن والبوابات.`);
+    this.closeModal('modalRequestPermit');
+    this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
 
-    // Sync permit to Odoo Security Team ("الأمن")
+    // Live Sync to Odoo Security Team
     try {
-      this.syncTicketToOdoo(newPermit);
+      this.syncTicketToOdoo(newPermit, visitorPhone, visitorName);
     } catch (pErr) {
       console.warn('[Odoo Permit Sync Exception]:', pErr);
     }
@@ -6041,6 +6083,10 @@ window.confirmSparePartPayment = function() { if (window.app) window.app.confirm
 window.sendOwnerDirectMsgToOdoo = function() { if (window.app) window.app.sendOwnerDirectMsgToOdoo(); };
 window.clearAllSystemRecords = function() { if (window.app) window.app.clearAllSystemRecords(); };
 window.resetAndWipeAllAppTickets = function() { if (window.app) window.app.resetAndWipeAllAppTickets(); };
+window.requestPermit = function(role, type) { if (window.app) window.app.requestPermit(role, type); };
+window.openPermitModal = function(role, type) { if (window.app) window.app.openPermitModal(role, type); };
+window.submitPermitModal = function() { if (window.app) window.app.submitPermitModal(); };
+window.approvePermit = function(id) { if (window.app) window.app.approvePermit(id); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());

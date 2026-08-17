@@ -97,6 +97,10 @@
     function sendOwnerDirectMsgToOdoo() { if (window.app) window.app.sendOwnerDirectMsgToOdoo(); }
     function openSparePartPaymentModal(id) { if (window.app) window.app.openSparePartPaymentModal(id); }
     function confirmSparePartPayment() { if (window.app) window.app.confirmSparePartPayment(); }
+    function requestPermit(role, type) { if (window.app) window.app.requestPermit(role, type); }
+    function openPermitModal(role, type) { if (window.app) window.app.openPermitModal(role, type); }
+    function submitPermitModal() { if (window.app) window.app.submitPermitModal(); }
+    function approvePermit(id) { if (window.app) window.app.approvePermit(id); }
     function clearAllSystemRecords() { if (window.app) window.app.clearAllSystemRecords(); }
     function resetAndWipeAllAppTickets() { if (window.app) window.app.resetAndWipeAllAppTickets(); }
     function executeLogin(role) {
@@ -2730,6 +2734,51 @@
           <i class="fa-solid fa-ban"></i> تأكيد الإلغاء والمزامنة مع أودو
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- 14. Request Security Entry Permit Modal -->
+  <div class="modal-overlay" id="modalRequestPermit">
+    <div class="modal-card" style="border-top: 5px solid #1b8f91;">
+      <button class="modal-close" onclick="closeModal('modalRequestPermit')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #1b8f91; font-size: 0.95rem;">
+        <i class="fa-solid fa-key" style="color: #d4af37;"></i> <span id="permitModalTitle">طلب تصريح دخول بوابات أمني</span>
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+        إصدار تصريح دخول إلكتروني معتمد للبوابات الأمنية وإرساله مباشرة لأمن القرية وأودو.
+      </p>
+
+      <input type="hidden" id="permitRequesterRole" value="homeowner">
+      <input type="hidden" id="permitTypeInput" value="تصريح دخول الوحدة">
+
+      <div class="form-group">
+        <label for="permitVisitorNameInput" class="form-label" style="font-weight: 700; color: #20274f;">اسم الزائر / الضيف أو جهة التوريد:</label>
+        <input type="text" id="permitVisitorNameInput" class="form-control" placeholder="مثال: م. أحمد عبد الفتاح أو شركة ألبان..." style="font-size: 0.8rem; font-weight: 600;">
+      </div>
+
+      <div class="form-group">
+        <label for="permitVisitorPhoneInput" class="form-label" style="font-weight: 700; color: #20274f;">رقم هاتف الزائر / السائق:</label>
+        <input type="tel" id="permitVisitorPhoneInput" class="form-control" placeholder="010XXXXXXXX" style="font-size: 0.8rem;">
+      </div>
+
+      <div class="form-group">
+        <label for="permitPlateNumInput" class="form-label" style="font-weight: 700; color: #20274f;">رقم لوحة السيارة (إن وجد):</label>
+        <input type="text" id="permitPlateNumInput" class="form-control" placeholder="مثال: س ص 9876" style="font-size: 0.8rem;">
+      </div>
+
+      <div class="form-group">
+        <label for="permitDaysSelect" class="form-label" style="font-weight: 700; color: #20274f;">مدة صلاحية التصريح:</label>
+        <select id="permitDaysSelect" class="form-control" style="font-size: 0.78rem; font-weight: 600;">
+          <option value="يوم واحد (24 ساعة)">يوم واحد (صالح 24 ساعة)</option>
+          <option value="3 أيام">3 أيام (عطلة نهاية الأسبوع)</option>
+          <option value="أسبوع كامل">أسبوع كامل (7 أيام)</option>
+          <option value="شهر كامل">شهر كامل (دخول متكرر)</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitPermitModal()" style="width: 100%; margin-top: 10px; font-size: 0.82rem; font-weight: 700; height: 42px; background: #1b8f91; border-color: #1b8f91; color: #ffffff;">
+        <i class="fa-solid fa-stamp"></i> إصدار التصريح والمزامنة مع أمن القرية
+      </button>
     </div>
   </div>
 
