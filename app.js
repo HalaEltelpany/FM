@@ -1298,6 +1298,36 @@ class UltimateFMApp {
         };
       }
 
+      // Step 2.9: Strict Deduplication Search Check - Prevent duplicate tickets in Odoo
+      try {
+        const checkExistingPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              targetModel,
+              "search",
+              [[["name", "ilike", `(#${ticket.id})`]]],
+              { limit: 1 }
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const existCheck = await this.callOdoo(baseUrl, checkExistingPayload);
+        if (existCheck && existCheck.result && existCheck.result.length > 0) {
+          console.log(`[Odoo Dedup Check] Ticket #${ticket.id} already exists in Odoo with ID:`, existCheck.result[0]);
+          ticket.odooId = existCheck.result[0];
+          ticket.odooModel = targetModel;
+          this.saveTicketsToStorage();
+          return;
+        }
+      } catch (chkErr) {
+        console.warn('[Odoo Dedup Check Exception]:', chkErr);
+      }
+
       console.log(`[Odoo Sync] Creating ticket under model [${targetModel}]`);
       let odooCreateData = await this.callOdoo(baseUrl, createPayload);
 
@@ -3016,42 +3046,48 @@ class UltimateFMApp {
   }
 
   submitPermitModal() {
-    const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
-    const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
-    const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
-    const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
-    const plate = document.getElementById('permitPlateNumInput')?.value || '';
-    const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+    if (this._submittingPermit) return;
+    this._submittingPermit = true;
 
-    if (!visitorName.trim()) {
-      this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
-      return;
-    }
-
-    const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
-
-    const newPermit = {
-      id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
-      type: type,
-      category: 'تصريح دخول بوابات أمني',
-      title: `${type}: ${visitorName}`,
-      status: 'تحت المراجعة',
-      bgClass: 'badge-warning',
-      requester: role,
-      details: detailsStr,
-      qrCode: ''
-    };
-
-    this.permits.unshift(newPermit);
-    this.renderTickets();
-    this.closeModal('modalRequestPermit');
-    this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
-
-    // Live Sync to Odoo Security Team
     try {
-      this.syncTicketToOdoo(newPermit, visitorPhone, visitorName);
-    } catch (pErr) {
-      console.warn('[Odoo Permit Sync Exception]:', pErr);
+      const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
+      const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
+      const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
+      const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
+      const plate = document.getElementById('permitPlateNumInput')?.value || '';
+      const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+
+      if (!visitorName.trim()) {
+        this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
+        this._submittingPermit = false;
+        return;
+      }
+
+      const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
+
+      const newPermit = {
+        id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
+        type: type,
+        category: 'تصريح دخول بوابات أمني',
+        title: `${type}: ${visitorName}`,
+        status: 'تحت المراجعة',
+        bgClass: 'badge-warning',
+        requester: role,
+        details: detailsStr,
+        qrCode: ''
+      };
+
+      this.permits.unshift(newPermit);
+      this.renderTickets();
+      this.closeModal('modalRequestPermit');
+      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
+
+      // Live Sync to Odoo Security Team
+      this.syncTicketToOdoo(newPermit, visitorPhone, visitorName).catch(pErr => {
+        console.warn('[Odoo Permit Sync Exception]:', pErr);
+      });
+    } finally {
+      setTimeout(() => { this._submittingPermit = false; }, 1000);
     }
   }
 
