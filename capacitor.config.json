@@ -1,0 +1,9 @@
+{
+  "appId": "com.ultimatefm.app",
+  "appName": "Ultimate FM",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "ultimate-fm",
+  "version": "3.0.0",
+  "description": "Ultimate FM Coastal & Commercial Facility Management App",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Ready'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
