@@ -3328,20 +3328,28 @@ class UltimateFMApp {
     const badge = document.getElementById('ownerFamilyCountBadge');
 
     if (list) {
+      // Remove empty placeholder message
+      const emptyDiv = list.querySelector('div:only-child');
+      if (emptyDiv && emptyDiv.innerText.includes('لا يوجد أفراد')) {
+        list.innerHTML = '';
+      }
+
       const item = document.createElement('div');
-      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px; margin-top: 6px;';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(32,39,79,0.12); box-shadow: 0 2px 5px rgba(0,0,0,0.04); margin-top: 4px;';
       item.innerHTML = `
-        <div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">${name} (${relationArabic})</span>
-          <p style="font-size: 0.65rem; color: #cbd5e1; margin: 0;">حساب فرد أسرة • ${phone} • بانتظار مراجعة واعتماد بطاقة الرقم القومي من إدارة القرية 🪪</p>
+        <div style="text-align: right;">
+          <div style="font-size: 0.85rem; font-weight: 800; color: #1c2140;">${name} <span style="font-size: 0.75rem; color: #1b8f91; font-weight: 700;">(${relationArabic})</span></div>
+          <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
+            <i class="fa-solid fa-phone" style="font-size: 0.62rem; color: #1b8f91;"></i> ${phone} • بانتظار مراجعة واعتماد بطاقة الرقم القومي 🪪
+          </p>
         </div>
-        <span class="badge" style="font-size: 0.6rem; margin-top:0; background: #f59e0b; color: #ffffff !important;"><i class="fa-solid fa-hourglass-half"></i> قيد مراجعة الإدارة ⏳</span>
+        <span class="badge" style="font-size: 0.65rem; margin-top:0; background: #f59e0b; color: #ffffff !important; padding: 4px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hourglass-half"></i> قيد مراجعة الإدارة ⏳</span>
       `;
       list.appendChild(item);
 
       // Update badge count
       if (badge) {
-        const count = list.children.length;
+        const count = list.querySelectorAll('div[style*="justify-content"]').length;
         badge.innerText = `${count} أفراد`;
       }
     }
@@ -3460,7 +3468,7 @@ class UltimateFMApp {
     // Step 2: Get exact target partnerId for owner
     const partnerId = (await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput)) || 3;
 
-    // Step 3: Create child contact in res.partner for family member with email
+    // Step 3: Create child contact in res.partner for family member with email and parent_id
     let childPartnerId = null;
     try {
       const childPayload = {
@@ -3478,6 +3486,7 @@ class UltimateFMApp {
               phone: phone,
               email: email || '',
               function: relation,
+              parent_id: partnerId,
               type: "other",
               comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
               company_type: "person"
@@ -3495,9 +3504,31 @@ class UltimateFMApp {
       console.warn('[Odoo Family Sync Child Create Error]:', cErr);
     }
 
-    if (childPartnerId && partnerId) {
-      // Step 4: Link child partner directly to Family Members tab (x_studio_many2many_field_7m1_1jvs7m7ps) ONLY!
+    // Step 4: Link child partner to Family Members Many2Many AND specific relation field on partner
+    if (partnerId) {
       try {
+        const partnerUpdates = {
+          "x_studio_many2many_field_7m1_1jvs7m7ps": childPartnerId ? [[4, childPartnerId, 0]] : undefined
+        };
+
+        const relClean = (relation || '').trim();
+        if (relClean.includes('أب') || relClean.toLowerCase().includes('father')) {
+          partnerUpdates["x_studio_father"] = `${name} (${phone})`;
+        } else if (relClean.includes('أم') || relClean.toLowerCase().includes('mother')) {
+          partnerUpdates["x_studio_mother"] = `${name} (${phone})`;
+        } else if (relClean.includes('ابن') || relClean.toLowerCase().includes('son')) {
+          partnerUpdates["x_studio_son"] = `${name} (${phone})`;
+        } else if (relClean.includes('ابنة') || relClean.toLowerCase().includes('daughter')) {
+          partnerUpdates["x_studio_daughter"] = `${name} (${phone})`;
+        } else if (relClean.includes('زوج') || relClean.toLowerCase().includes('husband')) {
+          partnerUpdates["x_studio_husband"] = `${name} (${phone})`;
+        } else if (relClean.includes('زوجة') || relClean.toLowerCase().includes('wife')) {
+          partnerUpdates["x_studio_wife"] = `${name} (${phone})`;
+        }
+
+        // Clean undefined keys
+        Object.keys(partnerUpdates).forEach(k => partnerUpdates[k] === undefined && delete partnerUpdates[k]);
+
         const linkPayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -3510,16 +3541,14 @@ class UltimateFMApp {
               "write",
               [
                 [partnerId],
-                {
-                  "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId, 0]]
-                }
+                partnerUpdates
               ]
             ]
           },
           id: Math.floor(Math.random() * 1000)
         };
         const linkRes = await this.callOdoo(baseUrl, linkPayload);
-        console.log(`[Odoo Family Sync] Linked child #${childPartnerId} to Family Members tab on #${partnerId}:`, linkRes);
+        console.log(`[Odoo Family Sync] Linked family member to partner #${partnerId}:`, linkRes);
       } catch (lErr) {
         console.warn('[Odoo Family Sync Link Error]:', lErr);
       }
@@ -4921,14 +4950,22 @@ class UltimateFMApp {
 
     const list = document.getElementById('lprActivePlatesList');
     if (list) {
+      // Remove empty state message if present
+      const emptyDiv = list.querySelector('div:only-child');
+      if (emptyDiv && emptyDiv.innerText.includes('لا توجد سيارات')) {
+        list.innerHTML = '';
+      }
+
       const item = document.createElement('div');
-      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(27, 143, 145, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(27, 143, 145, 0.15); margin-top: 6px;';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(27, 143, 145, 0.2); box-shadow: 0 2px 5px rgba(0,0,0,0.04); margin-top: 4px;';
       item.innerHTML = `
-        <div>
-          <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">${plate}</span>
-          <p style="font-size: 0.62rem; color: var(--text-muted); margin: 0;">الرخصة: ${frontData || backData ? 'تم رفع صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}</p>
+        <div style="text-align: right;">
+          <div style="font-weight: 900; color: #20274f; font-family: var(--font-number); letter-spacing: 2px; font-size: 0.95rem;">${plate}</div>
+          <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
+            <i class="fa-solid fa-id-card" style="color: #1b8f91;"></i> الرخصة: ${frontData || backData ? 'تم رفع وتوثيق صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}
+          </p>
         </div>
-        <span class="badge badge-success" style="font-size: 0.65rem; margin-top:0;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
+        <span class="badge badge-success" style="font-size: 0.68rem; margin-top:0; font-weight: 700; padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
       `;
       list.insertBefore(item, list.firstChild);
     }
@@ -5083,6 +5120,31 @@ class UltimateFMApp {
       const cRes = await this.callOdoo(baseUrl, carLinePayload);
       if (cRes && cRes.result) carLineId = cRes.result;
     } catch (cLineErr) {}
+
+    // Step 5.5: Also link directly to res.partner One2many field x_studio_one2many_field_3nh_1jvs8ot39
+    try {
+      const o2mPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "write",
+            [
+              [partnerId],
+              {
+                "x_studio_one2many_field_3nh_1jvs8ot39": carLineId ? [[4, carLineId, 0]] : [[0, 0, { "x_name": plate }]]
+              }
+            ]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, o2mPayload);
+    } catch (o2mErr) {}
 
     // Step 6: Create attachments for Front & Back license photos linked to res.partner in Odoo
     if (frontBase64) {
