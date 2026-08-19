@@ -1913,6 +1913,46 @@ class UltimateFMApp {
         </div>
       `;
 
+      // 1. Cancellation Info Box if Cancelled
+      let cancellationHtml = '';
+      if (tk.status === 'ملغاة' || tk.status === 'Cancelled' || tk.status === 'ملغي' || String(tk.status).includes('الغاء') || String(tk.status).includes('ملغ')) {
+        cancellationHtml = `
+          <div style="background: rgba(239, 68, 68, 0.08); border-right: 3px solid #ef4444; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-ban"></i> <span>تم إلغاء هذا البلاغ رسمياً</span>
+            </div>
+            <p style="font-size: 0.7rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">
+              <b>سبب الإلغاء المدون:</b> ${tk.cancelReason || tk.cancellationReason || tk.cancelNotes || 'تم الإلغاء من قِبل إدارة الصيانة لتعذر التنفيذ'}
+            </p>
+          </div>
+        `;
+      }
+
+      // 2. Customer Star Rating & Review Box if Solved / Completed
+      let ratingHtml = '';
+      const isSolved = tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved' || tk.status === 'Done' || tk.status === 'مكتمل';
+      if (isSolved) {
+        if (tk.customerRating) {
+          const starsStr = '⭐'.repeat(parseInt(tk.customerRating) || 5);
+          ratingHtml = `
+            <div style="background: rgba(212, 175, 55, 0.08); border-right: 3px solid #d4af37; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+              <div style="font-size: 0.75rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-star" style="color: #d4af37;"></i> <span>تقييمك لجودة الخدمة: ${starsStr} (${tk.customerRating}/5)</span>
+              </div>
+              ${tk.customerComment ? `<p style="font-size: 0.68rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">"${tk.customerComment}"</p>` : ''}
+            </div>
+          `;
+        } else {
+          ratingHtml = `
+            <div style="margin-top: 8px;">
+              <button class="btn btn-sm" onclick="app.openRateTicketModal('${tk.id}')" style="width: 100%; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #d4af37, #b8860b); color: #ffffff; border: none; border-radius: 6px; padding: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(212,175,55,0.25);">
+                <i class="fa-solid fa-star"></i> تقييم جودة الخدمة ورضا العميل ⭐
+              </button>
+            </div>
+          `;
+        }
+      }
+
       return `
         <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140')}; font-family: var(--font-main); border-radius: 10px; padding: 12px; margin-bottom: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1930,6 +1970,8 @@ class UltimateFMApp {
           ${photosHtml}
           ${paymentHtml}
           ${odooRepliesHtml}
+          ${cancellationHtml}
+          ${ratingHtml}
           ${emaarTrackerHtml}
         </div>
       `;
@@ -2927,24 +2969,32 @@ class UltimateFMApp {
     const notesInput = document.getElementById('cancelNotesInput');
 
     const ticketId = targetInput ? targetInput.value : '';
-    const reason = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
+    const reasonCategory = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
     const notes = (notesInput && notesInput.value.trim()) ? notesInput.value.trim() : '';
+
+    if (!reasonCategory && !notes) {
+      this.showToast('⚠️ يرجى تحديد أو كتابة سبب إلغاء البلاغ أولاً (حقل إجباري للحوكمة)!');
+      return;
+    }
 
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
-    tk.status = 'ملغي';
+    const fullReason = notes ? `${reasonCategory} - تفاصيل إضافية: ${notes}` : reasonCategory;
+
+    tk.status = 'ملغاة';
     tk.bgClass = 'badge-danger';
-    tk.cancelReason = reason;
+    tk.cancelReason = fullReason;
+    tk.cancellationReason = fullReason;
     tk.cancelNotes = notes;
-    tk.cancelledBy = 'م. أيمن السعيد (مدير الصيانة)';
+    tk.cancelledBy = this.currentRole === 'manager' ? 'المهندس أيمن السعيد (مدير الصيانة)' : 'فني الصيانة المسؤول';
     tk.cancelledAt = new Date().toISOString();
 
     this.saveTicketsToStorage();
     this.renderTickets();
     this.closeModal('modalManagerCancelTicket');
 
-    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} بنجاح!\nالسبب: ${reason}\nتم توثيق الإلغاء ونقله لأودو.`);
+    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} وتوثيق السبب إجبارياً بنجاح!\nالسبب: ${fullReason}\nتم قفل التذكرة ونقلها لمرحلة Cancelled بأودو.`);
 
     // Sync Cancellation to Odoo (Stage 5 = Cancelled + Chatter Log)
     try {
@@ -2965,7 +3015,7 @@ class UltimateFMApp {
     if (tk) {
       const now = new Date();
       tk.dispatchedAt = now;
-      tk.status = 'تم التعيين للفني';
+      tk.status = 'قيد التنفيذ';
       tk.bgClass = 'badge-info';
       tk.assignedTech = techName;
 
@@ -2978,9 +3028,9 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) خلال ${dispatchMins} دقيقة!\nتقييم سرعة استجابة المدير: ${managerRating}`);
+      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
-      // Sync update to Odoo
+      // Sync update to Odoo (Stage 2 = In Progress)
       this.syncTicketUpdateToOdoo(tk);
     }
   }
@@ -2998,7 +3048,7 @@ class UltimateFMApp {
       const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
       const totalMins = Math.max(1, Math.round((now - createTime) / 60000));
       
-      tk.status = 'تم الانتهاء';
+      tk.status = 'تم الحل';
       tk.bgClass = 'badge-success';
       tk.photoAfter = finalPhoto;
       tk.totalResolutionMins = totalMins;
@@ -3019,9 +3069,9 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} بنجاح!\nمدة الإنجاز الكلية: ${totalMins} دقيقة.\nمؤشر تقييم SLA: ${tk.slaRating}`);
+      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
       
-      // Sync update to Odoo
+      // Sync update to Odoo (Stage 4 = Solved)
       this.syncTicketUpdateToOdoo(tk);
     };
 
@@ -3031,6 +3081,105 @@ class UltimateFMApp {
       reader.readAsDataURL(fileInput.files[0]);
     } else {
       proceed(afterPhoto);
+    }
+  }
+
+  openRateTicketModal(ticketId) {
+    const targetInput = document.getElementById('rateTargetTicketId');
+    if (targetInput) targetInput.value = ticketId;
+    this.setRatingStars(5);
+    const commentInput = document.getElementById('rateCommentInput');
+    if (commentInput) commentInput.value = '';
+    this.openModal('modalRateTicket');
+  }
+
+  setRatingStars(stars) {
+    const valInput = document.getElementById('rateStarsValue');
+    if (valInput) valInput.value = stars;
+
+    const label = document.getElementById('starRatingLabel');
+    const labelsMap = {
+      1: '⭐ ضعيف جداً (1/5)',
+      2: '⭐⭐ مقبول (2/5)',
+      3: '⭐⭐⭐ جيد (3/5)',
+      4: '⭐⭐⭐⭐ جيد جداً (4/5)',
+      5: '⭐⭐⭐⭐⭐ ممتاز جداً (5/5)'
+    };
+    if (label) label.innerText = labelsMap[stars] || `${stars}/5`;
+
+    const starBtns = document.querySelectorAll('.star-btn');
+    starBtns.forEach((btn, idx) => {
+      if (idx < stars) {
+        btn.style.color = '#d4af37';
+        btn.classList.add('fa-solid');
+        btn.classList.remove('fa-regular');
+      } else {
+        btn.style.color = '#cbd5e1';
+        btn.classList.add('fa-regular');
+        btn.classList.remove('fa-solid');
+      }
+    });
+  }
+
+  async submitTicketRating() {
+    const targetInput = document.getElementById('rateTargetTicketId');
+    const valInput = document.getElementById('rateStarsValue');
+    const commentInput = document.getElementById('rateCommentInput');
+
+    const ticketId = targetInput ? targetInput.value : '';
+    const stars = valInput ? valInput.value : '5';
+    const comment = commentInput ? commentInput.value.trim() : '';
+
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    tk.customerRating = stars;
+    tk.customerComment = comment;
+
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.closeModal('modalRateTicket');
+
+    this.showToast(`⭐ شكراً لك! تم تسجيل تقييمك (${stars}/5 نجوم) بنجاح!\nتم إرسال التقييم لإدارة الجودة بأودو.`);
+
+    // Post Rating to Odoo Chatter
+    if (tk.odooId) {
+      try {
+        const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+        const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+        const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+        const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+        const baseUrl = urlInput.replace(/\/+$/, '');
+
+        const authPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const authData = await this.callOdoo(baseUrl, authPayload);
+        if (authData && authData.result) {
+          const uid = authData.result;
+          const starsStr = '⭐'.repeat(parseInt(stars) || 5);
+          const ratingBody = `<p><b>⭐ تقييم العميل لجودة الخدمة بعد الإغلاق:</b></p>` +
+                             `<p>• <b>التقييم:</b> ${starsStr} (${stars}/5)</p>` +
+                             (comment ? `<p>• <b>ملاحظات العميل:</b> ${comment}</p>` : '');
+
+          const chatterPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [dbInput, uid, keyInput, tk.odooModel || "helpdesk.ticket", "message_post", [[parseInt(tk.odooId)]], { body: ratingBody }]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, chatterPayload);
+        }
+      } catch (e) {
+        console.warn('[Odoo Rating Post Error]:', e);
+      }
     }
   }
 
@@ -6208,6 +6357,9 @@ window.requestPermit = function(role, type) { if (window.app) window.app.request
 window.openPermitModal = function(role, type) { if (window.app) window.app.openPermitModal(role, type); };
 window.submitPermitModal = function() { if (window.app) window.app.submitPermitModal(); };
 window.approvePermit = function(id) { if (window.app) window.app.approvePermit(id); };
+window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
+window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
+window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());

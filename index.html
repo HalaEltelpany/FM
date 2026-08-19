@@ -2753,6 +2753,42 @@
     </div>
   </div>
 
+  <!-- 13.5 Customer Rating & Satisfaction Modal -->
+  <div class="modal-overlay" id="modalRateTicket">
+    <div class="modal-card" style="border-top: 5px solid #d4af37;">
+      <button class="modal-close" onclick="closeModal('modalRateTicket')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #20274f; font-size: 0.95rem;">
+        <i class="fa-solid fa-star" style="color: #d4af37;"></i> تقييم جودة الخدمة ورضا العميل
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+        رأيك يهمنا لتحسين جودة التشغيل والصيانة بالقرية. سيتم إرسال تقييمك وملاحظاتك مباشرة لإدارة أودو.
+      </p>
+
+      <input type="hidden" id="rateTargetTicketId" value="">
+      <input type="hidden" id="rateStarsValue" value="5">
+
+      <div style="text-align: center; margin: 15px 0;">
+        <div id="starRatingContainer" style="font-size: 1.8rem; color: #d4af37; cursor: pointer; display: inline-flex; gap: 8px;">
+          <i class="fa-solid fa-star star-btn" data-star="1" onclick="app.setRatingStars(1)"></i>
+          <i class="fa-solid fa-star star-btn" data-star="2" onclick="app.setRatingStars(2)"></i>
+          <i class="fa-solid fa-star star-btn" data-star="3" onclick="app.setRatingStars(3)"></i>
+          <i class="fa-solid fa-star star-btn" data-star="4" onclick="app.setRatingStars(4)"></i>
+          <i class="fa-solid fa-star star-btn" data-star="5" onclick="app.setRatingStars(5)"></i>
+        </div>
+        <div id="starRatingLabel" style="font-size: 0.8rem; font-weight: 700; color: #10b981; margin-top: 6px;">⭐⭐⭐⭐⭐ ممتاز جداً (5/5)</div>
+      </div>
+
+      <div class="form-group">
+        <label for="rateCommentInput" class="form-label" style="font-weight: 700; color: #20274f;">ملاحظاتك وتقييمك لأداء الفني والخدمة:</label>
+        <textarea id="rateCommentInput" class="form-control" rows="3" placeholder="اكتب رأيك في سرعة الاستجابة، نظافة المكان، واحترافية الفني..." style="font-size: 0.78rem;"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="app.submitTicketRating()" style="width: 100%; font-size: 0.85rem; font-weight: 700; background: #1b8f91; border-color: #1b8f91; height: 42px; margin-top: 10px;">
+        <i class="fa-solid fa-paper-plane"></i> إرسال التقييم وتأكيد استلام الصيانة
+      </button>
+    </div>
+  </div>
+
   <!-- 14. Request Security Entry Permit Modal -->
   <div class="modal-overlay" id="modalRequestPermit">
     <div class="modal-card" style="border-top: 5px solid #1b8f91;">
@@ -8958,6 +8994,7 @@ if (document.readyState === 'loading') {
 </script>
 </body>
 </html>
+
 
 
 
