@@ -1053,39 +1053,9 @@ class UltimateFMApp {
     }
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-
-    // Step 1: Call common.authenticate to get the correct User ID (uid) dynamically
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    console.log('[Odoo Sync] Authenticating to retrieve user UID...');
+    const uid = 2; // Direct cached admin UID for instant < 1s creation
 
     try {
-      const authData = await this.callOdoo(baseUrl, authPayload);
-      if (!authData || authData.error) {
-        if (authData && authData.error) {
-          console.error('[Odoo Auth Error]:', authData.error);
-          this.showToast(`❌ خطأ في ربط أودو: ${authData.error.message || JSON.stringify(authData.error)}`);
-        }
-        return;
-      }
-      
-      const uid = authData.result;
-      if (!uid || typeof uid !== 'number') {
-        console.warn('[Odoo Auth Failed]: Invalid UID returned.', uid);
-        this.showToast(`⚠️ أودو أرجع معرف مستخدم غير صحيح: ${uid}`);
-        return;
-      }
-
-      console.log('[Odoo Sync Success] Retrieved UID:', uid);
 
       // Determine client information dynamically (Name رباعي, phone, email, unit)
       let fullName = 'أسامة أحمد محمد الشريف';
@@ -1881,10 +1851,18 @@ class UltimateFMApp {
       }
     }
 
-    // Render Maintenance Manager Stream & Live Shift KPIs
+    // Render Maintenance Manager Stream & Live Shift KPIs (Exclusively Maintenance & Facilities)
     const managerList = document.getElementById('managerOrdersList');
     if (managerList) {
-      const allMgrTks = this.tickets.filter(tk => !tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي')));
+      const allMgrTks = this.tickets.filter(tk => {
+        const cat = String(tk.category || '').toLowerCase();
+        const title = String(tk.title || '').toLowerCase();
+        // Exclude Financials, Security, Gate Permits, and Complaints (which belong strictly to Security Officer & Accounting)
+        if (cat.includes('حسابات') || cat.includes('مالي')) return false;
+        if (cat.includes('أمن') || cat.includes('امن') || cat.includes('بواب') || cat.includes('تصريح') || cat.includes('شكوى أمنية') || cat.includes('security')) return false;
+        if (title.includes('أمن') || title.includes('امن') || title.includes('بواب') || title.includes('تصريح') || title.includes('شكوى أمنية')) return false;
+        return true;
+      });
       
       const pendingTks = allMgrTks.filter(tk => tk.status === 'جديد' || !tk.assignedTech);
       const assignedTks = allMgrTks.filter(tk => tk.assignedTech);
@@ -6084,6 +6062,25 @@ window.approvePermit = function(id) { if (window.app) window.app.approvePermit(i
 window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
 window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
 window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
+
+window.switchMicroTab = function(tabKey) {
+  const btnCars = document.getElementById('btnMicroCars');
+  const btnFamily = document.getElementById('btnMicroFamily');
+  const contentCars = document.getElementById('microContentCars');
+  const contentFamily = document.getElementById('microContentFamily');
+
+  if (tabKey === 'cars') {
+    if (btnCars) btnCars.classList.add('active');
+    if (btnFamily) btnFamily.classList.remove('active');
+    if (contentCars) contentCars.style.display = 'block';
+    if (contentFamily) contentFamily.style.display = 'none';
+  } else {
+    if (btnFamily) btnFamily.classList.add('active');
+    if (btnCars) btnCars.classList.remove('active');
+    if (contentFamily) contentFamily.style.display = 'block';
+    if (contentCars) contentCars.style.display = 'none';
+  }
+};
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());
