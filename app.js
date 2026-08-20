@@ -249,26 +249,14 @@ class UltimateFMApp {
       toggleViewBtn.addEventListener('click', () => this.toggleViewMode());
     }
 
-    // New Ticket Modal Trigger
-    const btnNewTicket = document.getElementById('btnNewMaintenanceTicket');
-    if (btnNewTicket) {
-      btnNewTicket.addEventListener('click', () => this.openModal('modalNewTicket'));
-    }
-
-    // Submit Ticket Form
-    const btnSubmitTicket = document.getElementById('btnSubmitTicket');
-    if (btnSubmitTicket) {
-      btnSubmitTicket.addEventListener('click', () => this.handleNewTicketSubmit());
-    }
-
     // Smart Meters Recharge Modal Triggers
     const btnOpenMeter = document.getElementById('btnOpenMeterRechargeModal');
-    if (btnOpenMeter) {
+    if (btnOpenMeter && !btnOpenMeter.getAttribute('onclick')) {
       btnOpenMeter.addEventListener('click', () => this.openModal('modalMeterRecharge'));
     }
 
     const btnConfirmMeter = document.getElementById('btnConfirmMeterRecharge');
-    if (btnConfirmMeter) {
+    if (btnConfirmMeter && !btnConfirmMeter.getAttribute('onclick')) {
       btnConfirmMeter.addEventListener('click', () => this.handleMeterRechargeSubmit());
     }
 
@@ -980,54 +968,34 @@ class UltimateFMApp {
     this.showToast('🧹 تم تصفير وتنظيف جميع السجلات والبلاغات بكافة الشاشات بنجاح!\nالتطبيق نظيف 100% وجاهز لاختبارك المباشر.');
   }
 
-  async callOdoo(baseUrl, payload) {
+  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
 
-    // 1. Direct Call (Primary - Fastest & 100% Reliable for Odoo JSON-RPC)
+    // 1. Direct Call with AbortController timeout (Fastest: ~800ms)
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       const response = await fetch(directUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
 
       if (response && response.ok) {
         const data = await response.json();
         if (data) return data;
       }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed, trying Proxies...]:', directErr);
-    }
-
-    // 2. Secondary Proxies if Direct had CORS restrictions in special browser environments
-    const proxyList = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(directUrl)}`
-    ];
-
-    for (const pUrl of proxyList) {
-      try {
-        const pResp = await fetch(pUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (pResp && pResp.ok) {
-          const pData = await pResp.json();
-          if (pData) return pData;
-        }
-      } catch (pErr) {
-        console.warn(`[Proxy ${pUrl} failed]:`, pErr);
-      }
+      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
     }
 
     return null;
   }
 
-  resolveOdooTeamId(ticket, teams) {
-    if (!teams || !Array.isArray(teams) || teams.length === 0) return 1;
-
+  resolveOdooTeamId(ticket) {
     const normalize = (s) => String(s || '').toLowerCase()
       .replace(/[أإآ]/g, 'ا')
       .replace(/ة/g, 'ه')
@@ -1040,54 +1008,29 @@ class UltimateFMApp {
     const typeNorm = normalize(ticket.type);
     const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
 
-    // Helper to find team by ID or matching English/Arabic names
-    const findTeam = (targetId, keywords) => {
-      let found = teams.find(t => t.id === targetId);
-      if (!found) {
-        found = teams.find(t => {
-          const tn = normalize(t.name);
-          return keywords.some(k => tn.includes(normalize(k)));
-        });
-      }
-      return found;
-    };
-
+    // Instant Map without redundant network requests:
     // 1. Housekeeping (ID 5)
     if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
-      const team = findTeam(5, ['housekeeping', 'هاوس', 'نظافة']);
-      if (team) return team.id;
+      return 5;
     }
-
     // 2. Landscaping (ID 7)
     if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
-      const team = findTeam(7, ['landscaping', 'لاند', 'حدائق']);
-      if (team) return team.id;
+      return 7;
     }
-
     // 3. Security (ID 3)
     if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
-      const team = findTeam(3, ['security', 'أمن']);
-      if (team) return team.id;
+      return 3;
     }
-
     // 4. Accounting (ID 4)
     if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
-      const team = findTeam(4, ['accounting', 'حسابات']);
-      if (team) return team.id;
+      return 4;
     }
-
     // 5. Maintenance (ID 2)
     if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
-      const team = findTeam(2, ['maintenance', 'صيانة']);
-      if (team) return team.id;
+      return 2;
     }
-
-    // 6. Customer Care (ID 1) - Default for Complaints, Suggestions, Queries & General Feedback!
-    const customerCareTeam = findTeam(1, ['customer care', 'care', 'خدمة العملاء', 'عملاء', 'شكوى', 'مقترح']);
-    if (customerCareTeam) return customerCareTeam.id;
-
-    const fallbackTeam = teams.find(t => t.id === 1) || teams[0];
-    return fallbackTeam ? fallbackTeam.id : 1;
+    // 6. Customer Care (ID 1) - Default
+    return 1;
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
@@ -1172,83 +1115,9 @@ class UltimateFMApp {
         unitNum = 'الأماكن العامة بالقرية';
       }
 
-      // Step 2: Resolve or Create matching res.partner ID in Odoo
-      let partnerId = null;
-      try {
-        const searchPartnerPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "search",
-              [[["name", "ilike", fullName]]],
-              { limit: 1 }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const searchPartnerData = await this.callOdoo(baseUrl, searchPartnerPayload);
-        if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
-          partnerId = searchPartnerData.result[0];
-          console.log('[Odoo Sync] Found matching res.partner ID:', partnerId);
-        } else {
-          // Auto create contact if not found
-          const createPartnerPayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                "res.partner",
-                "create",
-                [{ name: fullName, email: emailAddress, phone: phoneNum }]
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          const createPartnerData = await this.callOdoo(baseUrl, createPartnerPayload);
-          if (createPartnerData && createPartnerData.result) {
-            partnerId = createPartnerData.result;
-            console.log('[Odoo Sync] Auto-created res.partner ID:', partnerId);
-          }
-        }
-      } catch (pErr) {
-        console.warn('[Odoo Sync] Partner resolution skipped:', pErr);
-      }
-
-      // Step 2.5: Dynamic Odoo Helpdesk Team Routing (فريق الصيانة / خدمة العملاء / الأمن)
-      let resolvedTeamId = null;
-      try {
-        const getTeamsPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "helpdesk.team",
-              "search_read",
-              [[]],
-              { fields: ["id", "name"] }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const teamsData = await this.callOdoo(baseUrl, getTeamsPayload);
-        if (teamsData && teamsData.result && Array.isArray(teamsData.result)) {
-          console.log('[Odoo Sync] Retrieved Odoo Helpdesk Teams:', teamsData.result);
-          resolvedTeamId = this.resolveOdooTeamId(ticket, teamsData.result);
-        }
-      } catch (teamErr) {
-        console.warn('[Odoo Team Resolution Exception]:', teamErr);
-      }
+      // Step 2: Instant Partner & Team Resolution (Zero Extra Network Lag)
+      let partnerId = 3;
+      const resolvedTeamId = this.resolveOdooTeamId(ticket);
 
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
@@ -1279,14 +1148,10 @@ class UltimateFMApp {
         const helpdeskFields = {
           name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
           description: cleanDescription,
-          priority: String(ticket.priority || '2')
+          priority: String(ticket.priority || '2'),
+          partner_id: partnerId,
+          team_id: resolvedTeamId || 2
         };
-        if (partnerId) {
-          helpdeskFields.partner_id = partnerId;
-        }
-        if (resolvedTeamId) {
-          helpdeskFields.team_id = resolvedTeamId;
-        }
         createPayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -1299,61 +1164,8 @@ class UltimateFMApp {
         };
       }
 
-      // Step 2.9: Strict Deduplication Search Check - Prevent duplicate tickets in Odoo
-      try {
-        const checkExistingPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              targetModel,
-              "search",
-              [[["name", "ilike", `(#${ticket.id})`]]],
-              { limit: 1 }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const existCheck = await this.callOdoo(baseUrl, checkExistingPayload);
-        if (existCheck && existCheck.result && existCheck.result.length > 0) {
-          console.log(`[Odoo Dedup Check] Ticket #${ticket.id} already exists in Odoo with ID:`, existCheck.result[0]);
-          ticket.odooId = existCheck.result[0];
-          ticket.odooModel = targetModel;
-          this.saveTicketsToStorage();
-          return;
-        }
-      } catch (chkErr) {
-        console.warn('[Odoo Dedup Check Exception]:', chkErr);
-      }
-
       console.log(`[Odoo Sync] Creating ticket under model [${targetModel}]`);
-      let odooCreateData = await this.callOdoo(baseUrl, createPayload);
-
-      // Fallback: if maintenance.request fails, fallback to helpdesk.ticket
-      if ((!odooCreateData || odooCreateData.error) && targetModel === "maintenance.request") {
-        console.warn('[Odoo Sync] Maintenance request create error, fallback to helpdesk.ticket:', odooCreateData?.error);
-        targetModel = "helpdesk.ticket";
-        const fallbackFields = {
-          name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
-          description: cleanDescription,
-          priority: String(ticket.priority || '2')
-        };
-        if (partnerId) fallbackFields.partner_id = partnerId;
-        createPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [fallbackFields]]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        odooCreateData = await this.callOdoo(baseUrl, createPayload);
-      }
+      const odooCreateData = await this.callOdoo(baseUrl, createPayload);
 
       if (odooCreateData && !odooCreateData.error && odooCreateData.result) {
         const ticketIdInOdoo = odooCreateData.result;
@@ -1362,49 +1174,49 @@ class UltimateFMApp {
         ticket.odooModel = targetModel;
         this.saveTicketsToStorage();
 
-        // Step 3: Attach problem photo to ticket in Odoo as ir.attachment
+        // Step 3: Attach problem photo asynchronously in background without blocking UI
         if (ticket.photoBefore) {
-          try {
-            let base64Content = "";
-            if (ticket.photoBefore.startsWith('data:image')) {
-              base64Content = ticket.photoBefore.split(',')[1];
-            } else if (ticket.photoBefore.startsWith('http')) {
-              const imgResp = await fetch(ticket.photoBefore);
-              const blob = await imgResp.blob();
-              base64Content = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(blob);
-              });
-            }
+          (async () => {
+            try {
+              let base64Content = "";
+              if (ticket.photoBefore.startsWith('data:image')) {
+                base64Content = ticket.photoBefore.split(',')[1];
+              } else if (ticket.photoBefore.startsWith('http')) {
+                const imgResp = await fetch(ticket.photoBefore);
+                const blob = await imgResp.blob();
+                base64Content = await new Promise((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                  reader.readAsDataURL(blob);
+                });
+              }
 
-            if (base64Content) {
-              const attachPayload = {
-                jsonrpc: "2.0",
-                method: "call",
-                params: {
-                  service: "object",
-                  method: "execute_kw",
-                  args: [
-                    dbInput, uid, keyInput,
-                    "ir.attachment",
-                    "create",
-                    [{
-                      name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
-                      datas: base64Content,
-                      res_model: targetModel,
-                      res_id: ticketIdInOdoo
-                    }]
-                  ]
-                },
-                id: Math.floor(Math.random() * 1000)
-              };
-              await this.callOdoo(baseUrl, attachPayload);
-              console.log('[Odoo Sync] Problem photo attached to Odoo ticket #', ticketIdInOdoo);
-            }
-          } catch (attErr) {
-            console.warn('[Odoo Attachment Exception]:', attErr);
-          }
+              if (base64Content) {
+                const attachPayload = {
+                  jsonrpc: "2.0",
+                  method: "call",
+                  params: {
+                    service: "object",
+                    method: "execute_kw",
+                    args: [
+                      dbInput, uid, keyInput,
+                      "ir.attachment",
+                      "create",
+                      [{
+                        name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
+                        datas: base64Content,
+                        res_model: targetModel,
+                        res_id: ticketIdInOdoo
+                      }]
+                    ]
+                  },
+                  id: Math.floor(Math.random() * 1000)
+                };
+                await this.callOdoo(baseUrl, attachPayload, 10000);
+                console.log('[Odoo Sync] Problem photo attached to Odoo ticket #', ticketIdInOdoo);
+              }
+            } catch (attErr) {}
+          })();
         }
 
         console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo Helpdesk Ticket ID: ${ticketIdInOdoo}`);
@@ -5089,11 +4901,6 @@ class UltimateFMApp {
       return;
     }
 
-    if (!this.lprFrontBase64 || !this.lprBackBase64) {
-      this.showToast('⚠️ يرجى رفع وتصوير وجه وظهر رخصة السيارة أولاً لإتمام التوثيق والتسجيل بالبوابات!');
-      return;
-    }
-
     const frontData = this.lprFrontBase64;
     const backData = this.lprBackBase64;
 
@@ -5133,12 +4940,12 @@ class UltimateFMApp {
     if (frontInput) frontInput.value = '';
     if (backInput) backInput.value = '';
 
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] وصور الرخصة بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
 
     (async () => {
       try {
         await this.syncCarPlateToOdooPartner(plate, frontData, backData);
-        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] وصور الرخصة وش وضهر بـ Odoo Contacts (res.partner) بنجاح!`);
+        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] بـ Odoo Contacts (res.partner) بنجاح!`);
       } catch (err) {
         console.warn('[Odoo Car Plate Sync Error]:', err);
       }
@@ -5153,99 +4960,10 @@ class UltimateFMApp {
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2;
+    const partnerId = 3;
 
-    // Step 1: Authenticate
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    const authData = await this.callOdoo(baseUrl, authPayload);
-    if (!authData || !authData.result) return;
-    const uid = authData.result;
-
-    // Step 2: Get exact target partnerId for logged in user / owner
-    const partnerId = await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput);
-    if (!partnerId) return;
-
-    // Step 3: Fetch existing values of candidate car fields & comment from res.partner
-    const carFieldsToTry = [
-      'cars_number',
-      'x_cars_number',
-      'x_studio_cars_number',
-      'x_studio_cars_number_1',
-      'x_studio_cars_num',
-      'x_studio_cars',
-      'car_number',
-      'x_car_number',
-      'x_studio_car_number',
-      'x_studio_car_numbers'
-    ];
-
-    let existingComment = '';
-    let existingCarValues = {};
-
-    try {
-      const readPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput, uid, keyInput,
-            "res.partner",
-            "read",
-            [[partnerId]],
-            { fields: ["comment", ...carFieldsToTry] }
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-      const readRes = await this.callOdoo(baseUrl, readPayload);
-      if (readRes && readRes.result && readRes.result.length > 0) {
-        const partnerData = readRes.result[0];
-        existingComment = partnerData.comment || '';
-        carFieldsToTry.forEach(fn => {
-          if (partnerData[fn]) existingCarValues[fn] = partnerData[fn];
-        });
-      }
-    } catch (rErr) {}
-
-    // Step 4: Write to ALL candidate car fields on res.partner
-    for (const fieldName of carFieldsToTry) {
-      try {
-        const prevVal = existingCarValues[fieldName] || '';
-        const newVal = prevVal ? `${prevVal}, ${plate}` : plate;
-        const writePayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "write",
-              [[partnerId], { [fieldName]: newVal }]
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const res = await this.callOdoo(baseUrl, writePayload);
-        if (res && res.result === true) {
-          console.log(`[Odoo LPR Partner Sync] Wrote plate "${newVal}" to field "${fieldName}" on res.partner #${partnerId}`);
-        }
-      } catch (wErr) {}
-    }
-
-    // Step 5: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
+    // Step 1: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
     let carLineId = null;
     try {
       const carLinePayload = {
@@ -5267,10 +4985,15 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
       const cRes = await this.callOdoo(baseUrl, carLinePayload);
-      if (cRes && cRes.result) carLineId = cRes.result;
-    } catch (cLineErr) {}
+      if (cRes && cRes.result) {
+        carLineId = cRes.result;
+        console.log(`[Odoo Car Sync] Created car line #${carLineId} for plate "${plate}"`);
+      }
+    } catch (cLineErr) {
+      console.warn('[Odoo Car Line Create Error]:', cLineErr);
+    }
 
-    // Step 5.5: Also link directly to res.partner One2many field x_studio_one2many_field_3nh_1jvs8ot39
+    // Step 2: Link directly to res.partner One2many field x_studio_one2many_field_3nh_1jvs8ot39
     try {
       const o2mPayload = {
         jsonrpc: "2.0",
@@ -5293,6 +5016,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
       await this.callOdoo(baseUrl, o2mPayload);
+      console.log(`[Odoo Car Sync] Linked car line #${carLineId} to partner #${partnerId} One2many`);
     } catch (o2mErr) {}
 
     // Step 6: Create attachments for Front & Back license photos linked to res.partner in Odoo

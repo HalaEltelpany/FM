@@ -814,46 +814,148 @@ header.global-header {
   box-shadow: 0 2px 10px rgba(32, 39, 79, 0.04);
 }
 
-/* Bottom Mobile Navbar */
+/* Floating Rounded iOS Dock Navbar */
 .phone-navbar {
-  height: 64px;
-  background: #ffffff;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(32, 39, 79, 0.12);
+  height: 60px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(27, 143, 145, 0.25);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 6px;
   z-index: 900;
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  box-shadow: 0 -4px 20px rgba(32, 39, 79, 0.08);
-  flex-shrink: 0;
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  border-radius: 36px;
+  box-shadow: 0 8px 24px rgba(32, 39, 79, 0.16);
+}
+
+@media (max-width: 480px) {
+  .phone-navbar {
+    position: fixed !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+  }
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  color: var(--text-dim);
-  font-size: 0.7rem;
+  gap: 2px;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
   background: none;
   border: none;
+  padding: 6px 8px;
+  border-radius: 20px;
 }
 
 .nav-item i {
   font-size: 1.15rem;
+  transition: transform 0.2s ease;
 }
 
 .nav-item.active, .nav-item:hover {
-  color: var(--primary-gold);
+  color: var(--brand-teal);
+  background: rgba(27, 143, 145, 0.08);
+}
+
+.nav-item.active i {
+  transform: scale(1.1);
+}
+
+/* Center Wave Action Button */
+.nav-center-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-mauve));
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 15px rgba(27, 143, 145, 0.35);
+  margin-top: -18px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.nav-center-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(153, 87, 137, 0.45);
+}
+
+.nav-center-btn i {
+  font-size: 1.25rem;
+  color: #ffffff !important;
+}
+
+/* Horizontal Service Carousel */
+.horizontal-service-carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 14px 2px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.horizontal-service-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.service-pill-card {
+  min-width: 82px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 12px 8px;
+  border: 1px solid rgba(32, 39, 79, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.service-pill-card:hover, .service-pill-card:active {
+  transform: translateY(-3px);
+  border-color: var(--brand-teal);
+  box-shadow: 0 8px 20px rgba(27, 143, 145, 0.15);
+}
+
+.service-pill-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  font-size: 1.25rem;
+}
+
+.service-pill-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #20274f;
+  text-align: center;
 }
 
 /* Modal Popup Overlay */
@@ -1221,4 +1323,58 @@ header.global-header {
 #phoneSimulator.dark-theme .slider-round {
   background-color: #334155 !important;
 }
+
+/* =========================================================
+   High Contrast & Sharp Typography for Family & Car Lists
+   ========================================================= */
+#ownerFamilyMembersList {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+#ownerFamilyMembersList > div {
+  background: #ffffff !important;
+  border: 1px solid rgba(32, 39, 79, 0.15) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+}
+
+#ownerFamilyMembersList span,
+#ownerFamilyMembersList div:not(.badge) {
+  color: #1c2140 !important;
+}
+
+#ownerFamilyMembersList p {
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+#ownerFamilyMembersList .badge {
+  color: #ffffff !important;
+  background-color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+
+#lprActivePlatesList > div {
+  background: #ffffff !important;
+  border: 1px solid rgba(27, 143, 145, 0.2) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+}
+
+#lprActivePlatesList span,
+#lprActivePlatesList div:not(.badge) {
+  color: #1c2140 !important;
+}
+
+#lprActivePlatesList p {
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+#lprActivePlatesList .badge {
+  color: #ffffff !important;
+  background-color: #10b981 !important;
+  font-weight: 700 !important;
+}
+
 

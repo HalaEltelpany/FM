@@ -302,33 +302,115 @@
             <!-- Tab 1: الرئيسية (Home Tab) -->
             <!-- ========================================== -->
             <div class="homeowner-tab-content active" id="tabHomeHomeowner">
-              <!-- Welcome Header & Customer Details Card -->
-              <div class="card gold-border">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <!-- Ultimate Code Resident Welcome Card -->
+              <div class="card gold-border" style="background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(27,143,145,0.04) 100%); border-radius: 20px; box-shadow: 0 4px 20px rgba(32,39,79,0.06);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <!-- Emaar Profile Picture Avatar Container -->
-                    <div style="position: relative; cursor: pointer;" onclick="document.getElementById('ownerAvatarFileInput').click()" title="تغيير صورة المالك الشخصية (Emaar Style)">
-                      <img id="ownerHeaderAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2.5px solid #d4af37; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                      <div style="position: absolute; bottom: 0; right: -2px; background: #1b8f91; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 1.5px solid #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <div style="position: relative; cursor: pointer;" onclick="document.getElementById('ownerAvatarFileInput').click()" title="تغيير الصورة الشخصية">
+                      <img id="ownerHeaderAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2.5px solid #1b8f91; box-shadow: 0 4px 10px rgba(0,0,0,0.12);">
+                      <div style="position: absolute; bottom: 0; right: -2px; background: #995789; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 1.5px solid #ffffff;">
                         <i class="fa-solid fa-camera"></i>
                       </div>
                       <input type="file" id="ownerAvatarFileInput" name="ownerAvatarFileInput" accept="image/*" style="display: none;" onchange="app.handleOwnerAvatarUpload(event)">
                     </div>
 
                     <div>
-                      <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">أهلاً بك، المالك الرئيسي 👋</span>
-                      <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0;" id="homeownerNameText">أسامة أحمد محمد الشريف</h2>
+                      <span style="font-size: 0.72rem; color: #64748b; font-weight: 600; display: block;">أهلاً بك 👋</span>
+                      <h2 style="font-size: 1.05rem; font-weight: 800; color: #20274f; margin: 0;" id="homeownerNameText">أسامة أحمد محمد الشريف</h2>
                     </div>
                   </div>
 
-                  <span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-shield-check"></i> مالك معتمد</span>
+                  <span class="badge" style="background: rgba(27, 143, 145, 0.12); color: #1b8f91; font-weight: 800; padding: 5px 10px; border-radius: 12px; font-size: 0.7rem; border: 1px solid rgba(27,143,145,0.25);">
+                    <i class="fa-solid fa-shield-check"></i> مالك معتمد
+                  </span>
                 </div>
 
-                <!-- Customer Details Badge -->
-                <div style="background: rgba(32, 39, 79, 0.06); border-radius: 8px; padding: 8px 10px; font-size: 0.72rem; color: var(--text-main); display: flex; flex-direction: column; gap: 4px; border: 1px solid rgba(32,39,79,0.1);">
-                  <div><i class="fa-solid fa-house-chimney-user" style="color: var(--primary-gold); width: 16px;"></i> <b>رقم الوحدة:</b> <span id="homeownerUnitText">فيلا 104 - زون الساحل الشمالي</span></div>
-                  <div><i class="fa-solid fa-phone" style="color: var(--brand-teal); width: 16px;"></i> <b>رقم التليفون:</b> <span id="homeownerPhoneText">01223456789</span></div>
-                  <div><i class="fa-solid fa-envelope" style="color: #3b82f6; width: 16px;"></i> <b>البريد الإلكتروني:</b> <span id="homeownerEmailText">fmhala6@gmail.com</span></div>
+                <!-- Unit & Phase Badge -->
+                <div style="background: rgba(32, 39, 79, 0.04); border-radius: 12px; padding: 8px 12px; font-size: 0.75rem; color: #20274f; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(32,39,79,0.08);">
+                  <div style="font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-house-chimney" style="color: #1b8f91;"></i>
+                    <span id="homeownerUnitText">فيلا A146</span>
+                    <span style="color: #995789; font-weight: 800;">• المرحلة 1</span>
+                  </div>
+                  <div style="font-size: 0.68rem; color: #64748b; font-weight: 600;">
+                    <i class="fa-solid fa-phone" style="color: #1b8f91;"></i> <span id="homeownerPhoneText">01223456789</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Horizontal Services Carousel -->
+              <div style="margin-top: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px;">
+                  <span style="font-size: 0.82rem; font-weight: 800; color: #20274f;">
+                    <i class="fa-solid fa-bolt" style="color: #1b8f91;"></i> الخدمات السريعة
+                  </span>
+                  <span style="font-size: 0.68rem; color: #64748b; font-weight: 600;">اسحب يميناً ويساراً ↔️</span>
+                </div>
+
+                <div class="horizontal-service-carousel">
+                  <!-- 1. Maintenance -->
+                  <div class="service-pill-card" onclick="openModal('modalNewTicket')">
+                    <div class="service-pill-icon" style="background: rgba(27, 143, 145, 0.12); color: #1b8f91;">
+                      <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <span class="service-pill-label">طلب صيانة</span>
+                  </div>
+
+                  <!-- 2. Security Gate Pass -->
+                  <div class="service-pill-card" onclick="requestPermit('homeowner', 'تصريح دخول الوحدة')">
+                    <div class="service-pill-icon" style="background: rgba(153, 87, 137, 0.12); color: #995789;">
+                      <i class="fa-solid fa-id-badge"></i>
+                    </div>
+                    <span class="service-pill-label">تصريح بوابات</span>
+                  </div>
+
+                  <!-- 3. Smart Meters -->
+                  <div class="service-pill-card" onclick="openModal('modalMeterRecharge')">
+                    <div class="service-pill-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                      <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <span class="service-pill-label">عدادات ذكية</span>
+                  </div>
+
+                  <!-- 4. Housekeeping -->
+                  <div class="service-pill-card" onclick="openHousekeepingModal('homeowner')">
+                    <div class="service-pill-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                      <i class="fa-solid fa-broom"></i>
+                    </div>
+                    <span class="service-pill-label">هاوس كيبينج</span>
+                  </div>
+
+                  <!-- 5. Vehicle Plates -->
+                  <div class="service-pill-card" onclick="document.getElementById('lprPlateInput').focus()">
+                    <div class="service-pill-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                      <i class="fa-solid fa-car-side"></i>
+                    </div>
+                    <span class="service-pill-label">لوحة سيارة</span>
+                  </div>
+
+                  <!-- 6. Landscaping -->
+                  <div class="service-pill-card" onclick="openLandscapingModal('homeowner')">
+                    <div class="service-pill-icon" style="background: rgba(34, 197, 94, 0.12); color: #22c55e;">
+                      <i class="fa-solid fa-tree"></i>
+                    </div>
+                    <span class="service-pill-label">لاندسكيب</span>
+                  </div>
+
+                  <!-- 7. Family Members -->
+                  <div class="service-pill-card" onclick="openModal('modalAddFamilyMember')">
+                    <div class="service-pill-icon" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+                      <i class="fa-solid fa-user-group"></i>
+                    </div>
+                    <span class="service-pill-label">أفراد الأسرة</span>
+                  </div>
+
+                  <!-- 8. Financials -->
+                  <div class="service-pill-card" onclick="switchHomeownerTab('tabFinancialsHomeowner')">
+                    <div class="service-pill-icon" style="background: rgba(212, 175, 55, 0.15); color: #b45309;">
+                      <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <span class="service-pill-label">المالية والسداد</span>
+                  </div>
                 </div>
               </div>
 
@@ -1703,7 +1785,7 @@
 
         </div>
 
-        <!-- Phone Bottom Navigation Bar -->
+        <!-- Floating Rounded iOS Dock Navigation Bar with Wave Center Button -->
         <nav class="phone-navbar" id="phoneNavbar" style="display: none;">
           <button class="nav-item active" data-tab="home" id="navHome">
             <i class="fa-solid fa-house"></i>
@@ -1713,13 +1795,12 @@
             <i class="fa-solid fa-ticket"></i>
             <span>البلاغات</span>
           </button>
+          <button class="nav-center-btn" id="navCenterActionBtn" onclick="openModal('modalNewTicket')" title="طلب صيانة جديد">
+            <i class="fa-solid fa-plus"></i>
+          </button>
           <button class="nav-item" data-tab="wallet" id="navWallet">
             <i class="fa-solid fa-wallet"></i>
             <span>المالية</span>
-          </button>
-          <button class="nav-item" data-tab="inbox" id="navInbox">
-            <i class="fa-solid fa-envelope-open-text"></i>
-            <span>الرسائل</span>
           </button>
           <button class="nav-item" data-tab="settings" id="navSettings">
             <i class="fa-solid fa-gear"></i>
@@ -8994,6 +9075,12 @@ if (document.readyState === 'loading') {
 </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
