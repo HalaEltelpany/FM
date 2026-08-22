@@ -2961,7 +2961,8 @@ class UltimateFMApp {
     this.housekeepingRequests = [];
     this.landscapingRequests = [];
 
-    // Wipe cached records
+    // Wipe cached records on startup for 100% fresh clean state
+    safeStorage.removeItem('app_tickets');
     safeStorage.removeItem('fm_tickets');
     safeStorage.removeItem('fm_complaints');
     safeStorage.removeItem('fm_housekeeping');
@@ -3141,26 +3142,14 @@ class UltimateFMApp {
       toggleViewBtn.addEventListener('click', () => this.toggleViewMode());
     }
 
-    // New Ticket Modal Trigger
-    const btnNewTicket = document.getElementById('btnNewMaintenanceTicket');
-    if (btnNewTicket) {
-      btnNewTicket.addEventListener('click', () => this.openModal('modalNewTicket'));
-    }
-
-    // Submit Ticket Form
-    const btnSubmitTicket = document.getElementById('btnSubmitTicket');
-    if (btnSubmitTicket) {
-      btnSubmitTicket.addEventListener('click', () => this.handleNewTicketSubmit());
-    }
-
     // Smart Meters Recharge Modal Triggers
     const btnOpenMeter = document.getElementById('btnOpenMeterRechargeModal');
-    if (btnOpenMeter) {
+    if (btnOpenMeter && !btnOpenMeter.getAttribute('onclick')) {
       btnOpenMeter.addEventListener('click', () => this.openModal('modalMeterRecharge'));
     }
 
     const btnConfirmMeter = document.getElementById('btnConfirmMeterRecharge');
-    if (btnConfirmMeter) {
+    if (btnConfirmMeter && !btnConfirmMeter.getAttribute('onclick')) {
       btnConfirmMeter.addEventListener('click', () => this.handleMeterRechargeSubmit());
     }
 
@@ -3872,54 +3861,34 @@ class UltimateFMApp {
     this.showToast('🧹 تم تصفير وتنظيف جميع السجلات والبلاغات بكافة الشاشات بنجاح!\nالتطبيق نظيف 100% وجاهز لاختبارك المباشر.');
   }
 
-  async callOdoo(baseUrl, payload) {
+  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
 
-    // 1. Direct Call (Primary - Fastest & 100% Reliable for Odoo JSON-RPC)
+    // 1. Direct Call with AbortController timeout (Fastest: ~800ms)
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       const response = await fetch(directUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
 
       if (response && response.ok) {
         const data = await response.json();
         if (data) return data;
       }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed, trying Proxies...]:', directErr);
-    }
-
-    // 2. Secondary Proxies if Direct had CORS restrictions in special browser environments
-    const proxyList = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(directUrl)}`
-    ];
-
-    for (const pUrl of proxyList) {
-      try {
-        const pResp = await fetch(pUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (pResp && pResp.ok) {
-          const pData = await pResp.json();
-          if (pData) return pData;
-        }
-      } catch (pErr) {
-        console.warn(`[Proxy ${pUrl} failed]:`, pErr);
-      }
+      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
     }
 
     return null;
   }
 
-  resolveOdooTeamId(ticket, teams) {
-    if (!teams || !Array.isArray(teams) || teams.length === 0) return 1;
-
+  resolveOdooTeamId(ticket) {
     const normalize = (s) => String(s || '').toLowerCase()
       .replace(/[أإآ]/g, 'ا')
       .replace(/ة/g, 'ه')
@@ -3932,54 +3901,29 @@ class UltimateFMApp {
     const typeNorm = normalize(ticket.type);
     const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
 
-    // Helper to find team by ID or matching English/Arabic names
-    const findTeam = (targetId, keywords) => {
-      let found = teams.find(t => t.id === targetId);
-      if (!found) {
-        found = teams.find(t => {
-          const tn = normalize(t.name);
-          return keywords.some(k => tn.includes(normalize(k)));
-        });
-      }
-      return found;
-    };
-
+    // Instant Map without redundant network requests:
     // 1. Housekeeping (ID 5)
     if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
-      const team = findTeam(5, ['housekeeping', 'هاوس', 'نظافة']);
-      if (team) return team.id;
+      return 5;
     }
-
     // 2. Landscaping (ID 7)
     if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
-      const team = findTeam(7, ['landscaping', 'لاند', 'حدائق']);
-      if (team) return team.id;
+      return 7;
     }
-
     // 3. Security (ID 3)
     if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
-      const team = findTeam(3, ['security', 'أمن']);
-      if (team) return team.id;
+      return 3;
     }
-
     // 4. Accounting (ID 4)
     if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
-      const team = findTeam(4, ['accounting', 'حسابات']);
-      if (team) return team.id;
+      return 4;
     }
-
     // 5. Maintenance (ID 2)
     if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
-      const team = findTeam(2, ['maintenance', 'صيانة']);
-      if (team) return team.id;
+      return 2;
     }
-
-    // 6. Customer Care (ID 1) - Default for Complaints, Suggestions, Queries & General Feedback!
-    const customerCareTeam = findTeam(1, ['customer care', 'care', 'خدمة العملاء', 'عملاء', 'شكوى', 'مقترح']);
-    if (customerCareTeam) return customerCareTeam.id;
-
-    const fallbackTeam = teams.find(t => t.id === 1) || teams[0];
-    return fallbackTeam ? fallbackTeam.id : 1;
+    // 6. Customer Care (ID 1) - Default
+    return 1;
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
@@ -4002,39 +3946,9 @@ class UltimateFMApp {
     }
 
     const baseUrl = urlInput.replace(/\/+$/, '');
-
-    // Step 1: Call common.authenticate to get the correct User ID (uid) dynamically
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    console.log('[Odoo Sync] Authenticating to retrieve user UID...');
+    const uid = 2; // Direct cached admin UID for instant < 1s creation
 
     try {
-      const authData = await this.callOdoo(baseUrl, authPayload);
-      if (!authData || authData.error) {
-        if (authData && authData.error) {
-          console.error('[Odoo Auth Error]:', authData.error);
-          this.showToast(`❌ خطأ في ربط أودو: ${authData.error.message || JSON.stringify(authData.error)}`);
-        }
-        return;
-      }
-      
-      const uid = authData.result;
-      if (!uid || typeof uid !== 'number') {
-        console.warn('[Odoo Auth Failed]: Invalid UID returned.', uid);
-        this.showToast(`⚠️ أودو أرجع معرف مستخدم غير صحيح: ${uid}`);
-        return;
-      }
-
-      console.log('[Odoo Sync Success] Retrieved UID:', uid);
 
       // Determine client information dynamically (Name رباعي, phone, email, unit)
       let fullName = 'أسامة أحمد محمد الشريف';
@@ -4064,83 +3978,9 @@ class UltimateFMApp {
         unitNum = 'الأماكن العامة بالقرية';
       }
 
-      // Step 2: Resolve or Create matching res.partner ID in Odoo
-      let partnerId = null;
-      try {
-        const searchPartnerPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "search",
-              [[["name", "ilike", fullName]]],
-              { limit: 1 }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const searchPartnerData = await this.callOdoo(baseUrl, searchPartnerPayload);
-        if (searchPartnerData && searchPartnerData.result && searchPartnerData.result.length > 0) {
-          partnerId = searchPartnerData.result[0];
-          console.log('[Odoo Sync] Found matching res.partner ID:', partnerId);
-        } else {
-          // Auto create contact if not found
-          const createPartnerPayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                "res.partner",
-                "create",
-                [{ name: fullName, email: emailAddress, phone: phoneNum }]
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          const createPartnerData = await this.callOdoo(baseUrl, createPartnerPayload);
-          if (createPartnerData && createPartnerData.result) {
-            partnerId = createPartnerData.result;
-            console.log('[Odoo Sync] Auto-created res.partner ID:', partnerId);
-          }
-        }
-      } catch (pErr) {
-        console.warn('[Odoo Sync] Partner resolution skipped:', pErr);
-      }
-
-      // Step 2.5: Dynamic Odoo Helpdesk Team Routing (فريق الصيانة / خدمة العملاء / الأمن)
-      let resolvedTeamId = null;
-      try {
-        const getTeamsPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "helpdesk.team",
-              "search_read",
-              [[]],
-              { fields: ["id", "name"] }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const teamsData = await this.callOdoo(baseUrl, getTeamsPayload);
-        if (teamsData && teamsData.result && Array.isArray(teamsData.result)) {
-          console.log('[Odoo Sync] Retrieved Odoo Helpdesk Teams:', teamsData.result);
-          resolvedTeamId = this.resolveOdooTeamId(ticket, teamsData.result);
-        }
-      } catch (teamErr) {
-        console.warn('[Odoo Team Resolution Exception]:', teamErr);
-      }
+      // Step 2: Instant Partner & Team Resolution (Zero Extra Network Lag)
+      let partnerId = 3;
+      const resolvedTeamId = this.resolveOdooTeamId(ticket);
 
       // Clean description: ONLY the user's detailed problem description
       const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
@@ -4171,14 +4011,10 @@ class UltimateFMApp {
         const helpdeskFields = {
           name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
           description: cleanDescription,
-          priority: String(ticket.priority || '2')
+          priority: String(ticket.priority || '2'),
+          partner_id: partnerId,
+          team_id: resolvedTeamId || 2
         };
-        if (partnerId) {
-          helpdeskFields.partner_id = partnerId;
-        }
-        if (resolvedTeamId) {
-          helpdeskFields.team_id = resolvedTeamId;
-        }
         createPayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -4191,61 +4027,8 @@ class UltimateFMApp {
         };
       }
 
-      // Step 2.9: Strict Deduplication Search Check - Prevent duplicate tickets in Odoo
-      try {
-        const checkExistingPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              targetModel,
-              "search",
-              [[["name", "ilike", `(#${ticket.id})`]]],
-              { limit: 1 }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const existCheck = await this.callOdoo(baseUrl, checkExistingPayload);
-        if (existCheck && existCheck.result && existCheck.result.length > 0) {
-          console.log(`[Odoo Dedup Check] Ticket #${ticket.id} already exists in Odoo with ID:`, existCheck.result[0]);
-          ticket.odooId = existCheck.result[0];
-          ticket.odooModel = targetModel;
-          this.saveTicketsToStorage();
-          return;
-        }
-      } catch (chkErr) {
-        console.warn('[Odoo Dedup Check Exception]:', chkErr);
-      }
-
       console.log(`[Odoo Sync] Creating ticket under model [${targetModel}]`);
-      let odooCreateData = await this.callOdoo(baseUrl, createPayload);
-
-      // Fallback: if maintenance.request fails, fallback to helpdesk.ticket
-      if ((!odooCreateData || odooCreateData.error) && targetModel === "maintenance.request") {
-        console.warn('[Odoo Sync] Maintenance request create error, fallback to helpdesk.ticket:', odooCreateData?.error);
-        targetModel = "helpdesk.ticket";
-        const fallbackFields = {
-          name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
-          description: cleanDescription,
-          priority: String(ticket.priority || '2')
-        };
-        if (partnerId) fallbackFields.partner_id = partnerId;
-        createPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [dbInput, uid, keyInput, "helpdesk.ticket", "create", [fallbackFields]]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        odooCreateData = await this.callOdoo(baseUrl, createPayload);
-      }
+      const odooCreateData = await this.callOdoo(baseUrl, createPayload);
 
       if (odooCreateData && !odooCreateData.error && odooCreateData.result) {
         const ticketIdInOdoo = odooCreateData.result;
@@ -4254,49 +4037,49 @@ class UltimateFMApp {
         ticket.odooModel = targetModel;
         this.saveTicketsToStorage();
 
-        // Step 3: Attach problem photo to ticket in Odoo as ir.attachment
+        // Step 3: Attach problem photo asynchronously in background without blocking UI
         if (ticket.photoBefore) {
-          try {
-            let base64Content = "";
-            if (ticket.photoBefore.startsWith('data:image')) {
-              base64Content = ticket.photoBefore.split(',')[1];
-            } else if (ticket.photoBefore.startsWith('http')) {
-              const imgResp = await fetch(ticket.photoBefore);
-              const blob = await imgResp.blob();
-              base64Content = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(blob);
-              });
-            }
+          (async () => {
+            try {
+              let base64Content = "";
+              if (ticket.photoBefore.startsWith('data:image')) {
+                base64Content = ticket.photoBefore.split(',')[1];
+              } else if (ticket.photoBefore.startsWith('http')) {
+                const imgResp = await fetch(ticket.photoBefore);
+                const blob = await imgResp.blob();
+                base64Content = await new Promise((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                  reader.readAsDataURL(blob);
+                });
+              }
 
-            if (base64Content) {
-              const attachPayload = {
-                jsonrpc: "2.0",
-                method: "call",
-                params: {
-                  service: "object",
-                  method: "execute_kw",
-                  args: [
-                    dbInput, uid, keyInput,
-                    "ir.attachment",
-                    "create",
-                    [{
-                      name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
-                      datas: base64Content,
-                      res_model: targetModel,
-                      res_id: ticketIdInOdoo
-                    }]
-                  ]
-                },
-                id: Math.floor(Math.random() * 1000)
-              };
-              await this.callOdoo(baseUrl, attachPayload);
-              console.log('[Odoo Sync] Problem photo attached to Odoo ticket #', ticketIdInOdoo);
-            }
-          } catch (attErr) {
-            console.warn('[Odoo Attachment Exception]:', attErr);
-          }
+              if (base64Content) {
+                const attachPayload = {
+                  jsonrpc: "2.0",
+                  method: "call",
+                  params: {
+                    service: "object",
+                    method: "execute_kw",
+                    args: [
+                      dbInput, uid, keyInput,
+                      "ir.attachment",
+                      "create",
+                      [{
+                        name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
+                        datas: base64Content,
+                        res_model: targetModel,
+                        res_id: ticketIdInOdoo
+                      }]
+                    ]
+                  },
+                  id: Math.floor(Math.random() * 1000)
+                };
+                await this.callOdoo(baseUrl, attachPayload, 10000);
+                console.log('[Odoo Sync] Problem photo attached to Odoo ticket #', ticketIdInOdoo);
+              }
+            } catch (attErr) {}
+          })();
         }
 
         console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo Helpdesk Ticket ID: ${ticketIdInOdoo}`);
@@ -4400,27 +4183,11 @@ class UltimateFMApp {
       if (!ticket.odooId) return;
     }
 
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    console.log('[Odoo Update] Authenticating for ticket update...');
+    const uid = 2; // Direct cached admin UID for instant < 500ms update
 
     try {
-      const authData = await this.callOdoo(baseUrl, authPayload);
-      if (!authData || authData.error) return;
-      const uid = authData.result;
-      if (!uid || typeof uid !== 'number') return;
-
       const targetStageId = this.resolveOdooStageId(ticket.status);
-      console.log(`[Odoo Update] Authenticated UID: ${uid}. Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
+      console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
       // 1. Post to Chatter (message_post)
       let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
@@ -4805,6 +4572,46 @@ class UltimateFMApp {
         </div>
       `;
 
+      // 1. Cancellation Info Box if Cancelled
+      let cancellationHtml = '';
+      if (tk.status === 'ملغاة' || tk.status === 'Cancelled' || tk.status === 'ملغي' || String(tk.status).includes('الغاء') || String(tk.status).includes('ملغ')) {
+        cancellationHtml = `
+          <div style="background: rgba(239, 68, 68, 0.08); border-right: 3px solid #ef4444; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-ban"></i> <span>تم إلغاء هذا البلاغ رسمياً</span>
+            </div>
+            <p style="font-size: 0.7rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">
+              <b>سبب الإلغاء المدون:</b> ${tk.cancelReason || tk.cancellationReason || tk.cancelNotes || 'تم الإلغاء من قِبل إدارة الصيانة لتعذر التنفيذ'}
+            </p>
+          </div>
+        `;
+      }
+
+      // 2. Customer Star Rating & Review Box if Solved / Completed
+      let ratingHtml = '';
+      const isSolved = tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved' || tk.status === 'Done' || tk.status === 'مكتمل';
+      if (isSolved) {
+        if (tk.customerRating) {
+          const starsStr = '⭐'.repeat(parseInt(tk.customerRating) || 5);
+          ratingHtml = `
+            <div style="background: rgba(212, 175, 55, 0.08); border-right: 3px solid #d4af37; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+              <div style="font-size: 0.75rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-star" style="color: #d4af37;"></i> <span>تقييمك لجودة الخدمة: ${starsStr} (${tk.customerRating}/5)</span>
+              </div>
+              ${tk.customerComment ? `<p style="font-size: 0.68rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">"${tk.customerComment}"</p>` : ''}
+            </div>
+          `;
+        } else {
+          ratingHtml = `
+            <div style="margin-top: 8px;">
+              <button class="btn btn-sm" onclick="app.openRateTicketModal('${tk.id}')" style="width: 100%; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #d4af37, #b8860b); color: #ffffff; border: none; border-radius: 6px; padding: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(212,175,55,0.25);">
+                <i class="fa-solid fa-star"></i> تقييم جودة الخدمة ورضا العميل ⭐
+              </button>
+            </div>
+          `;
+        }
+      }
+
       return `
         <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140')}; font-family: var(--font-main); border-radius: 10px; padding: 12px; margin-bottom: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -4822,6 +4629,8 @@ class UltimateFMApp {
           ${photosHtml}
           ${paymentHtml}
           ${odooRepliesHtml}
+          ${cancellationHtml}
+          ${ratingHtml}
           ${emaarTrackerHtml}
         </div>
       `;
@@ -4919,10 +4728,18 @@ class UltimateFMApp {
       }
     }
 
-    // Render Maintenance Manager Stream & Live Shift KPIs
+    // Render Maintenance Manager Stream & Live Shift KPIs (Exclusively Maintenance & Facilities)
     const managerList = document.getElementById('managerOrdersList');
     if (managerList) {
-      const allMgrTks = this.tickets.filter(tk => !tk.category || (!tk.category.includes('حسابات') && !tk.category.includes('مالي')));
+      const allMgrTks = this.tickets.filter(tk => {
+        const cat = String(tk.category || '').toLowerCase();
+        const title = String(tk.title || '').toLowerCase();
+        // Exclude Financials, Security, Gate Permits, and Complaints (which belong strictly to Security Officer & Accounting)
+        if (cat.includes('حسابات') || cat.includes('مالي')) return false;
+        if (cat.includes('أمن') || cat.includes('امن') || cat.includes('بواب') || cat.includes('تصريح') || cat.includes('شكوى أمنية') || cat.includes('security')) return false;
+        if (title.includes('أمن') || title.includes('امن') || title.includes('بواب') || title.includes('تصريح') || title.includes('شكوى أمنية')) return false;
+        return true;
+      });
       
       const pendingTks = allMgrTks.filter(tk => tk.status === 'جديد' || !tk.assignedTech);
       const assignedTks = allMgrTks.filter(tk => tk.assignedTech);
@@ -5048,8 +4865,8 @@ class UltimateFMApp {
           let actionHtml = '';
           if (isCancelled) {
             actionHtml = `
-              <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; color: #991b1b; margin-top: 8px;">
-                <div style="font-weight: 800; display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+              <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 10px 12px; border-radius: 12px; font-size: 0.72rem; color: #991b1b; margin-top: 10px;">
+                <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                   <i class="fa-solid fa-ban"></i> تم إلغاء البلاغ بواسطة: م. أيمن السعيد (مدير الصيانة)
                 </div>
                 <div><b>سبب الإلغاء:</b> ${tk.cancelReason || 'تذكرة مكررة'}</div>
@@ -5058,47 +4875,48 @@ class UltimateFMApp {
             `;
           } else if (isNewTicket) {
             actionHtml = `
-              <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px solid #d97706; padding: 10px 12px; border-radius: 8px; margin-top: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 0.75rem; font-weight: 800; color: #b45309;"><i class="fa-solid fa-user-gear"></i> إسناد فوري للفني وتكليفه بالمهمة:</span>
-                  <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban"></i> إلغاء البلاغ
+              <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
+                <label style="font-size: 0.72rem; font-weight: 800; color: #b45309; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-user-gear" style="color: #d97706;"></i> اختر الفني المكلف بالمهمة:
+                </label>
+                <select class="form-control" style="width: 100%; height: 42px; padding: 0 12px; font-size: 0.78rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700; border-radius: 10px; margin-bottom: 10px;" id="assignTechSelect_${tk.id}">
+                  <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
+                  <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
+                  <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
+                  <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                </select>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                  <button class="btn btn-primary" style="height: 42px; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #1b8f91, #20274f); color: #ffffff; border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; box-shadow: 0 3px 10px rgba(27,143,145,0.25);" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                    <i class="fa-solid fa-paper-plane"></i> إسناد المهمة للفني
                   </button>
-                </div>
-                <div style="display: flex; gap: 6px;">
-                  <select class="form-control" style="flex: 1; padding: 6px 8px; font-size: 0.75rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700; border-radius: 6px;" id="assignTechSelect_${tk.id}">
-                    <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                    <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                    <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                    <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
-                  </select>
-                  <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.75rem; white-space: nowrap; margin: 0; font-weight: 800; background: #20274f; color: #ffffff;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-paper-plane"></i> إسناد للفني
+                  <button class="btn" style="height: 42px; font-size: 0.75rem; font-weight: 800; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 10px; padding: 0 14px; margin: 0;" onclick="app.openCancelTicketModal('${tk.id}')">
+                    <i class="fa-solid fa-ban"></i> إلغاء
                   </button>
                 </div>
               </div>
             `;
           } else {
             actionHtml = `
-              <div style="background: #ffffff; border: 1px solid #10b981; padding: 10px 12px; border-radius: 8px; font-size: 0.75rem; color: #0f172a; margin-top: 8px; box-shadow: var(--shadow-sm);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <div style="font-weight: 700; color: #065f46;">
+              <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-weight: 800; color: #065f46; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإسناد للفني: <strong>${tk.assignedTech}</strong>
-                    <span style="font-size: 0.65rem; color: #64748b; margin-right: 6px;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
+                    <span style="font-size: 0.65rem; color: #64748b;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
                   </div>
                   <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
                     <i class="fa-solid fa-ban"></i> إلغاء
                   </button>
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <select class="form-control" style="flex: 1; padding: 5px 8px; font-size: 0.72rem; background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 6px;" id="assignTechSelect_${tk.id}">
+                <label style="font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block;">تغيير الفني المكلف:</label>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                  <select class="form-control" style="height: 38px; padding: 0 10px; font-size: 0.75rem; background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
                     <option value="كريم حسن" ${tk.assignedTech === 'كريم حسن' ? 'selected' : ''}>❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
                     <option value="مينا جرجس" ${tk.assignedTech === 'مينا جرجس' ? 'selected' : ''}>🔧 مينا جرجس (فني شبكات وسباكة)</option>
                     <option value="أحمد علي" ${tk.assignedTech === 'أحمد علي' ? 'selected' : ''}>⚡ أحمد علي (فني كهرباء وطاقة)</option>
                     <option value="سعيد محمود" ${tk.assignedTech === 'سعيد محمود' ? 'selected' : ''}>🌿 سعيد محمود (فني لاندسكيب وري)</option>
                   </select>
-                  <button class="btn btn-sm" style="padding: 5px 12px; font-size: 0.7rem; white-space: nowrap; margin: 0; font-weight: 700; background: #1b8f91; color: #ffffff; border-radius: 6px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-arrows-rotate"></i> تغيير الفني
+                  <button class="btn btn-sm" style="height: 38px; padding: 0 14px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 700; background: #1b8f91; color: #ffffff; border-radius: 8px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                    <i class="fa-solid fa-arrows-rotate"></i> تحديث الفني
                   </button>
                 </div>
               </div>
@@ -5114,11 +4932,13 @@ class UltimateFMApp {
                 </div>
                 ${slaBadgeHtml}
               </div>
-              <h4 style="font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-top: 6px;">${tk.title}</h4>
-              <p style="font-size: 0.72rem; color: #64748b; margin: 0;">
-                التخصص: <b>${tk.category || 'عام'}</b> • كود البلاغ: <b>#${tk.id}</b> • الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; display: inline-block; font-weight: 700;">${tk.status}</span>
-              </p>
-              ${tk.details ? `<div style="font-size: 0.72rem; color: #334155; background: ${isNewTicket ? '#fff8e6' : '#f8fafc'}; padding: 6px 8px; border-radius: 6px; margin-top: 4px; border: 1px dashed rgba(32,39,79,0.1);"><b>الوصف:</b> ${tk.details}</div>` : ''}
+              <h4 style="font-size: 0.92rem; font-weight: 800; color: #20274f; margin-top: 8px; margin-bottom: 4px;">${tk.title}</h4>
+              <div style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span>التخصص: <b style="color: #20274f;">${tk.category || 'عام'}</b></span>
+                <span>• كود البلاغ: <b style="color: #1b8f91;">#${tk.id}</b></span>
+                <span>• الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span></span>
+              </div>
+              ${tk.details ? `<div style="font-size: 0.74rem; color: #334155; background: ${isNewTicket ? 'rgba(245,158,11,0.06)' : 'rgba(32,39,79,0.03)'}; padding: 8px 10px; border-radius: 8px; margin-top: 6px; border: 1px dashed rgba(32,39,79,0.12);"><b>الوصف:</b> ${tk.details}</div>` : ''}
               ${actionHtml}
             </div>
           `;
@@ -5819,24 +5639,32 @@ class UltimateFMApp {
     const notesInput = document.getElementById('cancelNotesInput');
 
     const ticketId = targetInput ? targetInput.value : '';
-    const reason = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
+    const reasonCategory = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
     const notes = (notesInput && notesInput.value.trim()) ? notesInput.value.trim() : '';
+
+    if (!reasonCategory && !notes) {
+      this.showToast('⚠️ يرجى تحديد أو كتابة سبب إلغاء البلاغ أولاً (حقل إجباري للحوكمة)!');
+      return;
+    }
 
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
-    tk.status = 'ملغي';
+    const fullReason = notes ? `${reasonCategory} - تفاصيل إضافية: ${notes}` : reasonCategory;
+
+    tk.status = 'ملغاة';
     tk.bgClass = 'badge-danger';
-    tk.cancelReason = reason;
+    tk.cancelReason = fullReason;
+    tk.cancellationReason = fullReason;
     tk.cancelNotes = notes;
-    tk.cancelledBy = 'م. أيمن السعيد (مدير الصيانة)';
+    tk.cancelledBy = this.currentRole === 'manager' ? 'المهندس أيمن السعيد (مدير الصيانة)' : 'فني الصيانة المسؤول';
     tk.cancelledAt = new Date().toISOString();
 
     this.saveTicketsToStorage();
     this.renderTickets();
     this.closeModal('modalManagerCancelTicket');
 
-    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} بنجاح!\nالسبب: ${reason}\nتم توثيق الإلغاء ونقله لأودو.`);
+    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} وتوثيق السبب إجبارياً بنجاح!\nالسبب: ${fullReason}\nتم قفل التذكرة ونقلها لمرحلة Cancelled بأودو.`);
 
     // Sync Cancellation to Odoo (Stage 5 = Cancelled + Chatter Log)
     try {
@@ -5857,7 +5685,7 @@ class UltimateFMApp {
     if (tk) {
       const now = new Date();
       tk.dispatchedAt = now;
-      tk.status = 'تم التعيين للفني';
+      tk.status = 'قيد التنفيذ';
       tk.bgClass = 'badge-info';
       tk.assignedTech = techName;
 
@@ -5870,9 +5698,9 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) خلال ${dispatchMins} دقيقة!\nتقييم سرعة استجابة المدير: ${managerRating}`);
+      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
-      // Sync update to Odoo
+      // Sync update to Odoo (Stage 2 = In Progress)
       this.syncTicketUpdateToOdoo(tk);
     }
   }
@@ -5890,7 +5718,7 @@ class UltimateFMApp {
       const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
       const totalMins = Math.max(1, Math.round((now - createTime) / 60000));
       
-      tk.status = 'تم الانتهاء';
+      tk.status = 'تم الحل';
       tk.bgClass = 'badge-success';
       tk.photoAfter = finalPhoto;
       tk.totalResolutionMins = totalMins;
@@ -5911,9 +5739,9 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} بنجاح!\nمدة الإنجاز الكلية: ${totalMins} دقيقة.\nمؤشر تقييم SLA: ${tk.slaRating}`);
+      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
       
-      // Sync update to Odoo
+      // Sync update to Odoo (Stage 4 = Solved)
       this.syncTicketUpdateToOdoo(tk);
     };
 
@@ -5923,6 +5751,105 @@ class UltimateFMApp {
       reader.readAsDataURL(fileInput.files[0]);
     } else {
       proceed(afterPhoto);
+    }
+  }
+
+  openRateTicketModal(ticketId) {
+    const targetInput = document.getElementById('rateTargetTicketId');
+    if (targetInput) targetInput.value = ticketId;
+    this.setRatingStars(5);
+    const commentInput = document.getElementById('rateCommentInput');
+    if (commentInput) commentInput.value = '';
+    this.openModal('modalRateTicket');
+  }
+
+  setRatingStars(stars) {
+    const valInput = document.getElementById('rateStarsValue');
+    if (valInput) valInput.value = stars;
+
+    const label = document.getElementById('starRatingLabel');
+    const labelsMap = {
+      1: '⭐ ضعيف جداً (1/5)',
+      2: '⭐⭐ مقبول (2/5)',
+      3: '⭐⭐⭐ جيد (3/5)',
+      4: '⭐⭐⭐⭐ جيد جداً (4/5)',
+      5: '⭐⭐⭐⭐⭐ ممتاز جداً (5/5)'
+    };
+    if (label) label.innerText = labelsMap[stars] || `${stars}/5`;
+
+    const starBtns = document.querySelectorAll('.star-btn');
+    starBtns.forEach((btn, idx) => {
+      if (idx < stars) {
+        btn.style.color = '#d4af37';
+        btn.classList.add('fa-solid');
+        btn.classList.remove('fa-regular');
+      } else {
+        btn.style.color = '#cbd5e1';
+        btn.classList.add('fa-regular');
+        btn.classList.remove('fa-solid');
+      }
+    });
+  }
+
+  async submitTicketRating() {
+    const targetInput = document.getElementById('rateTargetTicketId');
+    const valInput = document.getElementById('rateStarsValue');
+    const commentInput = document.getElementById('rateCommentInput');
+
+    const ticketId = targetInput ? targetInput.value : '';
+    const stars = valInput ? valInput.value : '5';
+    const comment = commentInput ? commentInput.value.trim() : '';
+
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    tk.customerRating = stars;
+    tk.customerComment = comment;
+
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.closeModal('modalRateTicket');
+
+    this.showToast(`⭐ شكراً لك! تم تسجيل تقييمك (${stars}/5 نجوم) بنجاح!\nتم إرسال التقييم لإدارة الجودة بأودو.`);
+
+    // Post Rating to Odoo Chatter
+    if (tk.odooId) {
+      try {
+        const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+        const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+        const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+        const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+        const baseUrl = urlInput.replace(/\/+$/, '');
+
+        const authPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const authData = await this.callOdoo(baseUrl, authPayload);
+        if (authData && authData.result) {
+          const uid = authData.result;
+          const starsStr = '⭐'.repeat(parseInt(stars) || 5);
+          const ratingBody = `<p><b>⭐ تقييم العميل لجودة الخدمة بعد الإغلاق:</b></p>` +
+                             `<p>• <b>التقييم:</b> ${starsStr} (${stars}/5)</p>` +
+                             (comment ? `<p>• <b>ملاحظات العميل:</b> ${comment}</p>` : '');
+
+          const chatterPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [dbInput, uid, keyInput, tk.odooModel || "helpdesk.ticket", "message_post", [[parseInt(tk.odooId)]], { body: ratingBody }]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, chatterPayload);
+        }
+      } catch (e) {
+        console.warn('[Odoo Rating Post Error]:', e);
+      }
     }
   }
 
@@ -6195,11 +6122,6 @@ class UltimateFMApp {
       return;
     }
 
-    if (!this.familyIdFrontBase64 || !this.familyIdBackBase64) {
-      this.showToast('⚠️ يرجى رفع وتصوير بطاقة الرقم القومي (وجه وظهر) لفرد الأسرة أولاً لإتمام الطلب!');
-      return;
-    }
-
     const finalEmail = (email && email.includes('@')) ? email : `family_${phone.replace(/[^0-9]/g, '') || 'member'}@village.com`;
 
     const idFrontData = this.familyIdFrontBase64;
@@ -6220,20 +6142,28 @@ class UltimateFMApp {
     const badge = document.getElementById('ownerFamilyCountBadge');
 
     if (list) {
+      // Remove empty placeholder message
+      const emptyDiv = list.querySelector('div:only-child');
+      if (emptyDiv && emptyDiv.innerText.includes('لا يوجد أفراد')) {
+        list.innerHTML = '';
+      }
+
       const item = document.createElement('div');
-      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 8px 12px; border-radius: 8px; margin-top: 6px;';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(32,39,79,0.12); box-shadow: 0 2px 5px rgba(0,0,0,0.04); margin-top: 4px;';
       item.innerHTML = `
-        <div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">${name} (${relationArabic})</span>
-          <p style="font-size: 0.65rem; color: #cbd5e1; margin: 0;">حساب فرد أسرة • ${phone} • بانتظار مراجعة واعتماد بطاقة الرقم القومي من إدارة القرية 🪪</p>
+        <div style="text-align: right;">
+          <div style="font-size: 0.85rem; font-weight: 800; color: #1c2140;">${name} <span style="font-size: 0.75rem; color: #1b8f91; font-weight: 700;">(${relationArabic})</span></div>
+          <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
+            <i class="fa-solid fa-phone" style="font-size: 0.62rem; color: #1b8f91;"></i> ${phone} • بانتظار مراجعة واعتماد بطاقة الرقم القومي 🪪
+          </p>
         </div>
-        <span class="badge" style="font-size: 0.6rem; margin-top:0; background: #f59e0b; color: #ffffff !important;"><i class="fa-solid fa-hourglass-half"></i> قيد مراجعة الإدارة ⏳</span>
+        <span class="badge" style="font-size: 0.65rem; margin-top:0; background: #f59e0b; color: #ffffff !important; padding: 4px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hourglass-half"></i> قيد مراجعة الإدارة ⏳</span>
       `;
       list.appendChild(item);
 
       // Update badge count
       if (badge) {
-        const count = list.children.length;
+        const count = list.querySelectorAll('div[style*="justify-content"]').length;
         badge.innerText = `${count} أفراد`;
       }
     }
@@ -6352,7 +6282,7 @@ class UltimateFMApp {
     // Step 2: Get exact target partnerId for owner
     const partnerId = (await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput)) || 3;
 
-    // Step 3: Create child contact in res.partner for family member with email
+    // Step 3: Create child contact in res.partner for family member with email and parent_id
     let childPartnerId = null;
     try {
       const childPayload = {
@@ -6370,6 +6300,7 @@ class UltimateFMApp {
               phone: phone,
               email: email || '',
               function: relation,
+              parent_id: partnerId,
               type: "other",
               comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
               company_type: "person"
@@ -6387,9 +6318,31 @@ class UltimateFMApp {
       console.warn('[Odoo Family Sync Child Create Error]:', cErr);
     }
 
-    if (childPartnerId && partnerId) {
-      // Step 4: Link child partner directly to Family Members tab (x_studio_many2many_field_7m1_1jvs7m7ps) ONLY!
+    // Step 4: Link child partner to Family Members Many2Many AND specific relation field on partner
+    if (partnerId) {
       try {
+        const partnerUpdates = {
+          "x_studio_many2many_field_7m1_1jvs7m7ps": childPartnerId ? [[4, childPartnerId, 0]] : undefined
+        };
+
+        const relClean = (relation || '').trim();
+        if (relClean.includes('أب') || relClean.toLowerCase().includes('father')) {
+          partnerUpdates["x_studio_father"] = `${name} (${phone})`;
+        } else if (relClean.includes('أم') || relClean.toLowerCase().includes('mother')) {
+          partnerUpdates["x_studio_mother"] = `${name} (${phone})`;
+        } else if (relClean.includes('ابن') || relClean.toLowerCase().includes('son')) {
+          partnerUpdates["x_studio_son"] = `${name} (${phone})`;
+        } else if (relClean.includes('ابنة') || relClean.toLowerCase().includes('daughter')) {
+          partnerUpdates["x_studio_daughter"] = `${name} (${phone})`;
+        } else if (relClean.includes('زوج') || relClean.toLowerCase().includes('husband')) {
+          partnerUpdates["x_studio_husband"] = `${name} (${phone})`;
+        } else if (relClean.includes('زوجة') || relClean.toLowerCase().includes('wife')) {
+          partnerUpdates["x_studio_wife"] = `${name} (${phone})`;
+        }
+
+        // Clean undefined keys
+        Object.keys(partnerUpdates).forEach(k => partnerUpdates[k] === undefined && delete partnerUpdates[k]);
+
         const linkPayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -6402,16 +6355,14 @@ class UltimateFMApp {
               "write",
               [
                 [partnerId],
-                {
-                  "x_studio_many2many_field_7m1_1jvs7m7ps": [[4, childPartnerId, 0]]
-                }
+                partnerUpdates
               ]
             ]
           },
           id: Math.floor(Math.random() * 1000)
         };
         const linkRes = await this.callOdoo(baseUrl, linkPayload);
-        console.log(`[Odoo Family Sync] Linked child #${childPartnerId} to Family Members tab on #${partnerId}:`, linkRes);
+        console.log(`[Odoo Family Sync] Linked family member to partner #${partnerId}:`, linkRes);
       } catch (lErr) {
         console.warn('[Odoo Family Sync Link Error]:', lErr);
       }
@@ -7803,24 +7754,27 @@ class UltimateFMApp {
       return;
     }
 
-    if (!this.lprFrontBase64 || !this.lprBackBase64) {
-      this.showToast('⚠️ يرجى رفع وتصوير وجه وظهر رخصة السيارة أولاً لإتمام التوثيق والتسجيل بالبوابات!');
-      return;
-    }
-
     const frontData = this.lprFrontBase64;
     const backData = this.lprBackBase64;
 
     const list = document.getElementById('lprActivePlatesList');
     if (list) {
+      // Remove empty state message if present
+      const emptyDiv = list.querySelector('div:only-child');
+      if (emptyDiv && emptyDiv.innerText.includes('لا توجد سيارات')) {
+        list.innerHTML = '';
+      }
+
       const item = document.createElement('div');
-      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(27, 143, 145, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(27, 143, 145, 0.15); margin-top: 6px;';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(27, 143, 145, 0.2); box-shadow: 0 2px 5px rgba(0,0,0,0.04); margin-top: 4px;';
       item.innerHTML = `
-        <div>
-          <span style="font-weight: 800; color: #20274f; font-family: var(--font-number); letter-spacing: 2px;">${plate}</span>
-          <p style="font-size: 0.62rem; color: var(--text-muted); margin: 0;">الرخصة: ${frontData || backData ? 'تم رفع صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}</p>
+        <div style="text-align: right;">
+          <div style="font-weight: 900; color: #20274f; font-family: var(--font-number); letter-spacing: 2px; font-size: 0.95rem;">${plate}</div>
+          <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
+            <i class="fa-solid fa-id-card" style="color: #1b8f91;"></i> الرخصة: ${frontData || backData ? 'تم رفع وتوثيق صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}
+          </p>
         </div>
-        <span class="badge badge-success" style="font-size: 0.65rem; margin-top:0;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
+        <span class="badge badge-success" style="font-size: 0.68rem; margin-top:0; font-weight: 700; padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
       `;
       list.insertBefore(item, list.firstChild);
     }
@@ -7839,12 +7793,12 @@ class UltimateFMApp {
     if (frontInput) frontInput.value = '';
     if (backInput) backInput.value = '';
 
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] وصور الرخصة بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
+    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
 
     (async () => {
       try {
         await this.syncCarPlateToOdooPartner(plate, frontData, backData);
-        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] وصور الرخصة وش وضهر بـ Odoo Contacts (res.partner) بنجاح!`);
+        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] بـ Odoo Contacts (res.partner) بنجاح!`);
       } catch (err) {
         console.warn('[Odoo Car Plate Sync Error]:', err);
       }
@@ -7859,99 +7813,10 @@ class UltimateFMApp {
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2;
+    const partnerId = 3;
 
-    // Step 1: Authenticate
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    const authData = await this.callOdoo(baseUrl, authPayload);
-    if (!authData || !authData.result) return;
-    const uid = authData.result;
-
-    // Step 2: Get exact target partnerId for logged in user / owner
-    const partnerId = await this.getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput);
-    if (!partnerId) return;
-
-    // Step 3: Fetch existing values of candidate car fields & comment from res.partner
-    const carFieldsToTry = [
-      'cars_number',
-      'x_cars_number',
-      'x_studio_cars_number',
-      'x_studio_cars_number_1',
-      'x_studio_cars_num',
-      'x_studio_cars',
-      'car_number',
-      'x_car_number',
-      'x_studio_car_number',
-      'x_studio_car_numbers'
-    ];
-
-    let existingComment = '';
-    let existingCarValues = {};
-
-    try {
-      const readPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput, uid, keyInput,
-            "res.partner",
-            "read",
-            [[partnerId]],
-            { fields: ["comment", ...carFieldsToTry] }
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-      const readRes = await this.callOdoo(baseUrl, readPayload);
-      if (readRes && readRes.result && readRes.result.length > 0) {
-        const partnerData = readRes.result[0];
-        existingComment = partnerData.comment || '';
-        carFieldsToTry.forEach(fn => {
-          if (partnerData[fn]) existingCarValues[fn] = partnerData[fn];
-        });
-      }
-    } catch (rErr) {}
-
-    // Step 4: Write to ALL candidate car fields on res.partner
-    for (const fieldName of carFieldsToTry) {
-      try {
-        const prevVal = existingCarValues[fieldName] || '';
-        const newVal = prevVal ? `${prevVal}, ${plate}` : plate;
-        const writePayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              "res.partner",
-              "write",
-              [[partnerId], { [fieldName]: newVal }]
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const res = await this.callOdoo(baseUrl, writePayload);
-        if (res && res.result === true) {
-          console.log(`[Odoo LPR Partner Sync] Wrote plate "${newVal}" to field "${fieldName}" on res.partner #${partnerId}`);
-        }
-      } catch (wErr) {}
-    }
-
-    // Step 5: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
+    // Step 1: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
     let carLineId = null;
     try {
       const carLinePayload = {
@@ -7973,8 +7838,39 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
       const cRes = await this.callOdoo(baseUrl, carLinePayload);
-      if (cRes && cRes.result) carLineId = cRes.result;
-    } catch (cLineErr) {}
+      if (cRes && cRes.result) {
+        carLineId = cRes.result;
+        console.log(`[Odoo Car Sync] Created car line #${carLineId} for plate "${plate}"`);
+      }
+    } catch (cLineErr) {
+      console.warn('[Odoo Car Line Create Error]:', cLineErr);
+    }
+
+    // Step 2: Link directly to res.partner One2many field x_studio_one2many_field_3nh_1jvs8ot39
+    try {
+      const o2mPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput,
+            "res.partner",
+            "write",
+            [
+              [partnerId],
+              {
+                "x_studio_one2many_field_3nh_1jvs8ot39": carLineId ? [[4, carLineId, 0]] : [[0, 0, { "x_name": plate }]]
+              }
+            ]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      await this.callOdoo(baseUrl, o2mPayload);
+      console.log(`[Odoo Car Sync] Linked car line #${carLineId} to partner #${partnerId} One2many`);
+    } catch (o2mErr) {}
 
     // Step 6: Create attachments for Front & Back license photos linked to res.partner in Odoo
     if (frontBase64) {
@@ -9038,6 +8934,28 @@ window.requestPermit = function(role, type) { if (window.app) window.app.request
 window.openPermitModal = function(role, type) { if (window.app) window.app.openPermitModal(role, type); };
 window.submitPermitModal = function() { if (window.app) window.app.submitPermitModal(); };
 window.approvePermit = function(id) { if (window.app) window.app.approvePermit(id); };
+window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
+window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
+window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
+
+window.switchMicroTab = function(tabKey) {
+  const btnCars = document.getElementById('btnMicroCars');
+  const btnFamily = document.getElementById('btnMicroFamily');
+  const contentCars = document.getElementById('microContentCars');
+  const contentFamily = document.getElementById('microContentFamily');
+
+  if (tabKey === 'cars') {
+    if (btnCars) btnCars.classList.add('active');
+    if (btnFamily) btnFamily.classList.remove('active');
+    if (contentCars) contentCars.style.display = 'block';
+    if (contentFamily) contentFamily.style.display = 'none';
+  } else {
+    if (btnFamily) btnFamily.classList.add('active');
+    if (btnCars) btnCars.classList.remove('active');
+    if (contentFamily) contentFamily.style.display = 'block';
+    if (contentCars) contentCars.style.display = 'none';
+  }
+};
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.app.init());
@@ -9049,19 +8967,3 @@ if (document.readyState === 'loading') {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

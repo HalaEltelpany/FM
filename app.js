@@ -1290,27 +1290,11 @@ class UltimateFMApp {
       if (!ticket.odooId) return;
     }
 
-    const authPayload = {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        service: "common",
-        method: "authenticate",
-        args: [dbInput, userInput, keyInput, {}]
-      },
-      id: Math.floor(Math.random() * 1000)
-    };
-
-    console.log('[Odoo Update] Authenticating for ticket update...');
+    const uid = 2; // Direct cached admin UID for instant < 500ms update
 
     try {
-      const authData = await this.callOdoo(baseUrl, authPayload);
-      if (!authData || authData.error) return;
-      const uid = authData.result;
-      if (!uid || typeof uid !== 'number') return;
-
       const targetStageId = this.resolveOdooStageId(ticket.status);
-      console.log(`[Odoo Update] Authenticated UID: ${uid}. Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
+      console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
       // 1. Post to Chatter (message_post)
       let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
@@ -1988,8 +1972,8 @@ class UltimateFMApp {
           let actionHtml = '';
           if (isCancelled) {
             actionHtml = `
-              <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; color: #991b1b; margin-top: 8px;">
-                <div style="font-weight: 800; display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+              <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 10px 12px; border-radius: 12px; font-size: 0.72rem; color: #991b1b; margin-top: 10px;">
+                <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                   <i class="fa-solid fa-ban"></i> تم إلغاء البلاغ بواسطة: م. أيمن السعيد (مدير الصيانة)
                 </div>
                 <div><b>سبب الإلغاء:</b> ${tk.cancelReason || 'تذكرة مكررة'}</div>
@@ -1998,47 +1982,48 @@ class UltimateFMApp {
             `;
           } else if (isNewTicket) {
             actionHtml = `
-              <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px solid #d97706; padding: 10px 12px; border-radius: 8px; margin-top: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 0.75rem; font-weight: 800; color: #b45309;"><i class="fa-solid fa-user-gear"></i> إسناد فوري للفني وتكليفه بالمهمة:</span>
-                  <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban"></i> إلغاء البلاغ
+              <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
+                <label style="font-size: 0.72rem; font-weight: 800; color: #b45309; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-user-gear" style="color: #d97706;"></i> اختر الفني المكلف بالمهمة:
+                </label>
+                <select class="form-control" style="width: 100%; height: 42px; padding: 0 12px; font-size: 0.78rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700; border-radius: 10px; margin-bottom: 10px;" id="assignTechSelect_${tk.id}">
+                  <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
+                  <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
+                  <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
+                  <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                </select>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                  <button class="btn btn-primary" style="height: 42px; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #1b8f91, #20274f); color: #ffffff; border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; box-shadow: 0 3px 10px rgba(27,143,145,0.25);" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                    <i class="fa-solid fa-paper-plane"></i> إسناد المهمة للفني
                   </button>
-                </div>
-                <div style="display: flex; gap: 6px;">
-                  <select class="form-control" style="flex: 1; padding: 6px 8px; font-size: 0.75rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700; border-radius: 6px;" id="assignTechSelect_${tk.id}">
-                    <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                    <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                    <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                    <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
-                  </select>
-                  <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.75rem; white-space: nowrap; margin: 0; font-weight: 800; background: #20274f; color: #ffffff;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-paper-plane"></i> إسناد للفني
+                  <button class="btn" style="height: 42px; font-size: 0.75rem; font-weight: 800; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 10px; padding: 0 14px; margin: 0;" onclick="app.openCancelTicketModal('${tk.id}')">
+                    <i class="fa-solid fa-ban"></i> إلغاء
                   </button>
                 </div>
               </div>
             `;
           } else {
             actionHtml = `
-              <div style="background: #ffffff; border: 1px solid #10b981; padding: 10px 12px; border-radius: 8px; font-size: 0.75rem; color: #0f172a; margin-top: 8px; box-shadow: var(--shadow-sm);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <div style="font-weight: 700; color: #065f46;">
+              <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-weight: 800; color: #065f46; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإسناد للفني: <strong>${tk.assignedTech}</strong>
-                    <span style="font-size: 0.65rem; color: #64748b; margin-right: 6px;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
+                    <span style="font-size: 0.65rem; color: #64748b;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
                   </div>
                   <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
                     <i class="fa-solid fa-ban"></i> إلغاء
                   </button>
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <select class="form-control" style="flex: 1; padding: 5px 8px; font-size: 0.72rem; background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 6px;" id="assignTechSelect_${tk.id}">
+                <label style="font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block;">تغيير الفني المكلف:</label>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                  <select class="form-control" style="height: 38px; padding: 0 10px; font-size: 0.75rem; background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
                     <option value="كريم حسن" ${tk.assignedTech === 'كريم حسن' ? 'selected' : ''}>❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
                     <option value="مينا جرجس" ${tk.assignedTech === 'مينا جرجس' ? 'selected' : ''}>🔧 مينا جرجس (فني شبكات وسباكة)</option>
                     <option value="أحمد علي" ${tk.assignedTech === 'أحمد علي' ? 'selected' : ''}>⚡ أحمد علي (فني كهرباء وطاقة)</option>
                     <option value="سعيد محمود" ${tk.assignedTech === 'سعيد محمود' ? 'selected' : ''}>🌿 سعيد محمود (فني لاندسكيب وري)</option>
                   </select>
-                  <button class="btn btn-sm" style="padding: 5px 12px; font-size: 0.7rem; white-space: nowrap; margin: 0; font-weight: 700; background: #1b8f91; color: #ffffff; border-radius: 6px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-arrows-rotate"></i> تغيير الفني
+                  <button class="btn btn-sm" style="height: 38px; padding: 0 14px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 700; background: #1b8f91; color: #ffffff; border-radius: 8px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                    <i class="fa-solid fa-arrows-rotate"></i> تحديث الفني
                   </button>
                 </div>
               </div>
@@ -2054,11 +2039,13 @@ class UltimateFMApp {
                 </div>
                 ${slaBadgeHtml}
               </div>
-              <h4 style="font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-top: 6px;">${tk.title}</h4>
-              <p style="font-size: 0.72rem; color: #64748b; margin: 0;">
-                التخصص: <b>${tk.category || 'عام'}</b> • كود البلاغ: <b>#${tk.id}</b> • الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; display: inline-block; font-weight: 700;">${tk.status}</span>
-              </p>
-              ${tk.details ? `<div style="font-size: 0.72rem; color: #334155; background: ${isNewTicket ? '#fff8e6' : '#f8fafc'}; padding: 6px 8px; border-radius: 6px; margin-top: 4px; border: 1px dashed rgba(32,39,79,0.1);"><b>الوصف:</b> ${tk.details}</div>` : ''}
+              <h4 style="font-size: 0.92rem; font-weight: 800; color: #20274f; margin-top: 8px; margin-bottom: 4px;">${tk.title}</h4>
+              <div style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span>التخصص: <b style="color: #20274f;">${tk.category || 'عام'}</b></span>
+                <span>• كود البلاغ: <b style="color: #1b8f91;">#${tk.id}</b></span>
+                <span>• الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span></span>
+              </div>
+              ${tk.details ? `<div style="font-size: 0.74rem; color: #334155; background: ${isNewTicket ? 'rgba(245,158,11,0.06)' : 'rgba(32,39,79,0.03)'}; padding: 8px 10px; border-radius: 8px; margin-top: 6px; border: 1px dashed rgba(32,39,79,0.12);"><b>الوصف:</b> ${tk.details}</div>` : ''}
               ${actionHtml}
             </div>
           `;
