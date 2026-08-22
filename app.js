@@ -3242,11 +3242,6 @@ class UltimateFMApp {
       return;
     }
 
-    if (!this.familyIdFrontBase64 || !this.familyIdBackBase64) {
-      this.showToast('⚠️ يرجى رفع وتصوير بطاقة الرقم القومي (وجه وظهر) لفرد الأسرة أولاً لإتمام الطلب!');
-      return;
-    }
-
     const finalEmail = (email && email.includes('@')) ? email : `family_${phone.replace(/[^0-9]/g, '') || 'member'}@village.com`;
 
     const idFrontData = this.familyIdFrontBase64;

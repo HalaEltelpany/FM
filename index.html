@@ -63,11 +63,50 @@
         window.app.showRoleGrid();
       }
     }
-    function openModal(id) { if (window.app) window.app.openModal(id); }
-    function closeModal(id) { if (window.app) window.app.closeModal(id); }
-    function handleLogin() { if (window.app) window.app.handleLogin(); }
-    function setLanguage(lang) { if (window.app) window.app.setLanguage(lang); }
-    function switchHomeownerTab(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); }
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'flex';
+      if (window.app && typeof window.app.openModal === 'function') window.app.openModal(id);
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+      if (window.app && typeof window.app.closeModal === 'function') window.app.closeModal(id);
+    }
+    function switchMicroTab(tabKey) {
+      const btnCars = document.getElementById('btnMicroCars');
+      const btnFamily = document.getElementById('btnMicroFamily');
+      const contentCars = document.getElementById('microContentCars');
+      const contentFamily = document.getElementById('microContentFamily');
+
+      if (tabKey === 'cars') {
+        if (btnCars) {
+          btnCars.classList.add('active');
+          btnCars.style.background = '#ffffff';
+          btnCars.style.color = '#20274f';
+        }
+        if (btnFamily) {
+          btnFamily.classList.remove('active');
+          btnFamily.style.background = 'transparent';
+          btnFamily.style.color = '#64748b';
+        }
+        if (contentCars) contentCars.style.display = 'block';
+        if (contentFamily) contentFamily.style.display = 'none';
+      } else {
+        if (btnFamily) {
+          btnFamily.classList.add('active');
+          btnFamily.style.background = '#ffffff';
+          btnFamily.style.color = '#20274f';
+        }
+        if (btnCars) {
+          btnCars.classList.remove('active');
+          btnCars.style.background = 'transparent';
+          btnCars.style.color = '#64748b';
+        }
+        if (contentFamily) contentFamily.style.display = 'block';
+        if (contentCars) contentCars.style.display = 'none';
+      }
+    }
     function setEmaarTicketFilter(f) { if (window.app) window.app.setEmaarTicketFilter(f); }
     function setManagerFilter(f) { if (window.app) window.app.setManagerFilter(f); }
     function setTechTaskFilter(f) { if (window.app) window.app.setTechTaskFilter(f); }
@@ -9010,6 +9049,7 @@ if (document.readyState === 'loading') {
 </script>
 </body>
 </html>
+
 
 
 
