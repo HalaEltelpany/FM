@@ -3446,73 +3446,150 @@ class UltimateFMApp {
     const subEl = document.getElementById('engineerSpecialtySub');
     const listEl = document.getElementById('engineerChecklistsList');
 
-    if (specialtyKey === 'infra') {
-      if (nameEl) nameEl.innerText = 'م. محمود عبد الفتاح';
-      if (subEl) subEl.innerText = '💧 مهندس المرافق الأساسية (RO / STP / المحولات / البيلارات)';
-      if (listEl) {
-        listEl.innerHTML = `
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">محطة التحلية الرئيسية (RO Plant)</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">فحص ضغط الأغشية والكلور والملوحة</p>
-            </div>
-            <button class="btn btn-primary" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" id="btnOpenRoChecklist">فتح التفتيش</button>
-          </div>
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">محول الكهرباء الرئيسي 04 والبيلارات</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">اختبار حرارة الزيت والعزل واللوحات</p>
-            </div>
-            <span class="badge badge-success">مكتمل اليوم</span>
-          </div>
-        `;
-        // Re-bind RO button
-        const btnRo = document.getElementById('btnOpenRoChecklist');
-        if (btnRo) btnRo.addEventListener('click', () => this.openModal('modalRoChecklist'));
+    // 5 Specialized Engineering Teams (Mapped to Odoo maintenance.team IDs 2, 3, 5, 6, 7)
+    const teamsConfig = {
+      'mep': {
+        name: 'م. محمود عبد الفتاح',
+        sub: '❄️ مهندس الكهروميكانيك والتكييف والمحطات (Odoo Team #2)',
+        teamId: 2,
+        teamName: 'MEP Team',
+        checklists: [
+          {
+            title: 'محطة التحلية الرئيسية (RO Plant)',
+            desc: 'فحص ضغط الأغشية، نسبة الكلور والملوحة اليومية',
+            actionBtn: 'openModal(\'modalRoChecklist\')',
+            status: 'فحص دوري مطلوب'
+          },
+          {
+            title: 'محطة معالجة الصرف (STP Plant)',
+            desc: 'فحص طلمبات الهواء، نسبة الأكسجين ونقاء المياه المعالجة',
+            status: 'مطابق للمواصفات'
+          },
+          {
+            title: 'محطة طلمبات الرفع وغرف التبريد المركزي',
+            desc: 'فحص ضغط خطوط الطرد والفريون والضواغط',
+            status: 'مكتمل اليوم'
+          }
+        ]
+      },
+      'fls': {
+        name: 'م. خالد السعدني',
+        sub: '🔥 مهندس السلامة وأنظمة مكافحة الحريق (Odoo Team #3)',
+        teamId: 3,
+        teamName: 'FLS Team',
+        checklists: [
+          {
+            title: 'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي)',
+            desc: 'اختبار ضغط الشبكة عند 12 Bar وبدء التشغيل التلقائي',
+            status: 'فحص أسبوعي إجباري'
+          },
+          {
+            title: 'لوحة الإنذار المركزية ومحابس كشف السريان OS&Y',
+            desc: 'اختبار كواشف الدخان وحساسات الضغط في زون 1 و 2',
+            status: 'مكتمل وجاهز'
+          },
+          {
+            title: 'صناديق الحريق ورشاشات الإطفاء بالمول والممرات',
+            desc: 'فحص خراطيم الإطفاء وسلامة البوابات ومخارج الطوارئ',
+            status: 'مطابق للكود'
+          }
+        ]
+      },
+      'electrical': {
+        name: 'م. حسام النجار',
+        sub: '⚡ مهندس الكهرباء والطاقة والمحولات (Odoo Team #5)',
+        teamId: 5,
+        teamName: 'Electrical Team',
+        checklists: [
+          {
+            title: 'محول الجهد المتوسط 04 وأكشاك البيلارات',
+            desc: 'اختبار حرارة الزيت، العزل الكهربائي، وجهد الفازات',
+            status: 'مكتمل اليوم'
+          },
+          {
+            title: 'لوحات التوزيع العمومية MDBs ومولدات الطوارئ',
+            desc: 'فحص القواطع الذكية ومستوى الديزل للمولد الرئيسي',
+            status: 'جاهزية 100%'
+          },
+          {
+            title: 'شبكة الإنارة العامة وأعمدة الممشى والشاطئ',
+            desc: 'اختبار المؤقتات الزمنية وخلايا الفوتوسيل الذكية',
+            status: 'قيد التفتيش'
+          }
+        ]
+      },
+      'landscape': {
+        name: 'م. طارق عبد المجيد',
+        sub: '🌿 مهندس اللاندسكيب والزراعة وشبكات الري (Odoo Team #6)',
+        teamId: 6,
+        teamName: 'Landscaping & Agriculture Team',
+        checklists: [
+          {
+            title: 'شبكات الري الأوتوماتيكية بالمحور الرئيسي',
+            desc: 'فحص ضغط النوازل، محابس السولينويد، وجداول الضخ',
+            status: 'يعمل بكفاءة'
+          },
+          {
+            title: 'طلمبات التسميد وخزانات المغذيات المركزية',
+            desc: 'معايرة نسب التسميد واختبار نقاء خطوط التنقيط',
+            status: 'مكتمل اليوم'
+          },
+          {
+            title: 'المسطحات الخضراء ومزروعات الشاطئ والحدائق',
+            desc: 'جدول التقليم الدوري ومكافحة الآفات الزراعية',
+            status: 'مجدول الأسبوع القادم'
+          }
+        ]
+      },
+      'civil': {
+        name: 'م. ياسر الهواري',
+        sub: '🏗️ مهندس المدني والهياكل الإنشائية والتشطيبات (Odoo Team #7)',
+        teamId: 7,
+        teamName: 'Civil & Structural Team',
+        checklists: [
+          {
+            title: 'المماشي الخرسانية والإنترلوك والمحاور الرئيسية',
+            desc: 'فحص فواصل التمدد والتأكد من عدم وجود هبوط أرضي',
+            status: 'سليم وجاهز'
+          },
+          {
+            title: 'أرصفة البحيرات الصناعية والمصدات الشاطئية',
+            desc: 'فحص طبقات العزل المائي والتأكد من خلوها من التصدعات',
+            status: 'قيد المتابعة'
+          },
+          {
+            title: 'أرضيات حمامات السباحة والبرجولات الخشبية',
+            desc: 'فحص السيراميك والمظلات ودهانات الحماية من الرطوبة',
+            status: 'مطابق للمواصفات'
+          }
+        ]
       }
-    } else if (specialtyKey === 'pools') {
-      if (nameEl) nameEl.innerText = 'م. شريف مصطفى';
-      if (subEl) subEl.innerText = '🏊 مهندس البحيرات وحمامات السباحة والأنظمة المائية';
-      if (listEl) {
-        listEl.innerHTML = `
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">البحيرة الرئيسية وشاطئ القرية</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">فحص طلمبات السحب ونسبة نقاء المياه</p>
-            </div>
-            <span class="badge badge-warning">قيد التفتيش</span>
+    };
+
+    const config = teamsConfig[specialtyKey] || teamsConfig['mep'];
+    this.activeEngineerTeam = config;
+
+    if (nameEl) nameEl.innerText = config.name;
+    if (subEl) subEl.innerText = config.sub;
+
+    if (listEl) {
+      listEl.innerHTML = '';
+      config.checklists.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'ticket-item';
+        itemDiv.innerHTML = `
+          <div>
+            <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${item.title}</h4>
+            <p style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">${item.desc}</p>
           </div>
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">حمامات السباحة المركزية زون 2</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">فحص الفلاتر ونسبة التطهير والكلور</p>
-            </div>
-            <span class="badge badge-success">مطابق للمواصفات</span>
-          </div>
+          ${item.actionBtn ? `<button class="btn btn-primary" style="width: auto; padding: 5px 12px; font-size: 0.72rem; margin: 0; background: #1b8f91; border: none; font-weight: 700;" onclick="${item.actionBtn}"><i class="fa-solid fa-clipboard-check"></i> فتح التفتيش</button>` : `<span class="badge badge-success" style="font-size: 0.65rem; padding: 4px 8px;"><i class="fa-solid fa-check"></i> ${item.status}</span>`}
         `;
-      }
-    } else if (specialtyKey === 'landscape') {
-      if (nameEl) nameEl.innerText = 'م. طارق عبد المجيد';
-      if (subEl) subEl.innerText = '🌿 مهندس اللاندسكيب والحدائق والشبكات العامة';
-      if (listEl) {
-        listEl.innerHTML = `
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">شبكات الري التلقائي بالمحور الرئيسي</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">فحص ضغط النوازل ومواعيد الضخ</p>
-            </div>
-            <span class="badge badge-success">عمل بكفاءة</span>
-          </div>
-          <div class="ticket-item">
-            <div>
-              <h4 style="font-size: 0.85rem;">الأشجار والمزروعات بالميادين العامة</h4>
-              <p style="font-size: 0.72rem; color: var(--text-muted);">جدول التسميد والتقليم الدكتوري</p>
-            </div>
-            <span class="badge badge-info">مجدول الأسبوع القادم</span>
-          </div>
-        `;
-      }
+        listEl.appendChild(itemDiv);
+      });
     }
+
+    // Filter Engineer Tickets to show only team tickets
+    this.renderEngineerTickets();
   }
 
   handleEngineerSubmitToManager() {
@@ -3991,11 +4068,13 @@ class UltimateFMApp {
       let createPayload = null;
 
       if (isEngineerOrManager) {
+        const maintenanceTeamId = ticket.maintenanceTeamId || this.activeEngineerTeam?.teamId || 2;
         const maintenanceFields = {
           name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
           description: cleanDescription,
           priority: String(ticket.priority || '2'),
-          maintenance_type: 'corrective'
+          maintenance_type: 'corrective',
+          maintenance_team_id: maintenanceTeamId
         };
         createPayload = {
           jsonrpc: "2.0",
