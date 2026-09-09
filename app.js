@@ -149,8 +149,10 @@ class UltimateFMApp {
       try { this.initSplashScreen(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.loadTicketsFromStorage(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.syncTicketsFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
-      try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderEngineerTickets(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderEngineerPtws(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderDirectorPtwApprovals(); } catch (e) { console.warn('[Init warning]:', e); }
 
       // Start cleanly on the main role selection grid so all 10 screens are accessible, or execute pending click
       try {
@@ -389,10 +391,13 @@ class UltimateFMApp {
     this.currentRole = 'login';
     safeStorage.removeItem('active_session_role');
 
-    // Hide ALL view panels explicitly
+    // Remove any dynamic logout header
+    document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
+
+    // Hide ALL view panels explicitly with !important
     document.querySelectorAll('.view-panel').forEach(panel => {
       panel.classList.remove('active');
-      panel.style.display = 'none';
+      panel.style.setProperty('display', 'none', 'important');
     });
     
     const gridPanel = document.getElementById('viewLogin') || document.getElementById('viewRoleGrid');
@@ -404,7 +409,7 @@ class UltimateFMApp {
 
     // Hide phone bottom navbar when on login/selection grid
     const phoneNav = document.getElementById('phoneNavbar');
-    if (phoneNav) phoneNav.style.display = 'none';
+    if (phoneNav) phoneNav.style.setProperty('display', 'none', 'important');
   }
 
   switchRole(role) {
@@ -415,7 +420,10 @@ class UltimateFMApp {
 
     this.currentRole = role;
     
-    // Update role buttons UI
+    // Remove any dynamic logout header
+    document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
+
+    // Update role buttons UI if present
     document.querySelectorAll('#roleSelector .role-btn').forEach(btn => {
       if (btn.getAttribute('data-role') === role) {
         btn.classList.add('active');
@@ -424,16 +432,18 @@ class UltimateFMApp {
       }
     });
 
-    // Hide all views & show active
+    // Hide all views & show active with !important
     document.querySelectorAll('.view-panel').forEach(panel => {
       panel.classList.remove('active');
-      panel.style.display = 'none';
+      panel.style.setProperty('display', 'none', 'important');
     });
     
     const targetMap = {
+      'owner': 'viewHomeowner',
       'homeowner': 'viewHomeowner',
       'family': 'viewHomeowner', // Both map to the homeowner view panel
       'engineer': 'viewEngineer',
+      'engineering_director': 'viewEngineeringDirector',
       'manager': 'viewManager',
       'technician': 'viewTechnician',
       'tenant': 'viewTenant',
@@ -458,6 +468,9 @@ class UltimateFMApp {
 
     // Render lists on role switch
     this.renderHousekeeping();
+    this.renderEngineerPtws();
+    this.renderDirectorPtwApprovals();
+    this.renderEngineerTickets();
 
     // Toggle Owner-Only Financial details visibility dynamically
     const financialElements = document.querySelectorAll('.owner-only-financial');
@@ -489,7 +502,7 @@ class UltimateFMApp {
           ? 'Villa 104 - North Coast Zone • Associated to Main Owner' 
           : 'فيلا 104 - زون الساحل الشمالي • تابع للمالك الأساسي';
       }
-    } else if (role === 'homeowner') {
+    } else if (role === 'homeowner' || role === 'owner') {
       this.updateHomeownerNameUI();
       if (ownerCardBadge) {
         ownerCardBadge.innerHTML = this.currentLang === 'en' 
@@ -506,9 +519,6 @@ class UltimateFMApp {
 
     const backBtn = document.getElementById('btnBackToRoleGrid');
     if (backBtn) backBtn.style.display = 'inline-flex';
-
-    // Render screen logout header inside active view
-    this.renderLogoutHeader();
   }
 
   openCommercialMeterModal() {
@@ -553,13 +563,13 @@ class UltimateFMApp {
     const subEl = document.getElementById('engineerSpecialtySub');
     const listEl = document.getElementById('engineerChecklistsList');
 
-    // 5 Specialized Engineering Teams (Mapped to Odoo maintenance.team IDs 2, 3, 5, 6, 7)
+    // 5 Specialized Engineering Teams (Mapped to maintenance.team IDs 2, 3, 5, 6, 7)
     const teamsConfig = {
       'mep': {
         name: 'م. محمود عبد الفتاح',
-        sub: '❄️ مهندس الكهروميكانيك والتكييف والمحطات (Odoo Team #2)',
+        sub: '❄️ مهندس الكهروميكانيك والتكييف والمحطات المركزية',
         teamId: 2,
-        teamName: 'MEP Team',
+        teamName: 'فريق الكهروميكانيك والتكييف (MEP)',
         checklists: [
           {
             title: 'محطة التحلية الرئيسية (RO Plant)',
@@ -581,9 +591,9 @@ class UltimateFMApp {
       },
       'fls': {
         name: 'م. خالد السعدني',
-        sub: '🔥 مهندس السلامة وأنظمة مكافحة الحريق (Odoo Team #3)',
+        sub: '🔥 مهندس السلامة وأنظمة مكافحة الحريق والإنذار',
         teamId: 3,
-        teamName: 'FLS Team',
+        teamName: 'فريق السلامة ومكافحة الحريق (FLS)',
         checklists: [
           {
             title: 'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي)',
@@ -604,9 +614,9 @@ class UltimateFMApp {
       },
       'electrical': {
         name: 'م. حسام النجار',
-        sub: '⚡ مهندس الكهرباء والطاقة والمحولات (Odoo Team #5)',
+        sub: '⚡ مهندس الكهرباء والطاقة والمحولات ومولدات الطوارئ',
         teamId: 5,
-        teamName: 'Electrical Team',
+        teamName: 'فريق الكهرباء والمحولات (Electrical)',
         checklists: [
           {
             title: 'محول الجهد المتوسط 04 وأكشاك البيلارات',
@@ -627,9 +637,9 @@ class UltimateFMApp {
       },
       'landscape': {
         name: 'م. طارق عبد المجيد',
-        sub: '🌿 مهندس اللاندسكيب والزراعة وشبكات الري (Odoo Team #6)',
+        sub: '🌿 مهندس اللاندسكيب والزراعة وشبكات الري الأوتوماتيكية',
         teamId: 6,
-        teamName: 'Landscaping & Agriculture Team',
+        teamName: 'فريق اللاندسكيب والزراعة (Landscape)',
         checklists: [
           {
             title: 'شبكات الري الأوتوماتيكية بالمحور الرئيسي',
@@ -650,9 +660,9 @@ class UltimateFMApp {
       },
       'civil': {
         name: 'م. ياسر الهواري',
-        sub: '🏗️ مهندس المدني والهياكل الإنشائية والتشطيبات (Odoo Team #7)',
+        sub: '🏗️ مهندس المدني والهياكل الإنشائية والتشطيبات والمماشي',
         teamId: 7,
-        teamName: 'Civil & Structural Team',
+        teamName: 'فريق المدني والإنشاءات (Civil)',
         checklists: [
           {
             title: 'المماشي الخرسانية والإنترلوك والمحاور الرئيسية',
@@ -681,15 +691,18 @@ class UltimateFMApp {
 
     if (listEl) {
       listEl.innerHTML = '';
-      config.checklists.forEach(item => {
+      config.checklists.forEach((item, idx) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'ticket-item';
+        const actionCall = `openInspectionModal('${item.title.replace(/'/g, "\\'")}', '${item.desc.replace(/'/g, "\\'")}', ${idx})`;
         itemDiv.innerHTML = `
           <div>
             <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${item.title}</h4>
             <p style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">${item.desc}</p>
           </div>
-          ${item.actionBtn ? `<button class="btn btn-primary" style="width: auto; padding: 5px 12px; font-size: 0.72rem; margin: 0; background: #1b8f91; border: none; font-weight: 700;" onclick="${item.actionBtn}"><i class="fa-solid fa-clipboard-check"></i> فتح التفتيش</button>` : `<span class="badge badge-success" style="font-size: 0.65rem; padding: 4px 8px;"><i class="fa-solid fa-check"></i> ${item.status}</span>`}
+          <button class="btn btn-primary" id="engChecklistBtn_${idx}" style="width: auto; padding: 5px 12px; font-size: 0.72rem; margin: 0; background: #1b8f91; border: none; font-weight: 700;" onclick="${actionCall}">
+            <i class="fa-solid fa-clipboard-check"></i> ${item.status || 'فتح التفتيش'}
+          </button>
         `;
         listEl.appendChild(itemDiv);
       });
@@ -699,8 +712,580 @@ class UltimateFMApp {
     this.renderEngineerTickets();
   }
 
+  renderEngineerTickets() {
+    const listEl = document.getElementById('engineerTicketsList');
+    if (!listEl) return;
+
+    const engineerTickets = (this.tickets || []).filter(t => t.requester === 'engineer' || (t.id && String(t.id).startsWith('ENG-')));
+    const badge = document.getElementById('engineerTicketCountBadge');
+    if (badge) {
+      badge.innerText = `${engineerTickets.length} بلاغات`;
+    }
+
+    listEl.innerHTML = '';
+    if (engineerTickets.length === 0) {
+      listEl.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد أوامر صيانة للمرافق حالياً</div>';
+      return;
+    }
+
+    engineerTickets.forEach(tk => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'ticket-item';
+      itemDiv.style.flexDirection = 'column';
+      itemDiv.style.alignItems = 'stretch';
+      itemDiv.style.gap = '6px';
+      itemDiv.style.marginBottom = '8px';
+
+      const stars = '⭐'.repeat(parseInt(tk.priority || '2', 10));
+
+      itemDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 0.82rem; font-weight: 800; color: #20274f;">${tk.title}</h4>
+          <span class="badge ${tk.bgClass || 'badge-warning'}" style="font-size: 0.65rem; padding: 3px 8px;">${tk.status}</span>
+        </div>
+        <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0;">
+          ${tk.details || tk.desc || ''}
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: var(--text-muted); border-top: 1px dashed rgba(32,39,79,0.1); padding-top: 4px;">
+          <span>الأولوية: ${stars} • #${tk.id}</span>
+          <span><i class="fa-regular fa-clock"></i> ${tk.dateStr || ''} ${tk.timeStr || ''}</span>
+        </div>
+      `;
+      listEl.appendChild(itemDiv);
+    });
+  }
+
+  openEngineerWorkOrderModal() {
+    const nameEl = document.getElementById('engModalEngineerName');
+    const teamEl = document.getElementById('engModalTeamName');
+    const selectEl = document.getElementById('engAssetSelect');
+
+    const config = this.activeEngineerTeam || {
+      name: 'م. محمود عبد الفتاح',
+      sub: '❄️ فريق الكهروميكانيك والمحطات (Odoo Team #2)',
+      teamId: 2,
+      teamName: 'MEP Team'
+    };
+
+    if (nameEl) nameEl.innerText = config.name;
+    if (teamEl) teamEl.innerText = config.sub;
+
+    const assetsMap = {
+      'mep': [
+        'محطة التحلية الرئيسية (RO Plant)',
+        'محطة معالجة مياه الصرف الصحي (STP Plant)',
+        'شيلرات التكييف المركزي والمبادلات الحرارية',
+        'طلمبات رفع مياه الشرب وخزانات المياه العذبة',
+        'مضخات ونوافير البحيرات الكبرى وحمامات السباحة'
+      ],
+      'fls': [
+        'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي 12 Bar)',
+        'لوحة الإنذار المبكر المعنونة (Fire Alarm Panel)',
+        'محابس كشف السريان OS&Y وزون الصمامات 1 و 2',
+        'شبكة رشاشات الإطفاء التلقائي (Fire Sprinklers)',
+        'صناديق الحريق وخراطيم الإطفاء الهيدروليكية'
+      ],
+      'electrical': [
+        'محول الجهد المتوسط 04 وأكشاك البيلارات',
+        'لوحة التوزيع العمومية MDB وقواطع ACB الذكية',
+        'مولد الديزل الاحتياطي ومفتاح التحويل ATS',
+        'وحدات إمداد الطاقة غير المنقطعة المركزية UPS',
+        'أعمدة الإنارة الذكية بالممشى والشاطئ والبوابات'
+      ],
+      'landscape': [
+        'شبكة الري الأوتوماتيكية بالمحور المركزي',
+        'طلمبات التسميد وخزانات المغذيات الزراعية',
+        'محابس السولينويد الذكية لزون النخيل والحدائق',
+        'بحيرات القرية والشلالات المائية التجميلية',
+        'خطوط مياه الري المعالجة ونقاط الرشاشات'
+      ],
+      'civil': [
+        'المماشي الخرسانية وبلاط الإنترلوك بالمحور الرئيسي',
+        'فواصل التمدد الإنشائية وعوازل الرطوبة',
+        'أرصفة البحيرات الصناعية والمصدات الشاطئية',
+        'أرضيات السيراميك والمظلات الخشبية لحمامات السباحة',
+        'واجهات المباني الخدمية والأسوار الخارجية'
+      ]
+    };
+
+    const currentKey = document.getElementById('engineerSpecialtySelect')?.value || 'mep';
+    const assets = assetsMap[currentKey] || assetsMap['mep'];
+
+    if (selectEl) {
+      selectEl.innerHTML = '';
+      assets.forEach(asset => {
+        const opt = document.createElement('option');
+        opt.value = asset;
+        opt.innerText = asset;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    this.openModal('modalEngineerWorkOrder');
+  }
+
+  async submitEngineerWorkOrder() {
+    const config = this.activeEngineerTeam || {
+      name: 'م. محمود عبد الفتاح',
+      sub: '❄️ فريق الكهروميكانيك والمحطات (Odoo Team #2)',
+      teamId: 2,
+      teamName: 'MEP Team'
+    };
+
+    const asset = document.getElementById('engAssetSelect')?.value || 'محطة التحلية RO';
+    const maintType = document.getElementById('engMaintenanceType')?.value || 'corrective';
+    const priority = document.getElementById('engPrioritySelect')?.value || '2';
+    const desc = document.getElementById('engWorkOrderDesc')?.value || 'طلب صيانة عاجلة للمرفق';
+    const photoInput = document.getElementById('engWorkOrderPhoto');
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    const newTicket = {
+      id: `ENG-${Math.floor(1000 + Math.random() * 9000)}`,
+      title: `${config.teamName}: ${asset}`,
+      category: 'صيانة مرافق',
+      location: asset,
+      details: `${maintType === 'corrective' ? 'عطل تصحيحي طارئ' : 'صيانة وقائية دورية'}: ${desc}\nالمرفق: ${asset}\nالمهندس المشرف: ${config.name}`,
+      priority: priority,
+      status: 'تم إسناد الفني',
+      bgClass: 'badge-info',
+      requester: 'engineer',
+      requesterName: config.name,
+      maintenanceTeamId: config.teamId,
+      assignedTech: 'فني طوارئ المرافق (حسام المهدي)',
+      photoBefore: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr,
+      resolutionTime: ''
+    };
+
+    const proceed = async () => {
+      this.tickets.unshift(newTicket);
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.renderEngineerTickets();
+      this.closeModal('modalEngineerWorkOrder');
+
+      // Clear inputs
+      const descEl = document.getElementById('engWorkOrderDesc');
+      if (descEl) descEl.value = '';
+      if (photoInput) photoInput.value = '';
+
+      this.showToast(`🛠️ تم إصدار أمر العمل الهندسي رقم #${newTicket.id} بنجاح!\nالمرفق: ${asset}\nالمسؤول: ${config.name}\nتم توجيهه مباشرة لموديول الصيانة بأودو (maintenance.request - Team #${config.teamId}).`);
+
+      // Direct Sync to Odoo Maintenance module
+      try {
+        await this.syncTicketToOdoo(newTicket, '01223456789', config.name);
+        this.saveTicketsToStorage();
+        this.renderTickets();
+        this.renderEngineerTickets();
+      } catch (err) {
+        console.warn('[Odoo Engineer Sync Error]:', err);
+      }
+    };
+
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        newTicket.photoBefore = e.target.result;
+        proceed();
+      };
+      reader.readAsDataURL(photoInput.files[0]);
+    } else {
+      proceed();
+    }
+  }
+
+  openInspectionModal(title, desc, idx) {
+    const titleEl = document.getElementById('inspectModalTitle');
+    const descEl = document.getElementById('inspectModalDesc');
+    if (titleEl) titleEl.innerText = title;
+    if (descEl) descEl.innerText = desc;
+    this._currentInspectIdx = idx;
+    this.openModal('modalInspectionDetails');
+  }
+
+  confirmInspectionSignOff() {
+    this.closeModal('modalInspectionDetails');
+    const idx = this._currentInspectIdx;
+    if (typeof idx === 'number') {
+      const btn = document.getElementById(`engChecklistBtn_${idx}`);
+      if (btn) {
+        btn.outerHTML = `<span class="badge badge-success" style="font-size: 0.68rem; padding: 5px 10px; font-weight: 800;"><i class="fa-solid fa-circle-check"></i> مكتمل ومطابق للمواصفات ✅</span>`;
+      }
+    }
+    this.showToast('✅ تم توثيق واعتماد التفتيش الفني الرقمي بنجاح!\nتم تسجيل قراءات الفحص بسجلات الصيانة الدورية Odoo.');
+  }
+
+  openAssetScannerModal() {
+    this.openModal('modalAssetScanner');
+  }
+
+  selectScannedAsset(assetKey) {
+    this.closeModal('modalAssetScanner');
+    this.openAssetPassportModal(assetKey);
+  }
+
+  openAssetPassportModal(assetKey = 'ro') {
+    const assets = {
+      'ro': {
+        code: '#EQ-RO-8924',
+        name: 'محطة التحلية المركزية (RO Plant)',
+        loc: 'زون المحطات الغربية • مبنى الخدمات الفنية 01',
+        model: 'Grundfos / Dow Filmtec (5,000 m³/day)',
+        warranty: 'ساري حتى 2028 (ضمان ممتد)',
+        telemetry: '7.2 Bar • TDS: 210 ppm',
+        ppm: '15 أكتوبر 2026 (بعد 37 يوم)',
+        teamKey: 'mep'
+      },
+      'fire': {
+        code: '#EQ-FP-3310',
+        name: 'طلمبات الحريق الرئيسية 12 Bar',
+        loc: 'غرفة طلمبات الطوارئ FLS • المبنى الخدمي الرئيسي',
+        model: 'Patterson Fire Pumps / Cummins Diesel 750 GPM',
+        warranty: 'ساري ومطابق لاشتراطات الدفاع المدني',
+        telemetry: '12.4 Bar • Standby Ready 100%',
+        ppm: '28 سبتمبر 2026 (بعد 20 يوم)',
+        teamKey: 'fls'
+      },
+      'trans': {
+        code: '#EQ-TR-0402',
+        name: 'محول الكهرباء الجهد المتوسط 04',
+        loc: 'كشك المحولات 04 • زون الفلل الشمالي',
+        model: 'ABB / Schneider Electric 1500 kVA',
+        warranty: 'ساري حتى 2030 (ضمان الشركة المصنعة)',
+        telemetry: '380V / 220V • Load: 74%',
+        ppm: '10 نوفمبر 2026 (بعد 63 يوم)',
+        teamKey: 'electrical'
+      },
+      'stp': {
+        code: '#EQ-STP-1105',
+        name: 'محطة معالجة مياه الصرف الصحي (STP)',
+        loc: 'محطة المعالجة الثلاثية البيئية • زون الخدمات',
+        model: 'Kubota Membrane Bioreactor MBR',
+        warranty: 'ساري ومطابق للمواصفات البيئية',
+        telemetry: 'Dissolved O2: 4.5 mg/L • pH: 7.4',
+        ppm: '05 أكتوبر 2026 (بعد 27 يوم)',
+        teamKey: 'mep'
+      }
+    };
+
+    const asset = assets[assetKey] || assets['ro'];
+    this._activeScannedAsset = asset;
+
+    const codeBadge = document.getElementById('passAssetCodeBadge');
+    const nameEl = document.getElementById('passAssetName');
+    const locEl = document.getElementById('passAssetLocation');
+    const modelEl = document.getElementById('passAssetModel');
+    const warrantyEl = document.getElementById('passAssetWarranty');
+    const telEl = document.getElementById('passAssetTelemetry');
+    const ppmEl = document.getElementById('passAssetPpm');
+
+    if (codeBadge) codeBadge.innerText = asset.code;
+    if (nameEl) nameEl.innerText = asset.name;
+    if (locEl) locEl.innerText = asset.loc;
+    if (modelEl) modelEl.innerText = asset.model;
+    if (warrantyEl) warrantyEl.innerText = asset.warranty;
+    if (telEl) telEl.innerText = asset.telemetry;
+    if (ppmEl) ppmEl.innerText = asset.ppm;
+
+    this.openModal('modalAssetPassport');
+  }
+
+  raiseWorkOrderForActiveAsset() {
+    this.closeModal('modalAssetPassport');
+    this.openEngineerWorkOrderModal();
+    if (this._activeScannedAsset) {
+      const select = document.getElementById('engAssetSelect');
+      if (select) {
+        let found = false;
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value.includes(this._activeScannedAsset.name) || this._activeScannedAsset.name.includes(select.options[i].value)) {
+            select.selectedIndex = i;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          const opt = document.createElement('option');
+          opt.value = this._activeScannedAsset.name;
+          opt.innerText = this._activeScannedAsset.name;
+          opt.selected = true;
+          select.appendChild(opt);
+        }
+      }
+    }
+  }
+
+  openActiveAssetInspection() {
+    this.closeModal('modalAssetPassport');
+    const asset = this._activeScannedAsset || { name: 'محطة التحلية RO Plant', loc: 'الموقع الفني' };
+    this.openInspectionModal(asset.name, `فحص شامل لقراءات التشغيل والعزل وسلامة المحابس (${asset.code || '#EQ-ASSET'})`, 0);
+  }
+
+  renderEngineerPtws() {
+    const listEl = document.getElementById('engineerPtwList');
+    if (!listEl) return;
+
+    if (!this.ptwList) {
+      this.ptwList = [
+        {
+          id: 'PTW-HOT-9821',
+          typeLabel: '🔥 أعمال حرارية ولحام (Hot Work)',
+          contractor: 'المقاولون العرب (م. كريم سالم)',
+          phone: '01012345678',
+          location: 'غرفة طلمبات محطة RO - المحور الغربي',
+          engineer: 'م. محمود عبد الفتاح',
+          duration: '8 ساعات',
+          remaining: '06:45:00 ساعة',
+          status: 'ساري ومعتمد',
+          bgClass: 'badge-success'
+        },
+        {
+          id: 'PTW-HGT-4402',
+          typeLabel: '🏗️ أعمال ارتفاعات وسقالات (Heights)',
+          contractor: 'إيجيبت فاسيليتي لخدمات الواجهات',
+          phone: '01229876543',
+          location: 'واجهات المبنى الإداري والمول',
+          engineer: 'م. ياسر الهواري',
+          duration: '4 ساعات',
+          remaining: '04:00:00 ساعة',
+          status: 'بانتظار موافقة مدير القطاع الهندسي',
+          bgClass: 'badge-warning'
+        },
+        {
+          id: 'PTW-LOTO-1108',
+          typeLabel: '⚡ عزل طاقة وتأمين قواطع (LOTO)',
+          contractor: 'شنايدر إلكتريك مصر للصيانة',
+          phone: '01123456789',
+          location: 'موزع الجهد المتوسط رقم 02',
+          engineer: 'م. أحمد الصاوي',
+          duration: '8 ساعات',
+          remaining: '08:00:00 ساعة',
+          status: 'بانتظار موافقة مدير القطاع الهندسي',
+          bgClass: 'badge-warning'
+        }
+      ];
+    }
+
+    const badge = document.getElementById('activePtwBadge');
+    if (badge) badge.innerText = `${this.ptwList.length} تصاريح`;
+
+    listEl.innerHTML = '';
+    this.ptwList.forEach(ptw => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'ticket-item';
+      itemDiv.style.flexDirection = 'column';
+      itemDiv.style.alignItems = 'stretch';
+      itemDiv.style.gap = '6px';
+      itemDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${ptw.typeLabel}</h4>
+          <span class="badge ${ptw.bgClass}" style="font-size: 0.65rem; padding: 3px 8px;"><i class="fa-solid fa-circle-check"></i> ${ptw.status}</span>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>المقاول:</b> ${ptw.contractor} • #${ptw.id}</div>
+          <div>• <b>الموقع:</b> ${ptw.location}</div>
+          <div style="color: ${ptw.status === 'ساري ومعتمد' ? '#10b981' : '#d97706'}; font-weight: 700;"><i class="fa-regular fa-clock"></i> الصلاحية: ${ptw.remaining}</div>
+        </div>
+        <button class="btn btn-sm" onclick="viewPtwDetails('${ptw.id}')" style="margin-top: 4px; padding: 5px; font-size: 0.72rem; font-weight: 700; background: rgba(225,29,72,0.08); color: #e11d48; border: 1px solid rgba(225,29,72,0.25); border-radius: 6px; width: 100%;">
+          <i class="fa-solid fa-stamp"></i> عرض شهادة التصريح الرقمي
+        </button>
+      `;
+      listEl.appendChild(itemDiv);
+    });
+  }
+
+  renderDirectorPtwApprovals() {
+    const listEl = document.getElementById('directorPtwApprovalsList');
+    if (!listEl) return;
+
+    if (!this.ptwList) {
+      this.renderEngineerPtws();
+    }
+
+    const pendingCount = (this.ptwList || []).filter(p => p.status === 'بانتظار موافقة مدير القطاع الهندسي').length;
+    const badge = document.getElementById('directorPtwCountBadge');
+    if (badge) {
+      badge.innerText = `${pendingCount} بانتظار الاعتماد`;
+      badge.style.background = pendingCount > 0 ? '#e11d48' : '#10b981';
+    }
+
+    listEl.innerHTML = '';
+    if (!this.ptwList || this.ptwList.length === 0) {
+      listEl.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد تصاريح عمل حالياً</div>';
+      return;
+    }
+
+    this.ptwList.forEach(ptw => {
+      const isPending = ptw.status === 'بانتظار موافقة مدير القطاع الهندسي';
+      const isApproved = ptw.status === 'ساري ومعتمد';
+      const isRejected = ptw.status.includes('مرفوض');
+
+      let actionButtons = '';
+      if (isPending) {
+        actionButtons = `
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 0.7rem; font-weight: 700; color: #20274f; white-space: nowrap;">فترة الشفت:</span>
+              <select id="ptwShiftDuration_${ptw.id}" class="form-control" style="font-size: 0.72rem; padding: 3px 6px; height: 28px;">
+                <option value="4">4 ساعات (شفت قصير)</option>
+                <option value="8" selected>8 ساعات (شفت قياسي)</option>
+                <option value="12">12 ساعة (شفت طوارئ مكثف)</option>
+                <option value="24">24 ساعة (أعمال مستمرة)</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-success" onclick="app.approveDirectorPtw('${ptw.id}')" style="flex: 1; font-size: 0.72rem; padding: 6px 8px; font-weight: 800; background: #10b981; border: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <i class="fa-solid fa-stamp"></i> اعتماد وتصريح
+              </button>
+              <button class="btn btn-danger" onclick="app.rejectDirectorPtw('${ptw.id}')" style="width: auto; font-size: 0.72rem; padding: 6px 12px; font-weight: 700; background: #e11d48; border: none;">
+                <i class="fa-solid fa-ban"></i> رفض
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (isApproved) {
+        actionButtons = `
+          <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.72rem; color: #10b981; font-weight: 700;"><i class="fa-solid fa-certificate"></i> مصرح ومعتمد رسمياً من د.م. هشام القاضي</span>
+            <button class="btn btn-sm" onclick="app.viewPtwDetails('${ptw.id}')" style="font-size: 0.68rem; padding: 3px 8px; background: rgba(32,39,79,0.06); color: #20274f; border: 1px solid rgba(32,39,79,0.15); border-radius: 4px;">
+              عرض الشهادة
+            </button>
+          </div>
+        `;
+      } else {
+        actionButtons = `
+          <div style="margin-top: 6px; font-size: 0.72rem; color: #e11d48; font-weight: 700;">
+            <i class="fa-solid fa-triangle-exclamation"></i> مرفوض لعدم استيفاء تدابير الوقاية والسلامة
+          </div>
+        `;
+      }
+
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'ticket-item';
+      itemDiv.style.flexDirection = 'column';
+      itemDiv.style.alignItems = 'stretch';
+      itemDiv.style.gap = '6px';
+      itemDiv.style.marginBottom = '8px';
+      itemDiv.style.borderLeft = `4px solid ${isApproved ? '#10b981' : (isPending ? '#f59e0b' : '#e11d48')}`;
+      itemDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${ptw.typeLabel}</h4>
+          <span class="badge ${ptw.bgClass}" style="font-size: 0.65rem; padding: 3px 8px;">${ptw.status}</span>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>المقاول:</b> ${ptw.contractor} • رقم التصريح: #${ptw.id}</div>
+          <div>• <b>الموقع والمعدة:</b> ${ptw.location}</div>
+          <div>• <b>المهندس المشرف:</b> ${ptw.engineer}</div>
+          <div style="color: ${isApproved ? '#10b981' : '#d97706'}; font-weight: 700;"><i class="fa-regular fa-clock"></i> الصلاحية: ${ptw.remaining}</div>
+        </div>
+        ${actionButtons}
+      `;
+      listEl.appendChild(itemDiv);
+    });
+  }
+
+  approveDirectorPtw(ptwId) {
+    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
+    if (!ptw) return;
+
+    const selectEl = document.getElementById(`ptwShiftDuration_${ptwId}`);
+    const hours = selectEl ? selectEl.value : '8';
+
+    ptw.status = 'ساري ومعتمد';
+    ptw.bgClass = 'badge-success';
+    ptw.duration = `${hours} ساعات`;
+    ptw.remaining = `${hours.padStart(2, '0')}:00:00 ساعة`;
+    ptw.approvedBy = 'د.م. هشام القاضي (رئيس القطاع الهندسي والسلامة)';
+    ptw.approvedAt = new Date().toLocaleTimeString('ar-EG');
+
+    this.renderEngineerPtws();
+    this.renderDirectorPtwApprovals();
+
+    this.showToast(`🛡️ تم اعتماد وختم تصريح العمل رقم #${ptwId} بنجاح!\nالنوع: ${ptw.typeLabel}\nالمقاول: ${ptw.contractor}\nصلاحية الشفت: ${hours} ساعات.\nتم إخطار فريق الأمن الصناعي وبوابات الدخول.`);
+  }
+
+  rejectDirectorPtw(ptwId) {
+    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
+    if (!ptw) return;
+
+    ptw.status = 'مرفوض لعدم استيفاء تدابير HSE';
+    ptw.bgClass = 'badge-danger';
+    ptw.remaining = '00:00:00 (ملغي)';
+
+    this.renderEngineerPtws();
+    this.renderDirectorPtwApprovals();
+
+    this.showToast(`❌ تم رفض وتعليق تصريح العمل رقم #${ptwId}!\nتم إخطار المهندس المشرف (${ptw.engineer}) لاستيفاء اشتراطات السلامة والوقاية.`);
+  }
+
+  openNewPtwModal() {
+    this.openModal('modalNewPtw');
+  }
+
+  submitNewPtwModal() {
+    const typeSelect = document.getElementById('ptwTypeSelect');
+    const contractorInput = document.getElementById('ptwContractorInput');
+    const phoneInput = document.getElementById('ptwSupervisorPhone');
+    const locInput = document.getElementById('ptwLocationInput');
+    const durSelect = document.getElementById('ptwDurationSelect');
+
+    const typeText = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text : '🔥 تصريح عمل خطر';
+    const contractor = (contractorInput && contractorInput.value.trim()) ? contractorInput.value.trim() : 'المقاول المنفذ';
+    const phone = phoneInput ? phoneInput.value : '01012345678';
+    const loc = (locInput && locInput.value.trim()) ? locInput.value.trim() : 'الموقع العام';
+    const dur = durSelect ? `${durSelect.value} ساعات` : '8 ساعات';
+
+    const ptwId = 'PTW-' + Math.floor(1000 + Math.random() * 9000);
+    const newPtw = {
+      id: ptwId,
+      typeLabel: typeText,
+      contractor: `${contractor} (${phone})`,
+      phone: phone,
+      location: loc,
+      engineer: this.activeEngineerTeam ? this.activeEngineerTeam.name : 'م. محمود عبد الفتاح',
+      duration: dur,
+      remaining: `${durSelect ? durSelect.value.padStart(2, '0') : '08'}:00:00 ساعة`,
+      status: 'بانتظار موافقة مدير القطاع الهندسي',
+      bgClass: 'badge-warning'
+    };
+
+    if (!this.ptwList) this.ptwList = [];
+    this.ptwList.unshift(newPtw);
+    this.renderEngineerPtws();
+    this.renderDirectorPtwApprovals();
+    this.closeModal('modalNewPtw');
+
+    this.showToast(`🛡️ تم تقديم طلب تصريح العمل الخطر رقم #${ptwId} بنجاح!\nالمقاول: ${contractor}\nالموقع: ${loc}\nتم إرسال التصريح لصندوق اعتماد مدير القطاع الهندسي والسلامة (د.م. هشام القاضي).`);
+  }
+
+  viewPtwDetails(ptwId) {
+    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
+    if (!ptw) return;
+
+    const typeBadge = document.getElementById('viewPtwTypeBadge');
+    const idText = document.getElementById('viewPtwIdText');
+    const timeText = document.getElementById('viewPtwRemainingTime');
+    const contrText = document.getElementById('viewPtwContractor');
+    const locText = document.getElementById('viewPtwLocation');
+    const engText = document.getElementById('viewPtwEngineer');
+
+    if (typeBadge) typeBadge.innerText = ptw.typeLabel;
+    if (idText) idText.innerText = `#${ptw.id}`;
+    if (timeText) timeText.innerText = ptw.remaining;
+    if (contrText) contrText.innerText = ptw.contractor;
+    if (locText) locText.innerText = ptw.location;
+    if (engText) engText.innerText = ptw.engineer;
+
+    this.openModal('modalViewPtw');
+  }
+
   handleEngineerSubmitToManager() {
-    this.showToast('🛠 تم إرسال أمر العمل الهندسي العاجل بنجاح إلى شاشة مدير الصيانة!\nتم إدراج الطلب في طابور الوارد لتوزيع فني متاح.');
+    this.openEngineerWorkOrderModal();
   }
 
   dispatchOrderToTech(orderTitle, selectId) {
@@ -3975,7 +4560,10 @@ class UltimateFMApp {
 
   openModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.add('active');
+    if (el) {
+      el.classList.add('active');
+      el.style.display = 'flex';
+    }
     if (modalId === 'modalSignature') {
       setTimeout(() => this.initCanvas(), 100);
     }
@@ -4192,7 +4780,10 @@ class UltimateFMApp {
 
   closeModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.remove('active');
+    if (el) {
+      el.classList.remove('active');
+      el.style.display = 'none';
+    }
   }
 
   updateClock() {
@@ -4701,9 +5292,11 @@ class UltimateFMApp {
     if (em.includes('tenant')) role = 'tenant';
     else if (em.includes('commercial') || em.includes('comm')) role = 'commercial';
     else if (em.includes('security') || em.includes('sec')) role = 'security';
+    else if (em.includes('director') || em.includes('hse') || em.includes('eng_dir')) role = 'engineering_director';
     else if (em.includes('manager')) role = 'manager';
     else if (em.includes('technician') || em.includes('tech')) role = 'technician';
     else if (em.includes('engineer') || em.includes('eng')) role = 'engineer';
+    else if (em.includes('housekeeping') || em.includes('hk') || em.includes('clean')) role = 'housekeeping';
     else if (em.includes('admin')) role = 'admin';
     else if (em.includes('owner') || em.includes('ahmed')) role = 'homeowner';
 
@@ -4752,15 +5345,18 @@ class UltimateFMApp {
 
   getRoleArabicName(role) {
     const map = {
-      'homeowner': 'مالك الوحدة السكنية',
-      'family': 'أحد أفراد الأسرة (حساب محدود)',
+      'owner': 'شاشة المالك',
+      'homeowner': 'شاشة المالك',
+      'family': 'فرد من أفراد الأسرة',
       'tenant': 'المستأجر السكني',
       'commercial': 'المستأجر التجاري',
       'security': 'أمن وبوابات القرية',
       'manager': 'مدير الصيانة والتشغيل',
       'technician': 'الفني الميداني',
-      'engineer': 'المهندس المشرف',
-      'admin': 'الإدارة العليا'
+      'engineer': 'المهندس الميداني المشرف',
+      'engineering_director': 'مدير القطاع الهندسي والسلامة',
+      'admin': 'الإدارة العليا',
+      'housekeeping': 'هاوس كيبينج والنظافة'
     };
     return map[role] || role;
   }
@@ -4860,48 +5456,6 @@ class UltimateFMApp {
   renderLogoutHeader() {
     // Remove old dynamic headers
     document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
-
-    const activeView = document.querySelector('.view-panel.active');
-    if (!activeView || activeView.id === 'viewLogin') return;
-
-    // Create a sleek top header for this screen
-    const header = document.createElement('div');
-    header.className = 'dynamic-logout-header';
-    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(32, 39, 79, 0.08); box-shadow: var(--shadow-sm);';
-
-    // Left side: Screen Title
-    const titleSpan = document.createElement('span');
-    titleSpan.style.cssText = 'font-size: 0.78rem; font-weight: 700; color: #20274f; display: flex; align-items: center; gap: 6px;';
-    
-    // Choose appropriate icon based on active role
-    let iconHtml = '<i class="fa-solid fa-desktop"></i>';
-    if (this.currentRole === 'homeowner') iconHtml = '<i class="fa-solid fa-house-user" style="color: var(--primary-gold);"></i>';
-    else if (this.currentRole === 'tenant') iconHtml = '<i class="fa-solid fa-key" style="color: var(--primary-gold);"></i>';
-    else if (this.currentRole === 'commercial') iconHtml = '<i class="fa-solid fa-store" style="color: var(--brand-navy);"></i>';
-    else if (this.currentRole === 'security') iconHtml = '<i class="fa-solid fa-user-shield" style="color: var(--brand-navy);"></i>';
-    else if (this.currentRole === 'manager') iconHtml = '<i class="fa-solid fa-user-tie" style="color: var(--brand-navy);"></i>';
-    else if (this.currentRole === 'technician') iconHtml = '<i class="fa-solid fa-helmet-safety" style="color: var(--accent-cyan);"></i>';
-    else if (this.currentRole === 'engineer') iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-cyan);"></i>';
-    else if (this.currentRole === 'admin') iconHtml = '<i class="fa-solid fa-chart-line" style="color: var(--primary-gold);"></i>';
-
-    const roleName = this.currentLang === 'en' ? this.getRoleEnglishName(this.currentRole) : this.getRoleArabicName(this.currentRole);
-    titleSpan.innerHTML = `${iconHtml} ${roleName}`;
-
-    // Right side: Logout button
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-sm';
-    btn.style.cssText = 'padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;';
-    btn.innerHTML = this.currentLang === 'en' ? '<i class="fa-solid fa-right-from-bracket"></i> Logout' : '<i class="fa-solid fa-right-from-bracket"></i> خروج';
-    btn.onclick = (e) => {
-      e.preventDefault();
-      this.logout();
-    };
-
-    header.appendChild(titleSpan);
-    header.appendChild(btn);
-
-    // Prepend to active view!
-    activeView.insertBefore(header, activeView.firstChild);
   }
 
   handleLicenseFrontPreview(event) {
@@ -6123,6 +6677,23 @@ window.approvePermit = function(id) { if (window.app) window.app.approvePermit(i
 window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
 window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
 window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
+window.openEngineerWorkOrderModal = function() { if (window.app) window.app.openEngineerWorkOrderModal(); };
+window.submitEngineerWorkOrder = function() { if (window.app) window.app.submitEngineerWorkOrder(); };
+window.openInspectionModal = function(title, desc, idx) { if (window.app) window.app.openInspectionModal(title, desc, idx); };
+window.confirmInspectionSignOff = function() { if (window.app) window.app.confirmInspectionSignOff(); };
+window.openAssetScannerModal = function() { if (window.app) window.app.openAssetScannerModal(); };
+window.selectScannedAsset = function(key) { if (window.app) window.app.selectScannedAsset(key); };
+window.openAssetPassportModal = function(key) { if (window.app) window.app.openAssetPassportModal(key); };
+window.raiseWorkOrderForActiveAsset = function() { if (window.app) window.app.raiseWorkOrderForActiveAsset(); };
+window.openActiveAssetInspection = function() { if (window.app) window.app.openActiveAssetInspection(); };
+window.openNewPtwModal = function() { if (window.app) window.app.openNewPtwModal(); };
+window.submitNewPtwModal = function() { if (window.app) window.app.submitNewPtwModal(); };
+window.viewPtwDetails = function(id) { if (window.app) window.app.viewPtwDetails(id); };
+window.renderEngineerPtws = function() { if (window.app) window.app.renderEngineerPtws(); };
+window.renderDirectorPtwApprovals = function() { if (window.app) window.app.renderDirectorPtwApprovals(); };
+window.approveDirectorPtw = function(id) { if (window.app) window.app.approveDirectorPtw(id); };
+window.rejectDirectorPtw = function(id) { if (window.app) window.app.rejectDirectorPtw(id); };
+window.renderEngineerTickets = function() { if (window.app) window.app.renderEngineerTickets(); };
 
 window.switchMicroTab = function(tabKey) {
   const btnCars = document.getElementById('btnMicroCars');

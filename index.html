@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -231,7 +231,7 @@
             <div class="role-square-grid">
               
               <!-- 1. Homeowner Block (Teal) -->
-              <div class="role-block-card teal-block" data-role="owner" onclick="quickLogin('owner')">
+              <div class="role-block-card teal-block" data-role="homeowner" onclick="quickLogin('homeowner')">
                 <div class="block-icon">
                   <i class="fa-solid fa-house-user"></i>
                 </div>
@@ -302,22 +302,31 @@
                 <p class="block-desc">إشراف بوابات الأمن والشكاوى</p>
               </div>
 
-              <!-- 8. Admin Executive Block -->
-              <div class="role-block-card admin-block" data-role="admin" onclick="quickLogin('admin')">
-                <div class="block-icon" style="color: #d4af37;">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <h3 class="block-title">الإدارة العليا</h3>
-                <p class="block-desc">مؤشرات الأداء ومركز التحكم</p>
-              </div>
-
-              <!-- 9. Housekeeping Block -->
+              <!-- 8. Housekeeping Block -->
               <div class="role-block-card teal-block" data-role="housekeeping" onclick="quickLogin('housekeeping')">
                 <div class="block-icon">
                   <i class="fa-solid fa-broom"></i>
                 </div>
                 <h3 class="block-title" id="roleTitleHk">هاوس كيبينج</h3>
                 <p class="block-desc" id="roleDescHk">طلبات النظافة وإسناد عمال النظافة</p>
+              </div>
+
+              <!-- 9. Engineering Director Block -->
+              <div class="role-block-card mauve-block" data-role="engineering_director" onclick="quickLogin('engineering_director')">
+                <div class="block-icon">
+                  <i class="fa-solid fa-helmet-un"></i>
+                </div>
+                <h3 class="block-title">مدير القطاع الهندسي</h3>
+                <p class="block-desc">متابعة وإشراف القطاع الهندسي</p>
+              </div>
+
+              <!-- 10. Admin Executive Block -->
+              <div class="role-block-card admin-block" data-role="admin" onclick="quickLogin('admin')">
+                <div class="block-icon" style="color: #d4af37;">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3 class="block-title">الإدارة العليا</h3>
+                <p class="block-desc">مؤشرات الأداء ومركز التحكم</p>
               </div>
 
             </div>
@@ -967,15 +976,15 @@
             </div>
 
             <!-- Submit Order to Maintenance Manager -->
-            <div class="card">
+            <div class="card" style="border-right: 4px solid #1b8f91;">
               <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-paper-plane"></i> رفع بلاغ صيانة لمدير الصيانة</span>
+                <span class="card-title"><i class="fa-solid fa-paper-plane" style="color: #1b8f91;"></i> رفع أمر صيانة عامة لمدير الصيانة</span>
               </div>
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
-                عند رصد أي عطل في المرافق أثناء التفتيش، قم بإرسال أمر صيانة لمدير الصيانة لتكليف فني مختص.
+                عند رصد أي عطل في المرافق والمحطات العامة أثناء التفتيش، قم بإصدار أمر صيانة وتوجيهه لمدير الصيانة لتكليف فني مختص.
               </p>
-              <button class="btn btn-primary" onclick="openModal('modalNewTicket')">
-                <i class="fa-solid fa-wrench"></i> إرسال أمر عمل لمدير الصيانة
+              <button class="btn btn-primary" onclick="openModal('modalEngineerNewTicket')" style="background: #1b8f91; border: none; color: #ffffff; width: 100%; font-weight: 800; height: 42px; cursor: pointer; box-shadow: 0 4px 12px rgba(27,143,145,0.35);">
+                <i class="fa-solid fa-wrench"></i> إرسال أمر صيانة عامة لمدير الصيانة
               </button>
 
               <!-- Engineer Tickets List Card -->
@@ -986,6 +995,195 @@
                 </div>
                 <div class="list-group" id="engineerTicketsList">
                   <!-- Renders Dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Engineer PTW Work Permit Issuance Card (طلب تصاريح الأعمال الحرجة لمدير القطاع) -->
+            <div class="card" style="border-right: 4px solid #995789;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-file-shield" style="color: #995789;"></i> تصاريح العمل الحرجة (PTW Permits)</span>
+                <span class="badge" style="background: rgba(153, 87, 137, 0.12); color: #995789; font-weight: 800; font-size: 0.68rem;" id="engPtwCountBadge">2 تصاريح نشطة</span>
+              </div>
+              <p style="font-size: 0.73rem; color: var(--text-muted); margin-bottom: 10px;">
+                إصدار طلب تصريح عمل حرج (لحام، عزل طاقة LOTO، أماكن مغلقة) لتوجيهه مباشرة لمدير القطاع الهندسي للاعتماد.
+              </p>
+              <button class="btn btn-primary" onclick="openModal('modalEngineerPtwRequest')" style="background: linear-gradient(135deg, #995789 0%, #20274f 100%); border: none; color: #ffffff; width: 100%; font-weight: 800; height: 42px; cursor: pointer; box-shadow: 0 4px 12px rgba(153,87,137,0.35);">
+                <i class="fa-solid fa-plus-circle"></i> إصدار طلب تصريح عمل حرج جديد
+              </button>
+
+              <!-- Engineer My PTW Permits List -->
+              <div style="margin-top: 12px; border-top: 1px dashed rgba(32,39,79,0.15); padding-top: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #20274f; display: block; margin-bottom: 8px;">
+                  <i class="fa-solid fa-clock-rotate-left"></i> سجل تصاريح الموقع الحالية:
+                </span>
+                <div class="list-group" id="engineerPtwList" style="gap: 8px;">
+                  <!-- Dynamically synced with director approvals -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 2b. ENGINEERING DIRECTOR VIEW (شاشة مدير القطاع الهندسي والسلامة) -->
+          <!-- ========================================== -->
+          <div class="view-panel" id="viewEngineeringDirector">
+            <div class="sticky-view-header">
+              <button class="btn btn-sm" onclick="showRoleGrid()" style="background: #ffffff; color: #20274f; font-weight: 700; border: 1px solid rgba(32,39,79,0.15); margin: 0; box-shadow: var(--shadow-sm); width: auto; font-size: 0.72rem; padding: 4px 10px;">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الأدوار الرئيسية
+              </button>
+              <div style="font-size: 0.72rem; font-weight: 800; color: #1b8f91; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-helmet-un"></i> <span>مدير القطاع الهندسي والسلامة (HSE & Engineering Director)</span>
+              </div>
+            </div>
+
+            <!-- Director Executive Identity Card -->
+            <div class="card gold-border" style="background: linear-gradient(135deg, rgba(32,39,79,0.03) 0%, rgba(27,143,145,0.06) 100%);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">رئيس قطاع التشغيل والصيانة والسلامة</span>
+                  <h2 style="font-size: 1.15rem; font-weight: 900; color: #20274f; margin: 2px 0;">م. طارق عبد العزيز</h2>
+                  <p style="font-size: 0.72rem; color: #1b8f91; font-weight: 700; margin: 0;">الإشراف العام على مهندسي الموقع وحوكمة تصاريح الأعمال (PTW)</p>
+                </div>
+                <span class="badge" style="background: #20274f; color: #67e8f9; font-weight: 800; font-size: 0.75rem; padding: 6px 12px; border-radius: 20px;">
+                  <i class="fa-solid fa-shield-halved"></i> مدير المهندسين
+                </span>
+              </div>
+            </div>
+
+            <!-- 1. Pending Permits Inbox (صندوق طلبات التصاريح بانتظار الاعتماد) -->
+            <div class="card" style="border-right: 4px solid #e11d48;">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-inbox" style="color: #e11d48;"></i> طلبات تصاريح العمل بانتظار الموافقة (Pending Approvals)</span>
+                <span class="badge badge-danger" id="ptwPendingBadge">2 طلبات معلقة</span>
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px;">
+                تصاريح الأعمال المرفوعة من المهندسين الميدانيين والمقاولين بانتظار المراجعة والاعتماد الفني:
+              </p>
+
+              <div class="list-group" id="directorPtwInbox" style="gap: 10px;">
+                <!-- Permit Request 1 -->
+                <div class="ticket-item" id="ptwCard1" style="background: #ffffff; border: 1px solid rgba(225,29,72,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="badge badge-danger" style="font-size: 0.68rem;">🔥 أعمال حرارية ولحام (Hot Work)</span>
+                        <span style="font-weight: 800; font-size: 0.8rem; color: #20274f;">#PTW-HOT-9821</span>
+                      </div>
+                      <div style="font-size: 0.75rem; font-weight: 700; color: #20274f; margin-top: 4px;">
+                        لحام وتعديل خط سحب طلمبات محطة التحلية RO
+                      </div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);">
+                        الموقع: محطة RO الرئيسية • المهندس مقدم الطلب: <b>م. محمود عبد الفتاح</b> • المقاول: <b>المقاولون العرب</b>
+                      </div>
+                    </div>
+                    <span class="badge badge-warning" style="font-size: 0.65rem;">بانتظار الاعتماد</span>
+                  </div>
+
+                  <div style="background: rgba(225,29,72,0.04); border-radius: 6px; padding: 6px 8px; font-size: 0.68rem; color: #9f1239;">
+                    <i class="fa-solid fa-list-check"></i> <b>اشتراطات السلامة المستوفاة:</b> تم توفير طفايات الحريق، فحص مهمات الوقاية، وتعيين مراقب حريق (Fire Watch).
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 4px;">
+                    <button class="btn btn-primary" onclick="approveDirectorPtw('ptwCard1', 'PTW-HOT-9821')" style="flex: 1; background: #059669; border: none; font-size: 0.75rem; font-weight: 700; padding: 8px;">
+                      <i class="fa-solid fa-circle-check"></i> موافقة واعتماد التصريح
+                    </button>
+                    <button class="btn" onclick="rejectDirectorPtw('ptwCard1', 'PTW-HOT-9821')" style="flex: 1; background: rgba(225,29,72,0.1); border: 1px solid rgba(225,29,72,0.3); color: #e11d48; font-size: 0.75rem; font-weight: 700; padding: 8px;">
+                      <i class="fa-solid fa-circle-xmark"></i> رفض التصريح
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Permit Request 2 -->
+                <div class="ticket-item" id="ptwCard2" style="background: #ffffff; border: 1px solid rgba(217,119,6,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="badge badge-warning" style="font-size: 0.68rem;">⚡ عزل طاقة ولوحات (LOTO)</span>
+                        <span style="font-weight: 800; font-size: 0.8rem; color: #20274f;">#PTW-LOTO-4412</span>
+                      </div>
+                      <div style="font-size: 0.75rem; font-weight: 700; color: #20274f; margin-top: 4px;">
+                        عزل وإعادة تأهيل لوحة التوزيع الرئيسية MDB-02
+                      </div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);">
+                        الموقع: غرفة كهرباء زون B • المهندس مقدم الطلب: <b>م. شريف كمال</b> • المقاول: <b>فريق الصيانة الكهربائية</b>
+                      </div>
+                    </div>
+                    <span class="badge badge-warning" style="font-size: 0.65rem;">بانتظار الاعتماد</span>
+                  </div>
+
+                  <div style="background: rgba(217,119,6,0.04); border-radius: 6px; padding: 6px 8px; font-size: 0.68rem; color: #b45309;">
+                    <i class="fa-solid fa-list-check"></i> <b>اشتراطات السلامة المستوفاة:</b> تم تركيب أقفال LOTO والتحقق من فصل الجهد واختبار التأريض.
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 4px;">
+                    <button class="btn btn-primary" onclick="approveDirectorPtw('ptwCard2', 'PTW-LOTO-4412')" style="flex: 1; background: #059669; border: none; font-size: 0.75rem; font-weight: 700; padding: 8px;">
+                      <i class="fa-solid fa-circle-check"></i> موافقة واعتماد التصريح
+                    </button>
+                    <button class="btn" onclick="rejectDirectorPtw('ptwCard2', 'PTW-LOTO-4412')" style="flex: 1; background: rgba(225,29,72,0.1); border: 1px solid rgba(225,29,72,0.3); color: #e11d48; font-size: 0.75rem; font-weight: 700; padding: 8px;">
+                      <i class="fa-solid fa-circle-xmark"></i> رفض التصريح
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. SCADA & Plant Telemetry Overview (المراقبة الحية لمحطات البنية التحتية) -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-gauge-high"></i> سجل قراءات التفتيش اليومي للمحطات (مرفوعة من المهندسين)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> تحديث حي</span>
+              </div>
+              <div class="grid-2" style="gap: 8px;">
+                <div class="stat-box" style="padding: 10px; border-right: 3px solid #1b8f91;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">محطة التحلية RO Plant:</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #20274f;" id="scadaRoVal">7.2 Bar <span style="font-size: 0.7rem; color: #10b981;">(TDS 210)</span></div>
+                  <span class="badge badge-success" id="scadaRoSub" style="font-size: 0.6rem; padding: 2px 6px; margin-top: 4px;">إنتاج 4,200 م³/يوم</span>
+                  <div style="font-size: 0.62rem; color: #64748b; margin-top: 4px;" id="scadaRoInspector">
+                    <i class="fa-solid fa-user-check" style="color: #1b8f91;"></i> فحص: <b>م. محمود عبد الفتاح</b> (09:30 ص)
+                  </div>
+                </div>
+                <div class="stat-box" style="padding: 10px; border-right: 3px solid #e11d48;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">شبكة مكافحة الحريق:</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #e11d48;" id="scadaFireVal">12.0 Bar <span style="font-size: 0.7rem; color: #10b981;">(جاهزية 100%)</span></div>
+                  <span class="badge badge-danger" id="scadaFireSub" style="font-size: 0.6rem; padding: 2px 6px; margin-top: 4px;">ضغط البوستر مستقر</span>
+                  <div style="font-size: 0.62rem; color: #64748b; margin-top: 4px;" id="scadaFireInspector">
+                    <i class="fa-solid fa-user-check" style="color: #e11d48;"></i> فحص: <b>م. خالد السعدني</b> (08:45 ص)
+                  </div>
+                </div>
+                <div class="stat-box" style="padding: 10px; border-right: 3px solid #d97706;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">محولات الكهرباء TR 1-6:</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #20274f;" id="scadaTransVal">68% <span style="font-size: 0.7rem; color: #d97706;">(الحمل الحالي)</span></div>
+                  <span class="badge badge-warning" id="scadaTransSub" style="font-size: 0.6rem; padding: 2px 6px; margin-top: 4px;">الحرارة 54°C طبيعي</span>
+                  <div style="font-size: 0.62rem; color: #64748b; margin-top: 4px;" id="scadaTransInspector">
+                    <i class="fa-solid fa-user-check" style="color: #d97706;"></i> فحص: <b>م. حسام النجار</b> (10:15 ص)
+                  </div>
+                </div>
+                <div class="stat-box" style="padding: 10px; border-right: 3px solid #059669;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">محطة المعالجة الثلاثية STP:</div>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #059669;" id="scadaStpVal">98% <span style="font-size: 0.7rem; color: #10b981;">(كفاءة المعالجة)</span></div>
+                  <span class="badge badge-success" id="scadaStpSub" style="font-size: 0.6rem; padding: 2px 6px; margin-top: 4px;">ضخ مياه الري لشبكات اللاندسكيب</span>
+                  <div style="font-size: 0.62rem; color: #64748b; margin-top: 4px;" id="scadaStpInspector">
+                    <i class="fa-solid fa-user-check" style="color: #059669;"></i> فحص: <b>م. محمود عبد الفتاح</b> (09:45 ص)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. HSE Compliance & Safety Stats (مؤشرات الامتثال والسلامة) -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> مؤشرات الامتثال والسلامة المهنية بالموقع</span>
+              </div>
+              <div class="grid-2" style="gap: 8px;">
+                <div class="stat-box" style="padding: 10px; text-align: center;">
+                  <div style="font-size: 1.1rem; font-weight: 900; color: #10b981;">184 يوم</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">ساعات عمل آمنة بدون حوادث (LTI Free)</div>
+                </div>
+                <div class="stat-box" style="padding: 10px; text-align: center;">
+                  <div style="font-size: 1.1rem; font-weight: 900; color: #1b8f91;">100%</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">نسبة التزام المقاولين باشتراطات HSE</div>
                 </div>
               </div>
             </div>
@@ -2304,26 +2502,181 @@
     </div>
   </div>
 
-  <!-- 4. RO Inspection Checklist Modal -->
-  <div class="modal-overlay" id="modalRoChecklist">
-    <div class="modal-card">
-      <button class="modal-close" onclick="closeModal('modalRoChecklist')"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 14px; color: var(--accent-cyan);"><i class="fa-solid fa-clipboard-check"></i> قائمة فحص محطة التحلية RO</h3>
-      
-      <div class="form-group">
-        <label class="form-label">ضغط فلاتر الأغشية (Membranes Pressure)</label>
-        <input id="form_field_1" name="form_field_1" type="text" class="form-control" value="62 PSI - طبيعي">
-      </div>
-      <div class="form-group">
-        <label for="form_field_2" class="form-label">نسبة الملوحة المتبقية (TDS Level)</label>
-        <input id="form_field_2" name="form_field_2" type="text" class="form-control" value="120 PPM - مطابق للمواصفات">
-      </div>
-      <div class="form-group">
-        <label for="form_field_3" class="form-label">مستوى الكلور المستثمر</label>
-        <input id="form_field_3" name="form_field_3" type="text" class="form-control" value="0.8 mg/L">
+  <!-- 4. Dynamic Plant & Facility Inspection Checklist Modal -->
+  <div class="modal-overlay" id="modalPlantInspection">
+    <div class="modal-card" style="border-top: 5px solid #1b8f91; max-width: 460px;">
+      <button class="modal-close" onclick="closeModal('modalPlantInspection')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #20274f;" id="plantInspectModalTitle">
+        <i class="fa-solid fa-clipboard-check" style="color: #1b8f91;"></i> فحص وتسجيل قراءات المحطة
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;" id="plantInspectModalSub">
+        تسجيل القياسات الميدانية ومزامنتها مع مدير القطاع الهندسي.
+      </p>
+
+      <input type="hidden" id="plantInspectTypeHidden" value="ro">
+
+      <!-- Dynamic Fields Container -->
+      <div id="plantInspectDynamicFields">
+        <!-- Injected dynamically based on plant type -->
       </div>
 
-      <button class="btn btn-primary" id="btnSaveRoChecklist">اعتماد وحفظ تقرير الفحص اليومي</button>
+      <!-- Mandatory Visual & Safety Checklist -->
+      <div style="background: rgba(27, 143, 145, 0.05); border: 1px solid rgba(27, 143, 145, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 0.72rem;">
+        <div style="font-weight: 800; color: #20274f; margin-bottom: 6px;">بنود التحقق الهندسي الإلزامية:</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" checked style="accent-color: #1b8f91;">
+            <span>1. مطابقة قراءات العدادات والضغوط للمعدل التصميمي.</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" checked style="accent-color: #1b8f91;">
+            <span>2. خلو المحطة من أي تسريب زيوت أو مياه أو حرارة غير طبيعية.</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" checked style="accent-color: #1b8f91;">
+            <span>3. سلامة منظومة التأريض واللوحات الكهربائية ومهمات السلامة.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="plantInspectNotes" class="form-label" style="font-weight: 700;">ملاحظات وتوصيات المهندس الميداني</label>
+        <textarea class="form-control" rows="2" id="plantInspectNotes" name="plantInspectNotes" placeholder="أدخل أي ملاحظات فنية أو توصيات صيانة...">المحطة تعمل بحالة ممتازة ومطابقة للمواصفات القياسية.</textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitPlantInspection()" style="background: #1b8f91; border: none; color: #ffffff; width: 100%; font-weight: 800; height: 42px; cursor: pointer; box-shadow: 0 4px 12px rgba(27,143,145,0.35);">
+        <i class="fa-solid fa-signature"></i> اعتماد وتوثيق التقرير ومزامنته فوراً
+      </button>
+    </div>
+  </div>
+
+  <!-- 4b. Engineer PTW Permit Request Modal (نموذج إصدار تصريح عمل حرج) -->
+  <div class="modal-overlay" id="modalEngineerPtwRequest">
+    <div class="modal-card" style="border-top: 5px solid #995789; max-width: 460px;">
+      <button class="modal-close" onclick="closeModal('modalEngineerPtwRequest')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 6px; color: #20274f;">
+        <i class="fa-solid fa-file-shield" style="color: #995789;"></i> إصدار طلب تصريح عمل حرج (PTW)
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+        سيتم إرسال هذا التصريح فوراً لشاشة <b>مدير القطاع الهندسي والسلامة</b> للمراجعة والاعتماد.
+      </p>
+
+      <div class="form-group">
+        <label for="ptwTypeSelect" class="form-label" style="font-weight: 700;">نوع العمل الحرج وتصنيف الخطورة:</label>
+        <select id="ptwTypeSelect" name="ptwTypeSelect" class="form-control" style="font-size: 0.8rem; font-weight: 600;">
+          <option value="hot_work">🔥 أعمال حرارية ولحام وقص معادن (Hot Work)</option>
+          <option value="loto">⚡ عزل طاقة كهربائية ومحولات (LOTO - Lockout/Tagout)</option>
+          <option value="confined_space">🕳️ دخول أماكن مغلقة وبيارات وخزانات (Confined Space)</option>
+          <option value="heights">🏗️ أعمال على ارتفاعات وواجهات (Working at Heights)</option>
+          <option value="excavation">🚜 أعمال حفر وخطوط مدفونة (Excavation & Trenching)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ptwTitleInput" class="form-label" style="font-weight: 700;">عنوان ووصف العمل المطلوب:</label>
+        <input type="text" id="ptwTitleInput" name="ptwTitleInput" class="form-control" placeholder="مثال: لحام مسار طرد إضافي لطلمبات محطة STP" value="لحام وتعديل مسار طرد إضافي لطلمبات محطة معالجة الصرف STP">
+      </div>
+
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label for="ptwLocationInput" class="form-label" style="font-weight: 700;">الموقع / المحطة:</label>
+          <input type="text" id="ptwLocationInput" name="ptwLocationInput" class="form-control" value="محطة معالجة الصرف STP">
+        </div>
+        <div class="form-group">
+          <label for="ptwContractorInput" class="form-label" style="font-weight: 700;">المقاول / فريق التنفيذ:</label>
+          <input type="text" id="ptwContractorInput" name="ptwContractorInput" class="form-control" value="أوراسكوم للإنشاءات">
+        </div>
+      </div>
+
+      <!-- Safety Controls Checklist -->
+      <div style="background: rgba(153, 87, 137, 0.06); border: 1px solid rgba(153, 87, 137, 0.25); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 0.72rem;">
+        <div style="font-weight: 800; color: #20274f; margin-bottom: 6px;">ضوابط السلامة والصحة المهنية (HSE Verification):</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="ptwChk1" checked style="accent-color: #995789;">
+            <span>1. تم توفير طفايات الحريق ومهمات الوقاية PPE المناسبة.</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="ptwChk2" checked style="accent-color: #995789;">
+            <span>2. تم تعيين مراقب سلامة وحريق وتأمين منطقة العمل.</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="ptwChk3" checked style="accent-color: #995789;">
+            <span>3. تم فحص الغازات وتأريض المعدات قبل البدء.</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="submitEngineerPtwRequest()" style="background: linear-gradient(135deg, #995789 0%, #20274f 100%); border: none; color: #ffffff; width: 100%; font-weight: 800; height: 42px; cursor: pointer; box-shadow: 0 4px 12px rgba(153,87,137,0.35);">
+        <i class="fa-solid fa-paper-plane"></i> إرسال التصريح لمدير القطاع الهندسي للاعتماد
+      </button>
+    </div>
+  </div>
+
+  <!-- 4c. Engineer General Site Facility Maintenance Order Modal (أمر صيانة عامة للمرافق والموقع) -->
+  <div class="modal-overlay" id="modalEngineerNewTicket">
+    <div class="modal-card" style="border-top: 5px solid #1b8f91; max-width: 480px;">
+      <button class="modal-close" onclick="closeModal('modalEngineerNewTicket')"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom: 8px; color: #1b8f91; font-size: 1rem;">
+        <i class="fa-solid fa-wrench" style="color: #1b8f91;"></i> رفع أمر صيانة عامة لمرافق الموقع
+      </h3>
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px;">
+        صلاحية المهندس الميداني لإصدار أمر صيانة وتكليف لمدير الصيانة لمعالجة أعطال مرافق ومحطات القرية.
+      </p>
+
+      <!-- Engineer Identity Summary Badge -->
+      <div style="background: rgba(27, 143, 145, 0.06); border: 1px solid rgba(27, 143, 145, 0.25); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.72rem; color: var(--text-main);">
+        <div style="font-weight: 700; color: #1b8f91; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-user-gear"></i> بيانات المهندس المشرف مقدم أمر العمل:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div>• <b>المهندس المشرف:</b> <span id="modalEngOrderName" style="font-weight: 700; color: #20274f;">م. محمود عبد الفتاح</span></div>
+          <div>• <b>الفريق الهندسي:</b> <span id="modalEngOrderTeam" style="color: #1b8f91; font-weight: 600;">فريق الكهروميكانيك والمحطات (Odoo Team #2)</span></div>
+          <div>• <b>نطاق العمل:</b> <span style="font-weight: 700; color: #d97706;">مرافق وأصول البنية التحتية العامة بالقرية</span></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="engTicketCategorySelect" class="form-label" style="font-weight: 700;">التخصص / أصل المرفق المتأثر:</label>
+        <select class="form-control" id="engTicketCategorySelect" name="engTicketCategorySelect" style="font-size: 0.8rem; font-weight: 600;">
+          <option value="كهروميكانيك">❄️ محطات التحلية RO والتبريد المركزي ومضخات الرفع</option>
+          <option value="معالجة الصرف">💧 محطة معالجة الصرف الصحي الثلاثية STP وشبكات الطرد</option>
+          <option value="مكافحة حريق">🔥 شبكات الحريق وطلمبات الديزل والجوكي والرشاشات</option>
+          <option value="كهرباء وطاقة">⚡ محولات الجهد المتوسط وأكشاك البيلارات ولوحات MDBs</option>
+          <option value="لاندسكيب وري">🌿 خطوط وشبكات الري الأوتوماتيكية وطلمبات التسميد</option>
+          <option value="مدني وإنشاءات">🏗️ المماشي الخرسانية وفواصل التمدد وأرصفة البحيرات</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="engTicketLocationInput" class="form-label" style="font-weight: 700;">الموقع الهندسي الدقيق بالمشروع:</label>
+        <input type="text" id="engTicketLocationInput" name="engTicketLocationInput" class="form-control" placeholder="مثال: محطة الرفع زون 2 - بجوار البوابة الشرقية" value="محطة التحلية الرئيسية RO - خط السحب">
+      </div>
+
+      <div class="form-group">
+        <label for="engTicketPrioritySelect" class="form-label" style="font-weight: 700;">درجة الأهمية والأولوية (SLA):</label>
+        <select class="form-control" id="engTicketPrioritySelect" name="engTicketPrioritySelect" style="font-size: 0.8rem; font-weight: 600;">
+          <option value="3" selected>⭐⭐⭐ عاجل طارئ (P1 - استجابة فورية خلال 30 دقيقة)</option>
+          <option value="2">⭐⭐ هام جداً (P2 - أولوية تشغيل عالية)</option>
+          <option value="1">⭐ صيانة وقائية مجدولة (P3)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="engTicketDescInput" class="form-label" style="font-weight: 700;">التشخيص الفني للعطل وتوجيهات الصيانة المطلوبة:</label>
+        <textarea class="form-control" rows="3" id="engTicketDescInput" name="engTicketDescInput" placeholder="اكتب التشخيص الهندسي الدقيق والمطلوب تنفيذه من الفنيين..." style="font-size: 0.78rem;">رصد انخفاض في ضغط السحب على محبس التغذية رقم 03، يرجى فحص الفلتر الميكانيكي وتغيير الجوانات لمنع التسريب.</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="engTicketPhotoInput" class="form-label" style="font-weight: 700;">
+          <i class="fa-solid fa-camera"></i> إرفاق صورة العطل أو المرفق (اختياري):
+        </label>
+        <input type="file" class="form-control" accept="image/*" id="engTicketPhotoInput" name="engTicketPhotoInput" style="font-size: 0.75rem;">
+      </div>
+
+      <button class="btn btn-primary" onclick="submitEngineerGeneralMaintenanceOrder()" style="background: #1b8f91; border: none; color: #ffffff; width: 100%; font-weight: 800; height: 42px; cursor: pointer; box-shadow: 0 4px 12px rgba(27,143,145,0.35);">
+        <i class="fa-solid fa-paper-plane"></i> إصدار أمر العمل وتوجيهه فوراً لمدير الصيانة
+      </button>
     </div>
   </div>
 
@@ -3300,6 +3653,10 @@ class UltimateFMApp {
     if (phoneNav) phoneNav.style.display = 'none';
   }
 
+  quickLogin(role) {
+    this.switchRole(role);
+  }
+
   switchRole(role) {
     if (role === 'grid' || role === 'login') {
       this.showRoleGrid();
@@ -3325,8 +3682,10 @@ class UltimateFMApp {
     
     const targetMap = {
       'homeowner': 'viewHomeowner',
+      'owner': 'viewHomeowner',
       'family': 'viewHomeowner', // Both map to the homeowner view panel
       'engineer': 'viewEngineer',
+      'engineering_director': 'viewEngineeringDirector',
       'manager': 'viewManager',
       'technician': 'viewTechnician',
       'tenant': 'viewTenant',
@@ -3397,8 +3756,14 @@ class UltimateFMApp {
       }
     }
 
-    const backBtn = document.getElementById('btnBackToRoleGrid');
-    if (backBtn) backBtn.style.display = 'inline-flex';
+    if (role === 'engineer') {
+      const engSelect = document.getElementById('engineerSpecialtySelect');
+      const val = engSelect ? engSelect.value : 'mep';
+      this.handleSpecialtyChange(val);
+      if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+    } else if (role === 'engineering_director') {
+      if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+    }
 
     // Render screen logout header inside active view
     this.renderLogoutHeader();
@@ -3455,17 +3820,21 @@ class UltimateFMApp {
         teamName: 'MEP Team',
         checklists: [
           {
+            id: 'chk_ro',
             title: 'محطة التحلية الرئيسية (RO Plant)',
             desc: 'فحص ضغط الأغشية، نسبة الكلور والملوحة اليومية',
-            actionBtn: 'openModal(\'modalRoChecklist\')',
+            actionBtn: 'openPlantInspectionModal(\'ro\')',
             status: 'فحص دوري مطلوب'
           },
           {
+            id: 'chk_stp',
             title: 'محطة معالجة الصرف (STP Plant)',
-            desc: 'فحص طلمبات الهواء، نسبة الأكسجين ونقاء المياه المعالجة',
-            status: 'مطابق للمواصفات'
+            desc: 'فحص طلمبات الهواء، نسبة الأكسجين ونقاء مياه ري اللاندسكيب',
+            actionBtn: 'openPlantInspectionModal(\'stp\')',
+            status: 'فحص دوري مطلوب'
           },
           {
+            id: 'chk_chiller',
             title: 'محطة طلمبات الرفع وغرف التبريد المركزي',
             desc: 'فحص ضغط خطوط الطرد والفريون والضواغط',
             status: 'مكتمل اليوم'
@@ -3479,16 +3848,20 @@ class UltimateFMApp {
         teamName: 'FLS Team',
         checklists: [
           {
-            title: 'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي)',
+            id: 'chk_fls',
+            title: 'مضخات الحريق الرئيسية (ديزل / كهرباء / بوستر)',
             desc: 'اختبار ضغط الشبكة عند 12 Bar وبدء التشغيل التلقائي',
+            actionBtn: 'openPlantInspectionModal(\'fls\')',
             status: 'فحص أسبوعي إجباري'
           },
           {
+            id: 'chk_alarm',
             title: 'لوحة الإنذار المركزية ومحابس كشف السريان OS&Y',
             desc: 'اختبار كواشف الدخان وحساسات الضغط في زون 1 و 2',
             status: 'مكتمل وجاهز'
           },
           {
+            id: 'chk_hose',
             title: 'صناديق الحريق ورشاشات الإطفاء بالمول والممرات',
             desc: 'فحص خراطيم الإطفاء وسلامة البوابات ومخارج الطوارئ',
             status: 'مطابق للكود'
@@ -3502,16 +3875,20 @@ class UltimateFMApp {
         teamName: 'Electrical Team',
         checklists: [
           {
+            id: 'chk_trans',
             title: 'محول الجهد المتوسط 04 وأكشاك البيلارات',
-            desc: 'اختبار حرارة الزيت، العزل الكهربائي، وجهد الفازات',
-            status: 'مكتمل اليوم'
+            desc: 'اختبار حرارة الزيت، العزل الكهربائي، ونسبة الحمل',
+            actionBtn: 'openPlantInspectionModal(\'electrical\')',
+            status: 'فحص يومي مطلوب'
           },
           {
+            id: 'chk_mdb',
             title: 'لوحات التوزيع العمومية MDBs ومولدات الطوارئ',
             desc: 'فحص القواطع الذكية ومستوى الديزل للمولد الرئيسي',
             status: 'جاهزية 100%'
           },
           {
+            id: 'chk_light',
             title: 'شبكة الإنارة العامة وأعمدة الممشى والشاطئ',
             desc: 'اختبار المؤقتات الزمنية وخلايا الفوتوسيل الذكية',
             status: 'قيد التفتيش'
@@ -3527,7 +3904,8 @@ class UltimateFMApp {
           {
             title: 'شبكات الري الأوتوماتيكية بالمحور الرئيسي',
             desc: 'فحص ضغط النوازل، محابس السولينويد، وجداول الضخ',
-            status: 'يعمل بكفاءة'
+            actionBtn: 'openPlantInspectionModal(\'landscape\')',
+            status: 'فحص دوري مطلوب'
           },
           {
             title: 'طلمبات التسميد وخزانات المغذيات المركزية',
@@ -3550,7 +3928,8 @@ class UltimateFMApp {
           {
             title: 'المماشي الخرسانية والإنترلوك والمحاور الرئيسية',
             desc: 'فحص فواصل التمدد والتأكد من عدم وجود هبوط أرضي',
-            status: 'سليم وجاهز'
+            actionBtn: 'openPlantInspectionModal(\'civil\')',
+            status: 'فحص ميداني مطلوب'
           },
           {
             title: 'أرصفة البحيرات الصناعية والمصدات الشاطئية',
@@ -3571,6 +3950,11 @@ class UltimateFMApp {
 
     if (nameEl) nameEl.innerText = config.name;
     if (subEl) subEl.innerText = config.sub;
+
+    const modalOrderName = document.getElementById('modalEngOrderName');
+    const modalOrderTeam = document.getElementById('modalEngOrderTeam');
+    if (modalOrderName) modalOrderName.innerText = config.name;
+    if (modalOrderTeam) modalOrderTeam.innerText = `${config.teamName} (${config.sub.split('(')[1] ? '(' + config.sub.split('(')[1] : ''}`;
 
     if (listEl) {
       listEl.innerHTML = '';
@@ -3938,18 +4322,19 @@ class UltimateFMApp {
     this.showToast('🧹 تم تصفير وتنظيف جميع السجلات والبلاغات بكافة الشاشات بنجاح!\nالتطبيق نظيف 100% وجاهز لاختبارك المباشر.');
   }
 
-  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
+  async callOdoo(baseUrl, payload, timeoutMs = 7000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
+    const payloadStr = JSON.stringify(payload);
 
-    // 1. Direct Call with AbortController timeout (Fastest: ~800ms)
+    // 1. Direct Call (Works on Local/Web/Cordova/Electron or when CORS is permitted)
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       const response = await fetch(directUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: payloadStr,
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -3959,7 +4344,39 @@ class UltimateFMApp {
         if (data) return data;
       }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
+      console.warn('[Odoo Direct Call Failed / CORS]:', directErr.message || directErr);
+    }
+
+    // 2. CORS Proxy Fallbacks (Guarantees browser client-side execution from file:/// and all hosts)
+    const proxies = [
+      (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`,
+      (target) => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+      (target) => `https://proxy.cors.sh/${target}`
+    ];
+
+    for (const makeProxyUrl of proxies) {
+      try {
+        const pUrl = makeProxyUrl(directUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        const pResponse = await fetch(pUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payloadStr,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (pResponse && pResponse.ok) {
+          const pData = await pResponse.json();
+          if (pData) {
+            console.log('[Odoo Proxy Call Success]:', pUrl);
+            return pData;
+          }
+        }
+      } catch (proxyErr) {
+        console.warn('[Odoo Proxy Call Attempt Failed]:', proxyErr.message || proxyErr);
+      }
     }
 
     return null;
@@ -4001,6 +4418,73 @@ class UltimateFMApp {
     }
     // 6. Customer Care (ID 1) - Default
     return 1;
+  }
+
+  handleNewTicketSubmit() {
+    if (this._isTicketSubmitting) return;
+    this._isTicketSubmitting = true;
+    setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
+
+    const category = document.getElementById('ticketCategorySelect')?.value || 'سباكة';
+    const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
+    const desc = document.getElementById('ticketDescInput')?.value || 'طلب صيانة عاجلة';
+    const photoInput = document.getElementById('ticketPhotoInput');
+    
+    // Category fallback before-repair images
+    const fallbacks = {
+      'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
+      'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+      'كهروميكانيك': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
+      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
+    };
+    const defaultPhoto = fallbacks[category] || fallbacks['سباكة'];
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    const newTicket = {
+      id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
+      title: `${category}: ${desc.substring(0, 20)}...`,
+      category: category,
+      priority: priority,
+      details: desc,
+      status: 'جديد',
+      bgClass: 'badge-warning',
+      requester: this.currentRole || 'homeowner',
+      assignedTech: '',
+      photoBefore: defaultPhoto,
+      photoAfter: '',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr,
+      resolutionTime: ''
+    };
+
+    const proceedWithTicket = (finalPhoto) => {
+      newTicket.photoBefore = finalPhoto || defaultPhoto;
+      this.tickets.unshift(newTicket);
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.closeModal('modalNewTicket');
+
+      const descInput = document.getElementById('ticketDescInput');
+      if (descInput) descInput.value = '';
+      if (photoInput) photoInput.value = '';
+
+      this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}!\nجاري المزامنة مع Odoo Helpdesk...`);
+
+      // Live sync to Odoo Helpdesk
+      this.syncTicketToOdoo(newTicket, '01223456789', 'أسامة أحمد محمد الشريف');
+    };
+
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => proceedWithTicket(e.target.result);
+      reader.readAsDataURL(photoInput.files[0]);
+    } else {
+      proceedWithTicket(defaultPhoto);
+    }
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
@@ -4161,10 +4645,12 @@ class UltimateFMApp {
           })();
         }
 
-        console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo Helpdesk Ticket ID: ${ticketIdInOdoo}`);
-      } else if (helpdeskData && helpdeskData.error) {
-        console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
-        this.showToast(`❌ تعذر استكمال مزامنة الطلب: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
+        const modelLabel = targetModel === 'maintenance.request' ? 'أوامر الصيانة (Maintenance)' : 'الدعم الفني (Helpdesk)';
+        console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo ${modelLabel} ID: ${ticketIdInOdoo}`);
+        this.showToast(`✅ تم توثيق وحفظ الطلب #${ticket.id} بنظام Odoo المركزي بنجاح!\nالقسم: ${modelLabel}\nرقم السجل بأودو: #${ticketIdInOdoo}`);
+      } else if (odooCreateData && odooCreateData.error) {
+        console.error('[Odoo Create Error]:', odooCreateData.error);
+        this.showToast(`❌ تعذر استكمال مزامنة الطلب: ${odooCreateData.error.message || JSON.stringify(odooCreateData.error)}`);
       }
     } catch (err) {
       console.warn('[Odoo Sync Exception]:', err);
@@ -7594,9 +8080,11 @@ class UltimateFMApp {
     if (em.includes('tenant')) role = 'tenant';
     else if (em.includes('commercial') || em.includes('comm')) role = 'commercial';
     else if (em.includes('security') || em.includes('sec')) role = 'security';
+    else if (em.includes('director') || em.includes('hse') || em.includes('eng_dir')) role = 'engineering_director';
     else if (em.includes('manager')) role = 'manager';
     else if (em.includes('technician') || em.includes('tech')) role = 'technician';
     else if (em.includes('engineer') || em.includes('eng')) role = 'engineer';
+    else if (em.includes('housekeeping') || em.includes('hk') || em.includes('clean')) role = 'housekeeping';
     else if (em.includes('admin')) role = 'admin';
     else if (em.includes('owner') || em.includes('ahmed')) role = 'homeowner';
 
@@ -7653,7 +8141,9 @@ class UltimateFMApp {
       'manager': 'مدير الصيانة والتشغيل',
       'technician': 'الفني الميداني',
       'engineer': 'المهندس المشرف',
-      'admin': 'الإدارة العليا'
+      'engineering_director': 'مدير القطاع الهندسي والسلامة',
+      'admin': 'الإدارة العليا',
+      'housekeeping': 'هاوس كيبينج والنظافة'
     };
     return map[role] || role;
   }
@@ -9013,9 +9503,478 @@ window.requestPermit = function(role, type) { if (window.app) window.app.request
 window.openPermitModal = function(role, type) { if (window.app) window.app.openPermitModal(role, type); };
 window.submitPermitModal = function() { if (window.app) window.app.submitPermitModal(); };
 window.approvePermit = function(id) { if (window.app) window.app.approvePermit(id); };
-window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
-window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
-window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
+// Dynamic Shared PTW State Storage (Synced between Engineer & Director)
+window._ptwPermits = [
+  {
+    id: 'PTW-HOT-9821',
+    cardId: 'ptwCard_9821',
+    type: 'hot_work',
+    typeBadge: '🔥 أعمال حرارية ولحام (Hot Work)',
+    typeClass: 'badge-danger',
+    title: 'لحام وتعديل خط سحب طلمبات محطة التحلية RO',
+    location: 'محطة RO الرئيسية',
+    contractor: 'المقاولون العرب',
+    engineer: 'م. محمود عبد الفتاح',
+    safetyNotes: 'تم توفير طفايات الحريق، فحص مهمات الوقاية، وتعيين مراقب حريق (Fire Watch).',
+    status: 'pending', // 'pending', 'approved', 'rejected'
+    time: 'اليوم 09:30 ص'
+  },
+  {
+    id: 'PTW-LOTO-4412',
+    cardId: 'ptwCard_4412',
+    type: 'loto',
+    typeBadge: '⚡ عزل طاقة ولوحات (LOTO)',
+    typeClass: 'badge-warning',
+    title: 'عزل وإعادة تأهيل لوحة التوزيع الرئيسية MDB-02',
+    location: 'غرفة المحولات زون 01',
+    contractor: 'شنايدر إلكتريك / الصيانة الذاتية',
+    engineer: 'م. حسام النجار',
+    safetyNotes: 'تم تركيب أقفال العزل (Padlocks) وبطاقات التحذير وفحص انعدام الجهد تماماً.',
+    status: 'pending',
+    time: 'اليوم 10:15 ص'
+  }
+];
+
+window.renderPtwPermitsUI = function() {
+  const directorInbox = document.getElementById('directorPtwInbox');
+  const engineerList = document.getElementById('engineerPtwList');
+  const pendingBadge = document.getElementById('ptwPendingBadge');
+  const engBadge = document.getElementById('engPtwCountBadge');
+
+  const pendingCount = window._ptwPermits.filter(p => p.status === 'pending').length;
+  if (pendingBadge) pendingBadge.innerText = `${pendingCount} طلبات معلقة`;
+  if (engBadge) engBadge.innerText = `${window._ptwPermits.length} تصاريح`;
+
+  // 1. Render Director Inbox
+  if (directorInbox) {
+    directorInbox.innerHTML = '';
+    if (window._ptwPermits.length === 0) {
+      directorInbox.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 0.75rem; padding: 15px;">لا توجد تصاريح عمل حالية</div>';
+    } else {
+      window._ptwPermits.forEach(p => {
+        let actionButtonsHtml = '';
+        let statusBadgeHtml = '';
+
+        if (p.status === 'pending') {
+          statusBadgeHtml = `<span class="badge badge-warning" style="font-size: 0.65rem;">بانتظار الاعتماد</span>`;
+          actionButtonsHtml = `
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <button class="btn btn-primary" onclick="approveDirectorPtw('${p.id}')" style="flex: 1; background: #059669; border: none; font-size: 0.75rem; font-weight: 700; padding: 8px; cursor: pointer;">
+                <i class="fa-solid fa-circle-check"></i> موافقة واعتماد التصريح
+              </button>
+              <button class="btn" onclick="rejectDirectorPtw('${p.id}')" style="flex: 1; background: rgba(225,29,72,0.1); border: 1px solid rgba(225,29,72,0.3); color: #e11d48; font-size: 0.75rem; font-weight: 700; padding: 8px; cursor: pointer;">
+                <i class="fa-solid fa-circle-xmark"></i> رفض التصريح
+              </button>
+            </div>
+          `;
+        } else if (p.status === 'approved') {
+          statusBadgeHtml = `<span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-check"></i> معتمد HSE</span>`;
+          actionButtonsHtml = `
+            <div style="background: rgba(5, 150, 105, 0.08); border: 1px solid #059669; border-radius: 6px; padding: 6px 10px; font-size: 0.72rem; color: #059669; font-weight: 700;">
+              <i class="fa-solid fa-circle-check"></i> تم اعتماد التصريح وتفعيله مع أمن البوابات.
+            </div>
+          `;
+        } else {
+          statusBadgeHtml = `<span class="badge badge-danger" style="font-size: 0.65rem;"><i class="fa-solid fa-xmark"></i> مرفوض</span>`;
+          actionButtonsHtml = `
+            <div style="background: rgba(225, 29, 72, 0.08); border: 1px solid #e11d48; border-radius: 6px; padding: 6px 10px; font-size: 0.72rem; color: #e11d48; font-weight: 700;">
+              <i class="fa-solid fa-circle-xmark"></i> تم رفض التصريح وإعادته للمهندس للاستيفاء.
+            </div>
+          `;
+        }
+
+        directorInbox.innerHTML += `
+          <div class="ticket-item" id="ptwCard_${p.id}" style="background: #ffffff; border: 1px solid rgba(32,39,79,0.15); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span class="badge ${p.typeClass}" style="font-size: 0.68rem;">${p.typeBadge}</span>
+                  <span style="font-weight: 800; font-size: 0.8rem; color: #20274f;">#${p.id}</span>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 700; color: #20274f; margin-top: 4px;">
+                  ${p.title}
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">
+                  الموقع: <b>${p.location}</b> • المهندس مقدم الطلب: <b>${p.engineer}</b> • المقاول: <b>${p.contractor}</b> (${p.time})
+                </div>
+              </div>
+              ${statusBadgeHtml}
+            </div>
+
+            <div style="background: rgba(32,39,79,0.04); border-radius: 6px; padding: 6px 8px; font-size: 0.68rem; color: #334155;">
+              <i class="fa-solid fa-list-check"></i> <b>اشتراطات السلامة:</b> ${p.safetyNotes}
+            </div>
+
+            ${actionButtonsHtml}
+          </div>
+        `;
+      });
+    }
+  }
+
+  // 2. Render Engineer Screen List
+  if (engineerList) {
+    engineerList.innerHTML = '';
+    if (window._ptwPermits.length === 0) {
+      engineerList.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 0.75rem; padding: 10px;">لا توجد تصاريح صادرة</div>';
+    } else {
+      window._ptwPermits.forEach(p => {
+        let statusBadge = '';
+        if (p.status === 'pending') {
+          statusBadge = `<span class="badge badge-warning" style="font-size: 0.65rem;"><i class="fa-solid fa-hourglass-half"></i> بانتظار موافقة مدير القطاع</span>`;
+        } else if (p.status === 'approved') {
+          statusBadge = `<span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-check"></i> مصرح بالعمل (معتمد HSE)</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-danger" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-xmark"></i> مرفوض للاستيفاء</span>`;
+        }
+
+        engineerList.innerHTML += `
+          <div class="ticket-item" style="background: #ffffff; border-right: 4px solid ${p.status === 'approved' ? '#059669' : (p.status === 'rejected' ? '#e11d48' : '#d97706')}; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 800; font-size: 0.75rem; color: #20274f;">#${p.id} • ${p.typeBadge}</span>
+              ${statusBadge}
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #334155;">${p.title}</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted);">
+              الموقع: ${p.location} • المقاول: ${p.contractor}
+            </div>
+          </div>
+        `;
+      });
+    }
+  }
+};
+
+window.submitEngineerPtwRequest = function() {
+  const typeSelect = document.getElementById('ptwTypeSelect');
+  const typeVal = typeSelect?.value || 'hot_work';
+  const typeText = typeSelect?.options[typeSelect.selectedIndex]?.text || '🔥 أعمال حرارية (Hot Work)';
+  const title = document.getElementById('ptwTitleInput')?.value || 'طلب تصريح عمل حرج';
+  const location = document.getElementById('ptwLocationInput')?.value || 'محطة معالجة الصرف STP';
+  const contractor = document.getElementById('ptwContractorInput')?.value || 'فريق المقاولات المتخصص';
+  const engName = document.getElementById('engineerNameText')?.innerText || 'م. محمود عبد الفتاح';
+
+  const typeClassMap = {
+    'hot_work': 'badge-danger',
+    'loto': 'badge-warning',
+    'confined_space': 'badge-cyan',
+    'heights': 'badge-info',
+    'excavation': 'badge-warning'
+  };
+
+  const codePrefixMap = {
+    'hot_work': 'PTW-HOT',
+    'loto': 'PTW-LOTO',
+    'confined_space': 'PTW-CONF',
+    'heights': 'PTW-HGHT',
+    'excavation': 'PTW-EXCAV'
+  };
+
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  const ptwId = `${codePrefixMap[typeVal] || 'PTW'}-${randomNum}`;
+
+  const newPermit = {
+    id: ptwId,
+    cardId: `ptwCard_${randomNum}`,
+    type: typeVal,
+    typeBadge: typeText,
+    typeClass: typeClassMap[typeVal] || 'badge-danger',
+    title: title,
+    location: location,
+    contractor: contractor,
+    engineer: engName,
+    safetyNotes: 'تم التحقق من مهمات الوقاية PPE وتأمين منطقة العمل والتنسيق مع فريق السلامة.',
+    status: 'pending',
+    time: 'الآن'
+  };
+
+  window._ptwPermits.unshift(newPermit);
+  window.renderPtwPermitsUI();
+
+  // Close modal
+  const modal = document.getElementById('modalEngineerPtwRequest');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast(`🚀 تم إصدار طلب التصريح [${ptwId}] وتوجيهه فوراً لشاشة مدير القطاع الهندسي للاعتماد!`);
+  }
+};
+
+window.approveDirectorPtw = function(ptwId) {
+  const permit = window._ptwPermits.find(p => p.id === ptwId);
+  if (permit) {
+    permit.status = 'approved';
+    window.renderPtwPermitsUI();
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`✅ تم اعتماد وتفعيل تصريح العمل [${ptwId}] بنجاح وإخطار المهندس المشرف وأمن البوابات.`);
+    }
+  }
+};
+
+window.rejectDirectorPtw = function(ptwId) {
+  const permit = window._ptwPermits.find(p => p.id === ptwId);
+  if (permit) {
+    permit.status = 'rejected';
+    window.renderPtwPermitsUI();
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`❌ تم رفض تصريح العمل [${ptwId}] وإعادته لمهندس الموقع لاستيفاء الملاحظات.`);
+    }
+  }
+};
+
+window.submitEngineerGeneralMaintenanceOrder = function() {
+  const cat = document.getElementById('engTicketCategorySelect')?.value || 'كهروميكانيك';
+  const loc = document.getElementById('engTicketLocationInput')?.value || 'محطة التحلية الرئيسية RO';
+  const priority = document.getElementById('engTicketPrioritySelect')?.value || '3';
+  const desc = document.getElementById('engTicketDescInput')?.value || 'أمر صيانة عامة للمرافق';
+  const photoInput = document.getElementById('engTicketPhotoInput');
+
+  const engName = document.getElementById('engineerNameText')?.innerText || 'م. محمود عبد الفتاح';
+  const engTeam = window.app?.activeEngineerTeam?.teamName || 'MEP Team';
+  const maintenanceTeamId = window.app?.activeEngineerTeam?.teamId || 2;
+
+  const defaultPhotoMap = {
+    'كهروميكانيك': 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=300&q=80',
+    'معالجة الصرف': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
+    'مكافحة حريق': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
+    'كهرباء وطاقة': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+    'لاندسكيب وري': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80',
+    'مدني وإنشاءات': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=300&q=80'
+  };
+
+  const processOrder = (photoBase64) => {
+    const randomCode = Math.floor(1000 + Math.random() * 9000);
+    const newTicket = {
+      id: `ENG-${randomCode}`,
+      title: `${cat} - ${loc}`,
+      category: cat,
+      priority: priority,
+      requester: 'engineer',
+      requesterName: engName,
+      unit: loc,
+      phone: '01229988776',
+      email: 'engineer.site@domain.com',
+      details: desc,
+      status: 'قيد المراجعة وتكليف الفني',
+      statusHistory: [{ stage: 'قيد المراجعة وتكليف الفني', time: 'الآن' }],
+      photoBefore: photoBase64 || defaultPhotoMap[cat] || defaultPhotoMap['كهروميكانيك'],
+      maintenanceTeamId: maintenanceTeamId,
+      time: 'الآن',
+      createdAt: new Date().toISOString()
+    };
+
+    if (window.app) {
+      window.app.tickets.unshift(newTicket);
+      window.app.saveTicketsToStorage();
+      window.app.renderTickets();
+      if (typeof window.app.syncTicketToOdoo === 'function') {
+        window.app.syncTicketToOdoo(newTicket, '01229988776', engName);
+      }
+    }
+
+    // Close modal
+    const modal = document.getElementById('modalEngineerNewTicket');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`🚀 تم إصدار أمر الصيانة [#${newTicket.id}] بنجاح وتوجيهه لشاشة مدير الصيانة وأودو!`);
+    }
+  };
+
+  if (photoInput && photoInput.files && photoInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => processOrder(e.target.result);
+    reader.readAsDataURL(photoInput.files[0]);
+  } else {
+    processOrder(null);
+  }
+};
+
+window.openPlantInspectionModal = function(plantType) {
+  const modal = document.getElementById('modalPlantInspection');
+  const titleEl = document.getElementById('plantInspectModalTitle');
+  const subEl = document.getElementById('plantInspectModalSub');
+  const hiddenType = document.getElementById('plantInspectTypeHidden');
+  const fieldsContainer = document.getElementById('plantInspectDynamicFields');
+  
+  if (!modal || !fieldsContainer) return;
+  hiddenType.value = plantType;
+
+  const engName = document.getElementById('engineerNameText')?.innerText || 'م. محمود عبد الفتاح';
+  const engTeam = document.getElementById('engineerSpecialtySub')?.innerText || 'فريق الكهروميكانيك';
+  if (subEl) subEl.innerHTML = `المهندس الفاحص: <b>${engName}</b> • ${engTeam}`;
+
+  if (plantType === 'ro') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-droplet" style="color: #1b8f91;"></i> فحص وتسجيل قراءات محطة التحلية RO Plant';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">قراءة ضغط الأغشية والمضخات (Operating Pressure)</label>
+        <input type="text" id="inspectField1" class="form-control" value="7.4 Bar" style="font-weight: 800; color: #1b8f91;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">نسبة الملوحة (TDS ppm)</label>
+          <input type="text" id="inspectField2" class="form-control" value="195 PPM" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">معدل الإنتاج اليومي</label>
+          <input type="text" id="inspectField3" class="form-control" value="4,350 م³/يوم" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'stp') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-seedling" style="color: #059669;"></i> فحص وتسجيل قراءات محطة معالجة الصرف STP';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">نسبة كفاءة المعالجة الثلاثية (Treatment Efficiency)</label>
+        <input type="text" id="inspectField1" class="form-control" value="99%" style="font-weight: 800; color: #059669;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">نقاء مياه ري اللاندسكيب</label>
+          <input type="text" id="inspectField2" class="form-control" value="مطابق لمواصفات الري" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">معدل الضخ لشبكات الري</label>
+          <input type="text" id="inspectField3" class="form-control" value="1,850 م³/يوم" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'fls') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-fire-extinguisher" style="color: #e11d48;"></i> فحص واختبار شبكة طلمبات الحريق 12Bar';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">ضغط شبكة الحريق والبوستر (Network Pressure)</label>
+        <input type="text" id="inspectField1" class="form-control" value="12.2 Bar" style="font-weight: 800; color: #e11d48;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">جاهزية طلمبة الديزل/الجوكي</label>
+          <input type="text" id="inspectField2" class="form-control" value="جاهزية 100% تلقائي" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">منسوب خزان الحريق</label>
+          <input type="text" id="inspectField3" class="form-control" value="100% ممتلئ" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'electrical') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-bolt" style="color: #d97706;"></i> فحص محول الجهد المتوسط 04 وأكشاك البيلارات';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">نسبة الحمل الكهربائي الحالية (Load Percentage)</label>
+        <input type="text" id="inspectField1" class="form-control" value="71%" style="font-weight: 800; color: #d97706;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">درجة حرارة الزيت (°C)</label>
+          <input type="text" id="inspectField2" class="form-control" value="51°C طبيعي" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">استقرار جهد الفازات</label>
+          <input type="text" id="inspectField3" class="form-control" value="380V / 220V مستقر" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'landscape') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-seedling" style="color: #059669;"></i> فحص شبكات الري الأوتوماتيكية بالمحور الرئيسي';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">ضغط خطوط النوازل ومحابس السولينويد</label>
+        <input type="text" id="inspectField1" class="form-control" value="4.5 Bar" style="font-weight: 800; color: #059669;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">حالة طلمبات التسميد</label>
+          <input type="text" id="inspectField2" class="form-control" value="تعمل بكفاءة 100%" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">جدول الري المبرمج</label>
+          <input type="text" id="inspectField3" class="form-control" value="دورة ليلية 6:00 م" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'civil') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-cubes" style="color: #6366f1;"></i> فحص المماشي الخرسانية وفواصل التمدد والتشطيبات';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">حالة فواصل التمدد الإنشائية</label>
+        <input type="text" id="inspectField1" class="form-control" value="سليمة ولا يوجد هبوط" style="font-weight: 800; color: #6366f1;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">أرصفة البحيرات والمصدات</label>
+          <input type="text" id="inspectField2" class="form-control" value="عزل مائي سليم 100%" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">البرجولات والمظلات الخشبية</label>
+          <input type="text" id="inspectField3" class="form-control" value="مطابقة للمواصفات" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  }
+
+  modal.classList.add('active');
+  modal.style.display = 'flex';
+};
+
+window.submitPlantInspection = function() {
+  const hiddenType = document.getElementById('plantInspectTypeHidden')?.value || 'ro';
+  const f1 = document.getElementById('inspectField1')?.value || '';
+  const f2 = document.getElementById('inspectField2')?.value || '';
+  const f3 = document.getElementById('inspectField3')?.value || '';
+  const engName = document.getElementById('engineerNameText')?.innerText || 'م. محمود عبد الفتاح';
+  
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+  if (hiddenType === 'ro') {
+    const valEl = document.getElementById('scadaRoVal');
+    const subEl = document.getElementById('scadaRoSub');
+    const inspEl = document.getElementById('scadaRoInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(TDS ${f2.replace(/[^\d]/g, '') || '195'})</span>`;
+    if (subEl) subEl.innerText = `إنتاج ${f3}`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #1b8f91;"></i> فحص: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'stp') {
+    const valEl = document.getElementById('scadaStpVal');
+    const subEl = document.getElementById('scadaStpSub');
+    const inspEl = document.getElementById('scadaStpInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(كفاءة المعالجة)</span>`;
+    if (subEl) subEl.innerText = `ضخ مياه الري لشبكات اللاندسكيب (${f3})`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #059669;"></i> فحص: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'fls') {
+    const valEl = document.getElementById('scadaFireVal');
+    const subEl = document.getElementById('scadaFireSub');
+    const inspEl = document.getElementById('scadaFireInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(جاهزية 100%)</span>`;
+    if (subEl) subEl.innerText = `ضغط البوستر مستقر (${f2})`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #e11d48;"></i> فحص: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'electrical') {
+    const valEl = document.getElementById('scadaTransVal');
+    const subEl = document.getElementById('scadaTransSub');
+    const inspEl = document.getElementById('scadaTransInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #d97706;">(الحمل الحالي)</span>`;
+    if (subEl) subEl.innerText = `الحرارة ${f2}`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #d97706;"></i> فحص: <b>${engName}</b> (${timeStr})`;
+  }
+
+  // Close modal
+  const modal = document.getElementById('modalPlantInspection');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast('✅ تم توثيق تقرير الفحص اليومي بنجاح ومزامنة القراءات فوراً مع شاشة مدير القطاع الهندسي!');
+  }
+};
 
 window.switchMicroTab = function(tabKey) {
   const btnCars = document.getElementById('btnMicroCars');
@@ -9037,9 +9996,13 @@ window.switchMicroTab = function(tabKey) {
 };
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => window.app.init());
+  document.addEventListener('DOMContentLoaded', () => {
+    window.app.init();
+    if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+  });
 } else {
   window.app.init();
+  if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
 }
 
 
