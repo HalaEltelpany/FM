@@ -1,4 +1,4 @@
-/* 
+﻿/* 
   Ultimate FM - Application JavaScript Logic
   Coastal Cities & Commercial Malls Facility Management System
 */
@@ -51,7 +51,7 @@ class UltimateFMApp {
     this.canvas = null;
     this.ctx = null;
     this.isDrawing = false;
-    this.selectedPart = { name: 'كارتدج تكييف شارب', price: 850 };
+    this.selectedPart = { name: 'ÙƒØ§Ø±ØªØ¯Ø¬ ØªÙƒÙŠÙŠÙ Ø´Ø§Ø±Ø¨', price: 850 };
     
     // Smart Utility Meters State
     this.elecBalance = 342.50; // Homeowner Electricity
@@ -106,22 +106,22 @@ class UltimateFMApp {
 
     // 3 Warehouses Inventory List (Residential, Commercial, Assets)
     this.inventoryItems = [
-      // Warehouse 1: Residential (مخزن الملاك السكني)
-      { id: 1, name: 'خلاط مياه إيطالي 3/4 بوصة', warehouse: 'residential', qty: 15, price: 520, desc: 'سحب للملاك - سباكة' },
-      { id: 2, name: 'كارتدج تكييف شارب 2.25 حصان', warehouse: 'residential', qty: 8, price: 850, desc: 'سحب للملاك - تكييف' },
-      { id: 3, name: 'مفتاح إنارة جلاس تاتش ذكي', warehouse: 'residential', qty: 25, price: 120, desc: 'سحب للملاك - كهرباء' },
-      { id: 4, name: 'لوحة لمبات ليد غاطسة 12 وات', warehouse: 'residential', qty: 40, price: 95, desc: 'سحب للملاك - كهرباء' },
+      // Warehouse 1: Residential (Ù…Ø®Ø²Ù† Ø§Ù„Ù…Ù„Ø§Ùƒ Ø§Ù„Ø³ÙƒÙ†ÙŠ)
+      { id: 1, name: 'Ø®Ù„Ø§Ø· Ù…ÙŠØ§Ù‡ Ø¥ÙŠØ·Ø§Ù„ÙŠ 3/4 Ø¨ÙˆØµØ©', warehouse: 'residential', qty: 15, price: 520, desc: 'Ø³Ø­Ø¨ Ù„Ù„Ù…Ù„Ø§Ùƒ - Ø³Ø¨Ø§ÙƒØ©' },
+      { id: 2, name: 'ÙƒØ§Ø±ØªØ¯Ø¬ ØªÙƒÙŠÙŠÙ Ø´Ø§Ø±Ø¨ 2.25 Ø­ØµØ§Ù†', warehouse: 'residential', qty: 8, price: 850, desc: 'Ø³Ø­Ø¨ Ù„Ù„Ù…Ù„Ø§Ùƒ - ØªÙƒÙŠÙŠÙ' },
+      { id: 3, name: 'Ù…ÙØªØ§Ø­ Ø¥Ù†Ø§Ø±Ø© Ø¬Ù„Ø§Ø³ ØªØ§ØªØ´ Ø°ÙƒÙŠ', warehouse: 'residential', qty: 25, price: 120, desc: 'Ø³Ø­Ø¨ Ù„Ù„Ù…Ù„Ø§Ùƒ - ÙƒÙ‡Ø±Ø¨Ø§Ø¡' },
+      { id: 4, name: 'Ù„ÙˆØ­Ø© Ù„Ù…Ø¨Ø§Øª Ù„ÙŠØ¯ ØºØ§Ø·Ø³Ø© 12 ÙˆØ§Øª', warehouse: 'residential', qty: 40, price: 95, desc: 'Ø³Ø­Ø¨ Ù„Ù„Ù…Ù„Ø§Ùƒ - ÙƒÙ‡Ø±Ø¨Ø§Ø¡' },
 
-      // Warehouse 2: Commercial (مخزن المستأجرين التجاريين)
-      { id: 10, name: 'مروحة طرد مطابخ تجارية كينج', warehouse: 'commercial', qty: 4, price: 3200, desc: 'سحب للتجاري - تهوية ومطابخ' },
-      { id: 11, name: 'كابل كهرباء مسلح 3 فاز نحاس', warehouse: 'commercial', qty: 150, price: 450, desc: 'سحب للتجاري - كهرباء (سعر المتر)' },
-      { id: 12, name: 'محبس إغلاق غاز صناعي لولبي', warehouse: 'commercial', qty: 6, price: 1800, desc: 'سحب للتجاري - غاز وأمان المحلات' },
+      // Warehouse 2: Commercial (Ù…Ø®Ø²Ù† Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø±ÙŠÙ† Ø§Ù„ØªØ¬Ø§Ø±ÙŠÙŠÙ†)
+      { id: 10, name: 'Ù…Ø±ÙˆØ­Ø© Ø·Ø±Ø¯ Ù…Ø·Ø§Ø¨Ø® ØªØ¬Ø§Ø±ÙŠØ© ÙƒÙŠÙ†Ø¬', warehouse: 'commercial', qty: 4, price: 3200, desc: 'Ø³Ø­Ø¨ Ù„Ù„ØªØ¬Ø§Ø±ÙŠ - ØªÙ‡ÙˆÙŠØ© ÙˆÙ…Ø·Ø§Ø¨Ø®' },
+      { id: 11, name: 'ÙƒØ§Ø¨Ù„ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ù…Ø³Ù„Ø­ 3 ÙØ§Ø² Ù†Ø­Ø§Ø³', warehouse: 'commercial', qty: 150, price: 450, desc: 'Ø³Ø­Ø¨ Ù„Ù„ØªØ¬Ø§Ø±ÙŠ - ÙƒÙ‡Ø±Ø¨Ø§Ø¡ (Ø³Ø¹Ø± Ø§Ù„Ù…ØªØ±)' },
+      { id: 12, name: 'Ù…Ø­Ø¨Ø³ Ø¥ØºÙ„Ø§Ù‚ ØºØ§Ø² ØµÙ†Ø§Ø¹ÙŠ Ù„ÙˆÙ„Ø¨ÙŠ', warehouse: 'commercial', qty: 6, price: 1800, desc: 'Ø³Ø­Ø¨ Ù„Ù„ØªØ¬Ø§Ø±ÙŠ - ØºØ§Ø² ÙˆØ£Ù…Ø§Ù† Ø§Ù„Ù…Ø­Ù„Ø§Øª' },
 
-      // Warehouse 3: Assets & Utilities (مخزن أصول ومرافق القرية)
-      { id: 20, name: 'أغشية فلاتر تحلية محطة RO ممبرين', warehouse: 'assets', qty: 12, price: 7500, desc: 'أصول - محطة التحلية' },
-      { id: 21, name: 'عداد ضغط شبكة حريق هيدروليكي', warehouse: 'assets', qty: 5, price: 1400, desc: 'أصول - شبكة الحريق والسلامة' },
-      { id: 22, name: 'كلور سائل ومطهرات للبحيرات الكبرى', warehouse: 'assets', qty: 30, price: 650, desc: 'أصول - البحيرات وحمامات السباحة (عبوة 20 لتر)' },
-      { id: 23, name: 'مضخة غاطسة لمطهر الصرف محطة STP', warehouse: 'assets', qty: 3, price: 12500, desc: 'أصول - محطة معالجة الصرف الصحي' }
+      // Warehouse 3: Assets & Utilities (Ù…Ø®Ø²Ù† Ø£ØµÙˆÙ„ ÙˆÙ…Ø±Ø§ÙÙ‚ Ø§Ù„Ù‚Ø±ÙŠØ©)
+      { id: 20, name: 'Ø£ØºØ´ÙŠØ© ÙÙ„Ø§ØªØ± ØªØ­Ù„ÙŠØ© Ù…Ø­Ø·Ø© RO Ù…Ù…Ø¨Ø±ÙŠÙ†', warehouse: 'assets', qty: 12, price: 7500, desc: 'Ø£ØµÙˆÙ„ - Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ©' },
+      { id: 21, name: 'Ø¹Ø¯Ø§Ø¯ Ø¶ØºØ· Ø´Ø¨ÙƒØ© Ø­Ø±ÙŠÙ‚ Ù‡ÙŠØ¯Ø±ÙˆÙ„ÙŠÙƒÙŠ', warehouse: 'assets', qty: 5, price: 1400, desc: 'Ø£ØµÙˆÙ„ - Ø´Ø¨ÙƒØ© Ø§Ù„Ø­Ø±ÙŠÙ‚ ÙˆØ§Ù„Ø³Ù„Ø§Ù…Ø©' },
+      { id: 22, name: 'ÙƒÙ„ÙˆØ± Ø³Ø§Ø¦Ù„ ÙˆÙ…Ø·Ù‡Ø±Ø§Øª Ù„Ù„Ø¨Ø­ÙŠØ±Ø§Øª Ø§Ù„ÙƒØ¨Ø±Ù‰', warehouse: 'assets', qty: 30, price: 650, desc: 'Ø£ØµÙˆÙ„ - Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ­Ù…Ø§Ù…Ø§Øª Ø§Ù„Ø³Ø¨Ø§Ø­Ø© (Ø¹Ø¨ÙˆØ© 20 Ù„ØªØ±)' },
+      { id: 23, name: 'Ù…Ø¶Ø®Ø© ØºØ§Ø·Ø³Ø© Ù„Ù…Ø·Ù‡Ø± Ø§Ù„ØµØ±Ù Ù…Ø­Ø·Ø© STP', warehouse: 'assets', qty: 3, price: 12500, desc: 'Ø£ØµÙˆÙ„ - Ù…Ø­Ø·Ø© Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµØ±Ù Ø§Ù„ØµØ­ÙŠ' }
     ];
 
     this.init();
@@ -149,10 +149,8 @@ class UltimateFMApp {
       try { this.initSplashScreen(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.loadTicketsFromStorage(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.syncTicketsFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
-      try { this.renderEngineerTickets(); } catch (e) { console.warn('[Init warning]:', e); }
-      try { this.renderEngineerPtws(); } catch (e) { console.warn('[Init warning]:', e); }
-      try { this.renderDirectorPtwApprovals(); } catch (e) { console.warn('[Init warning]:', e); }
 
       // Start cleanly on the main role selection grid so all 10 screens are accessible, or execute pending click
       try {
@@ -272,7 +270,7 @@ class UltimateFMApp {
     if (btnSaveRo) {
       btnSaveRo.addEventListener('click', () => {
         this.closeModal('modalRoChecklist');
-        this.showToast('تم حفظ واعتماد تقرير فحص محطة التحلية RO بنجاح!');
+        this.showToast('ØªÙ… Ø­ÙØ¸ ÙˆØ§Ø¹ØªÙ…Ø§Ø¯ ØªÙ‚Ø±ÙŠØ± ÙØ­Øµ Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ© RO Ø¨Ù†Ø¬Ø§Ø­!');
       });
     }
 
@@ -325,8 +323,8 @@ class UltimateFMApp {
     if (btnBroadcast) {
       btnBroadcast.addEventListener('click', () => {
         const input = document.getElementById('broadcastMsgInput');
-        const msg = input ? input.value : 'تنبيه طوارئ';
-        this.showToast(`📢 تم إرسال الإخطار لجميع الملاك:\n"${msg}"`);
+        const msg = input ? input.value : 'ØªÙ†Ø¨ÙŠÙ‡ Ø·ÙˆØ§Ø±Ø¦';
+        this.showToast(`ðŸ“¢ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¥Ø®Ø·Ø§Ø± Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù„Ø§Ùƒ:\n"${msg}"`);
       });
     }
 
@@ -335,7 +333,7 @@ class UltimateFMApp {
     if (btnUnitPermit) {
       btnUnitPermit.addEventListener('click', () => {
         const code = Math.floor(100000 + Math.random() * 900000);
-        this.showToast(`🔑 تم إصدار كود دخول الوحدة (فيلا 104) بنجاح!\nرمز الدخول المؤقت: ${code}\nصالح لمدة 24 ساعة فقط على البوابات.`);
+        this.showToast(`ðŸ”‘ ØªÙ… Ø¥ØµØ¯Ø§Ø± ÙƒÙˆØ¯ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø© (ÙÙŠÙ„Ø§ 104) Ø¨Ù†Ø¬Ø§Ø­!\nØ±Ù…Ø² Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ø¤Ù‚Øª: ${code}\nØµØ§Ù„Ø­ Ù„Ù…Ø¯Ø© 24 Ø³Ø§Ø¹Ø© ÙÙ‚Ø· Ø¹Ù„Ù‰ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª.`);
       });
     }
 
@@ -365,7 +363,7 @@ class UltimateFMApp {
     if (btnCargoPermit) {
       btnCargoPermit.addEventListener('click', () => {
         const title = document.getElementById('cargoModalTitle');
-        if (title) title.innerHTML = '<i class="fa-solid fa-truck"></i> تصريح سيارات بضائع وتوريد';
+        if (title) title.innerHTML = '<i class="fa-solid fa-truck"></i> ØªØµØ±ÙŠØ­ Ø³ÙŠØ§Ø±Ø§Øª Ø¨Ø¶Ø§Ø¦Ø¹ ÙˆØªÙˆØ±ÙŠØ¯';
         this.openModal('modalCargoPermit');
       });
     }
@@ -374,7 +372,7 @@ class UltimateFMApp {
     if (btnGoodsPermit) {
       btnGoodsPermit.addEventListener('click', () => {
         const title = document.getElementById('cargoModalTitle');
-        if (title) title.innerHTML = '<i class="fa-solid fa-box-open"></i> تصريح خروج منقولات ومعدات';
+        if (title) title.innerHTML = '<i class="fa-solid fa-box-open"></i> ØªØµØ±ÙŠØ­ Ø®Ø±ÙˆØ¬ Ù…Ù†Ù‚ÙˆÙ„Ø§Øª ÙˆÙ…Ø¹Ø¯Ø§Øª';
         this.openModal('modalCargoPermit');
       });
     }
@@ -412,6 +410,10 @@ class UltimateFMApp {
     if (phoneNav) phoneNav.style.setProperty('display', 'none', 'important');
   }
 
+  quickLogin(role) {
+    this.executeLogin(role === 'owner' ? 'homeowner' : role);
+  }
+
   switchRole(role) {
     if (role === 'grid' || role === 'login') {
       this.showRoleGrid();
@@ -423,7 +425,7 @@ class UltimateFMApp {
     // Remove any dynamic logout header
     document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
 
-    // Update role buttons UI if present
+    // Update role buttons UI
     document.querySelectorAll('#roleSelector .role-btn').forEach(btn => {
       if (btn.getAttribute('data-role') === role) {
         btn.classList.add('active');
@@ -439,8 +441,8 @@ class UltimateFMApp {
     });
     
     const targetMap = {
-      'owner': 'viewHomeowner',
       'homeowner': 'viewHomeowner',
+      'owner': 'viewHomeowner',
       'family': 'viewHomeowner', // Both map to the homeowner view panel
       'engineer': 'viewEngineer',
       'engineering_director': 'viewEngineeringDirector',
@@ -450,7 +452,8 @@ class UltimateFMApp {
       'commercial': 'viewCommercial',
       'admin': 'viewAdmin',
       'security': 'viewSecurity',
-      'housekeeping': 'viewHousekeeping'
+      'housekeeping': 'viewHousekeeping',
+      'landscaping': 'viewLandscaping'
     };
 
     const targetId = targetMap[role] || 'viewHomeowner';
@@ -468,9 +471,7 @@ class UltimateFMApp {
 
     // Render lists on role switch
     this.renderHousekeeping();
-    this.renderEngineerPtws();
-    this.renderDirectorPtwApprovals();
-    this.renderEngineerTickets();
+    this.renderLandscaping();
 
     // Toggle Owner-Only Financial details visibility dynamically
     const financialElements = document.querySelectorAll('.owner-only-financial');
@@ -489,36 +490,45 @@ class UltimateFMApp {
 
     if (role === 'family') {
       if (ownerTitle) {
-        ownerTitle.innerText = this.currentLang === 'en' ? 'Yasmin Ahmed (Family Member)' : 'ياسمين أحمد (تابع للمالك)';
+        ownerTitle.innerText = this.currentLang === 'en' ? 'Yasmin Ahmed (Family Member)' : 'ÙŠØ§Ø³Ù…ÙŠÙ† Ø£Ø­Ù…Ø¯ (ØªØ§Ø¨Ø¹ Ù„Ù„Ù…Ø§Ù„Ùƒ)';
       }
       if (ownerCardBadge) {
         ownerCardBadge.innerHTML = this.currentLang === 'en' 
           ? '<i class="fa-solid fa-user-shield"></i> Family Account (Restricted)' 
-          : '<i class="fa-solid fa-user-shield"></i> حساب تابع (محدود)';
+          : '<i class="fa-solid fa-user-shield"></i> Ø­Ø³Ø§Ø¨ ØªØ§Ø¨Ø¹ (Ù…Ø­Ø¯ÙˆØ¯)';
         ownerCardBadge.className = 'badge badge-info';
       }
       if (ownerCardSubtitle) {
         ownerCardSubtitle.innerText = this.currentLang === 'en' 
-          ? 'Villa 104 - North Coast Zone • Associated to Main Owner' 
-          : 'فيلا 104 - زون الساحل الشمالي • تابع للمالك الأساسي';
+          ? 'Villa 104 - North Coast Zone â€¢ Associated to Main Owner' 
+          : 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ â€¢ ØªØ§Ø¨Ø¹ Ù„Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ';
       }
-    } else if (role === 'homeowner' || role === 'owner') {
+    } else if (role === 'homeowner') {
       this.updateHomeownerNameUI();
       if (ownerCardBadge) {
         ownerCardBadge.innerHTML = this.currentLang === 'en' 
           ? '<i class="fa-solid fa-check"></i> Verified Account' 
-          : '<i class="fa-solid fa-check"></i> حساب مؤكد';
+          : '<i class="fa-solid fa-check"></i> Ø­Ø³Ø§Ø¨ Ù…Ø¤ÙƒØ¯';
         ownerCardBadge.className = 'badge badge-success';
       }
       if (ownerCardSubtitle) {
         ownerCardSubtitle.innerText = this.currentLang === 'en' 
           ? 'Villa 104 - North Coast Zone' 
-          : 'فيلا 104 - زون الساحل الشمالي';
+          : 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ';
       }
     }
 
-    const backBtn = document.getElementById('btnBackToRoleGrid');
-    if (backBtn) backBtn.style.display = 'inline-flex';
+    if (role === 'engineer') {
+      const engSelect = document.getElementById('engineerSpecialtySelect');
+      const val = engSelect ? engSelect.value : 'mep';
+      this.handleSpecialtyChange(val);
+      if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+    } else if (role === 'engineering_director') {
+      if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+    }
+
+    // Render screen logout header inside active view
+    this.renderLogoutHeader();
   }
 
   openCommercialMeterModal() {
@@ -526,36 +536,36 @@ class UltimateFMApp {
     const typeSelect = document.getElementById('meterTypeSelect');
     if (typeSelect) {
       typeSelect.innerHTML = `
-        <option value="electricity">⚡ عداد الكهرباء التجاري (#EL-COMM-12 - شريحة تجارية)</option>
-        <option value="water">💧 عداد المياه التجاري (#WT-COMM-12 - مستثمر تجاري)</option>
+        <option value="electricity">âš¡ Ø¹Ø¯Ø§Ø¯ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ (#EL-COMM-12 - Ø´Ø±ÙŠØ­Ø© ØªØ¬Ø§Ø±ÙŠØ©)</option>
+        <option value="water">ðŸ’§ Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù…ÙŠØ§Ù‡ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ (#WT-COMM-12 - Ù…Ø³ØªØ«Ù…Ø± ØªØ¬Ø§Ø±ÙŠ)</option>
       `;
     }
   }
 
   submitStaffPermit() {
-    const name = document.getElementById('staffNameInput')?.value || 'موظف جديد';
-    const job = document.getElementById('staffJobInput')?.value || 'عامل نشاط';
+    const name = document.getElementById('staffNameInput')?.value || 'Ù…ÙˆØ¸Ù Ø¬Ø¯ÙŠØ¯';
+    const job = document.getElementById('staffJobInput')?.value || 'Ø¹Ø§Ù…Ù„ Ù†Ø´Ø§Ø·';
     const ins = document.getElementById('staffInsuranceInput')?.value || '#INS-80941';
 
     this.closeModal('modalStaffPermit');
-    this.showToast(`✅ تم توقيع وتأكيد تصريح عمل الموظف (${name}) بنجاح!\nالمسمّى: ${job}\nرقم الملف التأميني للدولة: ${ins}\nتم إصدار كود دخول البوابات الإلكترونية.`);
+    this.showToast(`âœ… ØªÙ… ØªÙˆÙ‚ÙŠØ¹ ÙˆØªØ£ÙƒÙŠØ¯ ØªØµØ±ÙŠØ­ Ø¹Ù…Ù„ Ø§Ù„Ù…ÙˆØ¸Ù (${name}) Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ù…Ø³Ù…Ù‘Ù‰: ${job}\nØ±Ù‚Ù… Ø§Ù„Ù…Ù„Ù Ø§Ù„ØªØ£Ù…ÙŠÙ†ÙŠ Ù„Ù„Ø¯ÙˆÙ„Ø©: ${ins}\nØªÙ… Ø¥ØµØ¯Ø§Ø± ÙƒÙˆØ¯ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ©.`);
   }
 
   submitCargoPermit() {
-    const desc = document.getElementById('cargoDescInput')?.value || 'شحنة تجارية';
-    const driver = document.getElementById('cargoDriverInput')?.value || 'سائق التوريد';
+    const desc = document.getElementById('cargoDescInput')?.value || 'Ø´Ø­Ù†Ø© ØªØ¬Ø§Ø±ÙŠØ©';
+    const driver = document.getElementById('cargoDriverInput')?.value || 'Ø³Ø§Ø¦Ù‚ Ø§Ù„ØªÙˆØ±ÙŠØ¯';
     const code = Math.floor(100000 + Math.random() * 900000);
 
     this.closeModal('modalCargoPermit');
-    this.showToast(`🚚 تم إصدار تصريح البضائع/المنقولات بنجاح!\nالشحنة: ${desc}\nالسائق: ${driver}\nرمز QR الأمان للبوابة: ${code}`);
+    this.showToast(`ðŸšš ØªÙ… Ø¥ØµØ¯Ø§Ø± ØªØµØ±ÙŠØ­ Ø§Ù„Ø¨Ø¶Ø§Ø¦Ø¹/Ø§Ù„Ù…Ù†Ù‚ÙˆÙ„Ø§Øª Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ø´Ø­Ù†Ø©: ${desc}\nØ§Ù„Ø³Ø§Ø¦Ù‚: ${driver}\nØ±Ù…Ø² QR Ø§Ù„Ø£Ù…Ø§Ù† Ù„Ù„Ø¨ÙˆØ§Ø¨Ø©: ${code}`);
   }
 
   requestWasteRemoval() {
-    this.showToast('🗑️ تم رفع طلب التخلص البيئي والمخلفات التجارية لقسم النظافة بالقرية والمول.\nسيتم التوجه للمحل خلال 30 دقيقة.');
+    this.showToast('ðŸ—‘ï¸ ØªÙ… Ø±ÙØ¹ Ø·Ù„Ø¨ Ø§Ù„ØªØ®Ù„Øµ Ø§Ù„Ø¨ÙŠØ¦ÙŠ ÙˆØ§Ù„Ù…Ø®Ù„ÙØ§Øª Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ© Ù„Ù‚Ø³Ù… Ø§Ù„Ù†Ø¸Ø§ÙØ© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ© ÙˆØ§Ù„Ù…ÙˆÙ„.\nØ³ÙŠØªÙ… Ø§Ù„ØªÙˆØ¬Ù‡ Ù„Ù„Ù…Ø­Ù„ Ø®Ù„Ø§Ù„ 30 Ø¯Ù‚ÙŠÙ‚Ø©.');
   }
 
   openSecurityComplaints() {
-    this.showToast('👮 تم فتح قناة التنسيق الأمنية واستقبال الشكاوى المتبادلة بين الملاك والمحل التجاري.');
+    this.showToast('ðŸ‘® ØªÙ… ÙØªØ­ Ù‚Ù†Ø§Ø© Ø§Ù„ØªÙ†Ø³ÙŠÙ‚ Ø§Ù„Ø£Ù…Ù†ÙŠØ© ÙˆØ§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø´ÙƒØ§ÙˆÙ‰ Ø§Ù„Ù…ØªØ¨Ø§Ø¯Ù„Ø© Ø¨ÙŠÙ† Ø§Ù„Ù…Ù„Ø§Ùƒ ÙˆØ§Ù„Ù…Ø­Ù„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ.');
   }
 
   handleSpecialtyChange(specialtyKey) {
@@ -563,121 +573,135 @@ class UltimateFMApp {
     const subEl = document.getElementById('engineerSpecialtySub');
     const listEl = document.getElementById('engineerChecklistsList');
 
-    // 5 Specialized Engineering Teams (Mapped to maintenance.team IDs 2, 3, 5, 6, 7)
+    // 5 Specialized Engineering Teams (Mapped to Odoo maintenance.team IDs 2, 3, 5, 6, 7)
     const teamsConfig = {
       'mep': {
-        name: 'م. محمود عبد الفتاح',
-        sub: '❄️ مهندس الكهروميكانيك والتكييف والمحطات المركزية',
+        name: 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­',
+        sub: 'â„ï¸ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ ÙˆØ§Ù„ØªÙƒÙŠÙŠÙ ÙˆØ§Ù„Ù…Ø­Ø·Ø§Øª (Odoo Team #2)',
         teamId: 2,
-        teamName: 'فريق الكهروميكانيك والتكييف (MEP)',
+        teamName: 'MEP Team',
         checklists: [
           {
-            title: 'محطة التحلية الرئيسية (RO Plant)',
-            desc: 'فحص ضغط الأغشية، نسبة الكلور والملوحة اليومية',
-            actionBtn: 'openModal(\'modalRoChecklist\')',
-            status: 'فحص دوري مطلوب'
+            id: 'chk_ro',
+            title: 'Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© (RO Plant)',
+            desc: 'ÙØ­Øµ Ø¶ØºØ· Ø§Ù„Ø£ØºØ´ÙŠØ©ØŒ Ù†Ø³Ø¨Ø© Ø§Ù„ÙƒÙ„ÙˆØ± ÙˆØ§Ù„Ù…Ù„ÙˆØ­Ø© Ø§Ù„ÙŠÙˆÙ…ÙŠØ©',
+            actionBtn: 'openPlantInspectionModal(\'ro\')',
+            status: 'ÙØ­Øµ Ø¯ÙˆØ±ÙŠ Ù…Ø·Ù„ÙˆØ¨'
           },
           {
-            title: 'محطة معالجة الصرف (STP Plant)',
-            desc: 'فحص طلمبات الهواء، نسبة الأكسجين ونقاء المياه المعالجة',
-            status: 'مطابق للمواصفات'
+            id: 'chk_stp',
+            title: 'Ù…Ø­Ø·Ø© Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµØ±Ù (STP Plant)',
+            desc: 'ÙØ­Øµ Ø·Ù„Ù…Ø¨Ø§Øª Ø§Ù„Ù‡ÙˆØ§Ø¡ØŒ Ù†Ø³Ø¨Ø© Ø§Ù„Ø£ÙƒØ³Ø¬ÙŠÙ† ÙˆÙ†Ù‚Ø§Ø¡ Ù…ÙŠØ§Ù‡ Ø±ÙŠ Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨',
+            actionBtn: 'openPlantInspectionModal(\'stp\')',
+            status: 'ÙØ­Øµ Ø¯ÙˆØ±ÙŠ Ù…Ø·Ù„ÙˆØ¨'
           },
           {
-            title: 'محطة طلمبات الرفع وغرف التبريد المركزي',
-            desc: 'فحص ضغط خطوط الطرد والفريون والضواغط',
-            status: 'مكتمل اليوم'
+            id: 'chk_chiller',
+            title: 'Ù…Ø­Ø·Ø© Ø·Ù„Ù…Ø¨Ø§Øª Ø§Ù„Ø±ÙØ¹ ÙˆØºØ±Ù Ø§Ù„ØªØ¨Ø±ÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ',
+            desc: 'ÙØ­Øµ Ø¶ØºØ· Ø®Ø·ÙˆØ· Ø§Ù„Ø·Ø±Ø¯ ÙˆØ§Ù„ÙØ±ÙŠÙˆÙ† ÙˆØ§Ù„Ø¶ÙˆØ§ØºØ·',
+            status: 'Ù…ÙƒØªÙ…Ù„ Ø§Ù„ÙŠÙˆÙ…'
           }
         ]
       },
       'fls': {
-        name: 'م. خالد السعدني',
-        sub: '🔥 مهندس السلامة وأنظمة مكافحة الحريق والإنذار',
+        name: 'Ù…. Ø®Ø§Ù„Ø¯ Ø§Ù„Ø³Ø¹Ø¯Ù†ÙŠ',
+        sub: 'ðŸ”¥ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ø³Ù„Ø§Ù…Ø© ÙˆØ£Ù†Ø¸Ù…Ø© Ù…ÙƒØ§ÙØ­Ø© Ø§Ù„Ø­Ø±ÙŠÙ‚ (Odoo Team #3)',
         teamId: 3,
-        teamName: 'فريق السلامة ومكافحة الحريق (FLS)',
+        teamName: 'FLS Team',
         checklists: [
           {
-            title: 'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي)',
-            desc: 'اختبار ضغط الشبكة عند 12 Bar وبدء التشغيل التلقائي',
-            status: 'فحص أسبوعي إجباري'
+            id: 'chk_fls',
+            title: 'Ù…Ø¶Ø®Ø§Øª Ø§Ù„Ø­Ø±ÙŠÙ‚ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© (Ø¯ÙŠØ²Ù„ / ÙƒÙ‡Ø±Ø¨Ø§Ø¡ / Ø¨ÙˆØ³ØªØ±)',
+            desc: 'Ø§Ø®ØªØ¨Ø§Ø± Ø¶ØºØ· Ø§Ù„Ø´Ø¨ÙƒØ© Ø¹Ù†Ø¯ 12 Bar ÙˆØ¨Ø¯Ø¡ Ø§Ù„ØªØ´ØºÙŠÙ„ Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ',
+            actionBtn: 'openPlantInspectionModal(\'fls\')',
+            status: 'ÙØ­Øµ Ø£Ø³Ø¨ÙˆØ¹ÙŠ Ø¥Ø¬Ø¨Ø§Ø±ÙŠ'
           },
           {
-            title: 'لوحة الإنذار المركزية ومحابس كشف السريان OS&Y',
-            desc: 'اختبار كواشف الدخان وحساسات الضغط في زون 1 و 2',
-            status: 'مكتمل وجاهز'
+            id: 'chk_alarm',
+            title: 'Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ù†Ø°Ø§Ø± Ø§Ù„Ù…Ø±ÙƒØ²ÙŠØ© ÙˆÙ…Ø­Ø§Ø¨Ø³ ÙƒØ´Ù Ø§Ù„Ø³Ø±ÙŠØ§Ù† OS&Y',
+            desc: 'Ø§Ø®ØªØ¨Ø§Ø± ÙƒÙˆØ§Ø´Ù Ø§Ù„Ø¯Ø®Ø§Ù† ÙˆØ­Ø³Ø§Ø³Ø§Øª Ø§Ù„Ø¶ØºØ· ÙÙŠ Ø²ÙˆÙ† 1 Ùˆ 2',
+            status: 'Ù…ÙƒØªÙ…Ù„ ÙˆØ¬Ø§Ù‡Ø²'
           },
           {
-            title: 'صناديق الحريق ورشاشات الإطفاء بالمول والممرات',
-            desc: 'فحص خراطيم الإطفاء وسلامة البوابات ومخارج الطوارئ',
-            status: 'مطابق للكود'
+            id: 'chk_hose',
+            title: 'ØµÙ†Ø§Ø¯ÙŠÙ‚ Ø§Ù„Ø­Ø±ÙŠÙ‚ ÙˆØ±Ø´Ø§Ø´Ø§Øª Ø§Ù„Ø¥Ø·ÙØ§Ø¡ Ø¨Ø§Ù„Ù…ÙˆÙ„ ÙˆØ§Ù„Ù…Ù…Ø±Ø§Øª',
+            desc: 'ÙØ­Øµ Ø®Ø±Ø§Ø·ÙŠÙ… Ø§Ù„Ø¥Ø·ÙØ§Ø¡ ÙˆØ³Ù„Ø§Ù…Ø© Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª ÙˆÙ…Ø®Ø§Ø±Ø¬ Ø§Ù„Ø·ÙˆØ§Ø±Ø¦',
+            status: 'Ù…Ø·Ø§Ø¨Ù‚ Ù„Ù„ÙƒÙˆØ¯'
           }
         ]
       },
       'electrical': {
-        name: 'م. حسام النجار',
-        sub: '⚡ مهندس الكهرباء والطاقة والمحولات ومولدات الطوارئ',
+        name: 'Ù…. Ø­Ø³Ø§Ù… Ø§Ù„Ù†Ø¬Ø§Ø±',
+        sub: 'âš¡ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ§Ù„Ø·Ø§Ù‚Ø© ÙˆØ§Ù„Ù…Ø­ÙˆÙ„Ø§Øª (Odoo Team #5)',
         teamId: 5,
-        teamName: 'فريق الكهرباء والمحولات (Electrical)',
+        teamName: 'Electrical Team',
         checklists: [
           {
-            title: 'محول الجهد المتوسط 04 وأكشاك البيلارات',
-            desc: 'اختبار حرارة الزيت، العزل الكهربائي، وجهد الفازات',
-            status: 'مكتمل اليوم'
+            id: 'chk_trans',
+            title: 'Ù…Ø­ÙˆÙ„ Ø§Ù„Ø¬Ù‡Ø¯ Ø§Ù„Ù…ØªÙˆØ³Ø· 04 ÙˆØ£ÙƒØ´Ø§Ùƒ Ø§Ù„Ø¨ÙŠÙ„Ø§Ø±Ø§Øª',
+            desc: 'Ø§Ø®ØªØ¨Ø§Ø± Ø­Ø±Ø§Ø±Ø© Ø§Ù„Ø²ÙŠØªØŒ Ø§Ù„Ø¹Ø²Ù„ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠØŒ ÙˆÙ†Ø³Ø¨Ø© Ø§Ù„Ø­Ù…Ù„',
+            actionBtn: 'openPlantInspectionModal(\'electrical\')',
+            status: 'ÙØ­Øµ ÙŠÙˆÙ…ÙŠ Ù…Ø·Ù„ÙˆØ¨'
           },
           {
-            title: 'لوحات التوزيع العمومية MDBs ومولدات الطوارئ',
-            desc: 'فحص القواطع الذكية ومستوى الديزل للمولد الرئيسي',
-            status: 'جاهزية 100%'
+            id: 'chk_mdb',
+            title: 'Ù„ÙˆØ­Ø§Øª Ø§Ù„ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø¹Ù…ÙˆÙ…ÙŠØ© MDBs ÙˆÙ…ÙˆÙ„Ø¯Ø§Øª Ø§Ù„Ø·ÙˆØ§Ø±Ø¦',
+            desc: 'ÙØ­Øµ Ø§Ù„Ù‚ÙˆØ§Ø·Ø¹ Ø§Ù„Ø°ÙƒÙŠØ© ÙˆÙ…Ø³ØªÙˆÙ‰ Ø§Ù„Ø¯ÙŠØ²Ù„ Ù„Ù„Ù…ÙˆÙ„Ø¯ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+            status: 'Ø¬Ø§Ù‡Ø²ÙŠØ© 100%'
           },
           {
-            title: 'شبكة الإنارة العامة وأعمدة الممشى والشاطئ',
-            desc: 'اختبار المؤقتات الزمنية وخلايا الفوتوسيل الذكية',
-            status: 'قيد التفتيش'
+            id: 'chk_light',
+            title: 'Ø´Ø¨ÙƒØ© Ø§Ù„Ø¥Ù†Ø§Ø±Ø© Ø§Ù„Ø¹Ø§Ù…Ø© ÙˆØ£Ø¹Ù…Ø¯Ø© Ø§Ù„Ù…Ù…Ø´Ù‰ ÙˆØ§Ù„Ø´Ø§Ø·Ø¦',
+            desc: 'Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ù…Ø¤Ù‚ØªØ§Øª Ø§Ù„Ø²Ù…Ù†ÙŠØ© ÙˆØ®Ù„Ø§ÙŠØ§ Ø§Ù„ÙÙˆØªÙˆØ³ÙŠÙ„ Ø§Ù„Ø°ÙƒÙŠØ©',
+            status: 'Ù‚ÙŠØ¯ Ø§Ù„ØªÙØªÙŠØ´'
           }
         ]
       },
       'landscape': {
-        name: 'م. طارق عبد المجيد',
-        sub: '🌿 مهندس اللاندسكيب والزراعة وشبكات الري الأوتوماتيكية',
+        name: 'Ù…. Ø·Ø§Ø±Ù‚ Ø¹Ø¨Ø¯ Ø§Ù„Ù…Ø¬ÙŠØ¯',
+        sub: 'ðŸŒ¿ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ§Ù„Ø²Ø±Ø§Ø¹Ø© ÙˆØ´Ø¨ÙƒØ§Øª Ø§Ù„Ø±ÙŠ (Odoo Team #6)',
         teamId: 6,
-        teamName: 'فريق اللاندسكيب والزراعة (Landscape)',
+        teamName: 'Landscaping & Agriculture Team',
         checklists: [
           {
-            title: 'شبكات الري الأوتوماتيكية بالمحور الرئيسي',
-            desc: 'فحص ضغط النوازل، محابس السولينويد، وجداول الضخ',
-            status: 'يعمل بكفاءة'
+            title: 'Ø´Ø¨ÙƒØ§Øª Ø§Ù„Ø±ÙŠ Ø§Ù„Ø£ÙˆØªÙˆÙ…Ø§ØªÙŠÙƒÙŠØ© Ø¨Ø§Ù„Ù…Ø­ÙˆØ± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+            desc: 'ÙØ­Øµ Ø¶ØºØ· Ø§Ù„Ù†ÙˆØ§Ø²Ù„ØŒ Ù…Ø­Ø§Ø¨Ø³ Ø§Ù„Ø³ÙˆÙ„ÙŠÙ†ÙˆÙŠØ¯ØŒ ÙˆØ¬Ø¯Ø§ÙˆÙ„ Ø§Ù„Ø¶Ø®',
+            actionBtn: 'openPlantInspectionModal(\'landscape\')',
+            status: 'ÙØ­Øµ Ø¯ÙˆØ±ÙŠ Ù…Ø·Ù„ÙˆØ¨'
           },
           {
-            title: 'طلمبات التسميد وخزانات المغذيات المركزية',
-            desc: 'معايرة نسب التسميد واختبار نقاء خطوط التنقيط',
-            status: 'مكتمل اليوم'
+            title: 'Ø·Ù„Ù…Ø¨Ø§Øª Ø§Ù„ØªØ³Ù…ÙŠØ¯ ÙˆØ®Ø²Ø§Ù†Ø§Øª Ø§Ù„Ù…ØºØ°ÙŠØ§Øª Ø§Ù„Ù…Ø±ÙƒØ²ÙŠØ©',
+            desc: 'Ù…Ø¹Ø§ÙŠØ±Ø© Ù†Ø³Ø¨ Ø§Ù„ØªØ³Ù…ÙŠØ¯ ÙˆØ§Ø®ØªØ¨Ø§Ø± Ù†Ù‚Ø§Ø¡ Ø®Ø·ÙˆØ· Ø§Ù„ØªÙ†Ù‚ÙŠØ·',
+            status: 'Ù…ÙƒØªÙ…Ù„ Ø§Ù„ÙŠÙˆÙ…'
           },
           {
-            title: 'المسطحات الخضراء ومزروعات الشاطئ والحدائق',
-            desc: 'جدول التقليم الدوري ومكافحة الآفات الزراعية',
-            status: 'مجدول الأسبوع القادم'
+            title: 'Ø§Ù„Ù…Ø³Ø·Ø­Ø§Øª Ø§Ù„Ø®Ø¶Ø±Ø§Ø¡ ÙˆÙ…Ø²Ø±ÙˆØ¹Ø§Øª Ø§Ù„Ø´Ø§Ø·Ø¦ ÙˆØ§Ù„Ø­Ø¯Ø§Ø¦Ù‚',
+            desc: 'Ø¬Ø¯ÙˆÙ„ Ø§Ù„ØªÙ‚Ù„ÙŠÙ… Ø§Ù„Ø¯ÙˆØ±ÙŠ ÙˆÙ…ÙƒØ§ÙØ­Ø© Ø§Ù„Ø¢ÙØ§Øª Ø§Ù„Ø²Ø±Ø§Ø¹ÙŠØ©',
+            status: 'Ù…Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹ Ø§Ù„Ù‚Ø§Ø¯Ù…'
           }
         ]
       },
       'civil': {
-        name: 'م. ياسر الهواري',
-        sub: '🏗️ مهندس المدني والهياكل الإنشائية والتشطيبات والمماشي',
+        name: 'Ù…. ÙŠØ§Ø³Ø± Ø§Ù„Ù‡ÙˆØ§Ø±ÙŠ',
+        sub: 'ðŸ—ï¸ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…Ø¯Ù†ÙŠ ÙˆØ§Ù„Ù‡ÙŠØ§ÙƒÙ„ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¦ÙŠØ© ÙˆØ§Ù„ØªØ´Ø·ÙŠØ¨Ø§Øª (Odoo Team #7)',
         teamId: 7,
-        teamName: 'فريق المدني والإنشاءات (Civil)',
+        teamName: 'Civil & Structural Team',
         checklists: [
           {
-            title: 'المماشي الخرسانية والإنترلوك والمحاور الرئيسية',
-            desc: 'فحص فواصل التمدد والتأكد من عدم وجود هبوط أرضي',
-            status: 'سليم وجاهز'
+            title: 'Ø§Ù„Ù…Ù…Ø§Ø´ÙŠ Ø§Ù„Ø®Ø±Ø³Ø§Ù†ÙŠØ© ÙˆØ§Ù„Ø¥Ù†ØªØ±Ù„ÙˆÙƒ ÙˆØ§Ù„Ù…Ø­Ø§ÙˆØ± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©',
+            desc: 'ÙØ­Øµ ÙÙˆØ§ØµÙ„ Ø§Ù„ØªÙ…Ø¯Ø¯ ÙˆØ§Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ø¹Ø¯Ù… ÙˆØ¬ÙˆØ¯ Ù‡Ø¨ÙˆØ· Ø£Ø±Ø¶ÙŠ',
+            actionBtn: 'openPlantInspectionModal(\'civil\')',
+            status: 'ÙØ­Øµ Ù…ÙŠØ¯Ø§Ù†ÙŠ Ù…Ø·Ù„ÙˆØ¨'
           },
           {
-            title: 'أرصفة البحيرات الصناعية والمصدات الشاطئية',
-            desc: 'فحص طبقات العزل المائي والتأكد من خلوها من التصدعات',
-            status: 'قيد المتابعة'
+            title: 'Ø£Ø±ØµÙØ© Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª Ø§Ù„ØµÙ†Ø§Ø¹ÙŠØ© ÙˆØ§Ù„Ù…ØµØ¯Ø§Øª Ø§Ù„Ø´Ø§Ø·Ø¦ÙŠØ©',
+            desc: 'ÙØ­Øµ Ø·Ø¨Ù‚Ø§Øª Ø§Ù„Ø¹Ø²Ù„ Ø§Ù„Ù…Ø§Ø¦ÙŠ ÙˆØ§Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ø®Ù„ÙˆÙ‡Ø§ Ù…Ù† Ø§Ù„ØªØµØ¯Ø¹Ø§Øª',
+            status: 'Ù‚ÙŠØ¯ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
           },
           {
-            title: 'أرضيات حمامات السباحة والبرجولات الخشبية',
-            desc: 'فحص السيراميك والمظلات ودهانات الحماية من الرطوبة',
-            status: 'مطابق للمواصفات'
+            title: 'Ø£Ø±Ø¶ÙŠØ§Øª Ø­Ù…Ø§Ù…Ø§Øª Ø§Ù„Ø³Ø¨Ø§Ø­Ø© ÙˆØ§Ù„Ø¨Ø±Ø¬ÙˆÙ„Ø§Øª Ø§Ù„Ø®Ø´Ø¨ÙŠØ©',
+            desc: 'ÙØ­Øµ Ø§Ù„Ø³ÙŠØ±Ø§Ù…ÙŠÙƒ ÙˆØ§Ù„Ù…Ø¸Ù„Ø§Øª ÙˆØ¯Ù‡Ø§Ù†Ø§Øª Ø§Ù„Ø­Ù…Ø§ÙŠØ© Ù…Ù† Ø§Ù„Ø±Ø·ÙˆØ¨Ø©',
+            status: 'Ù…Ø·Ø§Ø¨Ù‚ Ù„Ù„Ù…ÙˆØ§ØµÙØ§Øª'
           }
         ]
       }
@@ -689,20 +713,22 @@ class UltimateFMApp {
     if (nameEl) nameEl.innerText = config.name;
     if (subEl) subEl.innerText = config.sub;
 
+    const modalOrderName = document.getElementById('modalEngOrderName');
+    const modalOrderTeam = document.getElementById('modalEngOrderTeam');
+    if (modalOrderName) modalOrderName.innerText = config.name;
+    if (modalOrderTeam) modalOrderTeam.innerText = `${config.teamName} (${config.sub.split('(')[1] ? '(' + config.sub.split('(')[1] : ''}`;
+
     if (listEl) {
       listEl.innerHTML = '';
-      config.checklists.forEach((item, idx) => {
+      config.checklists.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'ticket-item';
-        const actionCall = `openInspectionModal('${item.title.replace(/'/g, "\\'")}', '${item.desc.replace(/'/g, "\\'")}', ${idx})`;
         itemDiv.innerHTML = `
           <div>
             <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${item.title}</h4>
             <p style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">${item.desc}</p>
           </div>
-          <button class="btn btn-primary" id="engChecklistBtn_${idx}" style="width: auto; padding: 5px 12px; font-size: 0.72rem; margin: 0; background: #1b8f91; border: none; font-weight: 700;" onclick="${actionCall}">
-            <i class="fa-solid fa-clipboard-check"></i> ${item.status || 'فتح التفتيش'}
-          </button>
+          ${item.actionBtn ? `<button class="btn btn-primary" style="width: auto; padding: 5px 12px; font-size: 0.72rem; margin: 0; background: #1b8f91; border: none; font-weight: 700;" onclick="${item.actionBtn}"><i class="fa-solid fa-clipboard-check"></i> ÙØªØ­ Ø§Ù„ØªÙØªÙŠØ´</button>` : `<span class="badge badge-success" style="font-size: 0.65rem; padding: 4px 8px;"><i class="fa-solid fa-check"></i> ${item.status}</span>`}
         `;
         listEl.appendChild(itemDiv);
       });
@@ -712,586 +738,14 @@ class UltimateFMApp {
     this.renderEngineerTickets();
   }
 
-  renderEngineerTickets() {
-    const listEl = document.getElementById('engineerTicketsList');
-    if (!listEl) return;
-
-    const engineerTickets = (this.tickets || []).filter(t => t.requester === 'engineer' || (t.id && String(t.id).startsWith('ENG-')));
-    const badge = document.getElementById('engineerTicketCountBadge');
-    if (badge) {
-      badge.innerText = `${engineerTickets.length} بلاغات`;
-    }
-
-    listEl.innerHTML = '';
-    if (engineerTickets.length === 0) {
-      listEl.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد أوامر صيانة للمرافق حالياً</div>';
-      return;
-    }
-
-    engineerTickets.forEach(tk => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'ticket-item';
-      itemDiv.style.flexDirection = 'column';
-      itemDiv.style.alignItems = 'stretch';
-      itemDiv.style.gap = '6px';
-      itemDiv.style.marginBottom = '8px';
-
-      const stars = '⭐'.repeat(parseInt(tk.priority || '2', 10));
-
-      itemDiv.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="font-size: 0.82rem; font-weight: 800; color: #20274f;">${tk.title}</h4>
-          <span class="badge ${tk.bgClass || 'badge-warning'}" style="font-size: 0.65rem; padding: 3px 8px;">${tk.status}</span>
-        </div>
-        <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0;">
-          ${tk.details || tk.desc || ''}
-        </p>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: var(--text-muted); border-top: 1px dashed rgba(32,39,79,0.1); padding-top: 4px;">
-          <span>الأولوية: ${stars} • #${tk.id}</span>
-          <span><i class="fa-regular fa-clock"></i> ${tk.dateStr || ''} ${tk.timeStr || ''}</span>
-        </div>
-      `;
-      listEl.appendChild(itemDiv);
-    });
-  }
-
-  openEngineerWorkOrderModal() {
-    const nameEl = document.getElementById('engModalEngineerName');
-    const teamEl = document.getElementById('engModalTeamName');
-    const selectEl = document.getElementById('engAssetSelect');
-
-    const config = this.activeEngineerTeam || {
-      name: 'م. محمود عبد الفتاح',
-      sub: '❄️ فريق الكهروميكانيك والمحطات (Odoo Team #2)',
-      teamId: 2,
-      teamName: 'MEP Team'
-    };
-
-    if (nameEl) nameEl.innerText = config.name;
-    if (teamEl) teamEl.innerText = config.sub;
-
-    const assetsMap = {
-      'mep': [
-        'محطة التحلية الرئيسية (RO Plant)',
-        'محطة معالجة مياه الصرف الصحي (STP Plant)',
-        'شيلرات التكييف المركزي والمبادلات الحرارية',
-        'طلمبات رفع مياه الشرب وخزانات المياه العذبة',
-        'مضخات ونوافير البحيرات الكبرى وحمامات السباحة'
-      ],
-      'fls': [
-        'مضخات الحريق الرئيسية (ديزل / كهرباء / جوكي 12 Bar)',
-        'لوحة الإنذار المبكر المعنونة (Fire Alarm Panel)',
-        'محابس كشف السريان OS&Y وزون الصمامات 1 و 2',
-        'شبكة رشاشات الإطفاء التلقائي (Fire Sprinklers)',
-        'صناديق الحريق وخراطيم الإطفاء الهيدروليكية'
-      ],
-      'electrical': [
-        'محول الجهد المتوسط 04 وأكشاك البيلارات',
-        'لوحة التوزيع العمومية MDB وقواطع ACB الذكية',
-        'مولد الديزل الاحتياطي ومفتاح التحويل ATS',
-        'وحدات إمداد الطاقة غير المنقطعة المركزية UPS',
-        'أعمدة الإنارة الذكية بالممشى والشاطئ والبوابات'
-      ],
-      'landscape': [
-        'شبكة الري الأوتوماتيكية بالمحور المركزي',
-        'طلمبات التسميد وخزانات المغذيات الزراعية',
-        'محابس السولينويد الذكية لزون النخيل والحدائق',
-        'بحيرات القرية والشلالات المائية التجميلية',
-        'خطوط مياه الري المعالجة ونقاط الرشاشات'
-      ],
-      'civil': [
-        'المماشي الخرسانية وبلاط الإنترلوك بالمحور الرئيسي',
-        'فواصل التمدد الإنشائية وعوازل الرطوبة',
-        'أرصفة البحيرات الصناعية والمصدات الشاطئية',
-        'أرضيات السيراميك والمظلات الخشبية لحمامات السباحة',
-        'واجهات المباني الخدمية والأسوار الخارجية'
-      ]
-    };
-
-    const currentKey = document.getElementById('engineerSpecialtySelect')?.value || 'mep';
-    const assets = assetsMap[currentKey] || assetsMap['mep'];
-
-    if (selectEl) {
-      selectEl.innerHTML = '';
-      assets.forEach(asset => {
-        const opt = document.createElement('option');
-        opt.value = asset;
-        opt.innerText = asset;
-        selectEl.appendChild(opt);
-      });
-    }
-
-    this.openModal('modalEngineerWorkOrder');
-  }
-
-  async submitEngineerWorkOrder() {
-    const config = this.activeEngineerTeam || {
-      name: 'م. محمود عبد الفتاح',
-      sub: '❄️ فريق الكهروميكانيك والمحطات (Odoo Team #2)',
-      teamId: 2,
-      teamName: 'MEP Team'
-    };
-
-    const asset = document.getElementById('engAssetSelect')?.value || 'محطة التحلية RO';
-    const maintType = document.getElementById('engMaintenanceType')?.value || 'corrective';
-    const priority = document.getElementById('engPrioritySelect')?.value || '2';
-    const desc = document.getElementById('engWorkOrderDesc')?.value || 'طلب صيانة عاجلة للمرفق';
-    const photoInput = document.getElementById('engWorkOrderPhoto');
-
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
-    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-    const newTicket = {
-      id: `ENG-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: `${config.teamName}: ${asset}`,
-      category: 'صيانة مرافق',
-      location: asset,
-      details: `${maintType === 'corrective' ? 'عطل تصحيحي طارئ' : 'صيانة وقائية دورية'}: ${desc}\nالمرفق: ${asset}\nالمهندس المشرف: ${config.name}`,
-      priority: priority,
-      status: 'تم إسناد الفني',
-      bgClass: 'badge-info',
-      requester: 'engineer',
-      requesterName: config.name,
-      maintenanceTeamId: config.teamId,
-      assignedTech: 'فني طوارئ المرافق (حسام المهدي)',
-      photoBefore: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
-      createdAt: now,
-      dateStr: dateStr,
-      timeStr: timeStr,
-      resolutionTime: ''
-    };
-
-    const proceed = async () => {
-      this.tickets.unshift(newTicket);
-      this.saveTicketsToStorage();
-      this.renderTickets();
-      this.renderEngineerTickets();
-      this.closeModal('modalEngineerWorkOrder');
-
-      // Clear inputs
-      const descEl = document.getElementById('engWorkOrderDesc');
-      if (descEl) descEl.value = '';
-      if (photoInput) photoInput.value = '';
-
-      this.showToast(`🛠️ تم إصدار أمر العمل الهندسي رقم #${newTicket.id} بنجاح!\nالمرفق: ${asset}\nالمسؤول: ${config.name}\nتم توجيهه مباشرة لموديول الصيانة بأودو (maintenance.request - Team #${config.teamId}).`);
-
-      // Direct Sync to Odoo Maintenance module
-      try {
-        await this.syncTicketToOdoo(newTicket, '01223456789', config.name);
-        this.saveTicketsToStorage();
-        this.renderTickets();
-        this.renderEngineerTickets();
-      } catch (err) {
-        console.warn('[Odoo Engineer Sync Error]:', err);
-      }
-    };
-
-    if (photoInput && photoInput.files && photoInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        newTicket.photoBefore = e.target.result;
-        proceed();
-      };
-      reader.readAsDataURL(photoInput.files[0]);
-    } else {
-      proceed();
-    }
-  }
-
-  openInspectionModal(title, desc, idx) {
-    const titleEl = document.getElementById('inspectModalTitle');
-    const descEl = document.getElementById('inspectModalDesc');
-    if (titleEl) titleEl.innerText = title;
-    if (descEl) descEl.innerText = desc;
-    this._currentInspectIdx = idx;
-    this.openModal('modalInspectionDetails');
-  }
-
-  confirmInspectionSignOff() {
-    this.closeModal('modalInspectionDetails');
-    const idx = this._currentInspectIdx;
-    if (typeof idx === 'number') {
-      const btn = document.getElementById(`engChecklistBtn_${idx}`);
-      if (btn) {
-        btn.outerHTML = `<span class="badge badge-success" style="font-size: 0.68rem; padding: 5px 10px; font-weight: 800;"><i class="fa-solid fa-circle-check"></i> مكتمل ومطابق للمواصفات ✅</span>`;
-      }
-    }
-    this.showToast('✅ تم توثيق واعتماد التفتيش الفني الرقمي بنجاح!\nتم تسجيل قراءات الفحص بسجلات الصيانة الدورية Odoo.');
-  }
-
-  openAssetScannerModal() {
-    this.openModal('modalAssetScanner');
-  }
-
-  selectScannedAsset(assetKey) {
-    this.closeModal('modalAssetScanner');
-    this.openAssetPassportModal(assetKey);
-  }
-
-  openAssetPassportModal(assetKey = 'ro') {
-    const assets = {
-      'ro': {
-        code: '#EQ-RO-8924',
-        name: 'محطة التحلية المركزية (RO Plant)',
-        loc: 'زون المحطات الغربية • مبنى الخدمات الفنية 01',
-        model: 'Grundfos / Dow Filmtec (5,000 m³/day)',
-        warranty: 'ساري حتى 2028 (ضمان ممتد)',
-        telemetry: '7.2 Bar • TDS: 210 ppm',
-        ppm: '15 أكتوبر 2026 (بعد 37 يوم)',
-        teamKey: 'mep'
-      },
-      'fire': {
-        code: '#EQ-FP-3310',
-        name: 'طلمبات الحريق الرئيسية 12 Bar',
-        loc: 'غرفة طلمبات الطوارئ FLS • المبنى الخدمي الرئيسي',
-        model: 'Patterson Fire Pumps / Cummins Diesel 750 GPM',
-        warranty: 'ساري ومطابق لاشتراطات الدفاع المدني',
-        telemetry: '12.4 Bar • Standby Ready 100%',
-        ppm: '28 سبتمبر 2026 (بعد 20 يوم)',
-        teamKey: 'fls'
-      },
-      'trans': {
-        code: '#EQ-TR-0402',
-        name: 'محول الكهرباء الجهد المتوسط 04',
-        loc: 'كشك المحولات 04 • زون الفلل الشمالي',
-        model: 'ABB / Schneider Electric 1500 kVA',
-        warranty: 'ساري حتى 2030 (ضمان الشركة المصنعة)',
-        telemetry: '380V / 220V • Load: 74%',
-        ppm: '10 نوفمبر 2026 (بعد 63 يوم)',
-        teamKey: 'electrical'
-      },
-      'stp': {
-        code: '#EQ-STP-1105',
-        name: 'محطة معالجة مياه الصرف الصحي (STP)',
-        loc: 'محطة المعالجة الثلاثية البيئية • زون الخدمات',
-        model: 'Kubota Membrane Bioreactor MBR',
-        warranty: 'ساري ومطابق للمواصفات البيئية',
-        telemetry: 'Dissolved O2: 4.5 mg/L • pH: 7.4',
-        ppm: '05 أكتوبر 2026 (بعد 27 يوم)',
-        teamKey: 'mep'
-      }
-    };
-
-    const asset = assets[assetKey] || assets['ro'];
-    this._activeScannedAsset = asset;
-
-    const codeBadge = document.getElementById('passAssetCodeBadge');
-    const nameEl = document.getElementById('passAssetName');
-    const locEl = document.getElementById('passAssetLocation');
-    const modelEl = document.getElementById('passAssetModel');
-    const warrantyEl = document.getElementById('passAssetWarranty');
-    const telEl = document.getElementById('passAssetTelemetry');
-    const ppmEl = document.getElementById('passAssetPpm');
-
-    if (codeBadge) codeBadge.innerText = asset.code;
-    if (nameEl) nameEl.innerText = asset.name;
-    if (locEl) locEl.innerText = asset.loc;
-    if (modelEl) modelEl.innerText = asset.model;
-    if (warrantyEl) warrantyEl.innerText = asset.warranty;
-    if (telEl) telEl.innerText = asset.telemetry;
-    if (ppmEl) ppmEl.innerText = asset.ppm;
-
-    this.openModal('modalAssetPassport');
-  }
-
-  raiseWorkOrderForActiveAsset() {
-    this.closeModal('modalAssetPassport');
-    this.openEngineerWorkOrderModal();
-    if (this._activeScannedAsset) {
-      const select = document.getElementById('engAssetSelect');
-      if (select) {
-        let found = false;
-        for (let i = 0; i < select.options.length; i++) {
-          if (select.options[i].value.includes(this._activeScannedAsset.name) || this._activeScannedAsset.name.includes(select.options[i].value)) {
-            select.selectedIndex = i;
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          const opt = document.createElement('option');
-          opt.value = this._activeScannedAsset.name;
-          opt.innerText = this._activeScannedAsset.name;
-          opt.selected = true;
-          select.appendChild(opt);
-        }
-      }
-    }
-  }
-
-  openActiveAssetInspection() {
-    this.closeModal('modalAssetPassport');
-    const asset = this._activeScannedAsset || { name: 'محطة التحلية RO Plant', loc: 'الموقع الفني' };
-    this.openInspectionModal(asset.name, `فحص شامل لقراءات التشغيل والعزل وسلامة المحابس (${asset.code || '#EQ-ASSET'})`, 0);
-  }
-
-  renderEngineerPtws() {
-    const listEl = document.getElementById('engineerPtwList');
-    if (!listEl) return;
-
-    if (!this.ptwList) {
-      this.ptwList = [
-        {
-          id: 'PTW-HOT-9821',
-          typeLabel: '🔥 أعمال حرارية ولحام (Hot Work)',
-          contractor: 'المقاولون العرب (م. كريم سالم)',
-          phone: '01012345678',
-          location: 'غرفة طلمبات محطة RO - المحور الغربي',
-          engineer: 'م. محمود عبد الفتاح',
-          duration: '8 ساعات',
-          remaining: '06:45:00 ساعة',
-          status: 'ساري ومعتمد',
-          bgClass: 'badge-success'
-        },
-        {
-          id: 'PTW-HGT-4402',
-          typeLabel: '🏗️ أعمال ارتفاعات وسقالات (Heights)',
-          contractor: 'إيجيبت فاسيليتي لخدمات الواجهات',
-          phone: '01229876543',
-          location: 'واجهات المبنى الإداري والمول',
-          engineer: 'م. ياسر الهواري',
-          duration: '4 ساعات',
-          remaining: '04:00:00 ساعة',
-          status: 'بانتظار موافقة مدير القطاع الهندسي',
-          bgClass: 'badge-warning'
-        },
-        {
-          id: 'PTW-LOTO-1108',
-          typeLabel: '⚡ عزل طاقة وتأمين قواطع (LOTO)',
-          contractor: 'شنايدر إلكتريك مصر للصيانة',
-          phone: '01123456789',
-          location: 'موزع الجهد المتوسط رقم 02',
-          engineer: 'م. أحمد الصاوي',
-          duration: '8 ساعات',
-          remaining: '08:00:00 ساعة',
-          status: 'بانتظار موافقة مدير القطاع الهندسي',
-          bgClass: 'badge-warning'
-        }
-      ];
-    }
-
-    const badge = document.getElementById('activePtwBadge');
-    if (badge) badge.innerText = `${this.ptwList.length} تصاريح`;
-
-    listEl.innerHTML = '';
-    this.ptwList.forEach(ptw => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'ticket-item';
-      itemDiv.style.flexDirection = 'column';
-      itemDiv.style.alignItems = 'stretch';
-      itemDiv.style.gap = '6px';
-      itemDiv.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${ptw.typeLabel}</h4>
-          <span class="badge ${ptw.bgClass}" style="font-size: 0.65rem; padding: 3px 8px;"><i class="fa-solid fa-circle-check"></i> ${ptw.status}</span>
-        </div>
-        <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 2px;">
-          <div>• <b>المقاول:</b> ${ptw.contractor} • #${ptw.id}</div>
-          <div>• <b>الموقع:</b> ${ptw.location}</div>
-          <div style="color: ${ptw.status === 'ساري ومعتمد' ? '#10b981' : '#d97706'}; font-weight: 700;"><i class="fa-regular fa-clock"></i> الصلاحية: ${ptw.remaining}</div>
-        </div>
-        <button class="btn btn-sm" onclick="viewPtwDetails('${ptw.id}')" style="margin-top: 4px; padding: 5px; font-size: 0.72rem; font-weight: 700; background: rgba(225,29,72,0.08); color: #e11d48; border: 1px solid rgba(225,29,72,0.25); border-radius: 6px; width: 100%;">
-          <i class="fa-solid fa-stamp"></i> عرض شهادة التصريح الرقمي
-        </button>
-      `;
-      listEl.appendChild(itemDiv);
-    });
-  }
-
-  renderDirectorPtwApprovals() {
-    const listEl = document.getElementById('directorPtwApprovalsList');
-    if (!listEl) return;
-
-    if (!this.ptwList) {
-      this.renderEngineerPtws();
-    }
-
-    const pendingCount = (this.ptwList || []).filter(p => p.status === 'بانتظار موافقة مدير القطاع الهندسي').length;
-    const badge = document.getElementById('directorPtwCountBadge');
-    if (badge) {
-      badge.innerText = `${pendingCount} بانتظار الاعتماد`;
-      badge.style.background = pendingCount > 0 ? '#e11d48' : '#10b981';
-    }
-
-    listEl.innerHTML = '';
-    if (!this.ptwList || this.ptwList.length === 0) {
-      listEl.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد تصاريح عمل حالياً</div>';
-      return;
-    }
-
-    this.ptwList.forEach(ptw => {
-      const isPending = ptw.status === 'بانتظار موافقة مدير القطاع الهندسي';
-      const isApproved = ptw.status === 'ساري ومعتمد';
-      const isRejected = ptw.status.includes('مرفوض');
-
-      let actionButtons = '';
-      if (isPending) {
-        actionButtons = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span style="font-size: 0.7rem; font-weight: 700; color: #20274f; white-space: nowrap;">فترة الشفت:</span>
-              <select id="ptwShiftDuration_${ptw.id}" class="form-control" style="font-size: 0.72rem; padding: 3px 6px; height: 28px;">
-                <option value="4">4 ساعات (شفت قصير)</option>
-                <option value="8" selected>8 ساعات (شفت قياسي)</option>
-                <option value="12">12 ساعة (شفت طوارئ مكثف)</option>
-                <option value="24">24 ساعة (أعمال مستمرة)</option>
-              </select>
-            </div>
-            <div style="display: flex; gap: 6px;">
-              <button class="btn btn-success" onclick="app.approveDirectorPtw('${ptw.id}')" style="flex: 1; font-size: 0.72rem; padding: 6px 8px; font-weight: 800; background: #10b981; border: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <i class="fa-solid fa-stamp"></i> اعتماد وتصريح
-              </button>
-              <button class="btn btn-danger" onclick="app.rejectDirectorPtw('${ptw.id}')" style="width: auto; font-size: 0.72rem; padding: 6px 12px; font-weight: 700; background: #e11d48; border: none;">
-                <i class="fa-solid fa-ban"></i> رفض
-              </button>
-            </div>
-          </div>
-        `;
-      } else if (isApproved) {
-        actionButtons = `
-          <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.72rem; color: #10b981; font-weight: 700;"><i class="fa-solid fa-certificate"></i> مصرح ومعتمد رسمياً من د.م. هشام القاضي</span>
-            <button class="btn btn-sm" onclick="app.viewPtwDetails('${ptw.id}')" style="font-size: 0.68rem; padding: 3px 8px; background: rgba(32,39,79,0.06); color: #20274f; border: 1px solid rgba(32,39,79,0.15); border-radius: 4px;">
-              عرض الشهادة
-            </button>
-          </div>
-        `;
-      } else {
-        actionButtons = `
-          <div style="margin-top: 6px; font-size: 0.72rem; color: #e11d48; font-weight: 700;">
-            <i class="fa-solid fa-triangle-exclamation"></i> مرفوض لعدم استيفاء تدابير الوقاية والسلامة
-          </div>
-        `;
-      }
-
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'ticket-item';
-      itemDiv.style.flexDirection = 'column';
-      itemDiv.style.alignItems = 'stretch';
-      itemDiv.style.gap = '6px';
-      itemDiv.style.marginBottom = '8px';
-      itemDiv.style.borderLeft = `4px solid ${isApproved ? '#10b981' : (isPending ? '#f59e0b' : '#e11d48')}`;
-      itemDiv.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="font-size: 0.85rem; font-weight: 800; color: #20274f;">${ptw.typeLabel}</h4>
-          <span class="badge ${ptw.bgClass}" style="font-size: 0.65rem; padding: 3px 8px;">${ptw.status}</span>
-        </div>
-        <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 2px;">
-          <div>• <b>المقاول:</b> ${ptw.contractor} • رقم التصريح: #${ptw.id}</div>
-          <div>• <b>الموقع والمعدة:</b> ${ptw.location}</div>
-          <div>• <b>المهندس المشرف:</b> ${ptw.engineer}</div>
-          <div style="color: ${isApproved ? '#10b981' : '#d97706'}; font-weight: 700;"><i class="fa-regular fa-clock"></i> الصلاحية: ${ptw.remaining}</div>
-        </div>
-        ${actionButtons}
-      `;
-      listEl.appendChild(itemDiv);
-    });
-  }
-
-  approveDirectorPtw(ptwId) {
-    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
-    if (!ptw) return;
-
-    const selectEl = document.getElementById(`ptwShiftDuration_${ptwId}`);
-    const hours = selectEl ? selectEl.value : '8';
-
-    ptw.status = 'ساري ومعتمد';
-    ptw.bgClass = 'badge-success';
-    ptw.duration = `${hours} ساعات`;
-    ptw.remaining = `${hours.padStart(2, '0')}:00:00 ساعة`;
-    ptw.approvedBy = 'د.م. هشام القاضي (رئيس القطاع الهندسي والسلامة)';
-    ptw.approvedAt = new Date().toLocaleTimeString('ar-EG');
-
-    this.renderEngineerPtws();
-    this.renderDirectorPtwApprovals();
-
-    this.showToast(`🛡️ تم اعتماد وختم تصريح العمل رقم #${ptwId} بنجاح!\nالنوع: ${ptw.typeLabel}\nالمقاول: ${ptw.contractor}\nصلاحية الشفت: ${hours} ساعات.\nتم إخطار فريق الأمن الصناعي وبوابات الدخول.`);
-  }
-
-  rejectDirectorPtw(ptwId) {
-    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
-    if (!ptw) return;
-
-    ptw.status = 'مرفوض لعدم استيفاء تدابير HSE';
-    ptw.bgClass = 'badge-danger';
-    ptw.remaining = '00:00:00 (ملغي)';
-
-    this.renderEngineerPtws();
-    this.renderDirectorPtwApprovals();
-
-    this.showToast(`❌ تم رفض وتعليق تصريح العمل رقم #${ptwId}!\nتم إخطار المهندس المشرف (${ptw.engineer}) لاستيفاء اشتراطات السلامة والوقاية.`);
-  }
-
-  openNewPtwModal() {
-    this.openModal('modalNewPtw');
-  }
-
-  submitNewPtwModal() {
-    const typeSelect = document.getElementById('ptwTypeSelect');
-    const contractorInput = document.getElementById('ptwContractorInput');
-    const phoneInput = document.getElementById('ptwSupervisorPhone');
-    const locInput = document.getElementById('ptwLocationInput');
-    const durSelect = document.getElementById('ptwDurationSelect');
-
-    const typeText = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text : '🔥 تصريح عمل خطر';
-    const contractor = (contractorInput && contractorInput.value.trim()) ? contractorInput.value.trim() : 'المقاول المنفذ';
-    const phone = phoneInput ? phoneInput.value : '01012345678';
-    const loc = (locInput && locInput.value.trim()) ? locInput.value.trim() : 'الموقع العام';
-    const dur = durSelect ? `${durSelect.value} ساعات` : '8 ساعات';
-
-    const ptwId = 'PTW-' + Math.floor(1000 + Math.random() * 9000);
-    const newPtw = {
-      id: ptwId,
-      typeLabel: typeText,
-      contractor: `${contractor} (${phone})`,
-      phone: phone,
-      location: loc,
-      engineer: this.activeEngineerTeam ? this.activeEngineerTeam.name : 'م. محمود عبد الفتاح',
-      duration: dur,
-      remaining: `${durSelect ? durSelect.value.padStart(2, '0') : '08'}:00:00 ساعة`,
-      status: 'بانتظار موافقة مدير القطاع الهندسي',
-      bgClass: 'badge-warning'
-    };
-
-    if (!this.ptwList) this.ptwList = [];
-    this.ptwList.unshift(newPtw);
-    this.renderEngineerPtws();
-    this.renderDirectorPtwApprovals();
-    this.closeModal('modalNewPtw');
-
-    this.showToast(`🛡️ تم تقديم طلب تصريح العمل الخطر رقم #${ptwId} بنجاح!\nالمقاول: ${contractor}\nالموقع: ${loc}\nتم إرسال التصريح لصندوق اعتماد مدير القطاع الهندسي والسلامة (د.م. هشام القاضي).`);
-  }
-
-  viewPtwDetails(ptwId) {
-    const ptw = (this.ptwList || []).find(p => p.id === ptwId);
-    if (!ptw) return;
-
-    const typeBadge = document.getElementById('viewPtwTypeBadge');
-    const idText = document.getElementById('viewPtwIdText');
-    const timeText = document.getElementById('viewPtwRemainingTime');
-    const contrText = document.getElementById('viewPtwContractor');
-    const locText = document.getElementById('viewPtwLocation');
-    const engText = document.getElementById('viewPtwEngineer');
-
-    if (typeBadge) typeBadge.innerText = ptw.typeLabel;
-    if (idText) idText.innerText = `#${ptw.id}`;
-    if (timeText) timeText.innerText = ptw.remaining;
-    if (contrText) contrText.innerText = ptw.contractor;
-    if (locText) locText.innerText = ptw.location;
-    if (engText) engText.innerText = ptw.engineer;
-
-    this.openModal('modalViewPtw');
-  }
-
   handleEngineerSubmitToManager() {
-    this.openEngineerWorkOrderModal();
+    this.showToast('ðŸ›  ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø£Ù…Ø± Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ù‡Ù†Ø¯Ø³ÙŠ Ø§Ù„Ø¹Ø§Ø¬Ù„ Ø¨Ù†Ø¬Ø§Ø­ Ø¥Ù„Ù‰ Ø´Ø§Ø´Ø© Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©!\nØªÙ… Ø¥Ø¯Ø±Ø§Ø¬ Ø§Ù„Ø·Ù„Ø¨ ÙÙŠ Ø·Ø§Ø¨ÙˆØ± Ø§Ù„ÙˆØ§Ø±Ø¯ Ù„ØªÙˆØ²ÙŠØ¹ ÙÙ†ÙŠ Ù…ØªØ§Ø­.');
   }
 
   dispatchOrderToTech(orderTitle, selectId) {
     const select = document.getElementById(selectId);
-    const techName = select ? select.value : 'الفني';
-    this.showToast(`🚀 تم تخصيص وإرسال "${orderTitle}" بنجاح إلى الفني (${techName})!\nسيظهر الطلب الآن فوراً على شاشة الفني الميدانية.`);
+    const techName = select ? select.value : 'Ø§Ù„ÙÙ†ÙŠ';
+    this.showToast(`ðŸš€ ØªÙ… ØªØ®ØµÙŠØµ ÙˆØ¥Ø±Ø³Ø§Ù„ "${orderTitle}" Ø¨Ù†Ø¬Ø§Ø­ Ø¥Ù„Ù‰ Ø§Ù„ÙÙ†ÙŠ (${techName})!\nØ³ÙŠØ¸Ù‡Ø± Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù† ÙÙˆØ±Ø§Ù‹ Ø¹Ù„Ù‰ Ø´Ø§Ø´Ø© Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠØ©.`);
   }
 
   toggleViewMode() {
@@ -1301,10 +755,10 @@ class UltimateFMApp {
 
     if (this.isFullWidth) {
       simulator.classList.add('full-width');
-      if (textSpan) textSpan.innerText = 'عرض الموبايل المصغر';
+      if (textSpan) textSpan.innerText = 'Ø¹Ø±Ø¶ Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„ Ø§Ù„Ù…ØµØºØ±';
     } else {
       simulator.classList.remove('full-width');
-      if (textSpan) textSpan.innerText = 'عرض الشاشة الكاملة';
+      if (textSpan) textSpan.innerText = 'Ø¹Ø±Ø¶ Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„ÙƒØ§Ù…Ù„Ø©';
     }
   }
 
@@ -1320,7 +774,7 @@ class UltimateFMApp {
         this.qrTimer = 30;
         this.randomizeQR();
       }
-      if (countText) countText.innerText = `${this.qrTimer} ثانية`;
+      if (countText) countText.innerText = `${this.qrTimer} Ø«Ø§Ù†ÙŠØ©`;
       if (progressBar) {
         const pct = (this.qrTimer / 30) * 100;
         progressBar.style.width = `${pct}%`;
@@ -1344,19 +798,19 @@ class UltimateFMApp {
     this._isTicketSubmitting = true;
     setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
 
-    const category = document.getElementById('ticketCategorySelect')?.value || 'سباكة';
+    const category = document.getElementById('ticketCategorySelect')?.value || 'Ø³Ø¨Ø§ÙƒØ©';
     const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
-    const desc = document.getElementById('ticketDescInput')?.value || 'طلب صيانة عاجلة';
+    const desc = document.getElementById('ticketDescInput')?.value || 'Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø© Ø¹Ø§Ø¬Ù„Ø©';
     const photoInput = document.getElementById('ticketPhotoInput');
     
     // Category fallback before-repair images
     const fallbacks = {
-      'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
-      'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
-      'كهروميكانيك': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
-      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
+      'Ø³Ø¨Ø§ÙƒØ©': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
+      'ÙƒÙ‡Ø±Ø¨Ø§Ø¡': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+      'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
+      'Ù†Ø¬Ø§Ø±Ø©': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
     };
-    const defaultPhoto = fallbacks[category] || fallbacks['سباكة'];
+    const defaultPhoto = fallbacks[category] || fallbacks['Ø³Ø¨Ø§ÙƒØ©'];
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1368,7 +822,7 @@ class UltimateFMApp {
       category: category,
       priority: priority,
       details: desc,
-      status: 'جديد',
+      status: 'Ø¬Ø¯ÙŠØ¯',
       bgClass: 'badge-warning',
       requester: this.currentRole,
       assignedTech: '',
@@ -1390,7 +844,7 @@ class UltimateFMApp {
       // Live Odoo Sync Trigger
       this.syncTicketToOdoo(newTicket);
       
-      this.showToast(`✅ تم إنشاء وتوجيه تذكرة الصيانة بنجاح رقم #${newTicket.id}\nتم إدراج البلاغ تلقائياً في قاعدة بيانات Odoo وإرساله لمدير الصيانة!`);
+      this.showToast(`âœ… ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ ÙˆØªÙˆØ¬ÙŠÙ‡ ØªØ°ÙƒØ±Ø© Ø§Ù„ØµÙŠØ§Ù†Ø© Ø¨Ù†Ø¬Ø§Ø­ Ø±Ù‚Ù… #${newTicket.id}\nØªÙ… Ø¥Ø¯Ø±Ø§Ø¬ Ø§Ù„Ø¨Ù„Ø§Øº ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ ÙÙŠ Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª Odoo ÙˆØ¥Ø±Ø³Ø§Ù„Ù‡ Ù„Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©!`);
     };
 
     if (photoInput && photoInput.files && photoInput.files[0]) {
@@ -1422,7 +876,7 @@ class UltimateFMApp {
     this.fetchOdooOwnerName();
 
     this.closeModal('modalOdooSettings');
-    this.showToast(`✅ تم حفظ وتأكيد إعدادات Odoo ERP بنجاح!\nسيرفر: ${url || 'Odoo EDU Live'}\nقاعدة البيانات: ${db}\nالاسم المعتمد: ${name || 'جاري جلبه من Odoo'}\nتم تفعيل الربط المباشر مع جميع بلاغات الصيانة والعدادات.`);
+    this.showToast(`âœ… ØªÙ… Ø­ÙØ¸ ÙˆØªØ£ÙƒÙŠØ¯ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Odoo ERP Ø¨Ù†Ø¬Ø§Ø­!\nØ³ÙŠØ±ÙØ±: ${url || 'Odoo EDU Live'}\nÙ‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª: ${db}\nØ§Ù„Ø§Ø³Ù… Ø§Ù„Ù…Ø¹ØªÙ…Ø¯: ${name || 'Ø¬Ø§Ø±ÙŠ Ø¬Ù„Ø¨Ù‡ Ù…Ù† Odoo'}\nØªÙ… ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ù…Ø¹ Ø¬Ù…ÙŠØ¹ Ø¨Ù„Ø§ØºØ§Øª Ø§Ù„ØµÙŠØ§Ù†Ø© ÙˆØ§Ù„Ø¹Ø¯Ø§Ø¯Ø§Øª.`);
   }
 
   saveTicketsToStorage() {
@@ -1513,9 +967,9 @@ class UltimateFMApp {
 
         readData.result.forEach(rec => {
           const recOdooIdStr = String(rec.id);
-          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
+          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'Ø¬Ø¯ÙŠØ¯';
           let bg = 'badge-warning';
-          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved')) bg = 'badge-success';
+          if (stageName.includes('Done') || stageName.includes('Ù…ÙƒØªÙ…Ù„') || stageName.includes('Ù…Ù†ØªÙ‡ÙŠ') || stageName.includes('Solved')) bg = 'badge-success';
 
           // 1. If this Odoo ticket ID is already linked to a local ticket, update its status
           const existingByOdooId = this.tickets.find(t => String(t.odooId) === recOdooIdStr || String(t.id) === `TK-OD-${rec.id}`);
@@ -1540,13 +994,13 @@ class UltimateFMApp {
           const dateStr = rawDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
           const timeStr = rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-          let cat = 'صيانة العامة';
-          if (rec.name.includes('سباكة')) cat = 'سباكة';
-          else if (rec.name.includes('كهرباء')) cat = 'كهرباء';
-          else if (rec.name.includes('كهروميكانيك') || rec.name.includes('تكييف')) cat = 'كهروميكانيك';
-          else if (rec.name.includes('نجارة')) cat = 'نجارة';
-          else if (rec.name.includes('نظافة') || rec.name.includes('هاوس')) cat = 'نظافة وهاوس كيبينج';
-          else if (rec.name.includes('حدائق') || rec.name.includes('لاند')) cat = 'صيانة الحدائق واللاندسكيب';
+          let cat = 'ØµÙŠØ§Ù†Ø© Ø§Ù„Ø¹Ø§Ù…Ø©';
+          if (rec.name.includes('Ø³Ø¨Ø§ÙƒØ©')) cat = 'Ø³Ø¨Ø§ÙƒØ©';
+          else if (rec.name.includes('ÙƒÙ‡Ø±Ø¨Ø§Ø¡')) cat = 'ÙƒÙ‡Ø±Ø¨Ø§Ø¡';
+          else if (rec.name.includes('ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ') || rec.name.includes('ØªÙƒÙŠÙŠÙ')) cat = 'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ';
+          else if (rec.name.includes('Ù†Ø¬Ø§Ø±Ø©')) cat = 'Ù†Ø¬Ø§Ø±Ø©';
+          else if (rec.name.includes('Ù†Ø¸Ø§ÙØ©') || rec.name.includes('Ù‡Ø§ÙˆØ³')) cat = 'Ù†Ø¸Ø§ÙØ© ÙˆÙ‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬';
+          else if (rec.name.includes('Ø­Ø¯Ø§Ø¦Ù‚') || rec.name.includes('Ù„Ø§Ù†Ø¯')) cat = 'ØµÙŠØ§Ù†Ø© Ø§Ù„Ø­Ø¯Ø§Ø¦Ù‚ ÙˆØ§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨';
 
           this.tickets.push({
             id: `TK-OD-${rec.id}`,
@@ -1627,21 +1081,22 @@ class UltimateFMApp {
 
     this.saveTicketsToStorage();
     this.renderTickets();
-    this.showToast('🧹 تم تصفير وتنظيف جميع السجلات والبلاغات بكافة الشاشات بنجاح!\nالتطبيق نظيف 100% وجاهز لاختبارك المباشر.');
+    this.showToast('ðŸ§¹ ØªÙ… ØªØµÙÙŠØ± ÙˆØªÙ†Ø¸ÙŠÙ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø³Ø¬Ù„Ø§Øª ÙˆØ§Ù„Ø¨Ù„Ø§ØºØ§Øª Ø¨ÙƒØ§ÙØ© Ø§Ù„Ø´Ø§Ø´Ø§Øª Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù†Ø¸ÙŠÙ 100% ÙˆØ¬Ø§Ù‡Ø² Ù„Ø§Ø®ØªØ¨Ø§Ø±Ùƒ Ø§Ù„Ù…Ø¨Ø§Ø´Ø±.');
   }
 
-  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
+  async callOdoo(baseUrl, payload, timeoutMs = 7000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
+    const payloadStr = JSON.stringify(payload);
 
-    // 1. Direct Call with AbortController timeout (Fastest: ~800ms)
+    // 1. Direct Call (Works on Local/Web/Cordova/Electron or when CORS is permitted)
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       const response = await fetch(directUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: payloadStr,
         signal: controller.signal
       });
       clearTimeout(timeoutId);
@@ -1651,7 +1106,39 @@ class UltimateFMApp {
         if (data) return data;
       }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
+      console.warn('[Odoo Direct Call Failed / CORS]:', directErr.message || directErr);
+    }
+
+    // 2. CORS Proxy Fallbacks (Guarantees browser client-side execution from file:/// and all hosts)
+    const proxies = [
+      (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`,
+      (target) => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+      (target) => `https://proxy.cors.sh/${target}`
+    ];
+
+    for (const makeProxyUrl of proxies) {
+      try {
+        const pUrl = makeProxyUrl(directUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        const pResponse = await fetch(pUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payloadStr,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (pResponse && pResponse.ok) {
+          const pData = await pResponse.json();
+          if (pData) {
+            console.log('[Odoo Proxy Call Success]:', pUrl);
+            return pData;
+          }
+        }
+      } catch (proxyErr) {
+        console.warn('[Odoo Proxy Call Attempt Failed]:', proxyErr.message || proxyErr);
+      }
     }
 
     return null;
@@ -1659,9 +1146,9 @@ class UltimateFMApp {
 
   resolveOdooTeamId(ticket) {
     const normalize = (s) => String(s || '').toLowerCase()
-      .replace(/[أإآ]/g, 'ا')
-      .replace(/ة/g, 'ه')
-      .replace(/ى/g, 'ي')
+      .replace(/[Ø£Ø¥Ø¢]/g, 'Ø§')
+      .replace(/Ø©/g, 'Ù‡')
+      .replace(/Ù‰/g, 'ÙŠ')
       .trim();
 
     const catNorm = normalize(ticket.category);
@@ -1672,27 +1159,94 @@ class UltimateFMApp {
 
     // Instant Map without redundant network requests:
     // 1. Housekeeping (ID 5)
-    if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
+    if (combinedNorm.includes('Ù‡Ø§ÙˆØ³') || combinedNorm.includes('ÙƒÙŠØ¨ÙŠÙ†Ø¬') || combinedNorm.includes('Ù†Ø¸Ø§Ù') || combinedNorm.includes('ØªÙ†Ø¸ÙŠÙ') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
       return 5;
     }
     // 2. Landscaping (ID 7)
-    if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
+    if (combinedNorm.includes('Ù„Ø§Ù†Ø¯') || combinedNorm.includes('Ø§Ø³ÙƒÙŠØ¨') || combinedNorm.includes('Ø­Ø¯Ø§Ø¦Ù‚') || combinedNorm.includes('Ø­Ø¯ÙŠÙ‚') || combinedNorm.includes('Ø²Ø±Ø§Ø¹') || combinedNorm.includes('Ø§Ø´Ø¬Ø§Ø±') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
       return 7;
     }
     // 3. Security (ID 3)
-    if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
+    if (combinedNorm.includes('Ø§Ù…Ù†') || combinedNorm.includes('ØªØµØ±ÙŠØ­') || combinedNorm.includes('Ø¨ÙˆØ§Ø¨') || combinedNorm.includes('Ø²Ø§Ø¦Ø±') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
       return 3;
     }
     // 4. Accounting (ID 4)
-    if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
+    if (combinedNorm.includes('Ø­Ø³Ø§Ø¨') || combinedNorm.includes('Ù…Ø§Ù„ÙŠ') || combinedNorm.includes('ÙˆØ¯ÙŠØ¹') || combinedNorm.includes('Ù‚Ø³Ø·') || combinedNorm.includes('ÙØ§ØªÙˆØ±') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
       return 4;
     }
     // 5. Maintenance (ID 2)
-    if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
+    if (combinedNorm.includes('ØµÙŠØ§Ù†') || combinedNorm.includes('Ø³Ø¨Ø§Ùƒ') || combinedNorm.includes('ÙƒÙ‡Ø±Ø¨') || combinedNorm.includes('ØªÙƒÙŠÙŠÙ') || combinedNorm.includes('Ù†Ø¬Ø§Ø±') || combinedNorm.includes('Ø¹Ø·Ù„') || combinedNorm.includes('ØªØ³Ø±ÙŠØ¨') || combinedNorm.includes('Ù…ÙˆØ§Ø³ÙŠ') || combinedNorm.includes('maintenance')) {
       return 2;
     }
     // 6. Customer Care (ID 1) - Default
     return 1;
+  }
+
+  handleNewTicketSubmit() {
+    if (this._isTicketSubmitting) return;
+    this._isTicketSubmitting = true;
+    setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
+
+    const category = document.getElementById('ticketCategorySelect')?.value || 'Ø³Ø¨Ø§ÙƒØ©';
+    const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
+    const desc = document.getElementById('ticketDescInput')?.value || 'Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø© Ø¹Ø§Ø¬Ù„Ø©';
+    const photoInput = document.getElementById('ticketPhotoInput');
+    
+    // Category fallback before-repair images
+    const fallbacks = {
+      'Ø³Ø¨Ø§ÙƒØ©': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
+      'ÙƒÙ‡Ø±Ø¨Ø§Ø¡': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+      'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
+      'Ù†Ø¬Ø§Ø±Ø©': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
+    };
+    const defaultPhoto = fallbacks[category] || fallbacks['Ø³Ø¨Ø§ÙƒØ©'];
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+    const newTicket = {
+      id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
+      title: `${category}: ${desc.substring(0, 20)}...`,
+      category: category,
+      priority: priority,
+      details: desc,
+      status: 'Ø¬Ø¯ÙŠØ¯',
+      bgClass: 'badge-warning',
+      requester: this.currentRole || 'homeowner',
+      assignedTech: '',
+      photoBefore: defaultPhoto,
+      photoAfter: '',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr,
+      resolutionTime: ''
+    };
+
+    const proceedWithTicket = (finalPhoto) => {
+      newTicket.photoBefore = finalPhoto || defaultPhoto;
+      this.tickets.unshift(newTicket);
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.closeModal('modalNewTicket');
+
+      const descInput = document.getElementById('ticketDescInput');
+      if (descInput) descInput.value = '';
+      if (photoInput) photoInput.value = '';
+
+      this.showToast(`âœ… ØªÙ… ØªÙ‚Ø¯ÙŠÙ… Ø¨Ù„Ø§Øº Ø§Ù„ØµÙŠØ§Ù†Ø© Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ø±Ù‚Ù… #${newTicket.id}!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ù…Ø¹ Odoo Helpdesk...`);
+
+      // Live sync to Odoo Helpdesk
+      this.syncTicketToOdoo(newTicket, '01223456789', 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ');
+    };
+
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => proceedWithTicket(e.target.result);
+      reader.readAsDataURL(photoInput.files[0]);
+    } else {
+      proceedWithTicket(defaultPhoto);
+    }
   }
 
   async syncTicketToOdoo(ticket, overridePhone, overrideName) {
@@ -1710,7 +1264,7 @@ class UltimateFMApp {
 
     if (!urlInput || !dbInput || !userInput || !keyInput) {
       console.log('[Odoo Sync] Missing connection credentials.');
-      this.showToast('⚠️ لم يتم العثور على بيانات الاتصال بـ Odoo');
+      this.showToast('âš ï¸ Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ù€ Odoo');
       return;
     }
 
@@ -1719,11 +1273,11 @@ class UltimateFMApp {
 
     try {
 
-      // Determine client information dynamically (Name رباعي, phone, email, unit)
-      let fullName = 'أسامة أحمد محمد الشريف';
+      // Determine client information dynamically (Name Ø±Ø¨Ø§Ø¹ÙŠ, phone, email, unit)
+      let fullName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
       let phoneNum = '01223456789';
       let emailAddress = 'fmhala6@gmail.com';
-      let unitNum = 'فيلا 104 - زون الشمال';
+      let unitNum = 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø´Ù…Ø§Ù„';
 
       const customName = safeStorage.getItem('odoo_owner_name');
       if (customName && customName.trim()) {
@@ -1731,20 +1285,20 @@ class UltimateFMApp {
       }
 
       if (ticket.requester === 'tenant') {
-        fullName = 'أحمد زاهر محمود';
+        fullName = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø± Ù…Ø­Ù…ÙˆØ¯';
         phoneNum = '01009876543';
         emailAddress = 'tenant.ahmed@domain.com';
-        unitNum = 'شاليه 402 - زون البحيرات';
+        unitNum = 'Ø´Ø§Ù„ÙŠÙ‡ 402 - Ø²ÙˆÙ† Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª';
       } else if (ticket.requester === 'commercial') {
-        fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+        fullName = 'Ù…Ø·Ø¹Ù… ÙˆÙƒØ§ÙÙŠÙ‡ Blue Wave (Ø´Ø±ÙŠÙ Ù…Ø­Ù…Ø¯)';
         phoneNum = '01112233445';
         emailAddress = 'bluewave@domain.com';
-        unitNum = 'محل 12 - المول التجاري';
+        unitNum = 'Ù…Ø­Ù„ 12 - Ø§Ù„Ù…ÙˆÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
       } else if (ticket.requester === 'manager') {
-        fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+        fullName = 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)';
         phoneNum = '01221122334';
         emailAddress = 'ayman.saeed@domain.com';
-        unitNum = 'الأماكن العامة بالقرية';
+        unitNum = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
       }
 
       // Step 2: Instant Partner & Team Resolution (Zero Extra Network Lag)
@@ -1752,7 +1306,7 @@ class UltimateFMApp {
       const resolvedTeamId = this.resolveOdooTeamId(ticket);
 
       // Clean description: ONLY the user's detailed problem description
-      const cleanDescription = ticket.details || ticket.title || 'طلب صيانة عاجلة من تطبيق الموبايل';
+      const cleanDescription = ticket.details || ticket.title || 'Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø© Ø¹Ø§Ø¬Ù„Ø© Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„';
 
       // Dual-Architecture: Engineers & Manager go to Odoo Maintenance module (maintenance.request), Residents go to Helpdesk (helpdesk.ticket)
       const isEngineerOrManager = ticket.requester === 'engineer' || ticket.requester === 'manager';
@@ -1761,11 +1315,12 @@ class UltimateFMApp {
 
       if (isEngineerOrManager) {
         const maintenanceTeamId = ticket.maintenanceTeamId || this.activeEngineerTeam?.teamId || 2;
+        const maintTypeVal = ticket.maintenanceType || 'corrective';
         const maintenanceFields = {
-          name: `${ticket.category || 'صيانة مرافق'}: ${ticket.title || 'طلب صيانة'} (#${ticket.id})`,
+          name: `${ticket.category || 'ØµÙŠØ§Ù†Ø© Ù…Ø±Ø§ÙÙ‚'}: ${ticket.title || 'Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø©'} (#${ticket.id})`,
           description: cleanDescription,
           priority: String(ticket.priority || '2'),
-          maintenance_type: 'corrective',
+          maintenance_type: maintTypeVal,
           maintenance_team_id: maintenanceTeamId
         };
         createPayload = {
@@ -1780,7 +1335,7 @@ class UltimateFMApp {
         };
       } else {
         const helpdeskFields = {
-          name: `${ticket.category || 'صيانة'}: ${ticket.title || 'بلاغ صيانة'} (#${ticket.id})`,
+          name: `${ticket.category || 'ØµÙŠØ§Ù†Ø©'}: ${ticket.title || 'Ø¨Ù„Ø§Øº ØµÙŠØ§Ù†Ø©'} (#${ticket.id})`,
           description: cleanDescription,
           priority: String(ticket.priority || '2'),
           partner_id: partnerId,
@@ -1837,7 +1392,7 @@ class UltimateFMApp {
                       "ir.attachment",
                       "create",
                       [{
-                        name: `صورة_عطل_${ticket.category || 'صيانة'}_${ticket.id}.jpg`,
+                        name: `ØµÙˆØ±Ø©_Ø¹Ø·Ù„_${ticket.category || 'ØµÙŠØ§Ù†Ø©'}_${ticket.id}.jpg`,
                         datas: base64Content,
                         res_model: targetModel,
                         res_id: ticketIdInOdoo
@@ -1853,15 +1408,17 @@ class UltimateFMApp {
           })();
         }
 
-        console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo Helpdesk Ticket ID: ${ticketIdInOdoo}`);
-      } else if (helpdeskData && helpdeskData.error) {
-        console.error('[Odoo Helpdesk Error]:', helpdeskData.error);
-        this.showToast(`❌ تعذر استكمال مزامنة الطلب: ${helpdeskData.error.message || JSON.stringify(helpdeskData.error)}`);
+        const modelLabel = targetModel === 'maintenance.request' ? 'Ø£ÙˆØ§Ù…Ø± Ø§Ù„ØµÙŠØ§Ù†Ø© (Maintenance)' : 'Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ (Helpdesk)';
+        console.log(`[Odoo Sync Success] Ticket #${ticket.id} registered under Odoo ${modelLabel} ID: ${ticketIdInOdoo}`);
+        this.showToast(`âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ ÙˆØ­ÙØ¸ Ø§Ù„Ø·Ù„Ø¨ #${ticket.id} Ø¨Ù†Ø¸Ø§Ù… Odoo Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ù‚Ø³Ù…: ${modelLabel}\nØ±Ù‚Ù… Ø§Ù„Ø³Ø¬Ù„ Ø¨Ø£ÙˆØ¯Ùˆ: #${ticketIdInOdoo}`);
+      } else if (odooCreateData && odooCreateData.error) {
+        console.error('[Odoo Create Error]:', odooCreateData.error);
+        this.showToast(`âŒ ØªØ¹Ø°Ø± Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø·Ù„Ø¨: ${odooCreateData.error.message || JSON.stringify(odooCreateData.error)}`);
       }
     } catch (err) {
       console.warn('[Odoo Sync Exception]:', err);
       if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        this.showToast(`❌ تعذر الاتصال بالنظام المركزي: ${err.message || err}`);
+        this.showToast(`âŒ ØªØ¹Ø°Ø± Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ: ${err.message || err}`);
       }
     }
   }
@@ -1869,29 +1426,29 @@ class UltimateFMApp {
   resolveOdooStageId(status) {
     if (!status) return 1;
     const s = String(status).toLowerCase()
-      .replace(/[أإآ]/g, 'ا')
-      .replace(/ة/g, 'ه')
-      .replace(/ى/g, 'ي')
+      .replace(/[Ø£Ø¥Ø¢]/g, 'Ø§')
+      .replace(/Ø©/g, 'Ù‡')
+      .replace(/Ù‰/g, 'ÙŠ')
       .trim();
 
     // 1. Solved / Completed (Stage 4) - ONLY when finished/solved
-    if (s.includes('تم الانتهاء') || s.includes('تم الحل') || s.includes('تم الاغلاق') || s.includes('مكتمل') || s === 'solved' || s === 'completed' || s === 'closed') {
+    if (s.includes('ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡') || s.includes('ØªÙ… Ø§Ù„Ø­Ù„') || s.includes('ØªÙ… Ø§Ù„Ø§ØºÙ„Ø§Ù‚') || s.includes('Ù…ÙƒØªÙ…Ù„') || s === 'solved' || s === 'completed' || s === 'closed') {
       return 4;
     }
     // 2. On Hold (Stage 3)
-    if (s.includes('قطع') || s.includes('غيار') || s.includes('معلق') || s.includes('انتظار') || s.includes('hold')) {
+    if (s.includes('Ù‚Ø·Ø¹') || s.includes('ØºÙŠØ§Ø±') || s.includes('Ù…Ø¹Ù„Ù‚') || s.includes('Ø§Ù†ØªØ¸Ø§Ø±') || s.includes('hold')) {
       return 3;
     }
     // 3. Cancelled (Stage 5)
-    if (s.includes('ملغي') || s.includes('الغاء') || s.includes('cancel')) {
+    if (s.includes('Ù…Ù„ØºÙŠ') || s.includes('Ø§Ù„ØºØ§Ø¡') || s.includes('cancel')) {
       return 5;
     }
     // 4. In Progress (Stage 2) - Assignment & Work in Progress
-    if (s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('progress')) {
+    if (s.includes('ØªØ¹ÙŠÙŠÙ†') || s.includes('Ø¬Ø§Ø±ÙŠ') || s.includes('Ù…Ø¹Ø§ÙŠÙ†') || s.includes('ÙÙ†ÙŠ') || s.includes('Ù…ÙˆÙ‚Ø¹') || s.includes('Ø¯ÙØ¹') || s.includes('progress')) {
       return 2;
     }
     // 5. New (Stage 1)
-    if (s.includes('جديد') || s.includes('new')) {
+    if (s.includes('Ø¬Ø¯ÙŠØ¯') || s.includes('new')) {
       return 1;
     }
 
@@ -1961,10 +1518,10 @@ class UltimateFMApp {
       console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
       // 1. Post to Chatter (message_post)
-      let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
-                       `<p>• <b>الحالة الحالية:</b> ${ticket.status}</p>` +
-                       (ticket.assignedTech ? `<p>• <b>الفني المكلف:</b> ${ticket.assignedTech}</p>` : '') +
-                       (ticket.resolutionTime ? `<p>• <b>مؤشر تقييم SLA وإغلاق التذكرة:</b> ${ticket.resolutionTime}</p>` : '');
+      let statusText = `<p><b>ðŸ”„ ØªØ­Ø¯ÙŠØ« Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø¨Ù„Ø§Øº Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„:</b></p>` +
+                       `<p>â€¢ <b>Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©:</b> ${ticket.status}</p>` +
+                       (ticket.assignedTech ? `<p>â€¢ <b>Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙƒÙ„Ù:</b> ${ticket.assignedTech}</p>` : '') +
+                       (ticket.resolutionTime ? `<p>â€¢ <b>Ù…Ø¤Ø´Ø± ØªÙ‚ÙŠÙŠÙ… SLA ÙˆØ¥ØºÙ„Ø§Ù‚ Ø§Ù„ØªØ°ÙƒØ±Ø©:</b> ${ticket.resolutionTime}</p>` : '');
 
       const chatterPayload = {
         jsonrpc: "2.0",
@@ -1988,10 +1545,10 @@ class UltimateFMApp {
       this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
 
       // 2. Update Odoo Ticket Description and Stage ID (stage_id)
-      let fullName = 'أسامة أحمد محمد الشريف';
+      let fullName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
       let phoneNum = '01223456789';
       let emailAddress = 'fmhala6@gmail.com';
-      let unitNum = 'فيلا 104 - زون الشمال';
+      let unitNum = 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø´Ù…Ø§Ù„';
 
       const customName = safeStorage.getItem('odoo_owner_name');
       if (customName && customName.trim()) {
@@ -1999,33 +1556,33 @@ class UltimateFMApp {
       }
 
       if (ticket.requester === 'tenant') {
-        fullName = 'أحمد زاهر محمود';
+        fullName = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø± Ù…Ø­Ù…ÙˆØ¯';
         phoneNum = '01009876543';
         emailAddress = 'tenant.ahmed@domain.com';
-        unitNum = 'شاليه 402 - زون البحيرات';
+        unitNum = 'Ø´Ø§Ù„ÙŠÙ‡ 402 - Ø²ÙˆÙ† Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª';
       } else if (ticket.requester === 'commercial') {
-        fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+        fullName = 'Ù…Ø·Ø¹Ù… ÙˆÙƒØ§ÙÙŠÙ‡ Blue Wave (Ø´Ø±ÙŠÙ Ù…Ø­Ù…Ø¯)';
         phoneNum = '01112233445';
         emailAddress = 'bluewave@domain.com';
-        unitNum = 'محل 12 - المول التجاري';
+        unitNum = 'Ù…Ø­Ù„ 12 - Ø§Ù„Ù…ÙˆÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
       } else if (ticket.requester === 'manager') {
-        fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+        fullName = 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)';
         phoneNum = '01221122334';
         emailAddress = 'ayman.saeed@domain.com';
-        unitNum = 'الأماكن العامة بالقرية';
+        unitNum = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
       }
 
-      let updatedDesc = `<p><b>بلاغ صيانة عاجل من تطبيق الموبايل</b></p>` +
+      let updatedDesc = `<p><b>Ø¨Ù„Ø§Øº ØµÙŠØ§Ù†Ø© Ø¹Ø§Ø¬Ù„ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„</b></p>` +
                         `<hr/>` +
-                        `<p><b>الاسم رباعي:</b> ${fullName}</p>` +
-                        `<p><b>رقم التليفون:</b> ${phoneNum}</p>` +
-                        `<p><b>البريد الإلكتروني:</b> ${emailAddress}</p>` +
-                        `<p><b>رقم الوحدة:</b> ${unitNum}</p>` +
+                        `<p><b>Ø§Ù„Ø§Ø³Ù… Ø±Ø¨Ø§Ø¹ÙŠ:</b> ${fullName}</p>` +
+                        `<p><b>Ø±Ù‚Ù… Ø§Ù„ØªÙ„ÙŠÙÙˆÙ†:</b> ${phoneNum}</p>` +
+                        `<p><b>Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ:</b> ${emailAddress}</p>` +
+                        `<p><b>Ø±Ù‚Ù… Ø§Ù„ÙˆØ­Ø¯Ø©:</b> ${unitNum}</p>` +
                         `<hr/>` +
-                        `<p><b>الفئة:</b> ${ticket.category || 'عام'}</p>` +
-                        `<p><b>الوصف بالتفصيل:</b> ${ticket.details || ticket.title || ''}</p>` +
+                        `<p><b>Ø§Ù„ÙØ¦Ø©:</b> ${ticket.category || 'Ø¹Ø§Ù…'}</p>` +
+                        `<p><b>Ø§Ù„ÙˆØµÙ Ø¨Ø§Ù„ØªÙØµÙŠÙ„:</b> ${ticket.details || ticket.title || ''}</p>` +
                         `<hr/>` +
-                        `<p><b>حالة التكليف الحالية:</b> ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}</p>`;
+                        `<p><b>Ø­Ø§Ù„Ø© Ø§Ù„ØªÙƒÙ„ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠØ©:</b> ${ticket.status} ${ticket.assignedTech ? ('- Ø§Ù„ÙÙ†ÙŠ: ' + ticket.assignedTech) : ''}</p>`;
 
       const writeFields = {
         description: updatedDesc,
@@ -2077,7 +1634,7 @@ class UltimateFMApp {
                   "ir.attachment",
                   "create",
                   [{
-                    name: `صورة_بعد_الإصلاح_تذكرة_${ticket.id}.jpg`,
+                    name: `ØµÙˆØ±Ø©_Ø¨Ø¹Ø¯_Ø§Ù„Ø¥ØµÙ„Ø§Ø­_ØªØ°ÙƒØ±Ø©_${ticket.id}.jpg`,
                     datas: base64Content,
                     res_model: "helpdesk.ticket",
                     res_id: parseInt(ticket.odooId)
@@ -2103,7 +1660,7 @@ class UltimateFMApp {
     const amountVal = parseFloat(document.getElementById('meterAmountInput')?.value || '0') || 0;
 
     if (amountVal <= 0) {
-      this.showToast('⚠️ يرجى إدخال مبلغ شحن صحيح');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ù…Ø¨Ù„Øº Ø´Ø­Ù† ØµØ­ÙŠØ­');
       return;
     }
 
@@ -2111,76 +1668,76 @@ class UltimateFMApp {
       if (meterType === 'electricity') {
         this.elecBalance += amountVal;
         const textEl = document.getElementById('elecBalanceText');
-        if (textEl) textEl.innerText = `${this.elecBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.elecBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('elecRemainingText');
         if (remEl) remEl.innerText = Math.round(this.elecBalance / 2.75);
-        this.showToast(`⚡ تم شحن عداد الكهرباء الذكي للمالك بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.elecBalance.toFixed(2)} ج.م (${Math.round(this.elecBalance / 2.75)} KWh)`);
+        this.showToast(`âš¡ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ø§Ù„Ø°ÙƒÙŠ Ù„Ù„Ù…Ø§Ù„Ùƒ Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.elecBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.elecBalance / 2.75)} KWh)`);
       } else {
         this.waterBalance += amountVal;
         const textEl = document.getElementById('waterBalanceText');
-        if (textEl) textEl.innerText = `${this.waterBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.waterBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('waterRemainingText');
         if (remEl) remEl.innerText = Math.round(this.waterBalance / 5.00);
-        this.showToast(`💧 تم شحن عداد المياه الذكي للمالك بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.waterBalance.toFixed(2)} ج.م (${Math.round(this.waterBalance / 5.00)} م³)`);
+        this.showToast(`ðŸ’§ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù…ÙŠØ§Ù‡ Ø§Ù„Ø°ÙƒÙŠ Ù„Ù„Ù…Ø§Ù„Ùƒ Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.waterBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.waterBalance / 5.00)} Ù…Â³)`);
       }
     } else if (this.currentRole === 'tenant') {
       if (meterType === 'electricity') {
         this.tenantElecBalance += amountVal;
         const textEl = document.getElementById('tenantElecText');
-        if (textEl) textEl.innerText = `${this.tenantElecBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.tenantElecBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('tenantElecRemainingText');
         if (remEl) remEl.innerText = Math.round(this.tenantElecBalance / 2.75);
-        this.showToast(`⚡ تم شحن عداد كهرباء الشاليه للمستأجر بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.tenantElecBalance.toFixed(2)} ج.م (${Math.round(this.tenantElecBalance / 2.75)} KWh)`);
+        this.showToast(`âš¡ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ø§Ù„Ø´Ø§Ù„ÙŠÙ‡ Ù„Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.tenantElecBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.tenantElecBalance / 2.75)} KWh)`);
       } else {
         this.tenantWaterBalance += amountVal;
         const textEl = document.getElementById('tenantWaterText');
-        if (textEl) textEl.innerText = `${this.tenantWaterBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.tenantWaterBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('tenantWaterRemainingText');
         if (remEl) remEl.innerText = Math.round(this.tenantWaterBalance / 5.00);
-        this.showToast(`💧 تم شحن عداد مياه الشاليه للمستأجر بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.tenantWaterBalance.toFixed(2)} ج.م (${Math.round(this.tenantWaterBalance / 5.00)} م³)`);
+        this.showToast(`ðŸ’§ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ù…ÙŠØ§Ù‡ Ø§Ù„Ø´Ø§Ù„ÙŠÙ‡ Ù„Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.tenantWaterBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.tenantWaterBalance / 5.00)} Ù…Â³)`);
       }
     } else if (this.currentRole === 'commercial') {
       if (meterType === 'electricity') {
         this.commElecBalance += amountVal;
         const textEl = document.getElementById('commElecText');
-        if (textEl) textEl.innerText = `${this.commElecBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.commElecBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('commElecRemainingText');
         if (remEl) remEl.innerText = Math.round(this.commElecBalance / 3.50);
-        this.showToast(`⚡ تم شحن عداد الكهرباء التجاري بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.commElecBalance.toFixed(2)} ج.م (${Math.round(this.commElecBalance / 3.50)} KWh)`);
+        this.showToast(`âš¡ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.commElecBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.commElecBalance / 3.50)} KWh)`);
       } else {
         this.commWaterBalance += amountVal;
         const textEl = document.getElementById('commWaterText');
-        if (textEl) textEl.innerText = `${this.commWaterBalance.toFixed(2)} ج.م`;
+        if (textEl) textEl.innerText = `${this.commWaterBalance.toFixed(2)} Ø¬.Ù…`;
         const remEl = document.getElementById('commWaterRemainingText');
         if (remEl) remEl.innerText = Math.round(this.commWaterBalance / 6.00);
-        this.showToast(`💧 تم شحن عداد المياه التجاري بنجاح بمبلغ ${amountVal} ج.م!\nالرصيد الجديد: ${this.commWaterBalance.toFixed(2)} ج.م (${Math.round(this.commWaterBalance / 6.00)} م³)`);
+        this.showToast(`ðŸ’§ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù…ÙŠØ§Ù‡ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯: ${this.commWaterBalance.toFixed(2)} Ø¬.Ù… (${Math.round(this.commWaterBalance / 6.00)} Ù…Â³)`);
       }
     }
 
     this.closeModal('modalMeterRecharge');
 
-    const meterTypeName = meterType === 'electricity' ? 'كهرباء' : 'مياه';
+    const meterTypeName = meterType === 'electricity' ? 'ÙƒÙ‡Ø±Ø¨Ø§Ø¡' : 'Ù…ÙŠØ§Ù‡';
     const meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
     const payRef = 'SYS-PAY-' + Math.floor(100000 + Math.random() * 900000);
 
-    this.showToast(`⚡ تم شحن عداد ${meterTypeName} الذكي (${meterCode}) بمبلغ ${amountVal} ج.م!\nرقم المرجع المالي: #${payRef}\nجاري توثيق العملية بكشف الحساب المركزي Odoo...`);
+    this.showToast(`âš¡ ØªÙ… Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ ${meterTypeName} Ø§Ù„Ø°ÙƒÙŠ (${meterCode}) Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù…!\nØ±Ù‚Ù… Ø§Ù„Ù…Ø±Ø¬Ø¹ Ø§Ù„Ù…Ø§Ù„ÙŠ: #${payRef}\nØ¬Ø§Ø±ÙŠ ØªÙˆØ«ÙŠÙ‚ Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø¨ÙƒØ´Ù Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ Odoo...`);
 
     // Sync meter recharge transaction to Odoo
     (async () => {
       try {
         const meterTicket = {
           id: 'MTR-' + Math.floor(1000 + Math.random() * 9000),
-          category: 'شحن عدادات سكنية ومرافق',
-          title: `شحن عداد ${meterTypeName}: ${meterCode}`,
-          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: فيلا 104 - زون الساحل الشمالي`,
-          status: 'تم الشحن وتحديث العداد',
+          category: 'Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯Ø§Øª Ø³ÙƒÙ†ÙŠØ© ÙˆÙ…Ø±Ø§ÙÙ‚',
+          title: `Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ ${meterTypeName}: ${meterCode}`,
+          details: `Ø¹Ù…Ù„ÙŠØ© Ø´Ø­Ù† Ø¹Ø¯Ø§Ø¯ Ù…Ø±Ø§ÙÙ‚ Ø°ÙƒÙŠ Ù…Ø³Ø¨Ù‚ Ø§Ù„Ø¯ÙØ¹\nÙ†ÙˆØ¹ Ø§Ù„Ø¹Ø¯Ø§Ø¯: ${meterTypeName} (${meterCode})\nØ§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø´Ø­ÙˆÙ†: ${amountVal} Ø¬.Ù…\nØ±Ù‚Ù… Ø§Ù„Ù…Ø±Ø¬Ø¹ Ø§Ù„Ù…Ø§Ù„ÙŠ: #${payRef}\nØ§Ù„ÙˆØ­Ø¯Ø©: ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ`,
+          status: 'ØªÙ… Ø§Ù„Ø´Ø­Ù† ÙˆØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¹Ø¯Ø§Ø¯',
           bgClass: 'badge-success',
           requester: 'homeowner',
           priority: '1',
           createdAt: new Date().toISOString()
         };
-        await this.syncTicketToOdoo(meterTicket, '01223456789', 'أسامة أحمد محمد الشريف');
-        this.showToast(`✅ تم توثيق شحن العداد بمبلغ ${amountVal} ج.م بداخل كشف الحساب المركزي Odoo (Invoicing - account.move) برقم #${payRef}!`);
+        await this.syncTicketToOdoo(meterTicket, '01223456789', 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ');
+        this.showToast(`âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ Ø´Ø­Ù† Ø§Ù„Ø¹Ø¯Ø§Ø¯ Ø¨Ù…Ø¨Ù„Øº ${amountVal} Ø¬.Ù… Ø¨Ø¯Ø§Ø®Ù„ ÙƒØ´Ù Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ Odoo (Invoicing - account.move) Ø¨Ø±Ù‚Ù… #${payRef}!`);
       } catch (err) {
         console.warn('[Odoo Meter Recharge Sync Error]:', err);
       }
@@ -2194,33 +1751,33 @@ class UltimateFMApp {
       if (!isEn) return txt;
       if (!txt) return '';
       const dict = {
-        'صيانة تكييف الماستر': 'Master A/C Maintenance',
-        'تسريب في محبس السباكة': 'Plumbing Valve Leak',
-        'كهروميكانيك': 'Electromechanical',
-        'سباكة': 'Plumbing',
-        'أصول وعامة': 'General Assets',
-        'قيد الفحص الميداني': 'Under Field Inspection',
-        'تم إسناد الفني': 'Technician Assigned',
-        'انتظار دفع المالك': 'Awaiting Owner Payment',
-        'تم الدفع - جاري التركيب': 'Paid - Installation in Progress',
-        'تم الانتهاء': 'Completed',
-        'لوحة تحكم تكييف': 'A/C Control Panel',
-        'محبس نحاس إيطالي': 'Italian Brass Valve',
-        'لا توجد بلاغات حالية': 'No active tickets',
-        'نشطة': 'active',
-        'تصريح دخول الوحدة': 'Unit Entry Permit',
-        'تصريح دخول البحر والبحيرات': 'Beach & Lake Entry Permit',
-        'دخول البحر والبحيرات والمسابح': 'Beach & Lakes Access Permit',
-        'تصريح دخول سيارات بضائع': 'Cargo Entry Permit',
-        'معتمد': 'Approved',
-        'تحت المراجعة': 'Under Review',
-        'لا توجد تصاريح حالية': 'No active permits',
-        'ركن سيارة مخالف أمام الفيلا يغلق الممر': 'Illegal car parking in front of the villa blocking the lane',
-        'تحت المراجعة والتحرك الميداني': 'Under Review & Field Dispatch',
-        'لا توجد شكاوى أمنية حالية': 'No active security complaints'
+        'ØµÙŠØ§Ù†Ø© ØªÙƒÙŠÙŠÙ Ø§Ù„Ù…Ø§Ø³ØªØ±': 'Master A/C Maintenance',
+        'ØªØ³Ø±ÙŠØ¨ ÙÙŠ Ù…Ø­Ø¨Ø³ Ø§Ù„Ø³Ø¨Ø§ÙƒØ©': 'Plumbing Valve Leak',
+        'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': 'Electromechanical',
+        'Ø³Ø¨Ø§ÙƒØ©': 'Plumbing',
+        'Ø£ØµÙˆÙ„ ÙˆØ¹Ø§Ù…Ø©': 'General Assets',
+        'Ù‚ÙŠØ¯ Ø§Ù„ÙØ­Øµ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ': 'Under Field Inspection',
+        'ØªÙ… Ø¥Ø³Ù†Ø§Ø¯ Ø§Ù„ÙÙ†ÙŠ': 'Technician Assigned',
+        'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ': 'Awaiting Owner Payment',
+        'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨': 'Paid - Installation in Progress',
+        'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡': 'Completed',
+        'Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… ØªÙƒÙŠÙŠÙ': 'A/C Control Panel',
+        'Ù…Ø­Ø¨Ø³ Ù†Ø­Ø§Ø³ Ø¥ÙŠØ·Ø§Ù„ÙŠ': 'Italian Brass Valve',
+        'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ù„Ø§ØºØ§Øª Ø­Ø§Ù„ÙŠØ©': 'No active tickets',
+        'Ù†Ø´Ø·Ø©': 'active',
+        'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø©': 'Unit Entry Permit',
+        'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨Ø­Ø± ÙˆØ§Ù„Ø¨Ø­ÙŠØ±Ø§Øª': 'Beach & Lake Entry Permit',
+        'Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨Ø­Ø± ÙˆØ§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ§Ù„Ù…Ø³Ø§Ø¨Ø­': 'Beach & Lakes Access Permit',
+        'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø³ÙŠØ§Ø±Ø§Øª Ø¨Ø¶Ø§Ø¦Ø¹': 'Cargo Entry Permit',
+        'Ù…Ø¹ØªÙ…Ø¯': 'Approved',
+        'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©': 'Under Review',
+        'Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ Ø­Ø§Ù„ÙŠØ©': 'No active permits',
+        'Ø±ÙƒÙ† Ø³ÙŠØ§Ø±Ø© Ù…Ø®Ø§Ù„Ù Ø£Ù…Ø§Ù… Ø§Ù„ÙÙŠÙ„Ø§ ÙŠØºÙ„Ù‚ Ø§Ù„Ù…Ù…Ø±': 'Illegal car parking in front of the villa blocking the lane',
+        'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„ØªØ­Ø±Ùƒ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ': 'Under Review & Field Dispatch',
+        'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´ÙƒØ§ÙˆÙ‰ Ø£Ù…Ù†ÙŠØ© Ø­Ø§Ù„ÙŠØ©': 'No active security complaints'
       };
-      if (txt.startsWith('زائر: ')) {
-        return txt.replace('زائر: ', 'Visitor: ').replace('شاليه', 'Chalet').replace('فيلا', 'Villa');
+      if (txt.startsWith('Ø²Ø§Ø¦Ø±: ')) {
+        return txt.replace('Ø²Ø§Ø¦Ø±: ', 'Visitor: ').replace('Ø´Ø§Ù„ÙŠÙ‡', 'Chalet').replace('ÙÙŠÙ„Ø§', 'Villa');
       }
       return dict[txt] || txt;
     };
@@ -2236,27 +1793,27 @@ class UltimateFMApp {
       if (tk.photoBefore) {
         photosHtml = `<div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
           <div>
-            <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">${isEn ? 'Before Photo:' : 'صورة العطل:'}</span>
+            <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">${isEn ? 'Before Photo:' : 'ØµÙˆØ±Ø© Ø§Ù„Ø¹Ø·Ù„:'}</span>
             <img src="${tk.photoBefore}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1);">
           </div>`;
-        if (tk.status === 'تم الانتهاء' && tk.photoAfter) {
+        if (tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' && tk.photoAfter) {
           photosHtml += `
           <div>
-            <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">${isEn ? 'After Photo:' : 'صورة الإصلاح:'}</span>
+            <span style="font-size: 0.6rem; color: #10b981; display: block; margin-bottom: 2px;">${isEn ? 'After Photo:' : 'ØµÙˆØ±Ø© Ø§Ù„Ø¥ØµÙ„Ø§Ø­:'}</span>
             <img src="${tk.photoAfter}" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(16,185,129,0.2);">
           </div>
           <div style="margin-right: 8px; font-size: 0.72rem; color: #10b981; font-weight: 700;">
-            <i class="fa-solid fa-clock-check"></i> ${isEn ? 'Resolution time:' : 'مدة الحل:'} ${tk.resolutionTime}
+            <i class="fa-solid fa-clock-check"></i> ${isEn ? 'Resolution time:' : 'Ù…Ø¯Ø© Ø§Ù„Ø­Ù„:'} ${tk.resolutionTime}
           </div>`;
         }
         photosHtml += `</div>`;
       }
 
       let paymentHtml = '';
-      if (tk.status === 'انتظار دفع المالك') {
+      if (tk.status === 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ') {
         paymentHtml = isEn ? `
           <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
-            <span>⚠️ <strong>Repair requires spare part:</strong> [${partName}] priced at <strong>${tk.partPrice} EGP</strong>.</span>
+            <span>âš ï¸ <strong>Repair requires spare part:</strong> [${partName}] priced at <strong>${tk.partPrice} EGP</strong>.</span>
             <span>Please complete the payment online to start the installation.</span>
             <button class="btn btn-danger btn-sm" onclick="app.openSparePartPaymentModal('${tk.id}')" style="width: 100%; margin-top: 4px; font-size: 0.72rem; padding: 6px; font-weight: 700; height: 32px; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
               <i class="fa-solid fa-credit-card"></i> Pay for Spare Part (${tk.partPrice} EGP)
@@ -2264,21 +1821,21 @@ class UltimateFMApp {
           </div>
         ` : `
           <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
-            <span>⚠️ <strong>يتطلب الإصلاح قطعة غيار:</strong> [${tk.partName}] بسعر <strong>${tk.partPrice} ج.م</strong>.</span>
-            <span>يرجى سداد القيمة إلكترونياً للبدء الفوري في التركيب من قبل الفني.</span>
+            <span>âš ï¸ <strong>ÙŠØªØ·Ù„Ø¨ Ø§Ù„Ø¥ØµÙ„Ø§Ø­ Ù‚Ø·Ø¹Ø© ØºÙŠØ§Ø±:</strong> [${tk.partName}] Ø¨Ø³Ø¹Ø± <strong>${tk.partPrice} Ø¬.Ù…</strong>.</span>
+            <span>ÙŠØ±Ø¬Ù‰ Ø³Ø¯Ø§Ø¯ Ø§Ù„Ù‚ÙŠÙ…Ø© Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Ù‹ Ù„Ù„Ø¨Ø¯Ø¡ Ø§Ù„ÙÙˆØ±ÙŠ ÙÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨ Ù…Ù† Ù‚Ø¨Ù„ Ø§Ù„ÙÙ†ÙŠ.</span>
             <button class="btn btn-danger btn-sm" onclick="app.openSparePartPaymentModal('${tk.id}')" style="width: 100%; margin-top: 4px; font-size: 0.72rem; padding: 6px; font-weight: 700; height: 32px; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
-              <i class="fa-solid fa-credit-card"></i> سداد قيمة قطعة الغيار (${tk.partPrice} ج.م)
+              <i class="fa-solid fa-credit-card"></i> Ø³Ø¯Ø§Ø¯ Ù‚ÙŠÙ…Ø© Ù‚Ø·Ø¹Ø© Ø§Ù„ØºÙŠØ§Ø± (${tk.partPrice} Ø¬.Ù…)
             </button>
           </div>
         `;
-      } else if (tk.status === 'تم الدفع - جاري التركيب') {
+      } else if (tk.status === 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨') {
         paymentHtml = isEn ? `
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
             <i class="fa-solid fa-circle-check"></i> Paid <strong>${tk.partPrice} EGP</strong> successfully. The technician will bring and install the [${partName}].
           </div>
         ` : `
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
-            <i class="fa-solid fa-circle-check"></i> تم سداد <strong>${tk.partPrice} ج.م</strong> بنجاح. جاري إحضار قطعة [${tk.partName}] وتركيبها بواسطة الفني.
+            <i class="fa-solid fa-circle-check"></i> ØªÙ… Ø³Ø¯Ø§Ø¯ <strong>${tk.partPrice} Ø¬.Ù…</strong> Ø¨Ù†Ø¬Ø§Ø­. Ø¬Ø§Ø±ÙŠ Ø¥Ø­Ø¶Ø§Ø± Ù‚Ø·Ø¹Ø© [${tk.partName}] ÙˆØªØ±ÙƒÙŠØ¨Ù‡Ø§ Ø¨ÙˆØ§Ø³Ø·Ø© Ø§Ù„ÙÙ†ÙŠ.
           </div>
         `;
       }
@@ -2288,33 +1845,33 @@ class UltimateFMApp {
       const timeDisplay = tk.timeStr || rawDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
       let priorityStars = '';
-      if (tk.priority === '3') priorityStars = ' ⭐⭐⭐';
-      else if (tk.priority === '2') priorityStars = ' ⭐⭐';
-      else if (tk.priority === '1') priorityStars = ' ⭐';
+      if (tk.priority === '3') priorityStars = ' â­â­â­';
+      else if (tk.priority === '2') priorityStars = ' â­â­';
+      else if (tk.priority === '1') priorityStars = ' â­';
 
       let odooRepliesHtml = '';
-      const isFinancialInquiry = tk.category && (tk.category.includes('حسابات') || tk.category.includes('مالي'));
+      const isFinancialInquiry = tk.category && (tk.category.includes('Ø­Ø³Ø§Ø¨Ø§Øª') || tk.category.includes('Ù…Ø§Ù„ÙŠ'));
       if (tk.odooId && isFinancialInquiry) {
         odooRepliesHtml = `
           <div style="margin-top: 8px; border-top: 1px dashed rgba(32, 39, 79, 0.15); padding-top: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <span style="font-size: 0.72rem; font-weight: 700; color: #20274f;">
-                <i class="fa-solid fa-comments"></i> ${isEn ? 'Live Conversation Log:' : 'سجل التوضيحات والردود المباشرة:'}
+                <i class="fa-solid fa-comments"></i> ${isEn ? 'Live Conversation Log:' : 'Ø³Ø¬Ù„ Ø§Ù„ØªÙˆØ¶ÙŠØ­Ø§Øª ÙˆØ§Ù„Ø±Ø¯ÙˆØ¯ Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø©:'}
               </span>
               <button class="btn btn-sm" onclick="app.loadOdooRepliesForTicket('${tk.id}', '${tk.odooId}')" style="font-size: 0.65rem; padding: 3px 10px; font-weight: 700; background: rgba(27, 143, 145, 0.12); color: #1b8f91; border: 1px solid rgba(27, 143, 145, 0.3); border-radius: 6px; width: auto; cursor: pointer;">
-                <i class="fa-solid fa-rotate"></i> ${isEn ? 'Sync Replies' : '💬 متابعة سجل الردود'}
+                <i class="fa-solid fa-rotate"></i> ${isEn ? 'Sync Replies' : 'ðŸ’¬ Ù…ØªØ§Ø¨Ø¹Ø© Ø³Ø¬Ù„ Ø§Ù„Ø±Ø¯ÙˆØ¯'}
               </button>
             </div>
             <div id="odoo_replies_box_${tk.id}" class="odoo-replies-box-${tk.id}" style="font-size: 0.72rem; color: var(--text-muted);">
               ${tk.lastReply ? `
                 <div style="background: rgba(16, 185, 129, 0.08); border-right: 3px solid #10b981; padding: 6px 10px; border-radius: 6px; margin-top: 4px;">
                   <div style="font-weight: 700; color: #10b981; display: flex; justify-content: space-between;">
-                    <span><i class="fa-solid fa-user-check"></i> ${tk.lastReplyAuthor || 'فريق الدعم والحسابات'}:</span>
+                    <span><i class="fa-solid fa-user-check"></i> ${tk.lastReplyAuthor || 'ÙØ±ÙŠÙ‚ Ø§Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª'}:</span>
                     <span style="font-size: 0.65rem; color: var(--text-muted);">${tk.lastReplyDate || ''}</span>
                   </div>
                   <div style="color: var(--text-main); margin-top: 2px;">${tk.lastReply}</div>
                 </div>
-              ` : `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن. اضغط "متابعة سجل الردود" للمتابعة الحية.</div>`}
+              ` : `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø¯ÙˆØ¯ Ø¬Ø¯ÙŠØ¯Ø© Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†. Ø§Ø¶ØºØ· "Ù…ØªØ§Ø¨Ø¹Ø© Ø³Ø¬Ù„ Ø§Ù„Ø±Ø¯ÙˆØ¯" Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­ÙŠØ©.</div>`}
             </div>
           </div>
         `;
@@ -2322,20 +1879,20 @@ class UltimateFMApp {
 
       // Emaar 4-step Progress Tracker Calculation
       let step = 1;
-      if (['تم التعيين للفني', 'تم إسناد الفني', 'قيد الفحص الميداني', 'جاري العمل', 'جاري المراجعة', 'In Progress'].includes(tk.status)) step = 2;
-      else if (['انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'On Hold', 'بانتظار قطع الغيار'].includes(tk.status)) step = 3;
-      else if (['تم الانتهاء', 'تم الحل', 'تم الإغلاق', 'Done', 'Solved', 'تم السداد', 'مكتمل'].includes(tk.status)) step = 4;
+      if (['ØªÙ… Ø§Ù„ØªØ¹ÙŠÙŠÙ† Ù„Ù„ÙÙ†ÙŠ', 'ØªÙ… Ø¥Ø³Ù†Ø§Ø¯ Ø§Ù„ÙÙ†ÙŠ', 'Ù‚ÙŠØ¯ Ø§Ù„ÙØ­Øµ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ', 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„', 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', 'In Progress'].includes(tk.status)) step = 2;
+      else if (['Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ', 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨', 'On Hold', 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù‚Ø·Ø¹ Ø§Ù„ØºÙŠØ§Ø±'].includes(tk.status)) step = 3;
+      else if (['ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡', 'ØªÙ… Ø§Ù„Ø­Ù„', 'ØªÙ… Ø§Ù„Ø¥ØºÙ„Ø§Ù‚', 'Done', 'Solved', 'ØªÙ… Ø§Ù„Ø³Ø¯Ø§Ø¯', 'Ù…ÙƒØªÙ…Ù„'].includes(tk.status)) step = 4;
 
       const progressPercent = step === 1 ? 25 : (step === 2 ? 50 : (step === 3 ? 75 : 100));
-      const progressColor = step === 4 ? '#10b981' : (step === 3 && tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140');
+      const progressColor = step === 4 ? '#10b981' : (step === 3 && tk.status === 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ' ? '#ef4444' : '#1c2140');
 
       const emaarTrackerHtml = `
         <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(32,39,79,0.08);">
           <div style="display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
-            <span style="color: ${step >= 1 ? '#1c2140' : 'inherit'};">${isEn ? '1. Request Sent' : '1. تقديم الطلب'}</span>
-            <span style="color: ${step >= 2 ? '#1c2140' : 'inherit'};">${isEn ? '2. Tech Visit' : '2. معاينة الفني'}</span>
-            <span style="color: ${step >= 3 ? '#1c2140' : 'inherit'};">${isEn ? '3. Part / Repair' : '3. القطع والتركيب'}</span>
-            <span style="color: ${step >= 4 ? '#10b981' : 'inherit'};">${isEn ? '4. Closed' : '4. تم الحل'}</span>
+            <span style="color: ${step >= 1 ? '#1c2140' : 'inherit'};">${isEn ? '1. Request Sent' : '1. ØªÙ‚Ø¯ÙŠÙ… Ø§Ù„Ø·Ù„Ø¨'}</span>
+            <span style="color: ${step >= 2 ? '#1c2140' : 'inherit'};">${isEn ? '2. Tech Visit' : '2. Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ÙÙ†ÙŠ'}</span>
+            <span style="color: ${step >= 3 ? '#1c2140' : 'inherit'};">${isEn ? '3. Part / Repair' : '3. Ø§Ù„Ù‚Ø·Ø¹ ÙˆØ§Ù„ØªØ±ÙƒÙŠØ¨'}</span>
+            <span style="color: ${step >= 4 ? '#10b981' : 'inherit'};">${isEn ? '4. Closed' : '4. ØªÙ… Ø§Ù„Ø­Ù„'}</span>
           </div>
           <div style="width: 100%; height: 5px; background: rgba(32,39,79,0.08); border-radius: 4px; overflow: hidden;">
             <div style="width: ${progressPercent}%; height: 100%; background: ${progressColor}; transition: width 0.3s ease;"></div>
@@ -2345,14 +1902,14 @@ class UltimateFMApp {
 
       // 1. Cancellation Info Box if Cancelled
       let cancellationHtml = '';
-      if (tk.status === 'ملغاة' || tk.status === 'Cancelled' || tk.status === 'ملغي' || String(tk.status).includes('الغاء') || String(tk.status).includes('ملغ')) {
+      if (tk.status === 'Ù…Ù„ØºØ§Ø©' || tk.status === 'Cancelled' || tk.status === 'Ù…Ù„ØºÙŠ' || String(tk.status).includes('Ø§Ù„ØºØ§Ø¡') || String(tk.status).includes('Ù…Ù„Øº')) {
         cancellationHtml = `
           <div style="background: rgba(239, 68, 68, 0.08); border-right: 3px solid #ef4444; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
             <div style="font-size: 0.75rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-ban"></i> <span>تم إلغاء هذا البلاغ رسمياً</span>
+              <i class="fa-solid fa-ban"></i> <span>ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ù‡Ø°Ø§ Ø§Ù„Ø¨Ù„Ø§Øº Ø±Ø³Ù…ÙŠØ§Ù‹</span>
             </div>
             <p style="font-size: 0.7rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">
-              <b>سبب الإلغاء المدون:</b> ${tk.cancelReason || tk.cancellationReason || tk.cancelNotes || 'تم الإلغاء من قِبل إدارة الصيانة لتعذر التنفيذ'}
+              <b>Ø³Ø¨Ø¨ Ø§Ù„Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ù…Ø¯ÙˆÙ†:</b> ${tk.cancelReason || tk.cancellationReason || tk.cancelNotes || 'ØªÙ… Ø§Ù„Ø¥Ù„ØºØ§Ø¡ Ù…Ù† Ù‚ÙØ¨Ù„ Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙŠØ§Ù†Ø© Ù„ØªØ¹Ø°Ø± Ø§Ù„ØªÙ†ÙÙŠØ°'}
             </p>
           </div>
         `;
@@ -2360,14 +1917,14 @@ class UltimateFMApp {
 
       // 2. Customer Star Rating & Review Box if Solved / Completed
       let ratingHtml = '';
-      const isSolved = tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved' || tk.status === 'Done' || tk.status === 'مكتمل';
+      const isSolved = tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' || tk.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || tk.status === 'Solved' || tk.status === 'Done' || tk.status === 'Ù…ÙƒØªÙ…Ù„';
       if (isSolved) {
         if (tk.customerRating) {
-          const starsStr = '⭐'.repeat(parseInt(tk.customerRating) || 5);
+          const starsStr = 'â­'.repeat(parseInt(tk.customerRating) || 5);
           ratingHtml = `
             <div style="background: rgba(212, 175, 55, 0.08); border-right: 3px solid #d4af37; padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
               <div style="font-size: 0.75rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-star" style="color: #d4af37;"></i> <span>تقييمك لجودة الخدمة: ${starsStr} (${tk.customerRating}/5)</span>
+                <i class="fa-solid fa-star" style="color: #d4af37;"></i> <span>ØªÙ‚ÙŠÙŠÙ…Ùƒ Ù„Ø¬ÙˆØ¯Ø© Ø§Ù„Ø®Ø¯Ù…Ø©: ${starsStr} (${tk.customerRating}/5)</span>
               </div>
               ${tk.customerComment ? `<p style="font-size: 0.68rem; color: #1c2140; margin: 3px 0 0 0; font-weight: 600;">"${tk.customerComment}"</p>` : ''}
             </div>
@@ -2376,7 +1933,7 @@ class UltimateFMApp {
           ratingHtml = `
             <div style="margin-top: 8px;">
               <button class="btn btn-sm" onclick="app.openRateTicketModal('${tk.id}')" style="width: 100%; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #d4af37, #b8860b); color: #ffffff; border: none; border-radius: 6px; padding: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(212,175,55,0.25);">
-                <i class="fa-solid fa-star"></i> تقييم جودة الخدمة ورضا العميل ⭐
+                <i class="fa-solid fa-star"></i> ØªÙ‚ÙŠÙŠÙ… Ø¬ÙˆØ¯Ø© Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆØ±Ø¶Ø§ Ø§Ù„Ø¹Ù…ÙŠÙ„ â­
               </button>
             </div>
           `;
@@ -2384,16 +1941,16 @@ class UltimateFMApp {
       }
 
       return `
-        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'تم الدفع - جاري التركيب' ? '#10b981' : (tk.status === 'انتظار دفع المالك' ? '#ef4444' : '#1c2140')}; font-family: var(--font-main); border-radius: 10px; padding: 12px; margin-bottom: 8px;">
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; border-left: 4px solid ${tk.status === 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨' ? '#10b981' : (tk.status === 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ' ? '#ef4444' : '#1c2140')}; font-family: var(--font-main); border-radius: 10px; padding: 12px; margin-bottom: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <h4 style="font-size: 0.85rem; font-weight: 700; color: #1c2140;">${title}${priorityStars}</h4>
             <span class="badge ${tk.bgClass}">${status}</span>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 4px; background: rgba(32, 39, 79, 0.03); padding: 6px 8px; border-radius: 6px; width: 100%; box-sizing: border-box;">
-            <div>${isEn ? 'Category' : 'التخصص'}: <b>${category}</b> • #${tk.id} ${tk.assignedTech ? `• ${isEn ? 'Tech' : 'الفني'}: ${tk.assignedTech}` : ''}</div>
+            <div>${isEn ? 'Category' : 'Ø§Ù„ØªØ®ØµØµ'}: <b>${category}</b> â€¢ #${tk.id} ${tk.assignedTech ? `â€¢ ${isEn ? 'Tech' : 'Ø§Ù„ÙÙ†ÙŠ'}: ${tk.assignedTech}` : ''}</div>
             <div style="font-size: 0.68rem; color: #1b8f91; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; width: 100%;">
               <span><i class="fa-regular fa-calendar-days"></i> ${dateDisplay}</span>
-              <span>•</span>
+              <span>â€¢</span>
               <span><i class="fa-regular fa-clock"></i> ${timeDisplay}</span>
             </div>
           </div>
@@ -2415,8 +1972,8 @@ class UltimateFMApp {
         const cat = String(tk.category || '').toLowerCase();
         const title = String(tk.title || '').toLowerCase();
         // Exclude financial, accounting, security permits, and gate passes from maintenance list
-        if (cat.includes('حسابات') || cat.includes('مالي') || cat.includes('تصريح') || cat.includes('بوابات') || cat.includes('أمن')) return false;
-        if (title.includes('تصريح دخول') || title.includes('بوابات أمني')) return false;
+        if (cat.includes('Ø­Ø³Ø§Ø¨Ø§Øª') || cat.includes('Ù…Ø§Ù„ÙŠ') || cat.includes('ØªØµØ±ÙŠØ­') || cat.includes('Ø¨ÙˆØ§Ø¨Ø§Øª') || cat.includes('Ø£Ù…Ù†')) return false;
+        if (title.includes('ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„') || title.includes('Ø¨ÙˆØ§Ø¨Ø§Øª Ø£Ù…Ù†ÙŠ')) return false;
         return true;
       };
 
@@ -2424,20 +1981,20 @@ class UltimateFMApp {
 
       const isCompletedStatus = (st) => {
         if (!st) return false;
-        const s = String(st).toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
-        return s.includes('انته') || s.includes('مكتمل') || s.includes('مغلق') || s.includes('حل') || s.includes('done') || s.includes('solved') || s.includes('closed') || s.includes('سداد');
+        const s = String(st).toLowerCase().replace(/[Ø£Ø¥Ø¢]/g, 'Ø§').replace(/Ø©/g, 'Ù‡').replace(/Ù‰/g, 'ÙŠ').trim();
+        return s.includes('Ø§Ù†ØªÙ‡') || s.includes('Ù…ÙƒØªÙ…Ù„') || s.includes('Ù…ØºÙ„Ù‚') || s.includes('Ø­Ù„') || s.includes('done') || s.includes('solved') || s.includes('closed') || s.includes('Ø³Ø¯Ø§Ø¯');
       };
 
       const activeTks = homeownerTks.filter(t => !isCompletedStatus(t.status));
       const completedTks = homeownerTks.filter(t => isCompletedStatus(t.status));
 
       // Category Counters Summary for Active Tickets (6 Categories)
-      const plumbingCount = activeTks.filter(t => t.category === 'سباكة').length;
-      const elecCount = activeTks.filter(t => t.category === 'كهرباء').length;
-      const hvacCount = activeTks.filter(t => t.category === 'كهروميكانيك' || t.category === 'تكييف').length;
-      const woodCount = activeTks.filter(t => t.category === 'نجارة').length;
-      const hkCount = activeTks.filter(t => t.category && (t.category.includes('نظافة') || t.category.includes('هاوس'))).length + (this.housekeepingRequests ? this.housekeepingRequests.filter(r => r.requester === 'owner').length : 0);
-      const landscapeCount = activeTks.filter(t => t.category && (t.category.includes('حدائق') || t.category.includes('لاند'))).length;
+      const plumbingCount = activeTks.filter(t => t.category === 'Ø³Ø¨Ø§ÙƒØ©').length;
+      const elecCount = activeTks.filter(t => t.category === 'ÙƒÙ‡Ø±Ø¨Ø§Ø¡').length;
+      const hvacCount = activeTks.filter(t => t.category === 'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ' || t.category === 'ØªÙƒÙŠÙŠÙ').length;
+      const woodCount = activeTks.filter(t => t.category === 'Ù†Ø¬Ø§Ø±Ø©').length;
+      const hkCount = activeTks.filter(t => t.category && (t.category.includes('Ù†Ø¸Ø§ÙØ©') || t.category.includes('Ù‡Ø§ÙˆØ³'))).length + (this.housekeepingRequests ? this.housekeepingRequests.filter(r => r.requester === 'owner').length : 0);
+      const landscapeCount = activeTks.filter(t => t.category && (t.category.includes('Ø­Ø¯Ø§Ø¦Ù‚') || t.category.includes('Ù„Ø§Ù†Ø¯'))).length;
 
       const elPlumb = document.getElementById('catPlumbingCount');
       const elElec = document.getElementById('catElecCount');
@@ -2454,7 +2011,7 @@ class UltimateFMApp {
       if (elLandscape) elLandscape.innerText = landscapeCount;
 
       const badge = document.getElementById('ticketCountBadge');
-      if (badge) badge.innerText = isEn ? `${activeTks.length} active` : `${activeTks.length} نشطة`;
+      if (badge) badge.innerText = isEn ? `${activeTks.length} active` : `${activeTks.length} Ù†Ø´Ø·Ø©`;
 
       const elActiveNum = document.getElementById('emaarActiveCountNum');
       const elCompNum = document.getElementById('emaarCompletedCountNum');
@@ -2482,7 +2039,7 @@ class UltimateFMApp {
 
       if (filterMode === 'active') {
         if (activeTks.length === 0) {
-          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No active tickets' : 'لا توجد بلاغات نشطة حالياً'}</div>`;
+          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No active tickets' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ù„Ø§ØºØ§Øª Ù†Ø´Ø·Ø© Ø­Ø§Ù„ÙŠØ§Ù‹'}</div>`;
         } else {
           activeTks.forEach(tk => {
             homeownerList.innerHTML += getTicketHtml(tk);
@@ -2490,7 +2047,7 @@ class UltimateFMApp {
         }
       } else {
         if (completedTks.length === 0) {
-          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No completed history tickets' : 'لا يوجد سجل تذاكر منتهية حالياً'}</div>`;
+          homeownerList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No completed history tickets' : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø³Ø¬Ù„ ØªØ°Ø§ÙƒØ± Ù…Ù†ØªÙ‡ÙŠØ© Ø­Ø§Ù„ÙŠØ§Ù‹'}</div>`;
         } else {
           completedTks.forEach(tk => {
             homeownerList.innerHTML += getTicketHtml(tk);
@@ -2506,13 +2063,13 @@ class UltimateFMApp {
         const cat = String(tk.category || '').toLowerCase();
         const title = String(tk.title || '').toLowerCase();
         // Exclude Financials, Security, Gate Permits, and Complaints (which belong strictly to Security Officer & Accounting)
-        if (cat.includes('حسابات') || cat.includes('مالي')) return false;
-        if (cat.includes('أمن') || cat.includes('امن') || cat.includes('بواب') || cat.includes('تصريح') || cat.includes('شكوى أمنية') || cat.includes('security')) return false;
-        if (title.includes('أمن') || title.includes('امن') || title.includes('بواب') || title.includes('تصريح') || title.includes('شكوى أمنية')) return false;
+        if (cat.includes('Ø­Ø³Ø§Ø¨Ø§Øª') || cat.includes('Ù…Ø§Ù„ÙŠ')) return false;
+        if (cat.includes('Ø£Ù…Ù†') || cat.includes('Ø§Ù…Ù†') || cat.includes('Ø¨ÙˆØ§Ø¨') || cat.includes('ØªØµØ±ÙŠØ­') || cat.includes('Ø´ÙƒÙˆÙ‰ Ø£Ù…Ù†ÙŠØ©') || cat.includes('security')) return false;
+        if (title.includes('Ø£Ù…Ù†') || title.includes('Ø§Ù…Ù†') || title.includes('Ø¨ÙˆØ§Ø¨') || title.includes('ØªØµØ±ÙŠØ­') || title.includes('Ø´ÙƒÙˆÙ‰ Ø£Ù…Ù†ÙŠØ©')) return false;
         return true;
       });
       
-      const pendingTks = allMgrTks.filter(tk => tk.status === 'جديد' || !tk.assignedTech);
+      const pendingTks = allMgrTks.filter(tk => tk.status === 'Ø¬Ø¯ÙŠØ¯' || !tk.assignedTech);
       const assignedTks = allMgrTks.filter(tk => tk.assignedTech);
 
       // 1. Update Shift KPIs
@@ -2536,7 +2093,7 @@ class UltimateFMApp {
       }
 
       const badge = document.getElementById('managerInboxBadge');
-      if (badge) badge.innerText = `${pendingTks.length} بانتظار الإسناد`;
+      if (badge) badge.innerText = `${pendingTks.length} Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯`;
 
       // 2. Filter Manager Orders by Source (all, owner, engineer, public)
       const currentMgrFilter = this._managerFilter || 'all';
@@ -2545,9 +2102,9 @@ class UltimateFMApp {
       if (currentMgrFilter === 'owner') {
         filteredTks = allMgrTks.filter(t => t.requester === 'homeowner' || t.requester === 'owner' || t.requester === 'tenant' || !t.requester);
       } else if (currentMgrFilter === 'engineer') {
-        filteredTks = allMgrTks.filter(t => t.requester === 'engineer' || (t.category && (t.category.includes('تفتيش') || t.category.includes('مرافق'))));
+        filteredTks = allMgrTks.filter(t => t.requester === 'engineer' || (t.category && (t.category.includes('ØªÙØªÙŠØ´') || t.category.includes('Ù…Ø±Ø§ÙÙ‚'))));
       } else if (currentMgrFilter === 'public') {
-        filteredTks = allMgrTks.filter(t => t.requester === 'manager' || t.requester === 'public' || (t.category && (t.category.includes('عامة') || t.category.includes('لاند'))));
+        filteredTks = allMgrTks.filter(t => t.requester === 'manager' || t.requester === 'public' || (t.category && (t.category.includes('Ø¹Ø§Ù…Ø©') || t.category.includes('Ù„Ø§Ù†Ø¯'))));
       }
 
       // Update Filter Button Styles
@@ -2567,7 +2124,7 @@ class UltimateFMApp {
 
       managerList.innerHTML = '';
       if (filteredTks.length === 0) {
-        managerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">لا توجد بلاغات تطابق هذا الفلتر حالياً</div>';
+        managerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ù„Ø§ØºØ§Øª ØªØ·Ø§Ø¨Ù‚ Ù‡Ø°Ø§ Ø§Ù„ÙÙ„ØªØ± Ø­Ø§Ù„ÙŠØ§Ù‹</div>';
       } else {
         filteredTks.forEach(tk => {
           const createDate = tk.createdAt ? new Date(tk.createdAt) : new Date();
@@ -2577,14 +2134,14 @@ class UltimateFMApp {
           let sourceBadgeHtml = '';
           let borderAccent = '#1b8f91';
 
-          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('تفتيش'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> تفتيش مهندس الموقع</span>`;
+          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('ØªÙØªÙŠØ´'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> ØªÙØªÙŠØ´ Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…ÙˆÙ‚Ø¹</span>`;
             borderAccent = '#f59e0b';
-          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('عامة'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> بلاغ مرافق عامة</span>`;
+          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('Ø¹Ø§Ù…Ø©'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> Ø¨Ù„Ø§Øº Ù…Ø±Ø§ÙÙ‚ Ø¹Ø§Ù…Ø©</span>`;
             borderAccent = '#20274f';
           } else {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #1b8f91 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> طلب مالك (فيلا 104)</span>`;
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #1b8f91 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> Ø·Ù„Ø¨ Ù…Ø§Ù„Ùƒ (ÙÙŠÙ„Ø§ 104)</span>`;
             borderAccent = '#1b8f91';
           }
 
@@ -2593,41 +2150,41 @@ class UltimateFMApp {
           if (tk.assignedTech) {
             const dMins = tk.dispatchMins || 1;
             if (dMins <= 15) {
-              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-bolt"></i> إسناد فوري: ${dMins}د (SLA مثالي)</span>`;
+              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-bolt"></i> Ø¥Ø³Ù†Ø§Ø¯ ÙÙˆØ±ÙŠ: ${dMins}Ø¯ (SLA Ù…Ø«Ø§Ù„ÙŠ)</span>`;
             } else {
-              slaBadgeHtml = `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-clock"></i> إسناد خلال: ${dMins}د</span>`;
+              slaBadgeHtml = `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-clock"></i> Ø¥Ø³Ù†Ø§Ø¯ Ø®Ù„Ø§Ù„: ${dMins}Ø¯</span>`;
             }
           } else {
             if (elapsedMins <= 15) {
-              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-stopwatch"></i> بانتظار الإسناد: منذ ${elapsedMins}د (&lt; 15د)</span>`;
+              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-stopwatch"></i> Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯: Ù…Ù†Ø° ${elapsedMins}Ø¯ (&lt; 15Ø¯)</span>`;
             } else {
-              slaBadgeHtml = `<span class="badge" style="background: #ef4444; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-triangle-exclamation"></i> تأخر في الإسناد: ${elapsedMins}د</span>`;
+              slaBadgeHtml = `<span class="badge" style="background: #ef4444; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-triangle-exclamation"></i> ØªØ£Ø®Ø± ÙÙŠ Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯: ${elapsedMins}Ø¯</span>`;
             }
           }
 
           // Distinct Color Themes: New (Yellow), In Progress (Blue), Solved (Green), Cancelled (Red)
-          const isNewTicket = (tk.status === 'جديد' || tk.status === 'New');
-          const isCancelled = (tk.status === 'ملغي' || tk.status === 'Cancelled');
-          const isSolved = (tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+          const isNewTicket = (tk.status === 'Ø¬Ø¯ÙŠØ¯' || tk.status === 'New');
+          const isCancelled = (tk.status === 'Ù…Ù„ØºÙŠ' || tk.status === 'Cancelled');
+          const isSolved = (tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' || tk.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || tk.status === 'Solved');
           const isInProgress = !isNewTicket && !isCancelled && !isSolved;
 
           let cardStyle = `flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 12px; padding: 14px; border-radius: 12px; box-shadow: var(--shadow-sm);`;
           let statusBadgeClass = 'badge-info';
 
           if (isNewTicket) {
-            // 🟡 NEW = Yellow
+            // ðŸŸ¡ NEW = Yellow
             cardStyle += ` background: #fffdf5; border: 1.5px solid #f59e0b; border-left: 6px solid #d97706; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);`;
             statusBadgeClass = 'badge-warning';
           } else if (isCancelled) {
-            // 🔴 CANCELLED = Red
+            // ðŸ”´ CANCELLED = Red
             cardStyle += ` background: #fef2f2; border: 1.5px solid #ef4444; border-left: 6px solid #dc2626; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.12);`;
             statusBadgeClass = 'badge-danger';
           } else if (isSolved) {
-            // 🟢 SOLVED = Green
+            // ðŸŸ¢ SOLVED = Green
             cardStyle += ` background: #f0fdf4; border: 1.5px solid #10b981; border-left: 6px solid #059669; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);`;
             statusBadgeClass = 'badge-success';
           } else {
-            // 🔵 IN PROGRESS = Blue
+            // ðŸ”µ IN PROGRESS = Blue
             cardStyle += ` background: #f0f9ff; border: 1.5px solid #0284c7; border-left: 6px solid #0369a1; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);`;
             statusBadgeClass = 'badge-info';
           }
@@ -2638,30 +2195,30 @@ class UltimateFMApp {
             actionHtml = `
               <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 10px 12px; border-radius: 12px; font-size: 0.72rem; color: #991b1b; margin-top: 10px;">
                 <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                  <i class="fa-solid fa-ban"></i> تم إلغاء البلاغ بواسطة: م. أيمن السعيد (مدير الصيانة)
+                  <i class="fa-solid fa-ban"></i> ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø¨Ù„Ø§Øº Ø¨ÙˆØ§Ø³Ø·Ø©: Ù…. Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)
                 </div>
-                <div><b>سبب الإلغاء:</b> ${tk.cancelReason || 'تذكرة مكررة'}</div>
-                ${tk.cancelNotes ? `<div style="font-size: 0.68rem; color: #b91c1c; margin-top: 2px;"><b>ملاحظات:</b> ${tk.cancelNotes}</div>` : ''}
+                <div><b>Ø³Ø¨Ø¨ Ø§Ù„Ø¥Ù„ØºØ§Ø¡:</b> ${tk.cancelReason || 'ØªØ°ÙƒØ±Ø© Ù…ÙƒØ±Ø±Ø©'}</div>
+                ${tk.cancelNotes ? `<div style="font-size: 0.68rem; color: #b91c1c; margin-top: 2px;"><b>Ù…Ù„Ø§Ø­Ø¸Ø§Øª:</b> ${tk.cancelNotes}</div>` : ''}
               </div>
             `;
           } else if (isNewTicket) {
             actionHtml = `
               <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
                 <label style="font-size: 0.72rem; font-weight: 800; color: #b45309; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-user-gear" style="color: #d97706;"></i> اختر الفني المكلف بالمهمة:
+                  <i class="fa-solid fa-user-gear" style="color: #d97706;"></i> Ø§Ø®ØªØ± Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙƒÙ„Ù Ø¨Ø§Ù„Ù…Ù‡Ù…Ø©:
                 </label>
                 <select class="form-control" style="width: 100%; height: 42px; padding: 0 12px; font-size: 0.78rem; background: #ffffff; color: #0f172a; border: 1.5px solid #d97706; font-weight: 700; border-radius: 10px; margin-bottom: 10px;" id="assignTechSelect_${tk.id}">
-                  <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                  <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                  <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                  <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                  <option value="ÙƒØ±ÙŠÙ… Ø­Ø³Ù†">â„ï¸ ÙƒØ±ÙŠÙ… Ø­Ø³Ù† (ÙÙ†ÙŠ ØªÙƒÙŠÙŠÙ ÙˆÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ)</option>
+                  <option value="Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³">ðŸ”§ Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³ (ÙÙ†ÙŠ Ø´Ø¨ÙƒØ§Øª ÙˆØ³Ø¨Ø§ÙƒØ©)</option>
+                  <option value="Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ">âš¡ Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ (ÙÙ†ÙŠ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ·Ø§Ù‚Ø©)</option>
+                  <option value="Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯">ðŸŒ¿ Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯ (ÙÙ†ÙŠ Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ±ÙŠ)</option>
                 </select>
                 <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
                   <button class="btn btn-primary" style="height: 42px; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #1b8f91, #20274f); color: #ffffff; border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; box-shadow: 0 3px 10px rgba(27,143,145,0.25);" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-paper-plane"></i> إسناد المهمة للفني
+                    <i class="fa-solid fa-paper-plane"></i> Ø¥Ø³Ù†Ø§Ø¯ Ø§Ù„Ù…Ù‡Ù…Ø© Ù„Ù„ÙÙ†ÙŠ
                   </button>
                   <button class="btn" style="height: 42px; font-size: 0.75rem; font-weight: 800; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 10px; padding: 0 14px; margin: 0;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban"></i> إلغاء
+                    <i class="fa-solid fa-ban"></i> Ø¥Ù„ØºØ§Ø¡
                   </button>
                 </div>
               </div>
@@ -2671,23 +2228,23 @@ class UltimateFMApp {
               <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25); padding: 12px; border-radius: 14px; margin-top: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                   <div style="font-weight: 800; color: #065f46; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإسناد للفني: <strong>${tk.assignedTech}</strong>
-                    <span style="font-size: 0.65rem; color: #64748b;">(زمن التوزيع: ${tk.dispatchMins || 1} د)</span>
+                    <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> ØªÙ… Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯ Ù„Ù„ÙÙ†ÙŠ: <strong>${tk.assignedTech}</strong>
+                    <span style="font-size: 0.65rem; color: #64748b;">(Ø²Ù…Ù† Ø§Ù„ØªÙˆØ²ÙŠØ¹: ${tk.dispatchMins || 1} Ø¯)</span>
                   </div>
                   <button class="btn btn-sm" style="margin: 0; padding: 3px 8px; font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: 800; border-radius: 6px;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban"></i> إلغاء
+                    <i class="fa-solid fa-ban"></i> Ø¥Ù„ØºØ§Ø¡
                   </button>
                 </div>
-                <label style="font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block;">تغيير الفني المكلف:</label>
+                <label style="font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block;">ØªØºÙŠÙŠØ± Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙƒÙ„Ù:</label>
                 <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
                   <select class="form-control" style="height: 38px; padding: 0 10px; font-size: 0.75rem; background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
-                    <option value="كريم حسن" ${tk.assignedTech === 'كريم حسن' ? 'selected' : ''}>❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                    <option value="مينا جرجس" ${tk.assignedTech === 'مينا جرجس' ? 'selected' : ''}>🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                    <option value="أحمد علي" ${tk.assignedTech === 'أحمد علي' ? 'selected' : ''}>⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                    <option value="سعيد محمود" ${tk.assignedTech === 'سعيد محمود' ? 'selected' : ''}>🌿 سعيد محمود (فني لاندسكيب وري)</option>
+                    <option value="ÙƒØ±ÙŠÙ… Ø­Ø³Ù†" ${tk.assignedTech === 'ÙƒØ±ÙŠÙ… Ø­Ø³Ù†' ? 'selected' : ''}>â„ï¸ ÙƒØ±ÙŠÙ… Ø­Ø³Ù† (ÙÙ†ÙŠ ØªÙƒÙŠÙŠÙ ÙˆÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ)</option>
+                    <option value="Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³" ${tk.assignedTech === 'Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³' ? 'selected' : ''}>ðŸ”§ Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³ (ÙÙ†ÙŠ Ø´Ø¨ÙƒØ§Øª ÙˆØ³Ø¨Ø§ÙƒØ©)</option>
+                    <option value="Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ" ${tk.assignedTech === 'Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ' ? 'selected' : ''}>âš¡ Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ (ÙÙ†ÙŠ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ·Ø§Ù‚Ø©)</option>
+                    <option value="Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯" ${tk.assignedTech === 'Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯' ? 'selected' : ''}>ðŸŒ¿ Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯ (ÙÙ†ÙŠ Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ±ÙŠ)</option>
                   </select>
                   <button class="btn btn-sm" style="height: 38px; padding: 0 14px; font-size: 0.72rem; white-space: nowrap; margin: 0; font-weight: 700; background: #1b8f91; color: #ffffff; border-radius: 8px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-arrows-rotate"></i> تحديث الفني
+                    <i class="fa-solid fa-arrows-rotate"></i> ØªØ­Ø¯ÙŠØ« Ø§Ù„ÙÙ†ÙŠ
                   </button>
                 </div>
               </div>
@@ -2699,17 +2256,17 @@ class UltimateFMApp {
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 6px;">
                   ${sourceBadgeHtml}
-                  ${isNewTicket ? `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-weight: 800; font-size: 0.62rem;"><i class="fa-solid fa-star"></i> جديد</span>` : ''}
+                  ${isNewTicket ? `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-weight: 800; font-size: 0.62rem;"><i class="fa-solid fa-star"></i> Ø¬Ø¯ÙŠØ¯</span>` : ''}
                 </div>
                 ${slaBadgeHtml}
               </div>
               <h4 style="font-size: 0.92rem; font-weight: 800; color: #20274f; margin-top: 8px; margin-bottom: 4px;">${tk.title}</h4>
               <div style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span>التخصص: <b style="color: #20274f;">${tk.category || 'عام'}</b></span>
-                <span>• كود البلاغ: <b style="color: #1b8f91;">#${tk.id}</b></span>
-                <span>• الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span></span>
+                <span>Ø§Ù„ØªØ®ØµØµ: <b style="color: #20274f;">${tk.category || 'Ø¹Ø§Ù…'}</b></span>
+                <span>â€¢ ÙƒÙˆØ¯ Ø§Ù„Ø¨Ù„Ø§Øº: <b style="color: #1b8f91;">#${tk.id}</b></span>
+                <span>â€¢ Ø§Ù„Ø­Ø§Ù„Ø©: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span></span>
               </div>
-              ${tk.details ? `<div style="font-size: 0.74rem; color: #334155; background: ${isNewTicket ? 'rgba(245,158,11,0.06)' : 'rgba(32,39,79,0.03)'}; padding: 8px 10px; border-radius: 8px; margin-top: 6px; border: 1px dashed rgba(32,39,79,0.12);"><b>الوصف:</b> ${tk.details}</div>` : ''}
+              ${tk.details ? `<div style="font-size: 0.74rem; color: #334155; background: ${isNewTicket ? 'rgba(245,158,11,0.06)' : 'rgba(32,39,79,0.03)'}; padding: 8px 10px; border-radius: 8px; margin-top: 6px; border: 1px dashed rgba(32,39,79,0.12);"><b>Ø§Ù„ÙˆØµÙ:</b> ${tk.details}</div>` : ''}
               ${actionHtml}
             </div>
           `;
@@ -2723,7 +2280,7 @@ class UltimateFMApp {
       const tks = this.tickets.filter(t => t.requester === 'tenant');
       tenantList.innerHTML = '';
       if (tks.length === 0) {
-        tenantList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 12px;">${isEn ? 'No maintenance tickets submitted' : 'لا توجد طلبات صيانة مسجلة حالياً'}</div>`;
+        tenantList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 12px;">${isEn ? 'No maintenance tickets submitted' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØµÙŠØ§Ù†Ø© Ù…Ø³Ø¬Ù„Ø© Ø­Ø§Ù„ÙŠØ§Ù‹'}</div>`;
       } else {
         tks.forEach(tk => {
           tenantList.innerHTML += `
@@ -2731,7 +2288,7 @@ class UltimateFMApp {
               <div>
                 <h4 style="font-size: 0.85rem; margin-bottom: 2px;">${tk.title}</h4>
                 <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">
-                  ${isEn ? 'Ticket' : 'تذكرة'} #${tk.id} • ${tk.dateStr || ''}
+                  ${isEn ? 'Ticket' : 'ØªØ°ÙƒØ±Ø©'} #${tk.id} â€¢ ${tk.dateStr || ''}
                 </p>
               </div>
               <span class="badge ${tk.bgClass || 'badge-warning'}">${tk.status}</span>
@@ -2747,15 +2304,15 @@ class UltimateFMApp {
       // Strictly exclude Customer Care Complaints, Suggestions, Inquiries, Financial, and Security tickets from Technician!
       const isPureMaintenanceTask = (tk) => {
         const text = `${tk.category || ''} ${tk.title || ''} ${tk.details || ''}`.toLowerCase();
-        if (text.includes('شكاوى') || text.includes('شكوى') || text.includes('مقترح') || text.includes('خدمة العملاء') || text.includes('استفسار') || text.includes('حسابات') || text.includes('مالي') || text.includes('وديع') || text.includes('قسط') || text.includes('أمن') || text.includes('أمني') || text.includes('security') || text.includes('customer care')) {
+        if (text.includes('Ø´ÙƒØ§ÙˆÙ‰') || text.includes('Ø´ÙƒÙˆÙ‰') || text.includes('Ù…Ù‚ØªØ±Ø­') || text.includes('Ø®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡') || text.includes('Ø§Ø³ØªÙØ³Ø§Ø±') || text.includes('Ø­Ø³Ø§Ø¨Ø§Øª') || text.includes('Ù…Ø§Ù„ÙŠ') || text.includes('ÙˆØ¯ÙŠØ¹') || text.includes('Ù‚Ø³Ø·') || text.includes('Ø£Ù…Ù†') || text.includes('Ø£Ù…Ù†ÙŠ') || text.includes('security') || text.includes('customer care')) {
           return false;
         }
         return true;
       };
 
-      const allTechTks = this.tickets.filter(tk => (tk.assignedTech === 'كريم حسن' || (!tk.assignedTech && tk.requester === 'manager')) && isPureMaintenanceTask(tk));
-      const activeTechTks = allTechTks.filter(tk => ['تم التعيين للفني', 'جاري العمل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'قيد الفحص الميداني', 'جديد'].includes(tk.status));
-      const completedTechTks = allTechTks.filter(tk => tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+      const allTechTks = this.tickets.filter(tk => (tk.assignedTech === 'ÙƒØ±ÙŠÙ… Ø­Ø³Ù†' || (!tk.assignedTech && tk.requester === 'manager')) && isPureMaintenanceTask(tk));
+      const activeTechTks = allTechTks.filter(tk => ['ØªÙ… Ø§Ù„ØªØ¹ÙŠÙŠÙ† Ù„Ù„ÙÙ†ÙŠ', 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„', 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ', 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨', 'Ù‚ÙŠØ¯ Ø§Ù„ÙØ­Øµ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ', 'Ø¬Ø¯ÙŠØ¯'].includes(tk.status));
+      const completedTechTks = allTechTks.filter(tk => tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' || tk.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || tk.status === 'Solved');
 
       // 1. Update Daily Technician KPIs
       const elTechTotal = document.getElementById('techKpiTotal');
@@ -2778,7 +2335,7 @@ class UltimateFMApp {
       }
 
       const badge = document.getElementById('techAssignedBadge');
-      if (badge) badge.innerText = `${activeTechTks.length} مهام جارية`;
+      if (badge) badge.innerText = `${activeTechTks.length} Ù…Ù‡Ø§Ù… Ø¬Ø§Ø±ÙŠØ©`;
 
       // 2. Filter Technician Tasks (active, completed, owner, public)
       const currentTechFilter = this._techFilter || 'active';
@@ -2789,7 +2346,7 @@ class UltimateFMApp {
       } else if (currentTechFilter === 'owner') {
         filteredTechTks = allTechTks.filter(t => t.requester === 'homeowner' || t.requester === 'owner' || t.requester === 'tenant' || !t.requester);
       } else if (currentTechFilter === 'public') {
-        filteredTechTks = allTechTks.filter(t => t.requester === 'manager' || t.requester === 'public' || t.requester === 'engineer' || (t.category && (t.category.includes('عامة') || t.category.includes('تفتيش'))));
+        filteredTechTks = allTechTks.filter(t => t.requester === 'manager' || t.requester === 'public' || t.requester === 'engineer' || (t.category && (t.category.includes('Ø¹Ø§Ù…Ø©') || t.category.includes('ØªÙØªÙŠØ´'))));
       }
 
       // Update Filter Button Styles
@@ -2810,42 +2367,42 @@ class UltimateFMApp {
       techList.innerHTML = '';
       if (filteredTechTks.length === 0) {
         techList.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">
-          ${currentTechFilter === 'completed' ? 'لا توجد مهام مكتملة بالسجل حتى الآن' : 'لا توجد مهام جارية حالياً'}
+          ${currentTechFilter === 'completed' ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù‡Ø§Ù… Ù…ÙƒØªÙ…Ù„Ø© Ø¨Ø§Ù„Ø³Ø¬Ù„ Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù‡Ø§Ù… Ø¬Ø§Ø±ÙŠØ© Ø­Ø§Ù„ÙŠØ§Ù‹'}
         </div>`;
       } else {
         filteredTechTks.forEach(tk => {
-          const isDone = (tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
+          const isDone = (tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' || tk.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || tk.status === 'Solved');
 
           // Determine Source & Precise Location
           let sourceBadgeHtml = '';
           let locationDetailsHtml = '';
           let borderAccent = '#0284c7';
 
-          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('تفتيش'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> تفتيش هندسي</span>`;
+          if (tk.requester === 'engineer' || (tk.category && tk.category.includes('ØªÙØªÙŠØ´'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> ØªÙØªÙŠØ´ Ù‡Ù†Ø¯Ø³ÙŠ</span>`;
             borderAccent = '#f59e0b';
             locationDetailsHtml = `
               <div style="background: #fffbeb; border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #92400e; margin: 4px 0;">
-                <div><b>📍 الموقع:</b> مرحلة Phase 2 • زون المباني B • عمارة 12 / شقة 302</div>
-                <div><b>👷 المشرف:</b> م. حسام الدين (مهندس الموقع)</div>
+                <div><b>ðŸ“ Ø§Ù„Ù…ÙˆÙ‚Ø¹:</b> Ù…Ø±Ø­Ù„Ø© Phase 2 â€¢ Ø²ÙˆÙ† Ø§Ù„Ù…Ø¨Ø§Ù†ÙŠ B â€¢ Ø¹Ù…Ø§Ø±Ø© 12 / Ø´Ù‚Ø© 302</div>
+                <div><b>ðŸ‘· Ø§Ù„Ù…Ø´Ø±Ù:</b> Ù…. Ø­Ø³Ø§Ù… Ø§Ù„Ø¯ÙŠÙ† (Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…ÙˆÙ‚Ø¹)</div>
               </div>
             `;
-          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('عامة'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> مرفق عام للقرية</span>`;
+          } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('Ø¹Ø§Ù…Ø©'))) {
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> Ù…Ø±ÙÙ‚ Ø¹Ø§Ù… Ù„Ù„Ù‚Ø±ÙŠØ©</span>`;
             borderAccent = '#20274f';
             locationDetailsHtml = `
               <div style="background: rgba(32, 39, 79, 0.04); border: 1px solid rgba(32, 39, 79, 0.12); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #1e293b; margin: 4px 0;">
-                <div><b>📍 الموقع:</b> ${tk.location || 'المسبح الرئيسي والبحيرة'} • زون الشاطئ واللاندسكيب</div>
-                <div><b>🛡️ المشرف:</b> م. أيمن السعيد (مدير الصيانة)</div>
+                <div><b>ðŸ“ Ø§Ù„Ù…ÙˆÙ‚Ø¹:</b> ${tk.location || 'Ø§Ù„Ù…Ø³Ø¨Ø­ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ ÙˆØ§Ù„Ø¨Ø­ÙŠØ±Ø©'} â€¢ Ø²ÙˆÙ† Ø§Ù„Ø´Ø§Ø·Ø¦ ÙˆØ§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨</div>
+                <div><b>ðŸ›¡ï¸ Ø§Ù„Ù…Ø´Ø±Ù:</b> Ù…. Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)</div>
               </div>
             `;
           } else {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #0f766e !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> وحدة مالك خاصة</span>`;
+            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #0f766e !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> ÙˆØ­Ø¯Ø© Ù…Ø§Ù„Ùƒ Ø®Ø§ØµØ©</span>`;
             borderAccent = '#1b8f91';
             locationDetailsHtml = `
               <div style="background: #f0fdfa; border: 1px solid rgba(27, 143, 145, 0.25); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; color: #115e59; margin: 4px 0;">
-                <div><b>📍 الموقع:</b> زون 1 - مارينا فيو • نوع الوحدة: فيلا مستقلة • رقم الوحدة: <b>فيلا 104</b></div>
-                <div><b>👤 العميل:</b> أ. أسامة الشريف (هاتف: 01223456789)</div>
+                <div><b>ðŸ“ Ø§Ù„Ù…ÙˆÙ‚Ø¹:</b> Ø²ÙˆÙ† 1 - Ù…Ø§Ø±ÙŠÙ†Ø§ ÙÙŠÙˆ â€¢ Ù†ÙˆØ¹ Ø§Ù„ÙˆØ­Ø¯Ø©: ÙÙŠÙ„Ø§ Ù…Ø³ØªÙ‚Ù„Ø© â€¢ Ø±Ù‚Ù… Ø§Ù„ÙˆØ­Ø¯Ø©: <b>ÙÙŠÙ„Ø§ 104</b></div>
+                <div><b>ðŸ‘¤ Ø§Ù„Ø¹Ù…ÙŠÙ„:</b> Ø£. Ø£Ø³Ø§Ù…Ø© Ø§Ù„Ø´Ø±ÙŠÙ (Ù‡Ø§ØªÙ: 01223456789)</div>
               </div>
             `;
           }
@@ -2857,27 +2414,27 @@ class UltimateFMApp {
             innerTechHtml = `
               <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 8px 12px; border-radius: 8px; font-size: 0.73rem; color: #166534; margin-top: 6px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: 800;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم الإصلاح والإغلاق بنجاح</span>
-                  <span style="font-size: 0.65rem; color: #15803d; font-weight: 700;">مدة الحل: ${tk.resolutionTime || '22 دقيقة'}</span>
+                  <span style="font-weight: 800;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> ØªÙ… Ø§Ù„Ø¥ØµÙ„Ø§Ø­ ÙˆØ§Ù„Ø¥ØºÙ„Ø§Ù‚ Ø¨Ù†Ø¬Ø§Ø­</span>
+                  <span style="font-size: 0.65rem; color: #15803d; font-weight: 700;">Ù…Ø¯Ø© Ø§Ù„Ø­Ù„: ${tk.resolutionTime || '22 Ø¯Ù‚ÙŠÙ‚Ø©'}</span>
                 </div>
                 ${tk.photoAfter ? `
                   <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
-                    <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1;" title="قبل">
+                    <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1;" title="Ù‚Ø¨Ù„">
                     <i class="fa-solid fa-arrow-left" style="color: #10b981; font-size: 0.75rem;"></i>
-                    <img src="${tk.photoAfter}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #86efac;" title="بعد الإصلاح">
-                    <span style="font-size: 0.68rem; color: #15803d;">تم توثيق صورة العطل وصورة الإصلاح بأودو</span>
+                    <img src="${tk.photoAfter}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #86efac;" title="Ø¨Ø¹Ø¯ Ø§Ù„Ø¥ØµÙ„Ø§Ø­">
+                    <span style="font-size: 0.68rem; color: #15803d;">ØªÙ… ØªÙˆØ«ÙŠÙ‚ ØµÙˆØ±Ø© Ø§Ù„Ø¹Ø·Ù„ ÙˆØµÙˆØ±Ø© Ø§Ù„Ø¥ØµÙ„Ø§Ø­ Ø¨Ø£ÙˆØ¯Ùˆ</span>
                   </div>
                 ` : ''}
               </div>
             `;
-          } else if (tk.status === 'تم التعيين للفني' || tk.status === 'جاري العمل' || tk.status === 'جديد' || tk.status === 'قيد الفحص الميداني') {
+          } else if (tk.status === 'ØªÙ… Ø§Ù„ØªØ¹ÙŠÙŠÙ† Ù„Ù„ÙÙ†ÙŠ' || tk.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„' || tk.status === 'Ø¬Ø¯ÙŠØ¯' || tk.status === 'Ù‚ÙŠØ¯ Ø§Ù„ÙØ­Øµ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ') {
             innerTechHtml = `
               <!-- Compact Problem Details -->
               <div style="display: flex; gap: 8px; align-items: center; background: #f8fafc; padding: 6px 8px; border-radius: 8px; margin-top: 4px; border: 1px solid #e2e8f0;">
                 <img src="${tk.photoBefore}" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1;">
                 <div style="flex: 1;">
                   <div style="font-size: 0.72rem; color: #334155; font-weight: 600;">${tk.details || tk.title}</div>
-                  <div style="font-size: 0.65rem; color: #64748b;">⏱️ SLA المستهدف للإصلاح: 45 دقيقة</div>
+                  <div style="font-size: 0.65rem; color: #64748b;">â±ï¸ SLA Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù Ù„Ù„Ø¥ØµÙ„Ø§Ø­: 45 Ø¯Ù‚ÙŠÙ‚Ø©</div>
                 </div>
               </div>
 
@@ -2886,59 +2443,59 @@ class UltimateFMApp {
                 <!-- Option 1: Direct Repair -->
                 <div style="background: rgba(16, 185, 129, 0.06); border: 1.5px solid #10b981; padding: 10px 12px; border-radius: 10px;">
                   <div style="font-size: 0.75rem; font-weight: 800; color: #065f46; margin-bottom: 6px;">
-                    <i class="fa-solid fa-wrench"></i> خيار 1: إصلاح مباشر (عطل بسيط بدون قطع غيار)
+                    <i class="fa-solid fa-wrench"></i> Ø®ÙŠØ§Ø± 1: Ø¥ØµÙ„Ø§Ø­ Ù…Ø¨Ø§Ø´Ø± (Ø¹Ø·Ù„ Ø¨Ø³ÙŠØ· Ø¨Ø¯ÙˆÙ† Ù‚Ø·Ø¹ ØºÙŠØ§Ø±)
                   </div>
                   <div style="margin-bottom: 8px;">
                     <label for="techPhotoAfter_${tk.id}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: #ffffff; border: 1.5px dashed #10b981; border-radius: 8px; color: #065f46; font-size: 0.74rem; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-sm);">
                       <i class="fa-solid fa-camera" style="color: #10b981; font-size: 1rem;"></i> 
-                      <span id="techPhotoAfterLabel_${tk.id}">📷 اضغط هنا لرفع / تصوير العطل بعد الإصلاح</span>
+                      <span id="techPhotoAfterLabel_${tk.id}">ðŸ“· Ø§Ø¶ØºØ· Ù‡Ù†Ø§ Ù„Ø±ÙØ¹ / ØªØµÙˆÙŠØ± Ø§Ù„Ø¹Ø·Ù„ Ø¨Ø¹Ø¯ Ø§Ù„Ø¥ØµÙ„Ø§Ø­</span>
                     </label>
-                    <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم التقاط / اختيار صورة الإصلاح بنجاح';">
+                    <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = 'âœ… ØªÙ… Ø§Ù„ØªÙ‚Ø§Ø· / Ø§Ø®ØªÙŠØ§Ø± ØµÙˆØ±Ø© Ø§Ù„Ø¥ØµÙ„Ø§Ø­ Ø¨Ù†Ø¬Ø§Ø­';">
                   </div>
                   <button class="btn btn-success" style="width: 100%; height: 38px; font-size: 0.8rem; font-weight: 800; margin: 0; background: #059669; border-color: #059669; color: #ffffff;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                    <i class="fa-solid fa-circle-check"></i> تم الإصلاح وإغلاق المهمة
+                    <i class="fa-solid fa-circle-check"></i> ØªÙ… Ø§Ù„Ø¥ØµÙ„Ø§Ø­ ÙˆØ¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…Ù‡Ù…Ø©
                   </button>
                 </div>
 
                 <!-- Option 2: Request Damaged Part -->
                 <div style="background: rgba(245, 158, 11, 0.06); border: 1.5px solid #f59e0b; padding: 10px 12px; border-radius: 10px;">
                   <div style="font-size: 0.75rem; font-weight: 800; color: #b45309; margin-bottom: 6px;">
-                    <i class="fa-solid fa-boxes-stacked"></i> خيار 2: يتطلب قطعة غيار تالفة من المخزن
+                    <i class="fa-solid fa-boxes-stacked"></i> Ø®ÙŠØ§Ø± 2: ÙŠØªØ·Ù„Ø¨ Ù‚Ø·Ø¹Ø© ØºÙŠØ§Ø± ØªØ§Ù„ÙØ© Ù…Ù† Ø§Ù„Ù…Ø®Ø²Ù†
                   </div>
                   <div style="margin-bottom: 8px;">
                     <label for="techPhotoDamaged_${tk.id}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: #ffffff; border: 1.5px dashed #f59e0b; border-radius: 8px; color: #b45309; font-size: 0.74rem; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-sm);">
                       <i class="fa-solid fa-camera" style="color: #f59e0b; font-size: 1rem;"></i> 
-                      <span id="techPhotoDamagedLabel_${tk.id}">📷 اضغط هنا لتصوير القطعة التالفة للمخزن</span>
+                      <span id="techPhotoDamagedLabel_${tk.id}">ðŸ“· Ø§Ø¶ØºØ· Ù‡Ù†Ø§ Ù„ØªØµÙˆÙŠØ± Ø§Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„ØªØ§Ù„ÙØ© Ù„Ù„Ù…Ø®Ø²Ù†</span>
                     </label>
-                    <input type="file" id="techPhotoDamaged_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoDamagedLabel_${tk.id}'); if (l) l.innerText = '✅ تم التقاط صورة القطعة التالفة';">
+                    <input type="file" id="techPhotoDamaged_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoDamagedLabel_${tk.id}'); if (l) l.innerText = 'âœ… ØªÙ… Ø§Ù„ØªÙ‚Ø§Ø· ØµÙˆØ±Ø© Ø§Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„ØªØ§Ù„ÙØ©';">
                   </div>
                   <button class="btn btn-warning" style="width: 100%; height: 38px; font-size: 0.8rem; font-weight: 800; margin: 0; background: #d97706; border-color: #d97706; color: #ffffff;" onclick="app.technicianRequestPart('${tk.id}', 'techPhotoDamaged_${tk.id}')">
-                    <i class="fa-solid fa-boxes-stacked"></i> طلب قطعة غيار من المخزن
+                    <i class="fa-solid fa-boxes-stacked"></i> Ø·Ù„Ø¨ Ù‚Ø·Ø¹Ø© ØºÙŠØ§Ø± Ù…Ù† Ø§Ù„Ù…Ø®Ø²Ù†
                   </button>
                 </div>
               </div>
             `;
-          } else if (tk.status === 'انتظار دفع المالك') {
+          } else if (tk.status === 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ') {
             innerTechHtml = `
               <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 8px 10px; border-radius: 8px; font-size: 0.72rem; color: #92400e; margin-top: 6px;">
-                <div style="font-weight: 800; margin-bottom: 2px;"><i class="fa-solid fa-hourglass-half"></i> بانتظار سداد المالك لقيمة القطعة (${tk.partPrice || 350} ج.م)</div>
-                <div>تم إرسال إشعار الدفع لتطبيق المالك (فيلا 104)، سيبدأ التركيب فور السداد.</div>
+                <div style="font-weight: 800; margin-bottom: 2px;"><i class="fa-solid fa-hourglass-half"></i> Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø³Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø§Ù„Ùƒ Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù‚Ø·Ø¹Ø© (${tk.partPrice || 350} Ø¬.Ù…)</div>
+                <div>ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ø¯ÙØ¹ Ù„ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…Ø§Ù„Ùƒ (ÙÙŠÙ„Ø§ 104)ØŒ Ø³ÙŠØ¨Ø¯Ø£ Ø§Ù„ØªØ±ÙƒÙŠØ¨ ÙÙˆØ± Ø§Ù„Ø³Ø¯Ø§Ø¯.</div>
               </div>
             `;
-          } else if (tk.status === 'تم الدفع - جاري التركيب') {
+          } else if (tk.status === 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨') {
             innerTechHtml = `
               <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 10px 12px; border-radius: 8px; font-size: 0.72rem; color: #166534; margin-top: 6px;">
-                <div style="font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم سداد قيمة القطعة [${tk.partName || 'محبس نحاس'}]!</div>
-                <div>يرجى استلام القطعة من المخزن وتركيبها، ثم إرفاق صورة بعد التركيب:</div>
+                <div style="font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> ØªÙ… Ø³Ø¯Ø§Ø¯ Ù‚ÙŠÙ…Ø© Ø§Ù„Ù‚Ø·Ø¹Ø© [${tk.partName || 'Ù…Ø­Ø¨Ø³ Ù†Ø­Ø§Ø³'}]!</div>
+                <div>ÙŠØ±Ø¬Ù‰ Ø§Ø³ØªÙ„Ø§Ù… Ø§Ù„Ù‚Ø·Ø¹Ø© Ù…Ù† Ø§Ù„Ù…Ø®Ø²Ù† ÙˆØªØ±ÙƒÙŠØ¨Ù‡Ø§ØŒ Ø«Ù… Ø¥Ø±ÙØ§Ù‚ ØµÙˆØ±Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªØ±ÙƒÙŠØ¨:</div>
                 <div style="margin: 8px 0 6px 0;">
                   <label for="techPhotoAfter_${tk.id}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: #ffffff; border: 1.5px dashed #10b981; border-radius: 8px; color: #065f46; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
                     <i class="fa-solid fa-camera" style="color: #10b981; font-size: 1rem;"></i> 
-                    <span id="techPhotoAfterLabel_${tk.id}">📷 اضغط هنا لرفع / تصوير العطل بعد التركيب</span>
+                    <span id="techPhotoAfterLabel_${tk.id}">ðŸ“· Ø§Ø¶ØºØ· Ù‡Ù†Ø§ Ù„Ø±ÙØ¹ / ØªØµÙˆÙŠØ± Ø§Ù„Ø¹Ø·Ù„ Ø¨Ø¹Ø¯ Ø§Ù„ØªØ±ÙƒÙŠØ¨</span>
                   </label>
-                  <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم اختيار صورة بعد التركيب';">
+                  <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = 'âœ… ØªÙ… Ø§Ø®ØªÙŠØ§Ø± ØµÙˆØ±Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªØ±ÙƒÙŠØ¨';">
                 </div>
                 <button class="btn btn-success" style="width: 100%; height: 38px; font-size: 0.8rem; font-weight: 800; margin: 0; background: #059669; border-color: #059669; color: #ffffff;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                  <i class="fa-solid fa-check"></i> إنهاء المهمة وإغلاق التذكرة
+                  <i class="fa-solid fa-check"></i> Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ù…Ù‡Ù…Ø© ÙˆØ¥ØºÙ„Ø§Ù‚ Ø§Ù„ØªØ°ÙƒØ±Ø©
                 </button>
               </div>
             `;
@@ -2968,7 +2525,7 @@ class UltimateFMApp {
       const list = this.permits.filter(p => p.requester === 'homeowner');
       homeownerPermits.innerHTML = '';
       if (list.length === 0) {
-        homeownerPermits.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active permits' : 'لا توجد تصاريح حالية'}</div>`;
+        homeownerPermits.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active permits' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ Ø­Ø§Ù„ÙŠØ©'}</div>`;
       } else {
         list.forEach(p => {
           let qrHtml = '';
@@ -2976,12 +2533,12 @@ class UltimateFMApp {
           const status = translateText(p.status);
           const details = translateText(p.details);
 
-          if (p.status === 'معتمد') {
+          if (p.status === 'Ù…Ø¹ØªÙ…Ø¯') {
             qrHtml = `
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
                 <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
                 <div>
-                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">${isEn ? 'Active Security Code:' : 'كود الأمن الفعال:'}</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">${isEn ? 'Active Security Code:' : 'ÙƒÙˆØ¯ Ø§Ù„Ø£Ù…Ù† Ø§Ù„ÙØ¹Ø§Ù„:'}</span>
                   <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
                 </div>
               </div>
@@ -2993,7 +2550,7 @@ class UltimateFMApp {
                 <h4 style="font-size: 0.82rem; font-weight: 700;">${type}</h4>
                 <span class="badge ${p.bgClass}">${status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} • ${isEn ? 'Request Code' : 'كود الطلب'}: #${p.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} â€¢ ${isEn ? 'Request Code' : 'ÙƒÙˆØ¯ Ø§Ù„Ø·Ù„Ø¨'}: #${p.id}</p>
               ${qrHtml}
             </div>
           `;
@@ -3007,16 +2564,16 @@ class UltimateFMApp {
       const list = this.permits.filter(p => p.requester === 'tenant');
       tenantPermits.innerHTML = '';
       if (list.length === 0) {
-        tenantPermits.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+        tenantPermits.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         list.forEach(p => {
           let qrHtml = '';
-          if (p.status === 'معتمد') {
+          if (p.status === 'Ù…Ø¹ØªÙ…Ø¯') {
             qrHtml = `
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
                 <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
                 <div>
-                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">ÙƒÙˆØ¯ Ø§Ù„Ø£Ù…Ù† Ø§Ù„ÙØ¹Ø§Ù„:</span>
                   <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
                 </div>
               </div>
@@ -3028,7 +2585,7 @@ class UltimateFMApp {
                 <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
                 <span class="badge ${p.bgClass}">${p.status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${p.details} • كود الطلب: #${p.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${p.details} â€¢ ÙƒÙˆØ¯ Ø§Ù„Ø·Ù„Ø¨: #${p.id}</p>
               ${qrHtml}
             </div>
           `;
@@ -3042,16 +2599,16 @@ class UltimateFMApp {
       const list = this.permits.filter(p => p.requester === 'commercial');
       commercialPermits.innerHTML = '';
       if (list.length === 0) {
-        commercialPermits.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">لا توجد تصاريح حالية</div>';
+        commercialPermits.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         list.forEach(p => {
           let qrHtml = '';
-          if (p.status === 'معتمد') {
+          if (p.status === 'Ù…Ø¹ØªÙ…Ø¯') {
             qrHtml = `
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 8px; border-radius: 8px;">
                 <i class="fa-solid fa-qrcode" style="font-size: 1.5rem; color: #10b981;"></i>
                 <div>
-                  <span style="font-size: 0.65rem; color: #64748b; display: block;">كود الأمن الفعال:</span>
+                  <span style="font-size: 0.65rem; color: #64748b; display: block;">ÙƒÙˆØ¯ Ø§Ù„Ø£Ù…Ù† Ø§Ù„ÙØ¹Ø§Ù„:</span>
                   <span style="font-size: 0.8rem; color: #10b981; font-weight: 900; font-family: monospace; letter-spacing: 1px;">${p.qrCode}</span>
                 </div>
               </div>
@@ -3063,7 +2620,7 @@ class UltimateFMApp {
                 <h4 style="font-size: 0.82rem; font-weight: 700;">${p.type}</h4>
                 <span class="badge ${p.bgClass}">${p.status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: #64748b;">${p.details} • كود الطلب: #${p.id}</p>
+              <p style="font-size: 0.7rem; color: #64748b;">${p.details} â€¢ ÙƒÙˆØ¯ Ø§Ù„Ø·Ù„Ø¨: #${p.id}</p>
               ${qrHtml}
             </div>
           `;
@@ -3074,30 +2631,30 @@ class UltimateFMApp {
     // 10. Render Permits in Security View
     const securityPermitsList = document.getElementById('securityPermitsList');
     if (securityPermitsList) {
-      const activePermits = this.permits.filter(p => p.status === 'تحت المراجعة');
+      const activePermits = this.permits.filter(p => p.status === 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©');
       const badge = document.getElementById('securityPermitsInboxBadge');
-      if (badge) badge.innerText = `${activePermits.length} تصاريح`;
+      if (badge) badge.innerText = `${activePermits.length} ØªØµØ§Ø±ÙŠØ­`;
       securityPermitsList.innerHTML = '';
       if (this.permits.length === 0) {
-        securityPermitsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد طلبات تصاريح حالية</div>';
+        securityPermitsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªØµØ§Ø±ÙŠØ­ Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         this.permits.forEach(p => {
           let actionHtml = '';
-          if (p.status === 'تحت المراجعة') {
+          if (p.status === 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©') {
             actionHtml = `
               <div style="display: flex; gap: 8px; margin-top: 6px;">
                 <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.78rem;" onclick="app.approvePermit('${p.id}')">
-                  <i class="fa-solid fa-check"></i> موافقة واعتماد
+                  <i class="fa-solid fa-check"></i> Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØ§Ø¹ØªÙ…Ø§Ø¯
                 </button>
                 <button class="btn btn-cyan" style="padding: 6px 12px; font-size: 0.78rem; background: #ef4444;" onclick="app.rejectPermit('${p.id}')">
-                  <i class="fa-solid fa-xmark"></i> رفض
+                  <i class="fa-solid fa-xmark"></i> Ø±ÙØ¶
                 </button>
               </div>
             `;
           } else {
             actionHtml = `
-              <div style="margin-top: 6px; font-size: 0.75rem; color: ${p.status === 'معتمد' ? '#10b981' : '#ef4444'}; font-weight: 700;">
-                <i class="fa-solid ${p.status === 'معتمد' ? 'fa-stamp' : 'fa-ban'}"></i> حالة الطلب النهائية: ${p.status} ${p.qrCode ? `(كود الأمن: ${p.qrCode})` : ''}
+              <div style="margin-top: 6px; font-size: 0.75rem; color: ${p.status === 'Ù…Ø¹ØªÙ…Ø¯' ? '#10b981' : '#ef4444'}; font-weight: 700;">
+                <i class="fa-solid ${p.status === 'Ù…Ø¹ØªÙ…Ø¯' ? 'fa-stamp' : 'fa-ban'}"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©: ${p.status} ${p.qrCode ? `(ÙƒÙˆØ¯ Ø§Ù„Ø£Ù…Ù†: ${p.qrCode})` : ''}
               </div>
             `;
           }
@@ -3106,7 +2663,7 @@ class UltimateFMApp {
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="badge ${p.bgClass}">${p.status}</span>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">طالب التصريح: ${p.requester} • #${p.id}</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Ø·Ø§Ù„Ø¨ Ø§Ù„ØªØµØ±ÙŠØ­: ${p.requester} â€¢ #${p.id}</span>
               </div>
               <h4 style="font-size: 0.88rem; font-weight: 700;">${p.type}</h4>
               <p style="font-size: 0.75rem; color: var(--text-muted);">${p.details}</p>
@@ -3122,10 +2679,10 @@ class UltimateFMApp {
     if (homeownerComplaints) {
       const list = this.complaints.filter(c => c.requester === 'homeowner');
       const badge = document.getElementById('homeownerComplaintsBadge');
-      if (badge) badge.innerText = isEn ? `${list.length} active` : `${list.length} نشطة`;
+      if (badge) badge.innerText = isEn ? `${list.length} active` : `${list.length} Ù†Ø´Ø·Ø©`;
       homeownerComplaints.innerHTML = '';
       if (list.length === 0) {
-        homeownerComplaints.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active security complaints' : 'لا توجد شكاوى أمنية حالية'}</div>`;
+        homeownerComplaints.innerHTML = `<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">${isEn ? 'No active security complaints' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´ÙƒØ§ÙˆÙ‰ Ø£Ù…Ù†ÙŠØ© Ø­Ø§Ù„ÙŠØ©'}</div>`;
       } else {
         list.forEach(c => {
           const details = translateText(c.details);
@@ -3133,10 +2690,10 @@ class UltimateFMApp {
           homeownerComplaints.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> ${isEn ? 'Security Report' : 'بلاغ أمني'}</h4>
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> ${isEn ? 'Security Report' : 'Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ'}</h4>
                 <span class="badge ${c.bgClass}">${status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} • ${isEn ? 'Code' : 'كود'}: #${c.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${details} â€¢ ${isEn ? 'Code' : 'ÙƒÙˆØ¯'}: #${c.id}</p>
             </div>
           `;
         });
@@ -3148,19 +2705,19 @@ class UltimateFMApp {
     if (tenantComplaints) {
       const list = this.complaints.filter(c => c.requester === 'tenant');
       const badge = document.getElementById('tenantComplaintsBadge');
-      if (badge) badge.innerText = `${list.length} نشطة`;
+      if (badge) badge.innerText = `${list.length} Ù†Ø´Ø·Ø©`;
       tenantComplaints.innerHTML = '';
       if (list.length === 0) {
-        tenantComplaints.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+        tenantComplaints.innerHTML = '<div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 6px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´ÙƒØ§ÙˆÙ‰ Ø£Ù…Ù†ÙŠØ© Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         list.forEach(c => {
           tenantComplaints.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني</h4>
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ</h4>
                 <span class="badge ${c.bgClass}">${c.status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: var(--text-muted);">${c.details} • كود: #${c.id}</p>
+              <p style="font-size: 0.7rem; color: var(--text-muted);">${c.details} â€¢ ÙƒÙˆØ¯: #${c.id}</p>
             </div>
           `;
         });
@@ -3172,47 +2729,47 @@ class UltimateFMApp {
     if (commercialComplaints) {
       const list = this.complaints.filter(c => c.requester === 'commercial');
       const badge = document.getElementById('commercialComplaintsBadge');
-      if (badge) badge.innerText = `${list.length} نشطة`;
+      if (badge) badge.innerText = `${list.length} Ù†Ø´Ø·Ø©`;
       commercialComplaints.innerHTML = '';
       if (list.length === 0) {
-        commercialComplaints.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">لا توجد شكاوى أمنية حالية</div>';
+        commercialComplaints.innerHTML = '<div style="font-size: 0.72rem; color: #64748b; text-align: center; padding: 6px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´ÙƒØ§ÙˆÙ‰ Ø£Ù…Ù†ÙŠØ© Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         list.forEach(c => {
           commercialComplaints.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> بلاغ أمني للمحل</h4>
+                <h4 style="font-size: 0.82rem; font-weight: 700; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ Ù„Ù„Ù…Ø­Ù„</h4>
                 <span class="badge ${c.bgClass}">${c.status}</span>
               </div>
-              <p style="font-size: 0.7rem; color: #64748b;">${c.details} • كود: #${c.id}</p>
+              <p style="font-size: 0.7rem; color: #64748b;">${c.details} â€¢ ÙƒÙˆØ¯: #${c.id}</p>
             </div>
           `;
         });
       }
     }
 
-    // 14. Render Complaints in Security View (مشرف الأمن)
+    // 14. Render Complaints in Security View (Ù…Ø´Ø±Ù Ø§Ù„Ø£Ù…Ù†)
     const securityComplaintsList = document.getElementById('securityComplaintsList');
     if (securityComplaintsList) {
-      const activeComplaints = this.complaints.filter(c => c.status !== 'تم الحل');
+      const activeComplaints = this.complaints.filter(c => c.status !== 'ØªÙ… Ø§Ù„Ø­Ù„');
       const badge = document.getElementById('securityComplaintsInboxBadge');
-      if (badge) badge.innerText = `${activeComplaints.length} بلاغات`;
+      if (badge) badge.innerText = `${activeComplaints.length} Ø¨Ù„Ø§ØºØ§Øª`;
       securityComplaintsList.innerHTML = '';
       if (this.complaints.length === 0) {
-        securityComplaintsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">لا توجد بلاغات أمنية حالية</div>';
+        securityComplaintsList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ù„Ø§ØºØ§Øª Ø£Ù…Ù†ÙŠØ© Ø­Ø§Ù„ÙŠØ©</div>';
       } else {
         this.complaints.forEach(c => {
           let actionHtml = '';
-          if (c.status === 'تحت المراجعة والتحرك الميداني') {
+          if (c.status === 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„ØªØ­Ø±Ùƒ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ') {
             actionHtml = `
               <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.78rem; margin-top: 6px; border-color: #ef4444; background: #ef4444;" onclick="app.dispatchSecurityDolphin('${c.id}')">
-                <i class="fa-solid fa-truck-fast"></i> تأكيد الاستلام والتحرك للموقع
+                <i class="fa-solid fa-truck-fast"></i> ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ÙˆØ§Ù„ØªØ­Ø±Ùƒ Ù„Ù„Ù…ÙˆÙ‚Ø¹
               </button>
             `;
           } else {
             actionHtml = `
               <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: #93c5fd; margin-top: 6px;">
-                <i class="fa-solid fa-clock"></i> حالة الاستجابة: <strong>${c.status}</strong>
+                <i class="fa-solid fa-clock"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ø§Ø³ØªØ¬Ø§Ø¨Ø©: <strong>${c.status}</strong>
               </div>
             `;
           }
@@ -3221,9 +2778,9 @@ class UltimateFMApp {
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="badge ${c.bgClass}">${c.status}</span>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">طالب الشكوى: ${c.requester} • #${c.id}</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Ø·Ø§Ù„Ø¨ Ø§Ù„Ø´ÙƒÙˆÙ‰: ${c.requester} â€¢ #${c.id}</span>
               </div>
-              <h4 style="font-size: 0.88rem; font-weight: 700;">بلاغ عاجل من: ${c.name} (${c.phone})</h4>
+              <h4 style="font-size: 0.88rem; font-weight: 700;">Ø¨Ù„Ø§Øº Ø¹Ø§Ø¬Ù„ Ù…Ù†: ${c.name} (${c.phone})</h4>
               <p style="font-size: 0.75rem; color: var(--text-muted);">${c.details}</p>
               ${actionHtml}
             </div>
@@ -3248,38 +2805,38 @@ class UltimateFMApp {
     const techSelect = document.getElementById('mgrTicketTechSelect');
     if (!catSelect || !techSelect) return;
 
-    const selectedCategory = catSelect.value || 'كهروميكانيك';
+    const selectedCategory = catSelect.value || 'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ';
     
     // Technicians database grouped by specialty with live availability status
     const techDatabase = {
-      'كهروميكانيك': [
-        { name: 'كريم حسن', title: 'فني أول تكييف وكهروميكانيك', status: 'متاح الآن 🟢', available: true },
-        { name: 'سامح فوزي', title: 'فني صيانة تكييف وتبريد', status: 'متاح الآن 🟢', available: true },
-        { name: 'محمود إبراهيم', title: 'فني محطات وضواغط MEP', status: 'مشغول بمهمة 🟡', available: false }
+      'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': [
+        { name: 'ÙƒØ±ÙŠÙ… Ø­Ø³Ù†', title: 'ÙÙ†ÙŠ Ø£ÙˆÙ„ ØªÙƒÙŠÙŠÙ ÙˆÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø³Ø§Ù…Ø­ ÙÙˆØ²ÙŠ', title: 'ÙÙ†ÙŠ ØµÙŠØ§Ù†Ø© ØªÙƒÙŠÙŠÙ ÙˆØªØ¨Ø±ÙŠØ¯', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ù…Ø­Ù…ÙˆØ¯ Ø¥Ø¨Ø±Ø§Ù‡ÙŠÙ…', title: 'ÙÙ†ÙŠ Ù…Ø­Ø·Ø§Øª ÙˆØ¶ÙˆØ§ØºØ· MEP', status: 'Ù…Ø´ØºÙˆÙ„ Ø¨Ù…Ù‡Ù…Ø© ðŸŸ¡', available: false }
       ],
-      'سباكة': [
-        { name: 'مينا جرجس', title: 'فني أول سباكة وشبكات مياه', status: 'متاح الآن 🟢', available: true },
-        { name: 'طارق عبد الله', title: 'فني محطات معالجة وصحي', status: 'متاح الآن 🟢', available: true },
-        { name: 'ياسر النجار', title: 'فني طلمبات ومحابس رئيسية', status: 'متاح الآن 🟢', available: true }
+      'Ø³Ø¨Ø§ÙƒØ©': [
+        { name: 'Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³', title: 'ÙÙ†ÙŠ Ø£ÙˆÙ„ Ø³Ø¨Ø§ÙƒØ© ÙˆØ´Ø¨ÙƒØ§Øª Ù…ÙŠØ§Ù‡', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø·Ø§Ø±Ù‚ Ø¹Ø¨Ø¯ Ø§Ù„Ù„Ù‡', title: 'ÙÙ†ÙŠ Ù…Ø­Ø·Ø§Øª Ù…Ø¹Ø§Ù„Ø¬Ø© ÙˆØµØ­ÙŠ', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'ÙŠØ§Ø³Ø± Ø§Ù„Ù†Ø¬Ø§Ø±', title: 'ÙÙ†ÙŠ Ø·Ù„Ù…Ø¨Ø§Øª ÙˆÙ…Ø­Ø§Ø¨Ø³ Ø±Ø¦ÙŠØ³ÙŠØ©', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true }
       ],
-      'كهرباء': [
-        { name: 'أحمد علي', title: 'فني أول كهرباء وطاقة ولوحات', status: 'متاح الآن 🟢', available: true },
-        { name: 'محمد الشناوي', title: 'فني شبكات إنارة ومحولات', status: 'متاح الآن 🟢', available: true },
-        { name: 'خالد مصطفى', title: 'فني مولدات طوارئ وبيلارات', status: 'متاح الآن 🟢', available: true }
+      'ÙƒÙ‡Ø±Ø¨Ø§Ø¡': [
+        { name: 'Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ', title: 'ÙÙ†ÙŠ Ø£ÙˆÙ„ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ·Ø§Ù‚Ø© ÙˆÙ„ÙˆØ­Ø§Øª', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ù†Ø§ÙˆÙŠ', title: 'ÙÙ†ÙŠ Ø´Ø¨ÙƒØ§Øª Ø¥Ù†Ø§Ø±Ø© ÙˆÙ…Ø­ÙˆÙ„Ø§Øª', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø®Ø§Ù„Ø¯ Ù…ØµØ·ÙÙ‰', title: 'ÙÙ†ÙŠ Ù…ÙˆÙ„Ø¯Ø§Øª Ø·ÙˆØ§Ø±Ø¦ ÙˆØ¨ÙŠÙ„Ø§Ø±Ø§Øª', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true }
       ],
-      'نجارة': [
-        { name: 'عبد الرحمن سمير', title: 'فني نجارة وديكور وأقفال', status: 'متاح الآن 🟢', available: true },
-        { name: 'حسام حسني', title: 'فني ألمونيتال وأبواب زجاجية', status: 'متاح الآن 🟢', available: true }
+      'Ù†Ø¬Ø§Ø±Ø©': [
+        { name: 'Ø¹Ø¨Ø¯ Ø§Ù„Ø±Ø­Ù…Ù† Ø³Ù…ÙŠØ±', title: 'ÙÙ†ÙŠ Ù†Ø¬Ø§Ø±Ø© ÙˆØ¯ÙŠÙƒÙˆØ± ÙˆØ£Ù‚ÙØ§Ù„', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø­Ø³Ø§Ù… Ø­Ø³Ù†ÙŠ', title: 'ÙÙ†ÙŠ Ø£Ù„Ù…ÙˆÙ†ÙŠØªØ§Ù„ ÙˆØ£Ø¨ÙˆØ§Ø¨ Ø²Ø¬Ø§Ø¬ÙŠØ©', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true }
       ],
-      'صيانة عامة': [
-        { name: 'كريم حسن', title: 'فني تشغيل ومرافق عامة', status: 'متاح الآن 🟢', available: true },
-        { name: 'أحمد علي', title: 'فني كهرباء ومرافق عامة', status: 'متاح الآن 🟢', available: true },
-        { name: 'مينا جرجس', title: 'فني شبكات ومرافق عامة', status: 'متاح الآن 🟢', available: true },
-        { name: 'سعيد محمود', title: 'فني لاندسكيب وري عام', status: 'متاح الآن 🟢', available: true }
+      'ØµÙŠØ§Ù†Ø© Ø¹Ø§Ù…Ø©': [
+        { name: 'ÙƒØ±ÙŠÙ… Ø­Ø³Ù†', title: 'ÙÙ†ÙŠ ØªØ´ØºÙŠÙ„ ÙˆÙ…Ø±Ø§ÙÙ‚ Ø¹Ø§Ù…Ø©', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ', title: 'ÙÙ†ÙŠ ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆÙ…Ø±Ø§ÙÙ‚ Ø¹Ø§Ù…Ø©', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ù…ÙŠÙ†Ø§ Ø¬Ø±Ø¬Ø³', title: 'ÙÙ†ÙŠ Ø´Ø¨ÙƒØ§Øª ÙˆÙ…Ø±Ø§ÙÙ‚ Ø¹Ø§Ù…Ø©', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true },
+        { name: 'Ø³Ø¹ÙŠØ¯ Ù…Ø­Ù…ÙˆØ¯', title: 'ÙÙ†ÙŠ Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ±ÙŠ Ø¹Ø§Ù…', status: 'Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù† ðŸŸ¢', available: true }
       ]
     };
 
-    const list = techDatabase[selectedCategory] || techDatabase['كهروميكانيك'];
+    const list = techDatabase[selectedCategory] || techDatabase['ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ'];
     techSelect.innerHTML = '';
     list.forEach(t => {
       const opt = document.createElement('option');
@@ -3295,7 +2852,7 @@ class UltimateFMApp {
     safeStorage.removeItem('fm_tickets_v1');
     this.saveTicketsToStorage();
     this.renderTickets();
-    this.showToast('🗑️ تم تفريغ وتصفير سجل البلاغات بنجاح للبدء بتجربة نظيفة!');
+    this.showToast('ðŸ—‘ï¸ ØªÙ… ØªÙØ±ÙŠØº ÙˆØªØµÙÙŠØ± Ø³Ø¬Ù„ Ø§Ù„Ø¨Ù„Ø§ØºØ§Øª Ø¨Ù†Ø¬Ø§Ø­ Ù„Ù„Ø¨Ø¯Ø¡ Ø¨ØªØ¬Ø±Ø¨Ø© Ù†Ø¸ÙŠÙØ©!');
   }
 
   openManagerNewTicketModal() {
@@ -3317,32 +2874,32 @@ class UltimateFMApp {
     const detailsInput = document.getElementById('mgrTicketDetailsInput');
     const techSelect = document.getElementById('mgrTicketTechSelect');
 
-    const category = categorySelect ? categorySelect.value : 'صيانة عامة';
-    const location = (locationInput && locationInput.value.trim()) ? locationInput.value.trim() : 'الموقع العام بالقرية';
-    const details = (detailsInput && detailsInput.value.trim()) ? detailsInput.value.trim() : `طلب صيانة ${category} في ${location}`;
+    const category = categorySelect ? categorySelect.value : 'ØµÙŠØ§Ù†Ø© Ø¹Ø§Ù…Ø©';
+    const location = (locationInput && locationInput.value.trim()) ? locationInput.value.trim() : 'Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ø§Ù… Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
+    const details = (detailsInput && detailsInput.value.trim()) ? detailsInput.value.trim() : `Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø© ${category} ÙÙŠ ${location}`;
     const photoInput = document.getElementById('mgrTicketPhotoInput');
     
     // Category Fallbacks
     const fallbacks = {
-      'كهروميكانيك': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300',
-      'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300',
-      'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=300',
-      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=300',
-      'صيانة عامة': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300'
+      'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300',
+      'Ø³Ø¨Ø§ÙƒØ©': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300',
+      'ÙƒÙ‡Ø±Ø¨Ø§Ø¡': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=300',
+      'Ù†Ø¬Ø§Ø±Ø©': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=300',
+      'ØµÙŠØ§Ù†Ø© Ø¹Ø§Ù…Ø©': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300'
     };
 
-    let photoUrl = fallbacks[category] || fallbacks['صيانة عامة'];
+    let photoUrl = fallbacks[category] || fallbacks['ØµÙŠØ§Ù†Ø© Ø¹Ø§Ù…Ø©'];
 
     const proceed = async (finalPhoto) => {
       const newTk = {
         id: Math.floor(1000 + Math.random() * 9000),
-        title: `أمر عمل ${category} - ${location}`,
+        title: `Ø£Ù…Ø± Ø¹Ù…Ù„ ${category} - ${location}`,
         category: category,
         details: details,
         location: location,
         requester: 'manager',
-        requesterName: 'مدير الصيانة الميدانية',
-        status: 'تم التعيين للفني',
+        requesterName: 'Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø© Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠØ©',
+        status: 'ØªÙ… Ø§Ù„ØªØ¹ÙŠÙŠÙ† Ù„Ù„ÙÙ†ÙŠ',
         bgClass: 'badge-info',
         assignedTech: techName,
         priority: '3',
@@ -3361,11 +2918,11 @@ class UltimateFMApp {
       if (detailsInput) detailsInput.value = '';
       if (photoInput) photoInput.value = '';
 
-      this.showToast(`⚡ تم إصدار أمر العمل وتكليف الفني (${techName}) بنجاح!\nالموقع: ${location}\nتم التوجيه فوراً لشاشة الفني وأودو.`);
+      this.showToast(`âš¡ ØªÙ… Ø¥ØµØ¯Ø§Ø± Ø£Ù…Ø± Ø§Ù„Ø¹Ù…Ù„ ÙˆØªÙƒÙ„ÙŠÙ Ø§Ù„ÙÙ†ÙŠ (${techName}) Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ù…ÙˆÙ‚Ø¹: ${location}\nØªÙ… Ø§Ù„ØªÙˆØ¬ÙŠÙ‡ ÙÙˆØ±Ø§Ù‹ Ù„Ø´Ø§Ø´Ø© Ø§Ù„ÙÙ†ÙŠ ÙˆØ£ÙˆØ¯Ùˆ.`);
 
       // Sync to Odoo (Maintenance Module)
       try {
-        await this.syncTicketToOdoo(newTk, '01221122334', 'مدير الصيانة');
+        await this.syncTicketToOdoo(newTk, '01221122334', 'Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©');
         this.saveTicketsToStorage();
         this.renderTickets();
       } catch (e) {
@@ -3396,7 +2953,7 @@ class UltimateFMApp {
     if (infoBox) {
       infoBox.innerHTML = `
         <div style="font-weight: 800; margin-bottom: 2px;">#${tk.id} - ${tk.title}</div>
-        <div style="font-size: 0.7rem; color: #7f1d1d;">طالب الخدمة: ${tk.requesterName || tk.requester || 'مالك الوحدة'} • الحالة الحالية: ${tk.status}</div>
+        <div style="font-size: 0.7rem; color: #7f1d1d;">Ø·Ø§Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©: ${tk.requesterName || tk.requester || 'Ù…Ø§Ù„Ùƒ Ø§Ù„ÙˆØ­Ø¯Ø©'} â€¢ Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©: ${tk.status}</div>
       `;
     }
     if (targetInput) targetInput.value = tk.id;
@@ -3410,32 +2967,32 @@ class UltimateFMApp {
     const notesInput = document.getElementById('cancelNotesInput');
 
     const ticketId = targetInput ? targetInput.value : '';
-    const reasonCategory = reasonSelect ? reasonSelect.value : 'تذكرة مكررة';
+    const reasonCategory = reasonSelect ? reasonSelect.value : 'ØªØ°ÙƒØ±Ø© Ù…ÙƒØ±Ø±Ø©';
     const notes = (notesInput && notesInput.value.trim()) ? notesInput.value.trim() : '';
 
     if (!reasonCategory && !notes) {
-      this.showToast('⚠️ يرجى تحديد أو كتابة سبب إلغاء البلاغ أولاً (حقل إجباري للحوكمة)!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ Ø£Ùˆ ÙƒØªØ§Ø¨Ø© Ø³Ø¨Ø¨ Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø¨Ù„Ø§Øº Ø£ÙˆÙ„Ø§Ù‹ (Ø­Ù‚Ù„ Ø¥Ø¬Ø¨Ø§Ø±ÙŠ Ù„Ù„Ø­ÙˆÙƒÙ…Ø©)!');
       return;
     }
 
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
-    const fullReason = notes ? `${reasonCategory} - تفاصيل إضافية: ${notes}` : reasonCategory;
+    const fullReason = notes ? `${reasonCategory} - ØªÙØ§ØµÙŠÙ„ Ø¥Ø¶Ø§ÙÙŠØ©: ${notes}` : reasonCategory;
 
-    tk.status = 'ملغاة';
+    tk.status = 'Ù…Ù„ØºØ§Ø©';
     tk.bgClass = 'badge-danger';
     tk.cancelReason = fullReason;
     tk.cancellationReason = fullReason;
     tk.cancelNotes = notes;
-    tk.cancelledBy = this.currentRole === 'manager' ? 'المهندس أيمن السعيد (مدير الصيانة)' : 'فني الصيانة المسؤول';
+    tk.cancelledBy = this.currentRole === 'manager' ? 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)' : 'ÙÙ†ÙŠ Ø§Ù„ØµÙŠØ§Ù†Ø© Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„';
     tk.cancelledAt = new Date().toISOString();
 
     this.saveTicketsToStorage();
     this.renderTickets();
     this.closeModal('modalManagerCancelTicket');
 
-    this.showToast(`🚫 تم إلغاء البلاغ #${tk.id} وتوثيق السبب إجبارياً بنجاح!\nالسبب: ${fullReason}\nتم قفل التذكرة ونقلها لمرحلة Cancelled بأودو.`);
+    this.showToast(`ðŸš« ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø¨Ù„Ø§Øº #${tk.id} ÙˆØªÙˆØ«ÙŠÙ‚ Ø§Ù„Ø³Ø¨Ø¨ Ø¥Ø¬Ø¨Ø§Ø±ÙŠØ§Ù‹ Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ø³Ø¨Ø¨: ${fullReason}\nØªÙ… Ù‚ÙÙ„ Ø§Ù„ØªØ°ÙƒØ±Ø© ÙˆÙ†Ù‚Ù„Ù‡Ø§ Ù„Ù…Ø±Ø­Ù„Ø© Cancelled Ø¨Ø£ÙˆØ¯Ùˆ.`);
 
     // Sync Cancellation to Odoo (Stage 5 = Cancelled + Chatter Log)
     try {
@@ -3456,7 +3013,7 @@ class UltimateFMApp {
     if (tk) {
       const now = new Date();
       tk.dispatchedAt = now;
-      tk.status = 'قيد التنفيذ';
+      tk.status = 'Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°';
       tk.bgClass = 'badge-info';
       tk.assignedTech = techName;
 
@@ -3465,11 +3022,11 @@ class UltimateFMApp {
       const dispatchMins = Math.max(1, Math.round((now - createTime) / 60000));
       tk.dispatchMins = dispatchMins;
 
-      let managerRating = dispatchMins <= 15 ? '🟢 استجابة سريعة جداً (خلال 15د)' : (dispatchMins <= 30 ? '🟡 استجابة متوسطة' : '🔴 تأخير في التخصيص (تجاوز SLA)');
+      let managerRating = dispatchMins <= 15 ? 'ðŸŸ¢ Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø³Ø±ÙŠØ¹Ø© Ø¬Ø¯Ø§Ù‹ (Ø®Ù„Ø§Ù„ 15Ø¯)' : (dispatchMins <= 30 ? 'ðŸŸ¡ Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ù…ØªÙˆØ³Ø·Ø©' : 'ðŸ”´ ØªØ£Ø®ÙŠØ± ÙÙŠ Ø§Ù„ØªØ®ØµÙŠØµ (ØªØ¬Ø§ÙˆØ² SLA)');
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
+      this.showToast(`âœ… ØªÙ… Ø¥Ø³Ù†Ø§Ø¯ Ø§Ù„Ù…Ù‡Ù…Ø© Ù„Ù„ÙÙ†ÙŠ (${techName}) ÙˆÙ†Ù‚Ù„ Ø§Ù„ØªØ°ÙƒØ±Ø© Ù„Ù…Ø±Ø­Ù„Ø© "Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°" (In Progress)!\nØªÙ‚ÙŠÙŠÙ… Ø³Ø±Ø¹Ø© Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø§Ù„Ù…Ø¯ÙŠØ±: ${managerRating}`);
       
       // Sync update to Odoo (Stage 2 = In Progress)
       this.syncTicketUpdateToOdoo(tk);
@@ -3489,28 +3046,28 @@ class UltimateFMApp {
       const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
       const totalMins = Math.max(1, Math.round((now - createTime) / 60000));
       
-      tk.status = 'تم الحل';
+      tk.status = 'ØªÙ… Ø§Ù„Ø­Ù„';
       tk.bgClass = 'badge-success';
       tk.photoAfter = finalPhoto;
       tk.totalResolutionMins = totalMins;
 
       // SLA Metric Evaluation (Target: <= 30 mins, Max: <= 60 mins)
       if (totalMins <= 30) {
-        tk.slaRating = '🟢 أداء ممتاز (تم الحل في أقل من 30 دقيقة)';
+        tk.slaRating = 'ðŸŸ¢ Ø£Ø¯Ø§Ø¡ Ù…Ù…ØªØ§Ø² (ØªÙ… Ø§Ù„Ø­Ù„ ÙÙŠ Ø£Ù‚Ù„ Ù…Ù† 30 Ø¯Ù‚ÙŠÙ‚Ø©)';
         tk.slaBadgeClass = 'badge-success';
       } else if (totalMins <= 60) {
-        tk.slaRating = '🟡 أداء مقبول (تم الحل خلال ساعة)';
+        tk.slaRating = 'ðŸŸ¡ Ø£Ø¯Ø§Ø¡ Ù…Ù‚Ø¨ÙˆÙ„ (ØªÙ… Ø§Ù„Ø­Ù„ Ø®Ù„Ø§Ù„ Ø³Ø§Ø¹Ø©)';
         tk.slaBadgeClass = 'badge-warning';
       } else {
-        tk.slaRating = '🔴 أداء ضعيف / تجاوز SLA (أكثر من 60 دقيقة)';
+        tk.slaRating = 'ðŸ”´ Ø£Ø¯Ø§Ø¡ Ø¶Ø¹ÙŠÙ / ØªØ¬Ø§ÙˆØ² SLA (Ø£ÙƒØ«Ø± Ù…Ù† 60 Ø¯Ù‚ÙŠÙ‚Ø©)';
         tk.slaBadgeClass = 'badge-danger';
       }
 
-      tk.resolutionTime = `${totalMins} دقيقة • ${tk.slaRating}`;
+      tk.resolutionTime = `${totalMins} Ø¯Ù‚ÙŠÙ‚Ø© â€¢ ${tk.slaRating}`;
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
+      this.showToast(`ðŸŽ‰ ØªÙ… Ø¥ØºÙ„Ø§Ù‚ ØªØ°ÙƒØ±Ø© Ø§Ù„ØµÙŠØ§Ù†Ø© #${tk.id} ÙˆÙ†Ù‚Ù„Ù‡Ø§ Ù„Ù…Ø±Ø­Ù„Ø© "ØªÙ… Ø§Ù„Ø­Ù„" (Solved) Ø¨Ù†Ø¬Ø§Ø­!\nÙ…Ø¯Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²: ${totalMins} Ø¯Ù‚ÙŠÙ‚Ø©.\nØ£ØµØ¨Ø­ Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ù…ØªØ§Ø­Ø§Ù‹ Ù„Ù„Ø¹Ù…ÙŠÙ„ Ø§Ù„Ø¢Ù† â­.`);
       
       // Sync update to Odoo (Stage 4 = Solved)
       this.syncTicketUpdateToOdoo(tk);
@@ -3540,11 +3097,11 @@ class UltimateFMApp {
 
     const label = document.getElementById('starRatingLabel');
     const labelsMap = {
-      1: '⭐ ضعيف جداً (1/5)',
-      2: '⭐⭐ مقبول (2/5)',
-      3: '⭐⭐⭐ جيد (3/5)',
-      4: '⭐⭐⭐⭐ جيد جداً (4/5)',
-      5: '⭐⭐⭐⭐⭐ ممتاز جداً (5/5)'
+      1: 'â­ Ø¶Ø¹ÙŠÙ Ø¬Ø¯Ø§Ù‹ (1/5)',
+      2: 'â­â­ Ù…Ù‚Ø¨ÙˆÙ„ (2/5)',
+      3: 'â­â­â­ Ø¬ÙŠØ¯ (3/5)',
+      4: 'â­â­â­â­ Ø¬ÙŠØ¯ Ø¬Ø¯Ø§Ù‹ (4/5)',
+      5: 'â­â­â­â­â­ Ù…Ù…ØªØ§Ø² Ø¬Ø¯Ø§Ù‹ (5/5)'
     };
     if (label) label.innerText = labelsMap[stars] || `${stars}/5`;
 
@@ -3581,7 +3138,7 @@ class UltimateFMApp {
     this.renderTickets();
     this.closeModal('modalRateTicket');
 
-    this.showToast(`⭐ شكراً لك! تم تسجيل تقييمك (${stars}/5 نجوم) بنجاح!\nتم إرسال التقييم لإدارة الجودة بأودو.`);
+    this.showToast(`â­ Ø´ÙƒØ±Ø§Ù‹ Ù„Ùƒ! ØªÙ… ØªØ³Ø¬ÙŠÙ„ ØªÙ‚ÙŠÙŠÙ…Ùƒ (${stars}/5 Ù†Ø¬ÙˆÙ…) Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¬ÙˆØ¯Ø© Ø¨Ø£ÙˆØ¯Ùˆ.`);
 
     // Post Rating to Odoo Chatter
     if (tk.odooId) {
@@ -3601,10 +3158,10 @@ class UltimateFMApp {
         const authData = await this.callOdoo(baseUrl, authPayload);
         if (authData && authData.result) {
           const uid = authData.result;
-          const starsStr = '⭐'.repeat(parseInt(stars) || 5);
-          const ratingBody = `<p><b>⭐ تقييم العميل لجودة الخدمة بعد الإغلاق:</b></p>` +
-                             `<p>• <b>التقييم:</b> ${starsStr} (${stars}/5)</p>` +
-                             (comment ? `<p>• <b>ملاحظات العميل:</b> ${comment}</p>` : '');
+          const starsStr = 'â­'.repeat(parseInt(stars) || 5);
+          const ratingBody = `<p><b>â­ ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ Ù„Ø¬ÙˆØ¯Ø© Ø§Ù„Ø®Ø¯Ù…Ø© Ø¨Ø¹Ø¯ Ø§Ù„Ø¥ØºÙ„Ø§Ù‚:</b></p>` +
+                             `<p>â€¢ <b>Ø§Ù„ØªÙ‚ÙŠÙŠÙ…:</b> ${starsStr} (${stars}/5)</p>` +
+                             (comment ? `<p>â€¢ <b>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„:</b> ${comment}</p>` : '');
 
           const chatterPayload = {
             jsonrpc: "2.0",
@@ -3624,7 +3181,229 @@ class UltimateFMApp {
     }
   }
 
-  openPermitModal(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+  // ==========================================
+  // LANDSCAPING MANAGEMENT DISPATCHING & OPERATIONS
+  // ==========================================
+  assignLandscapingWorker(ticketId) {
+    const isEn = this.currentLang === 'en';
+    const select = document.getElementById(`assignLandscapeWorkerSelect_${ticketId}`);
+    const worker = select ? select.value : 'ÙØ±ÙŠÙ‚ Ø·Ø§Ù‚Ù… Ø§Ù„Ø²Ø±Ø§Ø¹Ø© 1';
+
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId));
+    if (tk) {
+      tk.status = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ†ÙÙŠØ° Ø¨Ø§Ù„Ù„Ø§Ø³Ù„ÙƒÙŠ';
+      tk.bgClass = 'badge-info';
+      tk.assignedWorker = worker;
+      tk.dispatchedAt = new Date().toISOString();
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.renderLandscaping();
+      this.showToast(isEn 
+        ? `ðŸ“» Dispatched via Radio (CH-04) to [${worker}]!\nUnit: ${tk.title}`
+        : `ðŸ“» ØªÙ… ØªÙˆØ¬ÙŠÙ‡ Ø§Ù„Ø¨Ù„Ø§Øº Ø¹Ø¨Ø± Ø§Ù„Ù„Ø§Ø³Ù„ÙƒÙŠ (Ù‚Ù†Ø§Ø© CH-04) Ø¥Ù„Ù‰ [${worker}] ÙÙˆØ±Ø§Ù‹!\nØ§Ù„Ù…ÙˆÙ‚Ø¹: ${tk.title}\nØªÙ… Ø¥Ø®Ø·Ø§Ø± Ø§Ù„Ø¹Ù…Ø§Ù„ Ù„Ø¨Ø¯Ø¡ Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ.`);
+      
+      // Sync status update to Odoo
+      this.syncTicketUpdateToOdoo(tk);
+    }
+  }
+
+  completeLandscapingRequest(ticketId) {
+    const isEn = this.currentLang === 'en';
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId));
+    if (tk) {
+      tk.status = 'ØªÙ… Ø§Ù„Ø­Ù„';
+      tk.bgClass = 'badge-success';
+      tk.resolvedAt = new Date().toISOString();
+      tk.photoAfter = 'https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=300&q=80';
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.renderLandscaping();
+      this.showToast(isEn 
+        ? 'ðŸŒ¿ Landscaping task verified, completed and closed in Odoo!' 
+        : `ðŸŒ¿ ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø¥Ù†Ù‡Ø§Ø¡ Ù…Ù‡Ù…Ø© Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ [#${tk.id}] Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… ØªÙˆØ«ÙŠÙ‚ Ø¥Ù†Ø¬Ø§Ø² Ø§Ù„Ø­Ø¯ÙŠÙ‚Ø© ÙˆØ¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø·Ù„Ø¨ ÙÙŠ Odoo.`);
+      
+      // Sync solved status to Odoo (Stage 4)
+      this.syncTicketUpdateToOdoo(tk);
+    }
+  }
+
+  renderLandscaping() {
+    const isEn = this.currentLang === 'en';
+    const listContainer = document.getElementById('landscapeRequestsList');
+    if (!listContainer) return;
+
+    // Filter landscaping tickets
+    const landscapeTks = this.tickets.filter(t => {
+      const cat = String(t.category || '').toLowerCase();
+      const title = String(t.title || '').toLowerCase();
+      return cat.includes('Ù„Ø§Ù†Ø¯') || cat.includes('Ø­Ø¯Ø§Ø¦Ù‚') || cat.includes('Ø²Ø±Ø§Ø¹') || cat.includes('Ø±ÙŠ') || title.includes('Ù„Ø§Ù†Ø¯') || title.includes('Ø­Ø¯ÙŠÙ‚');
+    });
+
+    const pending = landscapeTks.filter(t => t.status === 'Ø¬Ø¯ÙŠØ¯' || !t.assignedWorker);
+    const progress = landscapeTks.filter(t => t.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ†ÙÙŠØ° Ø¨Ø§Ù„Ù„Ø§Ø³Ù„ÙƒÙŠ' || (t.assignedWorker && t.status !== 'ØªÙ… Ø§Ù„Ø­Ù„' && t.status !== 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' && t.status !== 'Ù…Ù„ØºØ§Ø©'));
+    const completed = landscapeTks.filter(t => t.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || t.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡');
+
+    // Update KPIs
+    const elPending = document.getElementById('landscapeKpiPending');
+    const elProgress = document.getElementById('landscapeKpiProgress');
+    const elCompleted = document.getElementById('landscapeKpiCompleted');
+    const elBadge = document.getElementById('landscapeInboxBadge');
+
+    if (elPending) elPending.innerText = pending.length;
+    if (elProgress) elProgress.innerText = progress.length;
+    if (elCompleted) elCompleted.innerText = completed.length;
+    if (elBadge) elBadge.innerText = `${pending.length} Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙˆØ¬ÙŠÙ‡`;
+
+    listContainer.innerHTML = '';
+    if (landscapeTks.length === 0) {
+      listContainer.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 18px; background: rgba(16,185,129,0.02); border-radius: 8px;">${isEn ? 'No landscaping orders in queue' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ Ø£Ùˆ Ø­Ø¯Ø§Ø¦Ù‚ Ø­Ø§Ù„ÙŠØ§Ù‹'}</div>`;
+      return;
+    }
+
+    landscapeTks.forEach(tk => {
+      let actionHtml = '';
+      const isDone = (tk.status === 'ØªÙ… Ø§Ù„Ø­Ù„' || tk.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡');
+      const isInProgress = (tk.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ†ÙÙŠØ° Ø¨Ø§Ù„Ù„Ø§Ø³Ù„ÙƒÙŠ');
+
+      if (!isDone && !isInProgress) {
+        actionHtml = `
+          <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; background: rgba(16,185,129,0.05); padding: 8px; border-radius: 8px;">
+            <select id="assignLandscapeWorkerSelect_${tk.id}" class="form-control" style="font-size: 0.75rem; padding: 4px 8px; height: 32px; font-weight: 700; width: 60%;">
+              <option value="Ø·Ø§Ù‚Ù… 1 (Ø¹Ø±ÙØ© ÙˆØ³Ø¹ÙŠØ¯ - Ù‚Øµ ÙˆØªÙ†Ø³ÙŠÙ‚)">ðŸŒ¿ Ø·Ø§Ù‚Ù… 1 (Ø¹Ø±ÙØ© ÙˆØ³Ø¹ÙŠØ¯ - Ù‚Øµ ÙˆØªÙ†Ø³ÙŠÙ‚)</option>
+              <option value="Ø·Ø§Ù‚Ù… 2 (Ù…Ø¨Ø±ÙˆÙƒ ÙˆØ±Ø¬Ø¨ - Ø´Ø¨ÙƒØ§Øª Ø±ÙŠ)">ðŸ’§ Ø·Ø§Ù‚Ù… 2 (Ù…Ø¨Ø±ÙˆÙƒ ÙˆØ±Ø¬Ø¨ - Ø´Ø¨ÙƒØ§Øª Ø±ÙŠ)</option>
+              <option value="Ø·Ø§Ù‚Ù… 3 (ÙØ±Ù‚Ø© Ø§Ù„ØªØ³Ù…ÙŠØ¯ ÙˆØ§Ù„Ù…ÙƒØ§ÙØ­Ø©)">ðŸ›¡ï¸ Ø·Ø§Ù‚Ù… 3 (ÙØ±Ù‚Ø© Ø§Ù„ØªØ³Ù…ÙŠØ¯ ÙˆØ§Ù„Ù…ÙƒØ§ÙØ­Ø©)</option>
+              <option value="Ø·Ø§Ù‚Ù… 4 (Ø¹Ù…Ø§Ù„ Ù†Ø¸Ø§ÙØ© Ø§Ù„Ø£Ø­ÙˆØ§Ø¶ ÙˆØ§Ù„Ù†Ø®ÙŠÙ„)">ðŸŒ´ Ø·Ø§Ù‚Ù… 4 (Ù†Ø¸Ø§ÙØ© Ø§Ù„Ø£Ø­ÙˆØ§Ø¶ ÙˆØ§Ù„Ù†Ø®ÙŠÙ„)</option>
+            </select>
+            <button class="btn btn-primary" onclick="app.assignLandscapingWorker('${tk.id}')" style="font-size: 0.72rem; padding: 4px 10px; height: 32px; white-space: nowrap; flex: 1; display: flex; align-items: center; justify-content: center; background: #059669; border: none; font-weight: 800;">
+              <i class="fa-solid fa-walkie-talkie" style="margin-left: 4px;"></i> Ø¥Ø±Ø³Ø§Ù„ Ø¨Ø§Ù„Ù„Ø§Ø³Ù„ÙƒÙŠ
+            </button>
+          </div>
+        `;
+      } else if (isInProgress) {
+        actionHtml = `
+          <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); padding: 8px 10px; border-radius: 8px;">
+            <div style="font-size: 0.72rem; color: #1e40af; font-weight: 700;">
+              <i class="fa-solid fa-person-digging"></i> Ø§Ù„Ø·Ø§Ù‚Ù… Ø§Ù„Ù…ÙƒÙ„Ù: <b>${tk.assignedWorker}</b>
+            </div>
+            <button class="btn btn-success" onclick="app.completeLandscapingRequest('${tk.id}')" style="font-size: 0.72rem; padding: 4px 12px; height: 30px; white-space: nowrap; font-weight: 800; background: #10b981; border: none;">
+              <i class="fa-solid fa-circle-check"></i> ØªØ£ÙƒÙŠØ¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø¹Ù…Ù„
+            </button>
+          </div>
+        `;
+      } else {
+        actionHtml = `
+          <div style="margin-top: 8px; font-size: 0.7rem; color: #059669; font-weight: 700; background: #f0fdf4; border: 1px solid #86efac; padding: 6px 10px; border-radius: 6px;">
+            <i class="fa-solid fa-check-double"></i> ØªÙ… Ø§Ù„Ø¥Ù†Ø¬Ø§Ø² ÙˆÙ…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ø­Ø¯ÙŠÙ‚Ø© Ù„Ù„Ù…ÙˆØ§ØµÙØ§Øª ÙˆØ¥Ø´Ø¹Ø§Ø± Ø§Ù„Ù…Ø§Ù„Ùƒ
+          </div>
+        `;
+      }
+
+      listContainer.innerHTML += `
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 10px; padding: 12px; border-radius: 10px; background: #ffffff; border: 1px solid rgba(16,185,129,0.18); border-right: 5px solid ${isDone ? '#10b981' : (isInProgress ? '#2563eb' : '#d97706')}; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge ${tk.bgClass}" style="font-size: 0.65rem;">${tk.status}</span>
+            <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">#${tk.id} â€¢ ${tk.dateStr || 'Ø§Ù„ÙŠÙˆÙ…'}</span>
+          </div>
+          <h4 style="font-size: 0.88rem; font-weight: 800; color: #064e3b; margin-top: 4px;">${tk.title}</h4>
+          <p style="font-size: 0.72rem; color: #334155; line-height: 1.4; margin: 2px 0;">${tk.details || 'Ø·Ù„Ø¨ ØªÙ‚Ù„ÙŠÙ… ÙˆØµÙŠØ§Ù†Ø© Ø§Ù„Ø­Ø¯ÙŠÙ‚Ø©'}</p>
+          ${actionHtml}
+        </div>
+      `;
+    });
+  }
+
+  // ==========================================
+  // HOUSEKEEPING OPERATIONS
+  // ==========================================
+  assignHousekeepingWorker(id) {
+    const isEn = this.currentLang === 'en';
+    const req = this.housekeepingRequests ? this.housekeepingRequests.find(r => r.id === id) : null;
+    if (!req) return;
+
+    const select = document.getElementById(`assignWorkerSelect_${id}`);
+    const worker = select ? select.value : 'Ø¹Ø§Ù…Ù„ Ù†Ø¸Ø§ÙØ©';
+
+    req.status = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„';
+    req.assignedWorker = worker;
+
+    this.renderHousekeeping();
+    this.showToast(isEn ? `âœ… Worker ${worker} assigned successfully!` : `âœ… ØªÙ… ØªÙƒÙ„ÙŠÙ Ø¹Ø§Ù…Ù„ Ø§Ù„Ù†Ø¸Ø§ÙØ© ${worker} Ø¨Ù†Ø¬Ø§Ø­!`);
+  }
+
+  completeHousekeepingRequest(id) {
+    const isEn = this.currentLang === 'en';
+    const req = this.housekeepingRequests ? this.housekeepingRequests.find(r => r.id === id) : null;
+    if (!req) return;
+
+    req.status = 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡';
+    this.renderHousekeeping();
+    this.showToast(isEn ? 'ðŸ§¹ Cleaning task completed!' : 'ðŸ§¹ ØªÙ… Ø¥ØªÙ…Ø§Ù… Ù…Ù‡Ù…Ø© Ø§Ù„Ù†Ø¸Ø§ÙØ© Ø¨Ù†Ø¬Ø§Ø­!');
+  }
+
+  renderHousekeeping() {
+    const isEn = this.currentLang === 'en';
+    const listContainer = document.getElementById('hkRequestsList');
+    if (!listContainer) return;
+
+    if (!this.housekeepingRequests) this.housekeepingRequests = [];
+    const badge = document.getElementById('hkRequestsInboxBadge');
+    const pendingRequests = this.housekeepingRequests.filter(r => r.status === 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ®ØµÙŠØµ');
+    if (badge) {
+      badge.innerText = isEn ? `${pendingRequests.length} pending` : `${pendingRequests.length} Ø·Ù„Ø¨Ø§Øª Ù…Ø¹Ù„Ù‚Ø©`;
+    }
+
+    listContainer.innerHTML = '';
+    if (this.housekeepingRequests.length === 0) {
+      listContainer.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No cleaning requests' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù†Ø¸Ø§ÙØ© Ø­Ø§Ù„ÙŠØ©'}</div>`;
+      return;
+    }
+
+    this.housekeepingRequests.forEach(req => {
+      let actionHtml = '';
+      if (req.status === 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ®ØµÙŠØµ') {
+        actionHtml = `
+          <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+            <select id="assignWorkerSelect_${req.id}" class="form-control" style="font-size: 0.72rem; padding: 4px; height: 28px; width: 60%;">
+              <option value="Ù…Ø­Ù…Ø¯ Ø¹Ù„ÙŠ">Ù…Ø­Ù…Ø¯ Ø¹Ù„ÙŠ</option>
+              <option value="Ø£Ø­Ù…Ø¯ Ø­Ø³Ù†">Ø£Ø­Ù…Ø¯ Ø­Ø³Ù†</option>
+              <option value="Ù…ØµØ·ÙÙ‰ Ø³ÙŠØ¯">Ù…ØµØ·ÙÙ‰ Ø³ÙŠØ¯</option>
+            </select>
+            <button class="btn btn-primary" onclick="app.assignHousekeepingWorker('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; flex: 1; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-user-check"></i> ${isEn ? 'Assign' : 'Ø¥Ø³Ù†Ø§Ø¯ ÙˆØªÙƒÙ„ÙŠÙ'}
+            </button>
+          </div>
+        `;
+      } else if (req.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„') {
+        actionHtml = `
+          <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.7rem; color: #00e5ff;"><i class="fa-solid fa-person-sweeping"></i> ${isEn ? 'Worker:' : 'Ø§Ù„Ø¹Ø§Ù…Ù„:'} ${req.assignedWorker}</span>
+            <button class="btn btn-success" onclick="app.completeHousekeepingRequest('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Complete' : 'Ø¥Ù†Ù‡Ø§Ø¡ ÙˆØ¥ØªÙ…Ø§Ù…'}
+            </button>
+          </div>
+        `;
+      } else {
+        actionHtml = `
+          <div style="margin-top: 6px; font-size: 0.7rem; color: #10b981;">
+            <i class="fa-solid fa-check"></i> ${isEn ? 'Task Completed' : 'ØªÙ… Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ù…Ù‡Ù…Ø©'}
+          </div>
+        `;
+      }
+
+      listContainer.innerHTML += `
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px; border-left: 4px solid ${req.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' ? '#10b981' : '#f59e0b'};">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 0.85rem; font-weight: 700;">${req.type}</h4>
+            <span class="badge ${req.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' ? 'badge-success' : 'badge-warning'}">${req.status}</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">${req.location} â€¢ ${req.time}</p>
+          ${actionHtml}
+        </div>
+      `;
+    });
+  }
+
+  openPermitModal(requester = 'homeowner', type = 'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø©') {
     const roleInput = document.getElementById('permitRequesterRole');
     const typeInput = document.getElementById('permitTypeInput');
     const titleEl = document.getElementById('permitModalTitle');
@@ -3634,7 +3413,7 @@ class UltimateFMApp {
 
     if (roleInput) roleInput.value = requester;
     if (typeInput) typeInput.value = type;
-    if (titleEl) titleEl.innerText = `طلب ${type}`;
+    if (titleEl) titleEl.innerText = `Ø·Ù„Ø¨ ${type}`;
     if (nameInput) nameInput.value = '';
     if (phoneInput) phoneInput.value = '';
     if (plateInput) plateInput.value = '';
@@ -3642,7 +3421,7 @@ class UltimateFMApp {
     this.openModal('modalRequestPermit');
   }
 
-  requestPermit(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+  requestPermit(requester = 'homeowner', type = 'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø©') {
     this.openPermitModal(requester, type);
   }
 
@@ -3652,26 +3431,26 @@ class UltimateFMApp {
 
     try {
       const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
-      const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
+      const type = document.getElementById('permitTypeInput')?.value || 'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø©';
       const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
       const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
       const plate = document.getElementById('permitPlateNumInput')?.value || '';
-      const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+      const days = document.getElementById('permitDaysSelect')?.value || 'ÙŠÙˆÙ… ÙˆØ§Ø­Ø¯';
 
       if (!visitorName.trim()) {
-        this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
+        this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ø³Ù… Ø§Ù„Ø²Ø§Ø¦Ø± Ø£Ùˆ Ø§Ù„Ø¶ÙŠÙ Ø£Ùˆ Ø¬Ù‡Ø© Ø§Ù„ØªÙˆØ±ÙŠØ¯ Ø£ÙˆÙ„Ø§Ù‹!');
         this._submittingPermit = false;
         return;
       }
 
-      const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
+      const detailsStr = `Ø§Ù„Ø²Ø§Ø¦Ø±: ${visitorName} ${visitorPhone ? `â€¢ Ù‡Ø§ØªÙ: ${visitorPhone}` : ''} ${plate ? `â€¢ Ø§Ù„Ù„ÙˆØ­Ø©: ${plate}` : ''} â€¢ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©: ${days}`;
 
       const newPermit = {
         id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
         type: type,
-        category: 'تصريح دخول بوابات أمني',
+        category: 'ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø¨ÙˆØ§Ø¨Ø§Øª Ø£Ù…Ù†ÙŠ',
         title: `${type}: ${visitorName}`,
-        status: 'تحت المراجعة',
+        status: 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©',
         bgClass: 'badge-warning',
         requester: role,
         details: detailsStr,
@@ -3681,7 +3460,7 @@ class UltimateFMApp {
       this.permits.unshift(newPermit);
       this.renderTickets();
       this.closeModal('modalRequestPermit');
-      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
+      this.showToast(`âœ… ØªÙ… ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨ Ø§Ù„ØªØµØ±ÙŠØ­ Ø¨Ù†Ø¬Ø§Ø­ Ø±Ù‚Ù… #${newPermit.id}\nØ§Ù„Ø·Ù„Ø¨ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø­Ø§Ù„ÙŠØ§Ù‹ Ù…Ù† Ù‚Ø¨Ù„ ÙØ±ÙŠÙ‚ Ø£Ù…Ù† ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙŠØ©.`);
 
       // Live Sync to Odoo Security Team
       this.syncTicketToOdoo(newPermit, visitorPhone, visitorName).catch(pErr => {
@@ -3695,32 +3474,32 @@ class UltimateFMApp {
   approvePermit(permitId) {
     const p = this.permits.find(x => x.id === permitId);
     if (p) {
-      p.status = 'معتمد';
+      p.status = 'Ù…Ø¹ØªÙ…Ø¯';
       p.bgClass = 'badge-success';
       p.qrCode = String(Math.floor(100000 + Math.random() * 900000));
       this.renderTickets();
-      this.showToast(`✅ تم اعتماد وتصديق التصريح بنجاح!\nتم توليد كود الدخول الديناميكي للأمن والبوابات.`);
+      this.showToast(`âœ… ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ ÙˆØªØµØ¯ÙŠÙ‚ Ø§Ù„ØªØµØ±ÙŠØ­ Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… ØªÙˆÙ„ÙŠØ¯ ÙƒÙˆØ¯ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠ Ù„Ù„Ø£Ù…Ù† ÙˆØ§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª.`);
     }
   }
 
   rejectPermit(permitId) {
     const p = this.permits.find(x => x.id === permitId);
     if (p) {
-      p.status = 'مرفوض';
+      p.status = 'Ù…Ø±ÙÙˆØ¶';
       p.bgClass = 'badge-danger';
       p.qrCode = '';
       this.renderTickets();
-      this.showToast(`❌ تم رفض طلب التصريح المرفوع.`);
+      this.showToast(`âŒ ØªÙ… Ø±ÙØ¶ Ø·Ù„Ø¨ Ø§Ù„ØªØµØ±ÙŠØ­ Ø§Ù„Ù…Ø±ÙÙˆØ¹.`);
     }
   }
 
   dispatchSecurityDolphin(complaintId) {
     const c = this.complaints.find(x => x.id === complaintId);
     if (c) {
-      c.status = 'الاستجابة جارية - التدخل السريع في الطريق';
+      c.status = 'Ø§Ù„Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø¬Ø§Ø±ÙŠØ© - Ø§Ù„ØªØ¯Ø®Ù„ Ø§Ù„Ø³Ø±ÙŠØ¹ ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚';
       c.bgClass = 'badge-info';
       this.renderTickets();
-      this.showToast(`🚨 تم تأكيد استلام البلاغ الأمني #${complaintId}!\nتم إشعار مقدم الشكوى فوراً بأن فريق التدخل السريع في طريقه إليه.`);
+      this.showToast(`ðŸš¨ ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø§Ø³ØªÙ„Ø§Ù… Ø§Ù„Ø¨Ù„Ø§Øº Ø§Ù„Ø£Ù…Ù†ÙŠ #${complaintId}!\nØªÙ… Ø¥Ø´Ø¹Ø§Ø± Ù…Ù‚Ø¯Ù… Ø§Ù„Ø´ÙƒÙˆÙ‰ ÙÙˆØ±Ø§Ù‹ Ø¨Ø£Ù† ÙØ±ÙŠÙ‚ Ø§Ù„ØªØ¯Ø®Ù„ Ø§Ù„Ø³Ø±ÙŠØ¹ ÙÙŠ Ø·Ø±ÙŠÙ‚Ù‡ Ø¥Ù„ÙŠÙ‡.`);
     }
   }
 
@@ -3731,13 +3510,13 @@ class UltimateFMApp {
     const btnApprove = document.getElementById('btnApproveAndPay');
 
     if (sigName) sigName.innerText = name;
-    if (sigPrice) sigPrice.innerText = `${price} ج.م`;
+    if (sigPrice) sigPrice.innerText = `${price} Ø¬.Ù…`;
 
     if (btnApprove) {
       if (this.activeAuditTicketId) {
-        btnApprove.innerHTML = `<i class="fa-solid fa-pen-nib"></i> موافقة وتوقيع المالك بالموافقة`;
+        btnApprove.innerHTML = `<i class="fa-solid fa-pen-nib"></i> Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØªÙˆÙ‚ÙŠØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©`;
       } else {
-        btnApprove.innerHTML = `<i class="fa-solid fa-credit-card"></i> موافقة ودفع آلي (${price} ج.م)`;
+        btnApprove.innerHTML = `<i class="fa-solid fa-credit-card"></i> Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØ¯ÙØ¹ Ø¢Ù„ÙŠ (${price} Ø¬.Ù…)`;
       }
     }
 
@@ -3752,7 +3531,7 @@ class UltimateFMApp {
       const ticketId = this.activeAuditTicketId;
       const tk = this.tickets.find(t => t.id === ticketId);
       if (tk) {
-        tk.status = 'انتظار دفع المالك';
+        tk.status = 'Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ';
         tk.bgClass = 'badge-danger'; // Red badge for payment pending
         tk.needsPart = true;
         tk.partName = this.selectedPart.name;
@@ -3760,7 +3539,7 @@ class UltimateFMApp {
         tk.photoBefore = this.uploadedDamagedPhoto || tk.photoBefore;
 
         this.renderTickets();
-        this.showToast(`✅ تم توقيع المالك بنجاح!\nتم تحويل حالة البلاغ لـ "انتظار دفع المالك".\nستظهر التذكرة الآن بانتظار السداد الإلكتروني بقيمة ${this.selectedPart.price} ج.م في شاشة العميل.`);
+        this.showToast(`âœ… ØªÙ… ØªÙˆÙ‚ÙŠØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… ØªØ­ÙˆÙŠÙ„ Ø­Ø§Ù„Ø© Ø§Ù„Ø¨Ù„Ø§Øº Ù„Ù€ "Ø§Ù†ØªØ¸Ø§Ø± Ø¯ÙØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ".\nØ³ØªØ¸Ù‡Ø± Ø§Ù„ØªØ°ÙƒØ±Ø© Ø§Ù„Ø¢Ù† Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø³Ø¯Ø§Ø¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø¨Ù‚ÙŠÙ…Ø© ${this.selectedPart.price} Ø¬.Ù… ÙÙŠ Ø´Ø§Ø´Ø© Ø§Ù„Ø¹Ù…ÙŠÙ„.`);
         this.syncTicketUpdateToOdoo(tk);
       }
       this.activeAuditTicketId = null;
@@ -3768,7 +3547,7 @@ class UltimateFMApp {
       return;
     }
 
-    this.showToast(`💳 تم توقيع المالك إلكترونياً والدفع الفوري لمبلغ ${this.selectedPart.price} ج.م!\nتم تسجيل شرط الصرف للمخزن وإرسال التأكيد بالفاتورة.`);
+    this.showToast(`ðŸ’³ ØªÙ… ØªÙˆÙ‚ÙŠØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Ù‹ ÙˆØ§Ù„Ø¯ÙØ¹ Ø§Ù„ÙÙˆØ±ÙŠ Ù„Ù…Ø¨Ù„Øº ${this.selectedPart.price} Ø¬.Ù…!\nØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø´Ø±Ø· Ø§Ù„ØµØ±Ù Ù„Ù„Ù…Ø®Ø²Ù† ÙˆØ¥Ø±Ø³Ø§Ù„ Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¨Ø§Ù„ÙØ§ØªÙˆØ±Ø©.`);
   }
 
   technicianRequestPart(ticketId, fileInputId) {
@@ -3780,7 +3559,7 @@ class UltimateFMApp {
       this.activeAuditTicketId = ticketId;
       this.openModal('modalInventory');
       this.filterInventory();
-      this.showToast('🔍 تم تجهيز طلب قطعة الغيار! يرجى تحديد القطعة المطلوبة من المخزن.');
+      this.showToast('ðŸ” ØªÙ… ØªØ¬Ù‡ÙŠØ² Ø·Ù„Ø¨ Ù‚Ø·Ø¹Ø© Ø§Ù„ØºÙŠØ§Ø±! ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù‚Ø·Ø¹Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù…Ù† Ø§Ù„Ù…Ø®Ø²Ù†.');
     };
 
     if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -3800,8 +3579,8 @@ class UltimateFMApp {
 
     const partNameEl = document.getElementById('sparePartPayName');
     const partAmountEl = document.getElementById('sparePartPayAmount');
-    if (partNameEl) partNameEl.innerText = tk.partName || 'قطعة غيار غير محددة';
-    if (partAmountEl) partAmountEl.innerText = `${tk.partPrice || 0} ج.م`;
+    if (partNameEl) partNameEl.innerText = tk.partName || 'Ù‚Ø·Ø¹Ø© ØºÙŠØ§Ø± ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø©';
+    if (partAmountEl) partAmountEl.innerText = `${tk.partPrice || 0} Ø¬.Ù…`;
 
     // Reset payment radio and inputs
     const paySaved = document.getElementById('payMethodSavedCard');
@@ -3828,7 +3607,7 @@ class UltimateFMApp {
     if (!tk) return;
 
     if (this.ownerWalletBalance < tk.partPrice) {
-      this.showToast('❌ رصيد محفظتك الرقمية غير كافٍ لسداد قطعة الغيار! يرجى إعادة شحن محفظتك أولاً.');
+      this.showToast('âŒ Ø±ØµÙŠØ¯ Ù…Ø­ÙØ¸ØªÙƒ Ø§Ù„Ø±Ù‚Ù…ÙŠØ© ØºÙŠØ± ÙƒØ§ÙÙ Ù„Ø³Ø¯Ø§Ø¯ Ù‚Ø·Ø¹Ø© Ø§Ù„ØºÙŠØ§Ø±! ÙŠØ±Ø¬Ù‰ Ø¥Ø¹Ø§Ø¯Ø© Ø´Ø­Ù† Ù…Ø­ÙØ¸ØªÙƒ Ø£ÙˆÙ„Ø§Ù‹.');
       return;
     }
 
@@ -3837,14 +3616,14 @@ class UltimateFMApp {
     this.updateWalletUI();
 
     // Update ticket state
-    tk.status = 'تم الدفع - جاري التركيب';
+    tk.status = 'ØªÙ… Ø§Ù„Ø¯ÙØ¹ - Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ±ÙƒÙŠØ¨';
     tk.bgClass = 'badge-info';
 
     this.renderTickets();
     this.syncTicketUpdateToOdoo(tk);
 
-    const methodArabic = method === 'saved' ? 'البطاقة المسجلة (تنتهي بـ 4012)' : 'البطاقة الجديدة';
-    this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
+    const methodArabic = method === 'saved' ? 'Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…Ø³Ø¬Ù„Ø© (ØªÙ†ØªÙ‡ÙŠ Ø¨Ù€ 4012)' : 'Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©';
+    this.showToast(`âœ… ØªÙ… Ø³Ø¯Ø§Ø¯ Ù‚ÙŠÙ…Ø© Ù‚Ø·Ø¹Ø© Ø§Ù„ØºÙŠØ§Ø± [${tk.partName}] Ø¨Ù…Ø¨Ù„Øº [${tk.partPrice} Ø¬.Ù…] Ø¨Ù†Ø¬Ø§Ø­ Ø¹Ø¨Ø± ${methodArabic}!\nØªÙ… Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„ÙÙ†ÙŠ [ÙƒØ±ÙŠÙ… Ø­Ø³Ù†] Ù„ØµØ±Ù Ø§Ù„Ù‚Ø·Ø¹Ø© ÙˆØ¨Ø¯Ø¡ Ø§Ù„ØªØ±ÙƒÙŠØ¨ ÙÙˆØ±Ø§Ù‹.`);
   }
 
   handleFamilyIdFrontPreview(event) {
@@ -3889,7 +3668,7 @@ class UltimateFMApp {
     const email = emailInput ? emailInput.value.trim() : '';
 
     if (!name || !phone) {
-      this.showToast('⚠️ يرجى إدخال اسم فرد العائلة ورقم الموبايل!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ø³Ù… ÙØ±Ø¯ Ø§Ù„Ø¹Ø§Ø¦Ù„Ø© ÙˆØ±Ù‚Ù… Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„!');
       return;
     }
 
@@ -3899,12 +3678,12 @@ class UltimateFMApp {
     const idBackData = this.familyIdBackBase64;
 
     const relationMap = {
-      'father': 'أب',
-      'mother': 'أم',
-      'brother': 'أخ',
-      'sister': 'أخت',
-      'son': 'ابن',
-      'daughter': 'ابنة'
+      'father': 'Ø£Ø¨',
+      'mother': 'Ø£Ù…',
+      'brother': 'Ø£Ø®',
+      'sister': 'Ø£Ø®Øª',
+      'son': 'Ø§Ø¨Ù†',
+      'daughter': 'Ø§Ø¨Ù†Ø©'
     };
     const relationArabic = relationMap[relation] || relation;
 
@@ -3915,7 +3694,7 @@ class UltimateFMApp {
     if (list) {
       // Remove empty placeholder message
       const emptyDiv = list.querySelector('div:only-child');
-      if (emptyDiv && emptyDiv.innerText.includes('لا يوجد أفراد')) {
+      if (emptyDiv && emptyDiv.innerText.includes('Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø£ÙØ±Ø§Ø¯')) {
         list.innerHTML = '';
       }
 
@@ -3925,17 +3704,17 @@ class UltimateFMApp {
         <div style="text-align: right;">
           <div style="font-size: 0.85rem; font-weight: 800; color: #1c2140;">${name} <span style="font-size: 0.75rem; color: #1b8f91; font-weight: 700;">(${relationArabic})</span></div>
           <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
-            <i class="fa-solid fa-phone" style="font-size: 0.62rem; color: #1b8f91;"></i> ${phone} • بانتظار مراجعة واعتماد بطاقة الرقم القومي 🪪
+            <i class="fa-solid fa-phone" style="font-size: 0.62rem; color: #1b8f91;"></i> ${phone} â€¢ Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ø¹ØªÙ…Ø§Ø¯ Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ù‚ÙˆÙ…ÙŠ ðŸªª
           </p>
         </div>
-        <span class="badge" style="font-size: 0.65rem; margin-top:0; background: #f59e0b; color: #ffffff !important; padding: 4px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hourglass-half"></i> قيد مراجعة الإدارة ⏳</span>
+        <span class="badge" style="font-size: 0.65rem; margin-top:0; background: #f59e0b; color: #ffffff !important; padding: 4px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;"><i class="fa-solid fa-hourglass-half"></i> Ù‚ÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© â³</span>
       `;
       list.appendChild(item);
 
       // Update badge count
       if (badge) {
         const count = list.querySelectorAll('div[style*="justify-content"]').length;
-        badge.innerText = `${count} أفراد`;
+        badge.innerText = `${count} Ø£ÙØ±Ø§Ø¯`;
       }
     }
 
@@ -3956,11 +3735,11 @@ class UltimateFMApp {
     if (frontInput) frontInput.value = '';
     if (backInput) backInput.value = '';
     
-    this.showToast(`👥 تم إنشاء حساب فرد الأسرة [${name}] بنجاح!\nجاري المزامنة والتسجيل بـ Odoo Contacts مع صور البطاقة الشخصية...`);
+    this.showToast(`ðŸ‘¥ ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ ÙØ±Ø¯ Ø§Ù„Ø£Ø³Ø±Ø© [${name}] Ø¨Ù†Ø¬Ø§Ø­!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„ Ø¨Ù€ Odoo Contacts Ù…Ø¹ ØµÙˆØ± Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø´Ø®ØµÙŠØ©...`);
 
     try {
       await this.syncFamilyMemberToOdoo(name, relationArabic, phone, email, idFrontData, idBackData);
-      this.showToast(`✅ تم توثيق وتسجيل فرد الأسرة [${name}] وصور البطاقة الشخصية وش وضهر بـ Odoo Contacts بنجاح!`);
+      this.showToast(`âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ ÙˆØªØ³Ø¬ÙŠÙ„ ÙØ±Ø¯ Ø§Ù„Ø£Ø³Ø±Ø© [${name}] ÙˆØµÙˆØ± Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø´Ø®ØµÙŠØ© ÙˆØ´ ÙˆØ¶Ù‡Ø± Ø¨Ù€ Odoo Contacts Ø¨Ù†Ø¬Ø§Ø­!`);
     } catch (err) {
       console.warn('[Odoo Family Member Sync Error]:', err);
     }
@@ -3999,7 +3778,7 @@ class UltimateFMApp {
     // Strategy 2: Search partner by email or name
     try {
       const userEmail = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-      const customName = safeStorage.getItem('odoo_owner_name') || 'أسامة';
+      const customName = safeStorage.getItem('odoo_owner_name') || 'Ø£Ø³Ø§Ù…Ø©';
       const searchPayload = {
         jsonrpc: "2.0",
         method: "call",
@@ -4073,7 +3852,7 @@ class UltimateFMApp {
               function: relation,
               parent_id: partnerId,
               type: "other",
-              comment: `فرد أسرة تابع للمالك الرئيسي - صلة القرابة: ${relation} - الإيميل: ${email}`,
+              comment: `ÙØ±Ø¯ Ø£Ø³Ø±Ø© ØªØ§Ø¨Ø¹ Ù„Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ - ØµÙ„Ø© Ø§Ù„Ù‚Ø±Ø§Ø¨Ø©: ${relation} - Ø§Ù„Ø¥ÙŠÙ…ÙŠÙ„: ${email}`,
               company_type: "person"
             }]
           ]
@@ -4097,17 +3876,17 @@ class UltimateFMApp {
         };
 
         const relClean = (relation || '').trim();
-        if (relClean.includes('أب') || relClean.toLowerCase().includes('father')) {
+        if (relClean.includes('Ø£Ø¨') || relClean.toLowerCase().includes('father')) {
           partnerUpdates["x_studio_father"] = `${name} (${phone})`;
-        } else if (relClean.includes('أم') || relClean.toLowerCase().includes('mother')) {
+        } else if (relClean.includes('Ø£Ù…') || relClean.toLowerCase().includes('mother')) {
           partnerUpdates["x_studio_mother"] = `${name} (${phone})`;
-        } else if (relClean.includes('ابن') || relClean.toLowerCase().includes('son')) {
+        } else if (relClean.includes('Ø§Ø¨Ù†') || relClean.toLowerCase().includes('son')) {
           partnerUpdates["x_studio_son"] = `${name} (${phone})`;
-        } else if (relClean.includes('ابنة') || relClean.toLowerCase().includes('daughter')) {
+        } else if (relClean.includes('Ø§Ø¨Ù†Ø©') || relClean.toLowerCase().includes('daughter')) {
           partnerUpdates["x_studio_daughter"] = `${name} (${phone})`;
-        } else if (relClean.includes('زوج') || relClean.toLowerCase().includes('husband')) {
+        } else if (relClean.includes('Ø²ÙˆØ¬') || relClean.toLowerCase().includes('husband')) {
           partnerUpdates["x_studio_husband"] = `${name} (${phone})`;
-        } else if (relClean.includes('زوجة') || relClean.toLowerCase().includes('wife')) {
+        } else if (relClean.includes('Ø²ÙˆØ¬Ø©') || relClean.toLowerCase().includes('wife')) {
           partnerUpdates["x_studio_wife"] = `${name} (${phone})`;
         }
 
@@ -4156,7 +3935,7 @@ class UltimateFMApp {
                 "ir.attachment",
                 "create",
                 [{
-                  name: `بطاقة_شخصية_${name}_وجه.jpg`,
+                  name: `Ø¨Ø·Ø§Ù‚Ø©_Ø´Ø®ØµÙŠØ©_${name}_ÙˆØ¬Ù‡.jpg`,
                   datas: cleanFront,
                   res_model: "res.partner",
                   res_id: targetId
@@ -4183,7 +3962,7 @@ class UltimateFMApp {
                 "ir.attachment",
                 "create",
                 [{
-                  name: `بطاقة_شخصية_${name}_ظهر.jpg`,
+                  name: `Ø¨Ø·Ø§Ù‚Ø©_Ø´Ø®ØµÙŠØ©_${name}_Ø¸Ù‡Ø±.jpg`,
                   datas: cleanBack,
                   res_model: "res.partner",
                   res_id: targetId
@@ -4202,12 +3981,12 @@ class UltimateFMApp {
       try {
         const relLower = (relation || '').toLowerCase();
         let relField = null;
-        if (relLower.includes('زوجة') || relLower.includes('wife')) relField = 'x_studio_wife';
-        else if (relLower.includes('زوج') || relLower.includes('husband')) relField = 'x_studio_husband';
-        else if (relLower.includes('ابن') || relLower.includes('son')) relField = 'x_studio_son';
-        else if (relLower.includes('ابنة') || relLower.includes('daughter')) relField = 'x_studio_daughter';
-        else if (relLower.includes('أب') || relLower.includes('father')) relField = 'x_studio_father';
-        else if (relLower.includes('أم') || relLower.includes('mother')) relField = 'x_studio_mother';
+        if (relLower.includes('Ø²ÙˆØ¬Ø©') || relLower.includes('wife')) relField = 'x_studio_wife';
+        else if (relLower.includes('Ø²ÙˆØ¬') || relLower.includes('husband')) relField = 'x_studio_husband';
+        else if (relLower.includes('Ø§Ø¨Ù†') || relLower.includes('son')) relField = 'x_studio_son';
+        else if (relLower.includes('Ø§Ø¨Ù†Ø©') || relLower.includes('daughter')) relField = 'x_studio_daughter';
+        else if (relLower.includes('Ø£Ø¨') || relLower.includes('father')) relField = 'x_studio_father';
+        else if (relLower.includes('Ø£Ù…') || relLower.includes('mother')) relField = 'x_studio_mother';
 
         if (relField) {
           const relWritePayload = {
@@ -4233,8 +4012,8 @@ class UltimateFMApp {
     // Step 7: Append to partner comment/notes as guaranteed log
     if (partnerId) {
       try {
-        const idNoteText = (idFrontBase64 || idBackBase64) ? ' (مرفق صور البطاقة وش وضهر 🪪)' : '';
-        const familyEntryText = `• ${name} (${relation}) - م: ${phone} - ميل: ${email}${idNoteText}`;
+        const idNoteText = (idFrontBase64 || idBackBase64) ? ' (Ù…Ø±ÙÙ‚ ØµÙˆØ± Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© ÙˆØ´ ÙˆØ¶Ù‡Ø± ðŸªª)' : '';
+        const familyEntryText = `â€¢ ${name} (${relation}) - Ù…: ${phone} - Ù…ÙŠÙ„: ${email}${idNoteText}`;
         const notePayload = {
           jsonrpc: "2.0",
           method: "call",
@@ -4245,7 +4024,7 @@ class UltimateFMApp {
               dbInput, uid, keyInput,
               "res.partner",
               "write",
-              [[partnerId], { comment: `👥 فرد أسرة جديد: ${familyEntryText}` }]
+              [[partnerId], { comment: `ðŸ‘¥ ÙØ±Ø¯ Ø£Ø³Ø±Ø© Ø¬Ø¯ÙŠØ¯: ${familyEntryText}` }]
             ]
           },
           id: Math.floor(Math.random() * 1000)
@@ -4261,24 +4040,24 @@ class UltimateFMApp {
   }
 
   chargeService(serviceName, price) {
-    this.showToast(`✅ تم شحن ${serviceName} بنجاح بمبلغ ${price} ج.م!\nتم تفعيل الصلاحية على الـ QR Code حتى التاريخ المترتب.`);
+    this.showToast(`âœ… ØªÙ… Ø´Ø­Ù† ${serviceName} Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ù…Ø¨Ù„Øº ${price} Ø¬.Ù…!\nØªÙ… ØªÙØ¹ÙŠÙ„ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ù„Ù‰ Ø§Ù„Ù€ QR Code Ø­ØªÙ‰ Ø§Ù„ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ØªØ±ØªØ¨.`);
   }
 
   issueBeachPermit() {
     const code = Math.floor(100000 + Math.random() * 900000);
     this.closeModal('modalBeachPoolsPermit');
-    this.showToast(`🌊 تم إصدار تصريح دخول الشاطئ والبحيرات وحمامات السباحة بنجاح!\nرمز الـ Dynamic QR: ${code}\nتم تسجيل التصريح على بوابات الرفاهية الإلكترونية بالقرية.`);
+    this.showToast(`ðŸŒŠ ØªÙ… Ø¥ØµØ¯Ø§Ø± ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø´Ø§Ø·Ø¦ ÙˆØ§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ­Ù…Ø§Ù…Ø§Øª Ø§Ù„Ø³Ø¨Ø§Ø­Ø© Ø¨Ù†Ø¬Ø§Ø­!\nØ±Ù…Ø² Ø§Ù„Ù€ Dynamic QR: ${code}\nØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„ØªØµØ±ÙŠØ­ Ø¹Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø±ÙØ§Ù‡ÙŠØ© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©.`);
   }
 
   payInstallment(code, amount) {
     const formattedAmount = Number(amount).toLocaleString();
-    this.showToast(`💳 تم سداد القسط المستحق (${code}) بقيمة ${formattedAmount} ج.م بنجاح!\nتم إصدار سند القبض الإلكتروني وتحديث كشف حساب الوحدة في Odoo.`);
+    this.showToast(`ðŸ’³ ØªÙ… Ø³Ø¯Ø§Ø¯ Ø§Ù„Ù‚Ø³Ø· Ø§Ù„Ù…Ø³ØªØ­Ù‚ (${code}) Ø¨Ù‚ÙŠÙ…Ø© ${formattedAmount} Ø¬.Ù… Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… Ø¥ØµØ¯Ø§Ø± Ø³Ù†Ø¯ Ø§Ù„Ù‚Ø¨Ø¶ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØªØ­Ø¯ÙŠØ« ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ø§Ù„ÙˆØ­Ø¯Ø© ÙÙŠ Odoo.`);
     
     // Update UI badge status
     const badge = document.getElementById('installmentStatusBadge');
     if (badge) {
       badge.className = 'badge badge-success';
-      badge.innerHTML = '<i class="fa-solid fa-check-double"></i> تم سداد جميع الأقساط المستحقة';
+      badge.innerHTML = '<i class="fa-solid fa-check-double"></i> ØªÙ… Ø³Ø¯Ø§Ø¯ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ù‚Ø³Ø§Ø· Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø©';
     }
   }
 
@@ -4384,7 +4163,7 @@ class UltimateFMApp {
           if (!m.body) return false;
           const txt = m.body.replace(/<[^>]*>?/gm, '').trim();
           if (!txt) return false;
-          if (txt.includes('Partner') || txt.includes('Name') || txt.includes('Phone') || txt.includes('Email') || txt.includes('فرد أسرة') || txt.includes('مرفق') || txt.includes('رخصة')) return false;
+          if (txt.includes('Partner') || txt.includes('Name') || txt.includes('Phone') || txt.includes('Email') || txt.includes('ÙØ±Ø¯ Ø£Ø³Ø±Ø©') || txt.includes('Ù…Ø±ÙÙ‚') || txt.includes('Ø±Ø®ØµØ©')) return false;
           return true;
         });
         this.renderOwnerChatterMessages(cleanMsgs);
@@ -4402,13 +4181,13 @@ class UltimateFMApp {
 
     if (!messages || messages.length === 0) return;
 
-    if (badge) badge.innerText = `${messages.length} جديدة`;
-    if (inboxBadge) inboxBadge.innerText = `${messages.length} تنبيه`;
+    if (badge) badge.innerText = `${messages.length} Ø¬Ø¯ÙŠØ¯Ø©`;
+    if (inboxBadge) inboxBadge.innerText = `${messages.length} ØªÙ†Ø¨ÙŠÙ‡`;
 
     const htmlItems = messages.map(m => {
       const cleanBody = m.body.replace(/<[^>]*>?/gm, '').trim();
-      const authorName = Array.isArray(m.author_id) ? m.author_id[1] : 'إدارة القرية (Odoo Admin)';
-      const isOwnerSender = authorName.includes('Halah') || authorName.includes('المالك') || authorName.includes('أسامة');
+      const authorName = Array.isArray(m.author_id) ? m.author_id[1] : 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù‚Ø±ÙŠØ© (Odoo Admin)';
+      const isOwnerSender = authorName.includes('Halah') || authorName.includes('Ø§Ù„Ù…Ø§Ù„Ùƒ') || authorName.includes('Ø£Ø³Ø§Ù…Ø©');
       const dateObj = new Date(m.create_date || m.date);
       const dateStr = !isNaN(dateObj) ? dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '12:11 AM';
 
@@ -4416,7 +4195,7 @@ class UltimateFMApp {
         <div style="background: ${isOwnerSender ? 'rgba(27, 143, 145, 0.06)' : 'rgba(32, 39, 79, 0.05)'}; border: 1px solid ${isOwnerSender ? 'rgba(27, 143, 145, 0.2)' : 'rgba(32, 39, 79, 0.12)'}; border-right: 4px solid ${isOwnerSender ? '#1b8f91' : '#d4af37'}; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <span style="font-size: 0.72rem; font-weight: 800; color: #20274f;">
-              <i class="${isOwnerSender ? 'fa-solid fa-user' : 'fa-solid fa-user-shield'}" style="color: ${isOwnerSender ? '#1b8f91' : '#d4af37'};"></i> ${authorName} ${isOwnerSender ? '(أنت)' : ''}
+              <i class="${isOwnerSender ? 'fa-solid fa-user' : 'fa-solid fa-user-shield'}" style="color: ${isOwnerSender ? '#1b8f91' : '#d4af37'};"></i> ${authorName} ${isOwnerSender ? '(Ø£Ù†Øª)' : ''}
             </span>
             <span style="font-size: 0.62rem; color: #64748b;">${dateStr}</span>
           </div>
@@ -4432,7 +4211,7 @@ class UltimateFMApp {
   async sendOwnerDirectMsgToOdoo() {
     const input = document.getElementById('ownerDirectMsgInput');
     if (!input || !input.value || !input.value.trim()) {
-      this.showToast('⚠️ يرجى كتابة نص الرسالة أولاً قبل الإرسال للإدارة!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© Ù†Øµ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø£ÙˆÙ„Ø§Ù‹ Ù‚Ø¨Ù„ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„ Ù„Ù„Ø¥Ø¯Ø§Ø±Ø©!');
       return;
     }
 
@@ -4478,12 +4257,12 @@ class UltimateFMApp {
           id: Math.floor(Math.random() * 1000)
         };
         await this.callOdoo(urlInput.replace(/\/+$/, ''), msgPayload);
-        this.showToast('✅ تم إرسال رسالتك للإدارة بـ Odoo Chatter بنجاح!\nسيقوم فريق خدمة العملاء بالرد المباشر عليك.');
+        this.showToast('âœ… ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„ØªÙƒ Ù„Ù„Ø¥Ø¯Ø§Ø±Ø© Ø¨Ù€ Odoo Chatter Ø¨Ù†Ø¬Ø§Ø­!\nØ³ÙŠÙ‚ÙˆÙ… ÙØ±ÙŠÙ‚ Ø®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø¨Ø§Ù„Ø±Ø¯ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ø¹Ù„ÙŠÙƒ.');
         this.fetchOwnerChatterMessagesFromOdoo();
       }
     } catch (err) {
       console.warn('[Send Owner Message to Odoo Error]:', err);
-      this.showToast('✅ تم تسجيل وتدوين رسالتك للإدارة بـ Odoo Chatter بنجاح!');
+      this.showToast('âœ… ØªÙ… ØªØ³Ø¬ÙŠÙ„ ÙˆØªØ¯ÙˆÙŠÙ† Ø±Ø³Ø§Ù„ØªÙƒ Ù„Ù„Ø¥Ø¯Ø§Ø±Ø© Ø¨Ù€ Odoo Chatter Ø¨Ù†Ø¬Ø§Ø­!');
     }
   }
 
@@ -4506,7 +4285,7 @@ class UltimateFMApp {
       if (imgEl) imgEl.src = base64;
 
       safeStorage.setItem('owner_avatar_img', base64);
-      this.showToast('✅ تم رفع وتحديث صورة المالك الشخصية بنجاح (مطابق لتطبيق إعمار)!');
+      this.showToast('âœ… ØªÙ… Ø±ÙØ¹ ÙˆØªØ­Ø¯ÙŠØ« ØµÙˆØ±Ø© Ø§Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„Ø´Ø®ØµÙŠØ© Ø¨Ù†Ø¬Ø§Ø­ (Ù…Ø·Ø§Ø¨Ù‚ Ù„ØªØ·Ø¨ÙŠÙ‚ Ø¥Ø¹Ù…Ø§Ø±)!');
 
       // Sync avatar photo to Odoo res.partner (image_1920)
       this.syncOwnerAvatarToOdoo(base64);
@@ -4560,10 +4339,7 @@ class UltimateFMApp {
 
   openModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) {
-      el.classList.add('active');
-      el.style.display = 'flex';
-    }
+    if (el) el.classList.add('active');
     if (modalId === 'modalSignature') {
       setTimeout(() => this.initCanvas(), 100);
     }
@@ -4572,21 +4348,21 @@ class UltimateFMApp {
 
   openHousekeepingModal(role = 'owner') {
     this._activeHkRole = role;
-    let name = 'أسامة أحمد محمد الشريف';
-    let unit = 'فيلا 104 - زون الساحل الشمالي';
+    let name = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
+    let unit = 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ';
 
     const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) name = customName;
 
     if (role === 'tenant') {
-      name = 'أحمد زاهر محمود';
-      unit = 'شاليه 402 - زون البحيرات';
+      name = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø± Ù…Ø­Ù…ÙˆØ¯';
+      unit = 'Ø´Ø§Ù„ÙŠÙ‡ 402 - Ø²ÙˆÙ† Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª';
     } else if (role === 'commercial') {
-      name = 'مطعم وكافيه Blue Wave';
-      unit = 'محل 12 - المول التجاري';
+      name = 'Ù…Ø·Ø¹Ù… ÙˆÙƒØ§ÙÙŠÙ‡ Blue Wave';
+      unit = 'Ù…Ø­Ù„ 12 - Ø§Ù„Ù…ÙˆÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
     } else if (role === 'manager') {
-      name = 'المهندس أيمن السعيد (مدير الصيانة)';
-      unit = 'الأماكن العامة بالقرية';
+      name = 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)';
+      unit = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
     }
 
     const nameEl = document.getElementById('modalHkOwnerName');
@@ -4606,8 +4382,8 @@ class UltimateFMApp {
     const slotSelect = document.getElementById('hkSlotSelect');
     const notesInput = document.getElementById('hkNotesInput');
 
-    const selectedType = typeSelect ? typeSelect.value : 'نظافة خفيفة يومية';
-    const selectedSlot = slotSelect ? slotSelect.value : 'الفترة الصباحية';
+    const selectedType = typeSelect ? typeSelect.value : 'Ù†Ø¸Ø§ÙØ© Ø®ÙÙŠÙØ© ÙŠÙˆÙ…ÙŠØ©';
+    const selectedSlot = slotSelect ? slotSelect.value : 'Ø§Ù„ÙØªØ±Ø© Ø§Ù„ØµØ¨Ø§Ø­ÙŠØ©';
     const notes = notesInput ? notesInput.value.trim() : '';
 
     this.closeModal('modalHousekeepingRequest');
@@ -4616,21 +4392,21 @@ class UltimateFMApp {
 
   openLandscapingModal(role = 'owner') {
     this._activeLandscapeRole = role;
-    let name = 'أسامة أحمد محمد الشريف';
-    let unit = 'فيلا 104 - زون الساحل الشمالي';
+    let name = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
+    let unit = 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ';
 
     const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) name = customName;
 
     if (role === 'tenant') {
-      name = 'أحمد زاهر محمود';
-      unit = 'شاليه 402 - زون البحيرات';
+      name = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø± Ù…Ø­Ù…ÙˆØ¯';
+      unit = 'Ø´Ø§Ù„ÙŠÙ‡ 402 - Ø²ÙˆÙ† Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª';
     } else if (role === 'commercial') {
-      name = 'مطعم وكافيه Blue Wave';
-      unit = 'محل 12 - المول التجاري';
+      name = 'Ù…Ø·Ø¹Ù… ÙˆÙƒØ§ÙÙŠÙ‡ Blue Wave';
+      unit = 'Ù…Ø­Ù„ 12 - Ø§Ù„Ù…ÙˆÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
     } else if (role === 'manager') {
-      name = 'المهندس أيمن السعيد (مدير الصيانة)';
-      unit = 'الأماكن العامة بالقرية';
+      name = 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)';
+      unit = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
     }
 
     const nameEl = document.getElementById('modalLandscapeOwnerName');
@@ -4650,8 +4426,8 @@ class UltimateFMApp {
     const slotSelect = document.getElementById('landscapeSlotSelect');
     const notesInput = document.getElementById('landscapeNotesInput');
 
-    const selectedType = typeSelect ? typeSelect.value : 'تقليم وقص الأشجار والنجيل';
-    const selectedSlot = slotSelect ? slotSelect.value : 'الفترة الصباحية';
+    const selectedType = typeSelect ? typeSelect.value : 'ØªÙ‚Ù„ÙŠÙ… ÙˆÙ‚Øµ Ø§Ù„Ø£Ø´Ø¬Ø§Ø± ÙˆØ§Ù„Ù†Ø¬ÙŠÙ„';
+    const selectedSlot = slotSelect ? slotSelect.value : 'Ø§Ù„ÙØªØ±Ø© Ø§Ù„ØµØ¨Ø§Ø­ÙŠØ©';
     const notes = notesInput ? notesInput.value.trim() : '';
 
     this.closeModal('modalLandscapingRequest');
@@ -4664,39 +4440,39 @@ class UltimateFMApp {
     setTimeout(() => { this._isLandscapeSubmitting = false; }, 2500);
 
     const isEn = this.currentLang === 'en';
-    let location = 'فيلا 104';
-    let requesterName = isEn ? 'Owner (Osama Ahmed)' : 'المالك (أسامة أحمد)';
-    let type = customType || 'تقليم وقص الأشجار والنجيل';
+    let location = 'ÙÙŠÙ„Ø§ 104';
+    let requesterName = isEn ? 'Owner (Osama Ahmed)' : 'Ø§Ù„Ù…Ø§Ù„Ùƒ (Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯)';
+    let type = customType || 'ØªÙ‚Ù„ÙŠÙ… ÙˆÙ‚Øµ Ø§Ù„Ø£Ø´Ø¬Ø§Ø± ÙˆØ§Ù„Ù†Ø¬ÙŠÙ„';
 
     const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) requesterName = customName;
 
     if (role === 'tenant') {
-      location = 'شاليه 402';
-      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'المستأجر (أحمد زاهر)';
+      location = 'Ø´Ø§Ù„ÙŠÙ‡ 402';
+      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± (Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø±)';
     } else if (role === 'commercial') {
-      location = 'محل 12 (Blue Wave)';
-      requesterName = isEn ? 'Commercial (Blue Wave)' : 'التجاري (Blue Wave)';
+      location = 'Ù…Ø­Ù„ 12 (Blue Wave)';
+      requesterName = isEn ? 'Commercial (Blue Wave)' : 'Ø§Ù„ØªØ¬Ø§Ø±ÙŠ (Blue Wave)';
     } else if (role === 'manager') {
-      location = 'الأماكن العامة والحدائق بالقرية';
-      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'المدير (أيمن السعيد)';
+      location = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© ÙˆØ§Ù„Ø­Ø¯Ø§Ø¦Ù‚ Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
+      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'Ø§Ù„Ù…Ø¯ÙŠØ± (Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯)';
     }
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
     const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-    let fullDetails = `طلب خدمة صيانة الحدائق واللاندسكيب\nنوع الخدمة المطلوب: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`;
-    if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
-    if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
+    let fullDetails = `Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© ØµÙŠØ§Ù†Ø© Ø§Ù„Ø­Ø¯Ø§Ø¦Ù‚ ÙˆØ§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨\nÙ†ÙˆØ¹ Ø§Ù„Ø®Ø¯Ù…Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨: ${type}\nØ§Ù„Ù…ÙˆÙ‚Ø¹: ${location}\nØ·Ø§Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©: ${requesterName}`;
+    if (slot) fullDetails += `\nØ§Ù„ØªÙˆÙ‚ÙŠØª Ø§Ù„Ù…ÙØ¶Ù„: ${slot}`;
+    if (notes) fullDetails += `\nÙ…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù…ÙŠÙ„: ${notes}`;
 
     const newTicket = {
       id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: `خدمة لاندسكيب: ${type} (${location})`,
-      category: 'صيانة الحدائق واللاندسكيب',
+      title: `Ø®Ø¯Ù…Ø© Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨: ${type} (${location})`,
+      category: 'ØµÙŠØ§Ù†Ø© Ø§Ù„Ø­Ø¯Ø§Ø¦Ù‚ ÙˆØ§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨',
       priority: '2',
       details: fullDetails,
-      status: 'جديد',
+      status: 'Ø¬Ø¯ÙŠØ¯',
       bgClass: 'badge-warning',
       requester: role === 'family' ? 'family' : 'homeowner',
       assignedTech: '',
@@ -4710,36 +4486,36 @@ class UltimateFMApp {
     this.tickets.unshift(newTicket);
     this.saveTicketsToStorage();
     this.renderTickets();
-    this.showToast(isEn ? '🌿 Landscaping request submitted successfully!' : '🌿 تم تقديم طلب خدمة اللاندسكيب بنجاح!\nجاري المزامنة مع فريق (لاند اسكيبينج) بـ Odoo...');
+    this.showToast(isEn ? 'ðŸŒ¿ Landscaping request submitted successfully!' : 'ðŸŒ¿ ØªÙ… ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ Ø¨Ù†Ø¬Ø§Ø­!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ù…Ø¹ ÙØ±ÙŠÙ‚ (Ù„Ø§Ù†Ø¯ Ø§Ø³ÙƒÙŠØ¨ÙŠÙ†Ø¬) Ø¨Ù€ Odoo...');
 
     // Sync ticket to Odoo (routed to Landscaping team automatically)
     this.syncTicketToOdoo(newTicket, '01223456789', requesterName);
   }
 
   updateModalTicketApplicantInfo() {
-    let fullName = 'أسامة أحمد محمد الشريف';
+    let fullName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
     let phoneNum = '01223456789';
     let emailAddress = 'fmhala6@gmail.com';
-    let unitNum = 'فيلا 104 - زون الساحل الشمالي';
+    let unitNum = 'ÙÙŠÙ„Ø§ 104 - Ø²ÙˆÙ† Ø§Ù„Ø³Ø§Ø­Ù„ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ';
 
     const customName = safeStorage.getItem('odoo_owner_name');
     if (customName && customName.trim()) fullName = customName;
 
     if (this.currentRole === 'tenant') {
-      fullName = 'أحمد زاهر محمود';
+      fullName = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø± Ù…Ø­Ù…ÙˆØ¯';
       phoneNum = '01009876543';
       emailAddress = 'tenant.ahmed@domain.com';
-      unitNum = 'شاليه 402 - زون البحيرات';
+      unitNum = 'Ø´Ø§Ù„ÙŠÙ‡ 402 - Ø²ÙˆÙ† Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª';
     } else if (this.currentRole === 'commercial') {
-      fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+      fullName = 'Ù…Ø·Ø¹Ù… ÙˆÙƒØ§ÙÙŠÙ‡ Blue Wave (Ø´Ø±ÙŠÙ Ù…Ø­Ù…Ø¯)';
       phoneNum = '01112233445';
       emailAddress = 'bluewave@domain.com';
-      unitNum = 'محل 12 - المول التجاري';
+      unitNum = 'Ù…Ø­Ù„ 12 - Ø§Ù„Ù…ÙˆÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
     } else if (this.currentRole === 'manager') {
-      fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
+      fullName = 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯ (Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©)';
       phoneNum = '01221122334';
       emailAddress = 'ayman.saeed@domain.com';
-      unitNum = 'الأماكن العامة بالقرية';
+      unitNum = 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ø§Ù„Ù‚Ø±ÙŠØ©';
     }
 
     // Maintenance ticket modal identity elements
@@ -4780,10 +4556,7 @@ class UltimateFMApp {
 
   closeModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) {
-      el.classList.remove('active');
-      el.style.display = 'none';
-    }
+    if (el) el.classList.remove('active');
   }
 
   updateClock() {
@@ -4807,15 +4580,15 @@ class UltimateFMApp {
     const badge = document.getElementById('odooStatusBadge');
     if (badge) {
       badge.className = 'badge badge-warning';
-      badge.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري المزامنة...';
+      badge.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ø¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø©...';
     }
 
     setTimeout(() => {
       if (badge) {
         badge.className = 'badge badge-success';
-        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> متصل بـ Odoo Live';
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Ù…ØªØµÙ„ Ø¨Ù€ Odoo Live';
       }
-      this.showToast(`✅ تم اختبار المزامنة المباشرة بنجاح مع قاعدة بيانات Odoo EDU!\nالسيرفر: ${url}\nقاعدة البيانات: ${db}\nتمت مزامنة الوحدات الـ 3,000 والبلاغات والبوابات آلياً.`);
+      this.showToast(`âœ… ØªÙ… Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø© Ø¨Ù†Ø¬Ø§Ø­ Ù…Ø¹ Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª Odoo EDU!\nØ§Ù„Ø³ÙŠØ±ÙØ±: ${url}\nÙ‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª: ${db}\nØªÙ…Øª Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„ÙˆØ­Ø¯Ø§Øª Ø§Ù„Ù€ 3,000 ÙˆØ§Ù„Ø¨Ù„Ø§ØºØ§Øª ÙˆØ§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª Ø¢Ù„ÙŠØ§Ù‹.`);
     }, 1200);
   }
 
@@ -4826,18 +4599,18 @@ class UltimateFMApp {
 
     if (nameInput && phoneInput) {
       if (this.currentRole === 'homeowner') {
-        let homeownerName = 'د. أسامة المنشاوي';
+        let homeownerName = 'Ø¯. Ø£Ø³Ø§Ù…Ø© Ø§Ù„Ù…Ù†Ø´Ø§ÙˆÙŠ';
         const nameEl = document.getElementById('homeownerNameText');
-        if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+        if (nameEl && nameEl.innerText && nameEl.innerText !== 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...') {
           homeownerName = nameEl.innerText;
         }
         nameInput.value = homeownerName;
         phoneInput.value = '01001234567';
       } else if (this.currentRole === 'tenant') {
-        nameInput.value = 'أحمد زاهر';
+        nameInput.value = 'Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø±';
         phoneInput.value = '01007654321';
       } else if (this.currentRole === 'commercial') {
-        nameInput.value = 'محلات Blue Wave';
+        nameInput.value = 'Ù…Ø­Ù„Ø§Øª Blue Wave';
         phoneInput.value = '01009988776';
       } else {
         nameInput.value = '';
@@ -4856,7 +4629,7 @@ class UltimateFMApp {
     const details = document.getElementById('complaintDetailsInput')?.value || '';
 
     if (!details.trim()) {
-      this.showToast('⚠️ يرجى كتابة تفاصيل المشكلة الأمنية أو البلاغ الطارئ أولاً!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø´ÙƒÙ„Ø© Ø§Ù„Ø£Ù…Ù†ÙŠØ© Ø£Ùˆ Ø§Ù„Ø¨Ù„Ø§Øº Ø§Ù„Ø·Ø§Ø±Ø¦ Ø£ÙˆÙ„Ø§Ù‹!');
       return;
     }
 
@@ -4865,7 +4638,7 @@ class UltimateFMApp {
       name: name,
       phone: phone,
       details: details,
-      status: 'تحت المراجعة والتحرك الميداني',
+      status: 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„ØªØ­Ø±Ùƒ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ',
       bgClass: 'badge-warning',
       requester: this.currentRole
     };
@@ -4875,7 +4648,7 @@ class UltimateFMApp {
     this.closeModal('modalSecurityComplaint');
     
     // Toast confirmation
-    this.showToast(`🚨 تم استقبال البلاغ الأمني العاجل وإرساله للعمليات بنجاح!\n\nالمرسل: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}\n\nتم توجيه فريق التدخل السريع للموقع فوراً!`);
+    this.showToast(`ðŸš¨ ØªÙ… Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø¨Ù„Ø§Øº Ø§Ù„Ø£Ù…Ù†ÙŠ Ø§Ù„Ø¹Ø§Ø¬Ù„ ÙˆØ¥Ø±Ø³Ø§Ù„Ù‡ Ù„Ù„Ø¹Ù…Ù„ÙŠØ§Øª Ø¨Ù†Ø¬Ø§Ø­!\n\nØ§Ù„Ù…Ø±Ø³Ù„: ${name}\nØ±Ù‚Ù… Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„: ${phone}\nØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¨Ù„Ø§Øº: ${details}\n\nØªÙ… ØªÙˆØ¬ÙŠÙ‡ ÙØ±ÙŠÙ‚ Ø§Ù„ØªØ¯Ø®Ù„ Ø§Ù„Ø³Ø±ÙŠØ¹ Ù„Ù„Ù…ÙˆÙ‚Ø¹ ÙÙˆØ±Ø§Ù‹!`);
     
     // Sync to Odoo ERP
     this.syncComplaintToOdoo(name, phone, details);
@@ -4884,10 +4657,10 @@ class UltimateFMApp {
   async syncComplaintToOdoo(name, phone, details) {
     console.log(`[Odoo Sync] Syncing Security Emergency Complaint for ${name} (${phone}): ${details}`);
     const secTicket = {
-      category: 'بلاغ أمني طارئ',
-      title: `بلاغ أمني عاجل: ${details.substring(0, 35)}`,
-      details: `بلاغ أمني عاجل من: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}`,
-      priority: '3' // ⭐⭐⭐ Red Alert High Priority
+      category: 'Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ Ø·Ø§Ø±Ø¦',
+      title: `Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ Ø¹Ø§Ø¬Ù„: ${details.substring(0, 35)}`,
+      details: `Ø¨Ù„Ø§Øº Ø£Ù…Ù†ÙŠ Ø¹Ø§Ø¬Ù„ Ù…Ù†: ${name}\nØ±Ù‚Ù… Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„: ${phone}\nØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¨Ù„Ø§Øº: ${details}`,
+      priority: '3' // â­â­â­ Red Alert High Priority
     };
     try {
       await this.syncTicketToOdoo(secTicket, phone, name);
@@ -4902,9 +4675,9 @@ class UltimateFMApp {
     const detailsInput = document.getElementById('csDetailsInput');
 
     if (nameInput && phoneInput) {
-      let ownerName = 'أسامة أحمد محمد الشريف';
+      let ownerName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
       const nameEl = document.getElementById('homeownerNameText');
-      if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+      if (nameEl && nameEl.innerText && nameEl.innerText !== 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...') {
         ownerName = nameEl.innerText;
       }
       nameInput.value = ownerName;
@@ -4917,20 +4690,20 @@ class UltimateFMApp {
   async submitComplaintSuggestion() {
     const name = document.getElementById('csNameInput')?.value || '';
     const phone = document.getElementById('csPhoneInput')?.value || '';
-    const type = document.getElementById('csTypeSelect')?.value || 'شكوى عن الخدمات العامة';
+    const type = document.getElementById('csTypeSelect')?.value || 'Ø´ÙƒÙˆÙ‰ Ø¹Ù† Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø©';
     const details = document.getElementById('csDetailsInput')?.value || '';
 
     if (!details.trim()) {
-      this.showToast('⚠️ يرجى كتابة تفاصيل الشكوى أو المقترح أولاً!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø´ÙƒÙˆÙ‰ Ø£Ùˆ Ø§Ù„Ù…Ù‚ØªØ±Ø­ Ø£ÙˆÙ„Ø§Ù‹!');
       return;
     }
 
     const csTicket = {
       id: 'CS-' + Math.floor(1000 + Math.random() * 9000),
-      category: 'شكاوى ومقترحات لخدمة العملاء',
+      category: 'Ø´ÙƒØ§ÙˆÙ‰ ÙˆÙ…Ù‚ØªØ±Ø­Ø§Øª Ù„Ø®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
       title: `${type}: ${details.substring(0, 30)}`,
-      details: `مقدم الطلب: ${name}\nرقم الموبايل: ${phone}\nنوع الطلب: ${type}\nالتفاصيل: ${details}`,
-      status: 'قيد المراجعة والرد',
+      details: `Ù…Ù‚Ø¯Ù… Ø§Ù„Ø·Ù„Ø¨: ${name}\nØ±Ù‚Ù… Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„: ${phone}\nÙ†ÙˆØ¹ Ø§Ù„Ø·Ù„Ø¨: ${type}\nØ§Ù„ØªÙØ§ØµÙŠÙ„: ${details}`,
+      status: 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„Ø±Ø¯',
       bgClass: 'badge-warning',
       requester: 'homeowner',
       priority: '2',
@@ -4941,7 +4714,7 @@ class UltimateFMApp {
     this.saveTicketsToStorage();
     this.renderTickets();
     this.closeModal('modalComplaintSuggestion');
-    this.showToast(`💬 تم إرسال الشكوى/المقترح بنجاح لخدمة العملاء (Customer Care)!\nسنقوم بالمتابعة معكم في أقرب وقت.`);
+    this.showToast(`ðŸ’¬ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø´ÙƒÙˆÙ‰/Ø§Ù„Ù…Ù‚ØªØ±Ø­ Ø¨Ù†Ø¬Ø§Ø­ Ù„Ø®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ (Customer Care)!\nØ³Ù†Ù‚ÙˆÙ… Ø¨Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ù…Ø¹ÙƒÙ… ÙÙŠ Ø£Ù‚Ø±Ø¨ ÙˆÙ‚Øª.`);
 
     try {
       await this.syncTicketToOdoo(csTicket, phone, name);
@@ -4958,9 +4731,9 @@ class UltimateFMApp {
     const detailsInput = document.getElementById('finDetailsInput');
 
     if (nameInput && phoneInput) {
-      let ownerName = 'أسامة أحمد محمد الشريف';
+      let ownerName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
       const nameEl = document.getElementById('homeownerNameText');
-      if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+      if (nameEl && nameEl.innerText && nameEl.innerText !== 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...') {
         ownerName = nameEl.innerText;
       }
       nameInput.value = ownerName;
@@ -4977,20 +4750,20 @@ class UltimateFMApp {
 
     const name = document.getElementById('finNameInput')?.value || '';
     const phone = document.getElementById('finPhoneInput')?.value || '';
-    const type = document.getElementById('finTypeSelect')?.value || 'استفسار مالي وحسابات';
+    const type = document.getElementById('finTypeSelect')?.value || 'Ø§Ø³ØªÙØ³Ø§Ø± Ù…Ø§Ù„ÙŠ ÙˆØ­Ø³Ø§Ø¨Ø§Øª';
     const details = document.getElementById('finDetailsInput')?.value || '';
 
     if (!details.trim()) {
-      this.showToast('⚠️ يرجى كتابة تفاصيل الاستفسار المالي أولاً!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø§Ø³ØªÙØ³Ø§Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ Ø£ÙˆÙ„Ø§Ù‹!');
       return;
     }
 
     const finTicket = {
       id: 'FIN-' + Math.floor(1000 + Math.random() * 9000),
-      category: 'استفسار مالي وحسابات',
-      title: `استفسار مالي: ${type}`,
-      details: `مقدم الاستفسار: ${name}\nرقم الموبايل: ${phone}\nموضوع الاستفسار: ${type}\nالتفاصيل: ${details}`,
-      status: 'قيد الفحص والرد من الحسابات',
+      category: 'Ø§Ø³ØªÙØ³Ø§Ø± Ù…Ø§Ù„ÙŠ ÙˆØ­Ø³Ø§Ø¨Ø§Øª',
+      title: `Ø§Ø³ØªÙØ³Ø§Ø± Ù…Ø§Ù„ÙŠ: ${type}`,
+      details: `Ù…Ù‚Ø¯Ù… Ø§Ù„Ø§Ø³ØªÙØ³Ø§Ø±: ${name}\nØ±Ù‚Ù… Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„: ${phone}\nÙ…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ø§Ø³ØªÙØ³Ø§Ø±: ${type}\nØ§Ù„ØªÙØ§ØµÙŠÙ„: ${details}`,
+      status: 'Ù‚ÙŠØ¯ Ø§Ù„ÙØ­Øµ ÙˆØ§Ù„Ø±Ø¯ Ù…Ù† Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª',
       bgClass: 'badge-warning',
       requester: 'homeowner',
       priority: '2',
@@ -5001,7 +4774,7 @@ class UltimateFMApp {
     this.saveTicketsToStorage();
     this.renderTickets();
     this.closeModal('modalFinancialInquiry');
-    this.showToast(`💳 تم إرسال الاستفسار المالي بنجاح لفريق الحسابات!\nجاري المراجعة والرد بكشف الحساب.`);
+    this.showToast(`ðŸ’³ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø§Ø³ØªÙØ³Ø§Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ Ø¨Ù†Ø¬Ø§Ø­ Ù„ÙØ±ÙŠÙ‚ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„Ø±Ø¯ Ø¨ÙƒØ´Ù Ø§Ù„Ø­Ø³Ø§Ø¨.`);
 
     try {
       await this.syncTicketToOdoo(finTicket, phone, name);
@@ -5077,14 +4850,14 @@ class UltimateFMApp {
 
     const boxes = document.querySelectorAll(`.odoo-replies-box-${localTicketId}, #odoo_replies_box_${localTicketId}`);
     boxes.forEach(b => {
-      b.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحديث ومزامنة الردود من النظام المركزي...</div>`;
+      b.innerHTML = `<div style="font-size: 0.68rem; color: #1b8f91;"><i class="fa-solid fa-spinner fa-spin"></i> Ø¬Ø§Ø±ÙŠ ØªØ­Ø¯ÙŠØ« ÙˆÙ…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø±Ø¯ÙˆØ¯ Ù…Ù† Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ...</div>`;
     });
 
     if (!targetOdooId || targetOdooId === 'undefined' || targetOdooId === 'null') {
       boxes.forEach(b => {
-        b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">التذكرة قيد التسجيل والتفعيل بالنظام... يرجى المحاولة بعد ثوانٍ.</div>`;
+        b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">Ø§Ù„ØªØ°ÙƒØ±Ø© Ù‚ÙŠØ¯ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙˆØ§Ù„ØªÙØ¹ÙŠÙ„ Ø¨Ø§Ù„Ù†Ø¸Ø§Ù…... ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ø¨Ø¹Ø¯ Ø«ÙˆØ§Ù†Ù.</div>`;
       });
-      this.showToast('ℹ️ جاري استكمال التسجيل بالنظام المركزي...');
+      this.showToast('â„¹ï¸ Ø¬Ø§Ø±ÙŠ Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ...');
       return;
     }
 
@@ -5115,7 +4888,7 @@ class UltimateFMApp {
             l.includes('accounting team')
           ) return;
 
-          let authorName = 'فريق الحسابات والدعم';
+          let authorName = 'ÙØ±ÙŠÙ‚ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª ÙˆØ§Ù„Ø¯Ø¹Ù…';
           if (msg.author_id && Array.isArray(msg.author_id) && msg.author_id[1]) {
             const origName = msg.author_id[1];
             if (!origName.includes('Halah') && !origName.includes('Odoo') && !origName.includes('Bot') && !origName.includes('Admin')) {
@@ -5142,21 +4915,21 @@ class UltimateFMApp {
         });
 
         if (!repliesContentHtml) {
-          repliesContentHtml = `<div style="font-size: 0.68rem; color: var(--text-muted);">لم يتم إضافة ردود نصية بعد من أخصائي الحسابات.</div>`;
+          repliesContentHtml = `<div style="font-size: 0.68rem; color: var(--text-muted);">Ù„Ù… ÙŠØªÙ… Ø¥Ø¶Ø§ÙØ© Ø±Ø¯ÙˆØ¯ Ù†ØµÙŠØ© Ø¨Ø¹Ø¯ Ù…Ù† Ø£Ø®ØµØ§Ø¦ÙŠ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª.</div>`;
         }
 
         boxes.forEach(b => { b.innerHTML = repliesContentHtml; });
-        this.showToast('✅ تم تحديث وتتبع سجل الردود بنجاح!');
+        this.showToast('âœ… ØªÙ… ØªØ­Ø¯ÙŠØ« ÙˆØªØªØ¨Ø¹ Ø³Ø¬Ù„ Ø§Ù„Ø±Ø¯ÙˆØ¯ Ø¨Ù†Ø¬Ø§Ø­!');
       } else {
         boxes.forEach(b => {
-          b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">لا توجد ردود جديدة حتى الآن من فريق العمل. اضغط "متابعة سجل الردود" للتحديث.</div>`;
+          b.innerHTML = `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø¯ÙˆØ¯ Ø¬Ø¯ÙŠØ¯Ø© Ø­ØªÙ‰ Ø§Ù„Ø¢Ù† Ù…Ù† ÙØ±ÙŠÙ‚ Ø§Ù„Ø¹Ù…Ù„. Ø§Ø¶ØºØ· "Ù…ØªØ§Ø¨Ø¹Ø© Ø³Ø¬Ù„ Ø§Ù„Ø±Ø¯ÙˆØ¯" Ù„Ù„ØªØ­Ø¯ÙŠØ«.</div>`;
         });
-        this.showToast('ℹ️ لا توجد ردود جديدة مضافة حتى الآن.');
+        this.showToast('â„¹ï¸ Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø¯ÙˆØ¯ Ø¬Ø¯ÙŠØ¯Ø© Ù…Ø¶Ø§ÙØ© Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†.');
       }
     } catch (err) {
       console.warn('[Replies Fetch Error]:', err);
       boxes.forEach(b => {
-        b.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">❌ يتعذر الاتصال بالنظام المركزي حالياً.</div>`;
+        b.innerHTML = `<div style="font-size: 0.68rem; color: #ef4444;">âŒ ÙŠØªØ¹Ø°Ø± Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ Ø­Ø§Ù„ÙŠØ§Ù‹.</div>`;
       });
     }
   }
@@ -5167,9 +4940,9 @@ class UltimateFMApp {
     if (chkStep) chkStep.style.display = 'block';
     if (recStep) recStep.style.display = 'none';
 
-    let ownerName = 'أسامة أحمد محمد الشريف';
+    let ownerName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
     const nameEl = document.getElementById('homeownerNameText');
-    if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+    if (nameEl && nameEl.innerText && nameEl.innerText !== 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...') {
       ownerName = nameEl.innerText;
     }
     const varOwnerEl = document.getElementById('varPayOwnerName');
@@ -5180,29 +4953,29 @@ class UltimateFMApp {
 
   async processVariancePayment() {
     const cardNum = document.getElementById('varCardNumberInput')?.value || '';
-    const payMethod = document.getElementById('varPayMethodSelect')?.value || 'بطاقة ائتمان (Visa)';
+    const payMethod = document.getElementById('varPayMethodSelect')?.value || 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù† (Visa)';
     
     if (!cardNum || cardNum.trim().length < 4) {
-      this.showToast('⚠️ يرجى إدخال رقم بطاقة الدفع أو تفعيل أبل باي');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø±Ù‚Ù… Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø¯ÙØ¹ Ø£Ùˆ ØªÙØ¹ÙŠÙ„ Ø£Ø¨Ù„ Ø¨Ø§ÙŠ');
       return;
     }
 
-    this.showToast('💳 جاري المعالجة المالية الموثقة لسداد فروق الصيانة...');
+    this.showToast('ðŸ’³ Ø¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ù…ÙˆØ«Ù‚Ø© Ù„Ø³Ø¯Ø§Ø¯ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø©...');
 
-    let ownerName = 'أسامة أحمد محمد الشريف';
+    let ownerName = 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ';
     const nameEl = document.getElementById('homeownerNameText');
-    if (nameEl && nameEl.innerText && nameEl.innerText !== 'جاري التحميل...') {
+    if (nameEl && nameEl.innerText && nameEl.innerText !== 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...') {
       ownerName = nameEl.innerText;
     }
 
     const receiptNo = `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const now = new Date();
-    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }) + ` • ${now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }) + ` â€¢ ${now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
     const qrRef = `Odoo-PAY-${Math.floor(100000 + Math.random() * 900000)}`;
 
     // Populate Receipt Details
     const recNoEl = document.getElementById('receiptNoText');
-    if (recNoEl) recNoEl.innerText = `رقم الإيصال: #${receiptNo}`;
+    if (recNoEl) recNoEl.innerText = `Ø±Ù‚Ù… Ø§Ù„Ø¥ÙŠØµØ§Ù„: #${receiptNo}`;
 
     const recOwnerEl = document.getElementById('recOwnerName');
     if (recOwnerEl) recOwnerEl.innerText = ownerName;
@@ -5219,13 +4992,13 @@ class UltimateFMApp {
     // Update Financials Screen UI
     const varAmtEl = document.getElementById('varianceAmountText');
     if (varAmtEl) {
-      varAmtEl.innerHTML = `<span style="color: #10b981; font-weight: 900;">0.00 ج.م <i class="fa-solid fa-circle-check"></i> (تم السداد بالكامل)</span>`;
+      varAmtEl.innerHTML = `<span style="color: #10b981; font-weight: 900;">0.00 Ø¬.Ù… <i class="fa-solid fa-circle-check"></i> (ØªÙ… Ø§Ù„Ø³Ø¯Ø§Ø¯ Ø¨Ø§Ù„ÙƒØ§Ù…Ù„)</span>`;
     }
     const btnPayVar = document.getElementById('btnPayVariance');
     if (btnPayVar) {
       btnPayVar.style.background = '#10b981';
       btnPayVar.style.opacity = '0.9';
-      btnPayVar.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>تم سداد فروق الصيانة بنجاح (إيصال #${receiptNo})</span>`;
+      btnPayVar.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>ØªÙ… Ø³Ø¯Ø§Ø¯ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø© Ø¨Ù†Ø¬Ø§Ø­ (Ø¥ÙŠØµØ§Ù„ #${receiptNo})</span>`;
     }
 
     // Switch View to Receipt
@@ -5234,13 +5007,13 @@ class UltimateFMApp {
     if (chkStep) chkStep.style.display = 'none';
     if (recStep) recStep.style.display = 'block';
 
-    this.showToast(`🎉 تم سداد فروق الصيانة 3,900 ج.م بنجاح!\n📧 تم إرسال إيصال السداد الرسمي رقم #${receiptNo} إلى بريدك الإلكتروني (fmhala6@gmail.com).`);
+    this.showToast(`ðŸŽ‰ ØªÙ… Ø³Ø¯Ø§Ø¯ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø© 3,900 Ø¬.Ù… Ø¨Ù†Ø¬Ø§Ø­!\nðŸ“§ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø¥ÙŠØµØ§Ù„ Ø§Ù„Ø³Ø¯Ø§Ø¯ Ø§Ù„Ø±Ø³Ù…ÙŠ Ø±Ù‚Ù… #${receiptNo} Ø¥Ù„Ù‰ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ (fmhala6@gmail.com).`);
 
     // Sync Payment to Odoo Helpdesk / Accounting
     const payTicket = {
-      category: 'استفسار مالي وحسابات',
-      title: `سداد فروق الصيانة أونلاين إيصال #${receiptNo}`,
-      details: `تم سداد فروق الصيانة والتشغيل أونلاين بنجاح!\nالمالك: ${ownerName}\nالمبلغ: 3,900.00 ج.م\nطريقة الدفع: ${payMethod}\nرقم الإيصال: ${receiptNo}\nكود التوثيق: ${qrRef}`,
+      category: 'Ø§Ø³ØªÙØ³Ø§Ø± Ù…Ø§Ù„ÙŠ ÙˆØ­Ø³Ø§Ø¨Ø§Øª',
+      title: `Ø³Ø¯Ø§Ø¯ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø© Ø£ÙˆÙ†Ù„Ø§ÙŠÙ† Ø¥ÙŠØµØ§Ù„ #${receiptNo}`,
+      details: `ØªÙ… Ø³Ø¯Ø§Ø¯ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø© ÙˆØ§Ù„ØªØ´ØºÙŠÙ„ Ø£ÙˆÙ†Ù„Ø§ÙŠÙ† Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ù…Ø§Ù„Ùƒ: ${ownerName}\nØ§Ù„Ù…Ø¨Ù„Øº: 3,900.00 Ø¬.Ù…\nØ·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹: ${payMethod}\nØ±Ù‚Ù… Ø§Ù„Ø¥ÙŠØµØ§Ù„: ${receiptNo}\nÙƒÙˆØ¯ Ø§Ù„ØªÙˆØ«ÙŠÙ‚: ${qrRef}`,
       priority: '2'
     };
 
@@ -5254,13 +5027,13 @@ class UltimateFMApp {
   downloadReceiptPDF() {
     const receiptEl = document.getElementById('officialReceiptContainer');
     if (!receiptEl) {
-      this.showToast('⚠️ لم يتم العثور على إيصال السداد للطباعة');
+      this.showToast('âš ï¸ Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø¥ÙŠØµØ§Ù„ Ø§Ù„Ø³Ø¯Ø§Ø¯ Ù„Ù„Ø·Ø¨Ø§Ø¹Ø©');
       return;
     }
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      this.showToast('⚠️ يرجى السماح بالنوافذ المنبثقة (Pop-ups) لتحميل إيصال الـ PDF');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ù…Ù†Ø¨Ø«Ù‚Ø© (Pop-ups) Ù„ØªØ­Ù…ÙŠÙ„ Ø¥ÙŠØµØ§Ù„ Ø§Ù„Ù€ PDF');
       return;
     }
 
@@ -5268,7 +5041,7 @@ class UltimateFMApp {
       <!DOCTYPE html>
       <html dir="rtl" lang="ar">
       <head>
-        <title>إيصال سداد مالي رسمي - شركة إدارة المجمع السكني</title>
+        <title>Ø¥ÙŠØµØ§Ù„ Ø³Ø¯Ø§Ø¯ Ù…Ø§Ù„ÙŠ Ø±Ø³Ù…ÙŠ - Ø´Ø±ÙƒØ© Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¬Ù…Ø¹ Ø§Ù„Ø³ÙƒÙ†ÙŠ</title>
         <meta charset="utf-8">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -5283,7 +5056,7 @@ class UltimateFMApp {
       </html>
     `);
     printWindow.document.close();
-    this.showToast('📄 تم فتح شاشة طباعة وتحميل إيصال الـ PDF الموثق بنجاح!');
+    this.showToast('ðŸ“„ ØªÙ… ÙØªØ­ Ø´Ø§Ø´Ø© Ø·Ø¨Ø§Ø¹Ø© ÙˆØªØ­Ù…ÙŠÙ„ Ø¥ÙŠØµØ§Ù„ Ø§Ù„Ù€ PDF Ø§Ù„Ù…ÙˆØ«Ù‚ Ø¨Ù†Ø¬Ø§Ø­!');
   }
   handleLogin() {
     const email = document.getElementById('loginEmailInput')?.value || '';
@@ -5297,6 +5070,7 @@ class UltimateFMApp {
     else if (em.includes('technician') || em.includes('tech')) role = 'technician';
     else if (em.includes('engineer') || em.includes('eng')) role = 'engineer';
     else if (em.includes('housekeeping') || em.includes('hk') || em.includes('clean')) role = 'housekeeping';
+    else if (em.includes('landscape') || em.includes('garden') || em.includes('agriculture')) role = 'landscaping';
     else if (em.includes('admin')) role = 'admin';
     else if (em.includes('owner') || em.includes('ahmed')) role = 'homeowner';
 
@@ -5335,28 +5109,29 @@ class UltimateFMApp {
     // Save active session
     safeStorage.setItem('active_session_role', role);
 
-    this.showToast(`🔑 تم فتح شاشة [${this.getRoleArabicName(role)}] بنجاح!`);
+    this.showToast(`ðŸ”‘ ØªÙ… ÙØªØ­ Ø´Ø§Ø´Ø© [${this.getRoleArabicName(role)}] Ø¨Ù†Ø¬Ø§Ø­!`);
   }
 
   logout() {
     this.showRoleGrid();
-    this.showToast('🚪 تم تسجيل الخروج والعودة للقائمة الرئيسية.');
+    this.showToast('ðŸšª ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ ÙˆØ§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©.');
   }
 
   getRoleArabicName(role) {
     const map = {
-      'owner': 'شاشة المالك',
-      'homeowner': 'شاشة المالك',
-      'family': 'فرد من أفراد الأسرة',
-      'tenant': 'المستأجر السكني',
-      'commercial': 'المستأجر التجاري',
-      'security': 'أمن وبوابات القرية',
-      'manager': 'مدير الصيانة والتشغيل',
-      'technician': 'الفني الميداني',
-      'engineer': 'المهندس الميداني المشرف',
-      'engineering_director': 'مدير القطاع الهندسي والسلامة',
-      'admin': 'الإدارة العليا',
-      'housekeeping': 'هاوس كيبينج والنظافة'
+      'homeowner': 'Ù…Ø§Ù„Ùƒ Ø§Ù„ÙˆØ­Ø¯Ø© Ø§Ù„Ø³ÙƒÙ†ÙŠØ©',
+      'owner': 'Ø´Ø§Ø´Ø© Ø§Ù„Ù…Ø§Ù„Ùƒ',
+      'family': 'Ø£Ø­Ø¯ Ø£ÙØ±Ø§Ø¯ Ø§Ù„Ø£Ø³Ø±Ø© (Ø­Ø³Ø§Ø¨ Ù…Ø­Ø¯ÙˆØ¯)',
+      'tenant': 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø§Ù„Ø³ÙƒÙ†ÙŠ',
+      'commercial': 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø§Ù„ØªØ¬Ø§Ø±ÙŠ',
+      'security': 'Ø£Ù…Ù† ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙŠØ©',
+      'manager': 'Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø© ÙˆØ§Ù„ØªØ´ØºÙŠÙ„',
+      'technician': 'Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ',
+      'engineer': 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…Ø´Ø±Ù',
+      'engineering_director': 'Ù…Ø¯ÙŠØ± Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„Ù‡Ù†Ø¯Ø³ÙŠ ÙˆØ§Ù„Ø³Ù„Ø§Ù…Ø©',
+      'admin': 'Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§',
+      'housekeeping': 'Ù‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬ ÙˆØ§Ù„Ù†Ø¸Ø§ÙØ©',
+      'landscaping': 'Ù…Ø¯ÙŠØ± Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ§Ù„Ø²Ø±Ø§Ø¹Ø©'
     };
     return map[role] || role;
   }
@@ -5389,7 +5164,7 @@ class UltimateFMApp {
     if (customName && customName.trim()) {
       el.innerText = customName;
     } else {
-      el.innerText = this.currentLang === 'en' ? 'Ahmed Mohamed' : 'أحمد محمد';
+      el.innerText = this.currentLang === 'en' ? 'Ahmed Mohamed' : 'Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯';
     }
   }
 
@@ -5456,6 +5231,48 @@ class UltimateFMApp {
   renderLogoutHeader() {
     // Remove old dynamic headers
     document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
+
+    const activeView = document.querySelector('.view-panel.active');
+    if (!activeView || activeView.id === 'viewLogin') return;
+
+    // Create a sleek top header for this screen
+    const header = document.createElement('div');
+    header.className = 'dynamic-logout-header';
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 10px 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(32, 39, 79, 0.08); box-shadow: var(--shadow-sm);';
+
+    // Left side: Screen Title
+    const titleSpan = document.createElement('span');
+    titleSpan.style.cssText = 'font-size: 0.78rem; font-weight: 700; color: #20274f; display: flex; align-items: center; gap: 6px;';
+    
+    // Choose appropriate icon based on active role
+    let iconHtml = '<i class="fa-solid fa-desktop"></i>';
+    if (this.currentRole === 'homeowner') iconHtml = '<i class="fa-solid fa-house-user" style="color: var(--primary-gold);"></i>';
+    else if (this.currentRole === 'tenant') iconHtml = '<i class="fa-solid fa-key" style="color: var(--primary-gold);"></i>';
+    else if (this.currentRole === 'commercial') iconHtml = '<i class="fa-solid fa-store" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'security') iconHtml = '<i class="fa-solid fa-user-shield" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'manager') iconHtml = '<i class="fa-solid fa-user-tie" style="color: var(--brand-navy);"></i>';
+    else if (this.currentRole === 'technician') iconHtml = '<i class="fa-solid fa-helmet-safety" style="color: var(--accent-cyan);"></i>';
+    else if (this.currentRole === 'engineer') iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-cyan);"></i>';
+    else if (this.currentRole === 'admin') iconHtml = '<i class="fa-solid fa-chart-line" style="color: var(--primary-gold);"></i>';
+
+    const roleName = this.currentLang === 'en' ? this.getRoleEnglishName(this.currentRole) : this.getRoleArabicName(this.currentRole);
+    titleSpan.innerHTML = `${iconHtml} ${roleName}`;
+
+    // Right side: Logout button
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm';
+    btn.style.cssText = 'padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;';
+    btn.innerHTML = this.currentLang === 'en' ? '<i class="fa-solid fa-right-from-bracket"></i> Logout' : '<i class="fa-solid fa-right-from-bracket"></i> Ø®Ø±ÙˆØ¬';
+    btn.onclick = (e) => {
+      e.preventDefault();
+      this.logout();
+    };
+
+    header.appendChild(titleSpan);
+    header.appendChild(btn);
+
+    // Prepend to active view!
+    activeView.insertBefore(header, activeView.firstChild);
   }
 
   handleLicenseFrontPreview(event) {
@@ -5490,7 +5307,7 @@ class UltimateFMApp {
     const input = document.getElementById('lprPlateInput');
     const plate = input ? input.value.trim() : '';
     if (!plate) {
-      this.showToast('⚠️ يرجى إدخال رقم لوحة السيارة أولاً!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø±Ù‚Ù… Ù„ÙˆØ­Ø© Ø§Ù„Ø³ÙŠØ§Ø±Ø© Ø£ÙˆÙ„Ø§Ù‹!');
       return;
     }
 
@@ -5501,7 +5318,7 @@ class UltimateFMApp {
     if (list) {
       // Remove empty state message if present
       const emptyDiv = list.querySelector('div:only-child');
-      if (emptyDiv && emptyDiv.innerText.includes('لا توجد سيارات')) {
+      if (emptyDiv && emptyDiv.innerText.includes('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø³ÙŠØ§Ø±Ø§Øª')) {
         list.innerHTML = '';
       }
 
@@ -5511,10 +5328,10 @@ class UltimateFMApp {
         <div style="text-align: right;">
           <div style="font-weight: 900; color: #20274f; font-family: var(--font-number); letter-spacing: 2px; font-size: 0.95rem;">${plate}</div>
           <p style="font-size: 0.68rem; color: #64748b; margin: 3px 0 0 0; font-weight: 600;">
-            <i class="fa-solid fa-id-card" style="color: #1b8f91;"></i> الرخصة: ${frontData || backData ? 'تم رفع وتوثيق صور الرخصة 📷' : 'تم التسجيل بدون مرفقات'}
+            <i class="fa-solid fa-id-card" style="color: #1b8f91;"></i> Ø§Ù„Ø±Ø®ØµØ©: ${frontData || backData ? 'ØªÙ… Ø±ÙØ¹ ÙˆØªÙˆØ«ÙŠÙ‚ ØµÙˆØ± Ø§Ù„Ø±Ø®ØµØ© ðŸ“·' : 'ØªÙ… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø¨Ø¯ÙˆÙ† Ù…Ø±ÙÙ‚Ø§Øª'}
           </p>
         </div>
-        <span class="badge badge-success" style="font-size: 0.68rem; margin-top:0; font-weight: 700; padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-circle-check"></i> مفعل على البوابات</span>
+        <span class="badge badge-success" style="font-size: 0.68rem; margin-top:0; font-weight: 700; padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-circle-check"></i> Ù…ÙØ¹Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª</span>
       `;
       list.insertBefore(item, list.firstChild);
     }
@@ -5533,12 +5350,12 @@ class UltimateFMApp {
     if (frontInput) frontInput.value = '';
     if (backInput) backInput.value = '';
 
-    this.showToast(`🚗 تم تسجيل لوحة السيارة [${plate}] بنجاح!\nجاري الحفظ المباشر والمزامنة مع Odoo Contacts...`);
+    this.showToast(`ðŸš— ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ù„ÙˆØ­Ø© Ø§Ù„Ø³ÙŠØ§Ø±Ø© [${plate}] Ø¨Ù†Ø¬Ø§Ø­!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± ÙˆØ§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ù…Ø¹ Odoo Contacts...`);
 
     (async () => {
       try {
         await this.syncCarPlateToOdooPartner(plate, frontData, backData);
-        this.showToast(`✅ تم توثيق رقم اللوحة [${plate}] بـ Odoo Contacts (res.partner) بنجاح!`);
+        this.showToast(`âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ Ø±Ù‚Ù… Ø§Ù„Ù„ÙˆØ­Ø© [${plate}] Ø¨Ù€ Odoo Contacts (res.partner) Ø¨Ù†Ø¬Ø§Ø­!`);
       } catch (err) {
         console.warn('[Odoo Car Plate Sync Error]:', err);
       }
@@ -5627,7 +5444,7 @@ class UltimateFMApp {
               "ir.attachment",
               "create",
               [{
-                name: `رخصة_سيارة_${plate}_وجه.jpg`,
+                name: `Ø±Ø®ØµØ©_Ø³ÙŠØ§Ø±Ø©_${plate}_ÙˆØ¬Ù‡.jpg`,
                 datas: cleanFront,
                 res_model: "res.partner",
                 res_id: partnerId
@@ -5657,7 +5474,7 @@ class UltimateFMApp {
               "ir.attachment",
               "create",
               [{
-                name: `رخصة_سيارة_${plate}_ظهر.jpg`,
+                name: `Ø±Ø®ØµØ©_Ø³ÙŠØ§Ø±Ø©_${plate}_Ø¸Ù‡Ø±.jpg`,
                 datas: cleanBack,
                 res_model: "res.partner",
                 res_id: partnerId
@@ -5675,10 +5492,10 @@ class UltimateFMApp {
 
     // Step 7: Always append to partner comment/notes as guaranteed log
     try {
-      const licenseNoteText = (frontBase64 || backBase64) ? ' (مرفق صور الرخصة وش وضهر 📷)' : '';
+      const licenseNoteText = (frontBase64 || backBase64) ? ' (Ù…Ø±ÙÙ‚ ØµÙˆØ± Ø§Ù„Ø±Ø®ØµØ© ÙˆØ´ ÙˆØ¶Ù‡Ø± ðŸ“·)' : '';
       const updatedNote = existingComment 
-        ? `${existingComment}\n🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}${licenseNoteText}`
-        : `🚗 رقم لوحة السيارة المسجلة (cars_number): ${plate}${licenseNoteText}`;
+        ? `${existingComment}\nðŸš— Ø±Ù‚Ù… Ù„ÙˆØ­Ø© Ø§Ù„Ø³ÙŠØ§Ø±Ø© Ø§Ù„Ù…Ø³Ø¬Ù„Ø© (cars_number): ${plate}${licenseNoteText}`
+        : `ðŸš— Ø±Ù‚Ù… Ù„ÙˆØ­Ø© Ø§Ù„Ø³ÙŠØ§Ø±Ø© Ø§Ù„Ù…Ø³Ø¬Ù„Ø© (cars_number): ${plate}${licenseNoteText}`;
 
       const notePayload = {
         jsonrpc: "2.0",
@@ -5712,7 +5529,7 @@ class UltimateFMApp {
     const time = timeSelect.options[timeSelect.selectedIndex].text;
 
     if (this.ownerWalletBalance < price) {
-      this.showToast('❌ رصيد المحفظة الإلكترونية غير كافٍ لشراء الحجز! يرجى شحن محفظتك أولاً.');
+      this.showToast('âŒ Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ© ØºÙŠØ± ÙƒØ§ÙÙ Ù„Ø´Ø±Ø§Ø¡ Ø§Ù„Ø­Ø¬Ø²! ÙŠØ±Ø¬Ù‰ Ø´Ø­Ù† Ù…Ø­ÙØ¸ØªÙƒ Ø£ÙˆÙ„Ø§Ù‹.');
       return;
     }
 
@@ -5733,35 +5550,35 @@ class UltimateFMApp {
       item.innerHTML = `
         <div>
           <h5 style="margin: 0 0 4px 0; color: #20274f; font-size: 0.8rem; font-weight: 700;">${amenityText}</h5>
-          <p style="margin: 0; font-size: 0.68rem; color: var(--text-muted);">${date} • ${time}</p>
-          <span style="font-size: 0.65rem; color: var(--primary-gold); font-weight: 700;">كود الحجز: #${code}</span>
+          <p style="margin: 0; font-size: 0.68rem; color: var(--text-muted);">${date} â€¢ ${time}</p>
+          <span style="font-size: 0.65rem; color: var(--primary-gold); font-weight: 700;">ÙƒÙˆØ¯ Ø§Ù„Ø­Ø¬Ø²: #${code}</span>
         </div>
         <div style="text-align: center;">
           <i class="fa-solid fa-qrcode" style="font-size: 1.6rem; color: #20274f; display: block; margin-bottom: 2px;"></i>
-          <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">مسح الدخول</span>
+          <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">Ù…Ø³Ø­ Ø§Ù„Ø¯Ø®ÙˆÙ„</span>
         </div>
       `;
       list.insertBefore(item, list.firstChild);
     }
 
-    this.showToast(`⚽ تم تأكيد حجز [${amenityText}] لليوم (${date} • ${time}) بنجاح!\nكود الحجز: #${code}\nجاري توثيق الحجز والخصم بالنظام المركزي...`);
+    this.showToast(`âš½ ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø­Ø¬Ø² [${amenityText}] Ù„Ù„ÙŠÙˆÙ… (${date} â€¢ ${time}) Ø¨Ù†Ø¬Ø§Ø­!\nÙƒÙˆØ¯ Ø§Ù„Ø­Ø¬Ø²: #${code}\nØ¬Ø§Ø±ÙŠ ØªÙˆØ«ÙŠÙ‚ Ø§Ù„Ø­Ø¬Ø² ÙˆØ§Ù„Ø®ØµÙ… Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ...`);
 
     // Sync to Odoo ticket/sales order
     (async () => {
       try {
         const amenityTicket = {
           id: 'BOOK-' + code,
-          category: 'حجوزات الملاعب والأنشطة الترفيهية',
-          title: `حجز نشاط ترفيهي: ${amenityText}`,
-          details: `طلب حجز ترفيهي مؤكد برقم #${code}\nالنشاط: ${amenityText}\nالتاريخ والوقت: ${date} - ${time}\nالقيمة: ${price} ج.م (تم الخصم من المحفظة الرقمية للمالك)\nالمالك: أسامة الشريف - فيلا 104`,
-          status: 'حجز مؤكد ومفعل',
+          category: 'Ø­Ø¬ÙˆØ²Ø§Øª Ø§Ù„Ù…Ù„Ø§Ø¹Ø¨ ÙˆØ§Ù„Ø£Ù†Ø´Ø·Ø© Ø§Ù„ØªØ±ÙÙŠÙ‡ÙŠØ©',
+          title: `Ø­Ø¬Ø² Ù†Ø´Ø§Ø· ØªØ±ÙÙŠÙ‡ÙŠ: ${amenityText}`,
+          details: `Ø·Ù„Ø¨ Ø­Ø¬Ø² ØªØ±ÙÙŠÙ‡ÙŠ Ù…Ø¤ÙƒØ¯ Ø¨Ø±Ù‚Ù… #${code}\nØ§Ù„Ù†Ø´Ø§Ø·: ${amenityText}\nØ§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„ÙˆÙ‚Øª: ${date} - ${time}\nØ§Ù„Ù‚ÙŠÙ…Ø©: ${price} Ø¬.Ù… (ØªÙ… Ø§Ù„Ø®ØµÙ… Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ø±Ù‚Ù…ÙŠØ© Ù„Ù„Ù…Ø§Ù„Ùƒ)\nØ§Ù„Ù…Ø§Ù„Ùƒ: Ø£Ø³Ø§Ù…Ø© Ø§Ù„Ø´Ø±ÙŠÙ - ÙÙŠÙ„Ø§ 104`,
+          status: 'Ø­Ø¬Ø² Ù…Ø¤ÙƒØ¯ ÙˆÙ…ÙØ¹Ù„',
           bgClass: 'badge-success',
           requester: 'homeowner',
           priority: '1',
           createdAt: new Date().toISOString()
         };
-        await this.syncTicketToOdoo(amenityTicket, '01223456789', 'أسامة أحمد محمد الشريف');
-        this.showToast(`✅ تم توثيق حجز [${amenityText}] بنجاح بالنظام المركزي (Odoo - Sales/Appointments) برقم #${code}!`);
+        await this.syncTicketToOdoo(amenityTicket, '01223456789', 'Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯ Ø§Ù„Ø´Ø±ÙŠÙ');
+        this.showToast(`âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ Ø­Ø¬Ø² [${amenityText}] Ø¨Ù†Ø¬Ø§Ø­ Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ (Odoo - Sales/Appointments) Ø¨Ø±Ù‚Ù… #${code}!`);
       } catch (err) {
         console.warn('[Odoo Amenity Booking Sync Error]:', err);
       }
@@ -5769,7 +5586,7 @@ class UltimateFMApp {
   }
 
   callDirectory(number) {
-    this.showToast(`📞 جاري الاتصال بـ (${number}) من الهاتف الميداني...`);
+    this.showToast(`ðŸ“ž Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ù€ (${number}) Ù…Ù† Ø§Ù„Ù‡Ø§ØªÙ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ...`);
   }
 
   async submitNewUserToOdoo() {
@@ -5786,15 +5603,15 @@ class UltimateFMApp {
     const userRole = roleSelect.value;
 
     if (!userName || !userEmail) {
-      this.showToast('⚠️ يرجى كتابة الاسم والبريد الإلكتروني على الأقل!');
+      this.showToast('âš ï¸ ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© Ø§Ù„Ø§Ø³Ù… ÙˆØ§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„!');
       return;
     }
 
     const roleMap = {
-      'homeowner': 'مالك وحدة سكنية',
-      'tenant': 'مستأجر سكني',
-      'technician': 'فني صيانة ميداني',
-      'engineer': 'مهندس مشرف'
+      'homeowner': 'Ù…Ø§Ù„Ùƒ ÙˆØ­Ø¯Ø© Ø³ÙƒÙ†ÙŠØ©',
+      'tenant': 'Ù…Ø³ØªØ£Ø¬Ø± Ø³ÙƒÙ†ÙŠ',
+      'technician': 'ÙÙ†ÙŠ ØµÙŠØ§Ù†Ø© Ù…ÙŠØ¯Ø§Ù†ÙŠ',
+      'engineer': 'Ù…Ù‡Ù†Ø¯Ø³ Ù…Ø´Ø±Ù'
     };
     const roleArabic = roleMap[userRole] || userRole;
 
@@ -5814,15 +5631,15 @@ class UltimateFMApp {
         item.innerHTML = `
           <div>
             <span style="font-size: 0.75rem; font-weight: 700; color: #ffffff;">${userName}</span>
-            <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">${userEmail} • ${roleArabic}</p>
+            <p style="font-size: 0.65rem; color: var(--text-muted); margin: 0;">${userEmail} â€¢ ${roleArabic}</p>
           </div>
-          <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">مفعل وموثق</span>
+          <span class="badge badge-success" style="font-size: 0.6rem; margin-top:0;">Ù…ÙØ¹Ù„ ÙˆÙ…ÙˆØ«Ù‚</span>
         `;
         list.insertBefore(item, list.firstChild);
       }
       if (badgeCount) {
         const count = list ? list.children.length : 5;
-        badgeCount.innerText = `${count} مستخدمين`;
+        badgeCount.innerText = `${count} Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ†`;
       }
     };
 
@@ -5833,7 +5650,7 @@ class UltimateFMApp {
       nameInput.value = '';
       emailInput.value = '';
       phoneInput.value = '';
-      this.showToast(`✅ تم إضافة المستخدم [${userName}] بنجاح للمحفظة المحلية!`);
+      this.showToast(`âœ… ØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… [${userName}] Ø¨Ù†Ø¬Ø§Ø­ Ù„Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ù…Ø­Ù„ÙŠØ©!`);
       return;
     }
 
@@ -5850,7 +5667,7 @@ class UltimateFMApp {
       id: Math.floor(Math.random() * 1000)
     };
 
-    this.showToast(`⏳ جاري تسجيل وتفعيل [${userName}] بالنظام المركزي...`);
+    this.showToast(`â³ Ø¬Ø§Ø±ÙŠ ØªØ³Ø¬ÙŠÙ„ ÙˆØªÙØ¹ÙŠÙ„ [${userName}] Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ...`);
 
     try {
       const authData = await this.callOdoo(baseUrl, authPayload);
@@ -5860,7 +5677,7 @@ class UltimateFMApp {
       }
       const uid = authData.result;
       if (!uid || typeof uid !== 'number') {
-        throw new Error('فشل تسجيل الدخول للربط بالنظام المركزي');
+        throw new Error('ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ù„Ø±Ø¨Ø· Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ');
       }
 
       const createPartnerPayload = {
@@ -5879,7 +5696,7 @@ class UltimateFMApp {
               name: userName,
               email: userEmail,
               phone: userPhone,
-              comment: `تم رفعه كـ ${roleArabic} من لوحة تحكم تطبيق الموبايل`
+              comment: `ØªÙ… Ø±ÙØ¹Ù‡ ÙƒÙ€ ${roleArabic} Ù…Ù† Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„`
             }]
           ]
         },
@@ -5895,7 +5712,7 @@ class UltimateFMApp {
       nameInput.value = '';
       emailInput.value = '';
       phoneInput.value = '';
-      this.showToast(`✅ تم بنجاح تفعيل وتسجيل المستخدم [${userName}] بالنظام المركزي (ID: ${createData.result})!`);
+      this.showToast(`âœ… ØªÙ… Ø¨Ù†Ø¬Ø§Ø­ ØªÙØ¹ÙŠÙ„ ÙˆØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… [${userName}] Ø¨Ø§Ù„Ù†Ø¸Ø§Ù… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ (ID: ${createData.result})!`);
     } catch (err) {
       console.error('[Odoo Contact Sync Exception]:', err);
       // Local fallback on error
@@ -5904,7 +5721,7 @@ class UltimateFMApp {
       nameInput.value = '';
       emailInput.value = '';
       phoneInput.value = '';
-      this.showToast(`⚠️ تعذر الاتصال بـ Odoo (تم الحفظ محلياً في الموك أب):\n${err.message || err}`);
+      this.showToast(`âš ï¸ ØªØ¹Ø°Ø± Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ù€ Odoo (ØªÙ… Ø§Ù„Ø­ÙØ¸ Ù…Ø­Ù„ÙŠØ§Ù‹ ÙÙŠ Ø§Ù„Ù…ÙˆÙƒ Ø£Ø¨):\n${err.message || err}`);
     }
   }
 
@@ -5926,7 +5743,7 @@ class UltimateFMApp {
 
     list.innerHTML = '';
     if (filtered.length === 0) {
-      list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem;">❌ لا توجد قطع غيار مطابقة للبحث في هذا المخزن</div>';
+      list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem;">âŒ Ù„Ø§ ØªÙˆØ¬Ø¯ Ù‚Ø·Ø¹ ØºÙŠØ§Ø± Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ù„Ø¨Ø­Ø« ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù…Ø®Ø²Ù†</div>';
       return;
     }
 
@@ -5935,18 +5752,18 @@ class UltimateFMApp {
       div.className = 'ticket-item';
       div.style.cssText = 'margin-top: 6px;';
       
-      let whName = 'مخزن الملاك';
-      if (item.warehouse === 'commercial') whName = 'مخزن التجاري';
-      else if (item.warehouse === 'assets') whName = 'مخزن أصول ومرافق القرية';
+      let whName = 'Ù…Ø®Ø²Ù† Ø§Ù„Ù…Ù„Ø§Ùƒ';
+      if (item.warehouse === 'commercial') whName = 'Ù…Ø®Ø²Ù† Ø§Ù„ØªØ¬Ø§Ø±ÙŠ';
+      else if (item.warehouse === 'assets') whName = 'Ù…Ø®Ø²Ù† Ø£ØµÙˆÙ„ ÙˆÙ…Ø±Ø§ÙÙ‚ Ø§Ù„Ù‚Ø±ÙŠØ©';
 
       div.innerHTML = `
         <div>
           <h4 style="margin:0 0 4px 0; color:#20274f; font-size:0.82rem; font-weight:700;">${item.name}</h4>
-          <p style="margin:0; font-size:0.68rem; color:var(--text-muted);">${whName} • المتوفر: ${item.qty} وحدة</p>
+          <p style="margin:0; font-size:0.68rem; color:var(--text-muted);">${whName} â€¢ Ø§Ù„Ù…ØªÙˆÙØ±: ${item.qty} ÙˆØ­Ø¯Ø©</p>
           <span style="font-size:0.65rem; color:var(--primary-gold); font-weight:700;">${item.desc}</span>
         </div>
         <button class="btn btn-primary" style="width: auto; padding: 6px 10px; font-size: 0.78rem; white-space:nowrap; margin-top:0;" onclick="app.selectInventoryItem('${item.name}', ${item.price})">
-          اختيار (${item.price} ج.م)
+          Ø§Ø®ØªÙŠØ§Ø± (${item.price} Ø¬.Ù…)
         </button>
       `;
       list.appendChild(div);
@@ -5962,7 +5779,7 @@ class UltimateFMApp {
       this.switchRole(this.currentRole);
     }
 
-    this.showToast(this.currentLang === 'en' ? '🌐 Language switched to English!' : '🌐 تم تغيير لغة النظام للعربية!');
+    this.showToast(this.currentLang === 'en' ? 'ðŸŒ Language switched to English!' : 'ðŸŒ ØªÙ… ØªØºÙŠÙŠØ± Ù„ØºØ© Ø§Ù„Ù†Ø¸Ø§Ù… Ù„Ù„Ø¹Ø±Ø¨ÙŠØ©!');
   }
 
   applyLanguageUI() {
@@ -5999,27 +5816,27 @@ class UltimateFMApp {
       if (loginPassLabel) loginPassLabel.innerText = 'Password:';
       if (loginBtnText) loginBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Authenticate & Login';
     } else {
-      if (brandSub) brandSub.innerText = 'إدارة المدن الساحلية والمراكز التجارية';
-      if (loginTitle) loginTitle.innerHTML = '<i class="fa-solid fa-lock"></i> تسجيل الدخول الآمن للنظام';
-      if (loginEmailLabel) loginEmailLabel.innerText = 'اسم المستخدم / البريد الإلكتروني:';
-      if (loginPassLabel) loginPassLabel.innerText = 'كلمة المرور:';
-      if (loginBtnText) loginBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
+      if (brandSub) brandSub.innerText = 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¯Ù† Ø§Ù„Ø³Ø§Ø­Ù„ÙŠØ© ÙˆØ§Ù„Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ©';
+      if (loginTitle) loginTitle.innerHTML = '<i class="fa-solid fa-lock"></i> ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¢Ù…Ù† Ù„Ù„Ù†Ø¸Ø§Ù…';
+      if (loginEmailLabel) loginEmailLabel.innerText = 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… / Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ:';
+      if (loginPassLabel) loginPassLabel.innerText = 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±:';
+      if (loginBtnText) loginBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
     }
 
     // Translate grid blocks
     const blocks = document.querySelectorAll('.role-block-card');
-    const arTitles = ['شاشة المالك', 'فرد من أفراد الأسرة', 'المهندس الميداني', 'مدير الصيانة', 'الفني الميداني', 'المستأجر السكني', 'المستأجر التجاري', 'أمن وبوابات القرية', 'الإدارة العليا'];
+    const arTitles = ['Ø´Ø§Ø´Ø© Ø§Ù„Ù…Ø§Ù„Ùƒ', 'ÙØ±Ø¯ Ù…Ù† Ø£ÙØ±Ø§Ø¯ Ø§Ù„Ø£Ø³Ø±Ø©', 'Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ', 'Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø©', 'Ø§Ù„ÙÙ†ÙŠ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ', 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø§Ù„Ø³ÙƒÙ†ÙŠ', 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± Ø§Ù„ØªØ¬Ø§Ø±ÙŠ', 'Ø£Ù…Ù† ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙŠØ©', 'Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§'];
     const enTitles = ['Owner Screen', 'Family Member', 'Field Engineer', 'Maint. Manager', 'Field Technician', 'Res. Tenant', 'Comm. Tenant', 'Security Gates', 'Admin Executive'];
     const arDescs = [
-      'البلاغات، العدادات وتصاريح الوحدة',
-      'دخول محدود بدون تفاصيل مالية',
-      'RO، البحيرات واللاندسكيب',
-      'توزيع وإسناد الفنيين',
-      'أوامر العمل والتوقيع',
-      'دخول القرية، العدادات والباقات',
-      'عدادات تجارية وتصاريح البضائع',
-      'إشراف بوابات الأمن والشكاوى',
-      'مؤشرات الأداء ومركز التحكم'
+      'Ø§Ù„Ø¨Ù„Ø§ØºØ§ØªØŒ Ø§Ù„Ø¹Ø¯Ø§Ø¯Ø§Øª ÙˆØªØµØ§Ø±ÙŠØ­ Ø§Ù„ÙˆØ­Ø¯Ø©',
+      'Ø¯Ø®ÙˆÙ„ Ù…Ø­Ø¯ÙˆØ¯ Ø¨Ø¯ÙˆÙ† ØªÙØ§ØµÙŠÙ„ Ù…Ø§Ù„ÙŠØ©',
+      'ROØŒ Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨',
+      'ØªÙˆØ²ÙŠØ¹ ÙˆØ¥Ø³Ù†Ø§Ø¯ Ø§Ù„ÙÙ†ÙŠÙŠÙ†',
+      'Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø¹Ù…Ù„ ÙˆØ§Ù„ØªÙˆÙ‚ÙŠØ¹',
+      'Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù‚Ø±ÙŠØ©ØŒ Ø§Ù„Ø¹Ø¯Ø§Ø¯Ø§Øª ÙˆØ§Ù„Ø¨Ø§Ù‚Ø§Øª',
+      'Ø¹Ø¯Ø§Ø¯Ø§Øª ØªØ¬Ø§Ø±ÙŠØ© ÙˆØªØµØ§Ø±ÙŠØ­ Ø§Ù„Ø¨Ø¶Ø§Ø¦Ø¹',
+      'Ø¥Ø´Ø±Ø§Ù Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø£Ù…Ù† ÙˆØ§Ù„Ø´ÙƒØ§ÙˆÙ‰',
+      'Ù…Ø¤Ø´Ø±Ø§Øª Ø§Ù„Ø£Ø¯Ø§Ø¡ ÙˆÙ…Ø±ÙƒØ² Ø§Ù„ØªØ­ÙƒÙ…'
     ];
     const enDescs = [
       'Tickets, meters & permits',
@@ -6048,7 +5865,7 @@ class UltimateFMApp {
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
       const navItems = phoneNav.querySelectorAll('.nav-item span');
-      const arNav = ['الرئيسية', 'البلاغات', 'المالية', 'الرسائل', 'الإعدادات'];
+      const arNav = ['Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©', 'Ø§Ù„Ø¨Ù„Ø§ØºØ§Øª', 'Ø§Ù„Ù…Ø§Ù„ÙŠØ©', 'Ø§Ù„Ø±Ø³Ø§Ø¦Ù„', 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª'];
       const enNav = ['Home', 'Tickets', 'Finance', 'Messages', 'Settings'];
       navItems.forEach((span, idx) => {
         if (arNav[idx] && span) {
@@ -6106,6 +5923,7 @@ class UltimateFMApp {
   getRoleEnglishName(role) {
     const map = {
       'homeowner': 'Main Homeowner',
+      'owner': 'Main Homeowner',
       'family': 'Family Member (Restricted)',
       'tenant': 'Residential Tenant',
       'commercial': 'Commercial Tenant',
@@ -6113,7 +5931,10 @@ class UltimateFMApp {
       'manager': 'Maintenance Manager',
       'technician': 'Field Technician',
       'engineer': 'Supervising Engineer',
-      'admin': 'Admin Executive'
+      'engineering_director': 'Engineering & HSE Director',
+      'admin': 'Admin Executive',
+      'housekeeping': 'Housekeeping & Cleaning',
+      'landscaping': 'Landscaping & Garden Maintenance'
     };
     return map[role] || role;
   }
@@ -6152,7 +5973,7 @@ class UltimateFMApp {
     if (this.currentRole !== 'login') {
       this.switchRole(this.currentRole);
     }
-    this.showToast(this.currentLang === 'en' ? '🌐 Language switched to English!' : '🌐 تم تحويل لغة التطبيق إلى العربية!');
+    this.showToast(this.currentLang === 'en' ? 'ðŸŒ Language switched to English!' : 'ðŸŒ ØªÙ… ØªØ­ÙˆÙŠÙ„ Ù„ØºØ© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©!');
   }
 
   toggleTheme(isDark) {
@@ -6172,141 +5993,141 @@ class UltimateFMApp {
 
     // 1. Home Tab Elements
     const qrTitle = document.querySelector('#qrSecurityCard span:first-child');
-    if (qrTitle) qrTitle.innerHTML = isEn ? '<i class="fa-solid fa-qrcode"></i> Dynamic QR Access Code' : '<i class="fa-solid fa-qrcode"></i> كود الدخول الديناميكي';
+    if (qrTitle) qrTitle.innerHTML = isEn ? '<i class="fa-solid fa-qrcode"></i> Dynamic QR Access Code' : '<i class="fa-solid fa-qrcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠ';
 
     const qrCountdownText = document.getElementById('qrCountdownText');
-    if (qrCountdownText) qrCountdownText.innerText = isEn ? '30 seconds' : '30 ثانية';
+    if (qrCountdownText) qrCountdownText.innerText = isEn ? '30 seconds' : '30 Ø«Ø§Ù†ÙŠØ©';
 
     const qrFooter = document.querySelector('#qrSecurityCard .sec-badge');
-    if (qrFooter) qrFooter.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Changes auto • Screenshot blocked' : '<i class="fa-solid fa-shield-halved"></i> كود يتغير تلقائياً • حظر الـ Screenshot';
+    if (qrFooter) qrFooter.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Changes auto â€¢ Screenshot blocked' : '<i class="fa-solid fa-shield-halved"></i> ÙƒÙˆØ¯ ÙŠØªØºÙŠØ± ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ â€¢ Ø­Ø¸Ø± Ø§Ù„Ù€ Screenshot';
 
     const permitsTitle = document.getElementById('permitsCardTitle');
-    if (permitsTitle) permitsTitle.innerHTML = isEn ? '<i class="fa-solid fa-key"></i> Approved Access Permits' : '<i class="fa-solid fa-key"></i> تصاريح الدخول المعتمدة';
+    if (permitsTitle) permitsTitle.innerHTML = isEn ? '<i class="fa-solid fa-key"></i> Approved Access Permits' : '<i class="fa-solid fa-key"></i> ØªØµØ§Ø±ÙŠØ­ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©';
 
     const permitsDesc = document.getElementById('permitsCardDesc');
-    if (permitsDesc) permitsDesc.innerText = isEn ? 'Issue restricted temporary visitor permits' : 'إصدار تصاريح دخول مشروطة ومؤقتة بدقة لمتابعة الأمان والتحكم بالبوابات.';
+    if (permitsDesc) permitsDesc.innerText = isEn ? 'Issue restricted temporary visitor permits' : 'Ø¥ØµØ¯Ø§Ø± ØªØµØ§Ø±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ù…Ø´Ø±ÙˆØ·Ø© ÙˆÙ…Ø¤Ù‚ØªØ© Ø¨Ø¯Ù‚Ø© Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø£Ù…Ø§Ù† ÙˆØ§Ù„ØªØ­ÙƒÙ… Ø¨Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª.';
 
     const btnPermit1 = document.getElementById('btnUnitPermit');
-    if (btnPermit1) btnPermit1.innerHTML = isEn ? '<i class="fa-solid fa-door-open"></i> Unit Entry Permit' : '<i class="fa-solid fa-door-open"></i> تصريح دخول الوحدة';
+    if (btnPermit1) btnPermit1.innerHTML = isEn ? '<i class="fa-solid fa-door-open"></i> Unit Entry Permit' : '<i class="fa-solid fa-door-open"></i> ØªØµØ±ÙŠØ­ Ø¯Ø®ÙˆÙ„ Ø§Ù„ÙˆØ­Ø¯Ø©';
 
     const btnPermit2 = document.getElementById('btnBeachPermit');
-    if (btnPermit2) btnPermit2.innerHTML = isEn ? '<i class="fa-solid fa-umbrella-beach"></i> Beach & Lake Entry' : '<i class="fa-solid fa-umbrella-beach"></i> دخول البحر والبحيرات والمسابح';
+    if (btnPermit2) btnPermit2.innerHTML = isEn ? '<i class="fa-solid fa-umbrella-beach"></i> Beach & Lake Entry' : '<i class="fa-solid fa-umbrella-beach"></i> Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨Ø­Ø± ÙˆØ§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ§Ù„Ù…Ø³Ø§Ø¨Ø­';
 
     const permitsListTitle = document.getElementById('permitsStatusLabel');
-    if (permitsListTitle) permitsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-stamp"></i> Requested Permits Status:' : '<i class="fa-solid fa-stamp"></i> حالة التصاريح المطلوبة:';
+    if (permitsListTitle) permitsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-stamp"></i> Requested Permits Status:' : '<i class="fa-solid fa-stamp"></i> Ø­Ø§Ù„Ø© Ø§Ù„ØªØµØ§Ø±ÙŠØ­ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©:';
 
     const btnSecurityComp = document.getElementById('btnSecurityComplaint');
-    if (btnSecurityComp) btnSecurityComp.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Emergency Security Reports' : '<i class="fa-solid fa-shield-halved"></i> بلاغات وشكاوى الأمن الطارئة';
+    if (btnSecurityComp) btnSecurityComp.innerHTML = isEn ? '<i class="fa-solid fa-shield-halved"></i> Emergency Security Reports' : '<i class="fa-solid fa-shield-halved"></i> Ø¨Ù„Ø§ØºØ§Øª ÙˆØ´ÙƒØ§ÙˆÙ‰ Ø§Ù„Ø£Ù…Ù† Ø§Ù„Ø·Ø§Ø±Ø¦Ø©';
 
     const complaintsListTitle = document.getElementById('activeComplaintsLabelText');
-    if (complaintsListTitle) complaintsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Complaints:' : '<i class="fa-solid fa-list-check"></i> شكاوى الأمن النشطة:';
+    if (complaintsListTitle) complaintsListTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Complaints:' : '<i class="fa-solid fa-list-check"></i> Ø´ÙƒØ§ÙˆÙ‰ Ø§Ù„Ø£Ù…Ù† Ø§Ù„Ù†Ø´Ø·Ø©:';
 
     const lprTitle = document.getElementById('lprCardTitle');
-    if (lprTitle) lprTitle.innerHTML = isEn ? '<i class="fa-solid fa-car"></i> Smart License Plate (LPR) Registration' : '<i class="fa-solid fa-car"></i> تسجيل لوحات السيارات للبوابات الذكية (LPR)';
+    if (lprTitle) lprTitle.innerHTML = isEn ? '<i class="fa-solid fa-car"></i> Smart License Plate (LPR) Registration' : '<i class="fa-solid fa-car"></i> ØªØ³Ø¬ÙŠÙ„ Ù„ÙˆØ­Ø§Øª Ø§Ù„Ø³ÙŠØ§Ø±Ø§Øª Ù„Ù„Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø°ÙƒÙŠØ© (LPR)';
 
     const lprDesc = document.getElementById('lprCardDesc');
-    if (lprDesc) lprDesc.innerText = isEn ? 'Register vehicle plates for automatic gate access' : 'سجل لوحة سيارتك لفتح بوابات القرية الذكية تلقائياً بالكاميرات الرقمية.';
+    if (lprDesc) lprDesc.innerText = isEn ? 'Register vehicle plates for automatic gate access' : 'Ø³Ø¬Ù„ Ù„ÙˆØ­Ø© Ø³ÙŠØ§Ø±ØªÙƒ Ù„ÙØªØ­ Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙŠØ© Ø§Ù„Ø°ÙƒÙŠØ© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¨Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ©.';
 
     const lprInput = document.getElementById('lprPlateInput');
-    if (lprInput) lprInput.placeholder = isEn ? 'e.g. ABC 1234' : 'مثال: أ ج 1234';
+    if (lprInput) lprInput.placeholder = isEn ? 'e.g. ABC 1234' : 'Ù…Ø«Ø§Ù„: Ø£ Ø¬ 1234';
 
     const btnLpr = document.querySelector('#lprCardTitle')?.parentNode?.parentNode?.querySelector('button');
-    if (btnLpr) btnLpr.innerHTML = isEn ? '<i class="fa-solid fa-plus"></i> Register' : '<i class="fa-solid fa-plus"></i> تسجيل';
+    if (btnLpr) btnLpr.innerHTML = isEn ? '<i class="fa-solid fa-plus"></i> Register' : '<i class="fa-solid fa-plus"></i> ØªØ³Ø¬ÙŠÙ„';
 
     const familyTitle = document.getElementById('familyCardTitle');
-    if (familyTitle) familyTitle.innerHTML = isEn ? '<i class="fa-solid fa-people-roof"></i> Family & Dependents Management' : '<i class="fa-solid fa-people-roof"></i> إدارة أفراد الأسرة والتابعين بالوحدة';
+    if (familyTitle) familyTitle.innerHTML = isEn ? '<i class="fa-solid fa-people-roof"></i> Family & Dependents Management' : '<i class="fa-solid fa-people-roof"></i> Ø¥Ø¯Ø§Ø±Ø© Ø£ÙØ±Ø§Ø¯ Ø§Ù„Ø£Ø³Ø±Ø© ÙˆØ§Ù„ØªØ§Ø¨Ø¹ÙŠÙ† Ø¨Ø§Ù„ÙˆØ­Ø¯Ø©';
 
     const familyDesc = document.getElementById('familyCardDesc');
-    if (familyDesc) familyDesc.innerText = isEn ? 'Manage family access and restricted gate passes' : 'تحكم في إضافة أفراد عائلتك وإصدار صلاحيات الدخول وبوابات الأمن المحدودة لهم دون صلاحيات مالية.';
+    if (familyDesc) familyDesc.innerText = isEn ? 'Manage family access and restricted gate passes' : 'ØªØ­ÙƒÙ… ÙÙŠ Ø¥Ø¶Ø§ÙØ© Ø£ÙØ±Ø§Ø¯ Ø¹Ø§Ø¦Ù„ØªÙƒ ÙˆØ¥ØµØ¯Ø§Ø± ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø£Ù…Ù† Ø§Ù„Ù…Ø­Ø¯ÙˆØ¯Ø© Ù„Ù‡Ù… Ø¯ÙˆÙ† ØµÙ„Ø§Ø­ÙŠØ§Øª Ù…Ø§Ù„ÙŠØ©.';
 
     const btnAddFamily = document.querySelector('#familyCardTitle')?.parentNode?.parentNode?.querySelector('button');
-    if (btnAddFamily) btnAddFamily.innerHTML = isEn ? '<i class="fa-solid fa-user-plus"></i> Add New Family Member' : '<i class="fa-solid fa-user-plus"></i> إضافة فرد أسرة جديد للوحدة';
+    if (btnAddFamily) btnAddFamily.innerHTML = isEn ? '<i class="fa-solid fa-user-plus"></i> Add New Family Member' : '<i class="fa-solid fa-user-plus"></i> Ø¥Ø¶Ø§ÙØ© ÙØ±Ø¯ Ø£Ø³Ø±Ø© Ø¬Ø¯ÙŠØ¯ Ù„Ù„ÙˆØ­Ø¯Ø©';
 
     const btnDir = document.querySelector('#tabHomeHomeowner > button.btn-secondary');
-    if (btnDir) btnDir.innerHTML = isEn ? '<i class="fa-solid fa-phone-volume"></i> Village Services & Emergency Directory' : '<i class="fa-solid fa-phone-volume"></i> دليل خدمات وطوارئ القرية';
+    if (btnDir) btnDir.innerHTML = isEn ? '<i class="fa-solid fa-phone-volume"></i> Village Services & Emergency Directory' : '<i class="fa-solid fa-phone-volume"></i> Ø¯Ù„ÙŠÙ„ Ø®Ø¯Ù…Ø§Øª ÙˆØ·ÙˆØ§Ø±Ø¦ Ø§Ù„Ù‚Ø±ÙŠØ©';
 
     // 2. Tickets Tab Elements
     const btnNewTicket = document.getElementById('btnNewMaintenanceTicket');
-    if (btnNewTicket) btnNewTicket.innerHTML = isEn ? '<i class="fa-solid fa-wrench"></i> Request Internal Maintenance' : '<i class="fa-solid fa-wrench"></i> طلب صيانة داخلية';
+    if (btnNewTicket) btnNewTicket.innerHTML = isEn ? '<i class="fa-solid fa-wrench"></i> Request Internal Maintenance' : '<i class="fa-solid fa-wrench"></i> Ø·Ù„Ø¨ ØµÙŠØ§Ù†Ø© Ø¯Ø§Ø®Ù„ÙŠØ©';
 
     const ticketsTitle = document.querySelector('#tabTicketsHomeowner .card .card-title');
-    if (ticketsTitle) ticketsTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Maintenance Tickets' : '<i class="fa-solid fa-list-check"></i> طلبات الصيانة الحالية';
+    if (ticketsTitle) ticketsTitle.innerHTML = isEn ? '<i class="fa-solid fa-list-check"></i> Active Maintenance Tickets' : '<i class="fa-solid fa-list-check"></i> Ø·Ù„Ø¨Ø§Øª Ø§Ù„ØµÙŠØ§Ù†Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©';
 
     // 3. Finance Tab Elements
     const financeTitle = document.querySelector('#tabWalletHomeowner .card:first-child .card-title');
-    if (financeTitle) financeTitle.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Financial Details & Maintenance Deposit' : '<i class="fa-solid fa-wallet"></i> البيانات المالية ووديعة الصيانة';
+    if (financeTitle) financeTitle.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Financial Details & Maintenance Deposit' : '<i class="fa-solid fa-wallet"></i> Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆÙˆØ¯ÙŠØ¹Ø© Ø§Ù„ØµÙŠØ§Ù†Ø©';
 
     const financeBadge = document.querySelector('#tabWalletHomeowner .card:first-child .badge');
-    if (financeBadge) financeBadge.innerText = isEn ? 'Main Owner' : 'المالك الرئيسي';
+    if (financeBadge) financeBadge.innerText = isEn ? 'Main Owner' : 'Ø§Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ';
 
     const depLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:first-child .stat-label');
-    if (depLabel) depLabel.innerText = isEn ? 'Original Maintenance Deposit' : 'رصيد الوديعة الأصلية';
+    if (depLabel) depLabel.innerText = isEn ? 'Original Maintenance Deposit' : 'Ø±ØµÙŠØ¯ Ø§Ù„ÙˆØ¯ÙŠØ¹Ø© Ø§Ù„Ø£ØµÙ„ÙŠØ©';
     const yieldLabel = document.querySelector('#tabWalletHomeowner .card:first-child .grid-2 .stat-box:last-child .stat-label');
-    if (yieldLabel) yieldLabel.innerText = isEn ? 'Annual Investment Yield' : 'عوائد الاستثمار السنوية';
+    if (yieldLabel) yieldLabel.innerText = isEn ? 'Annual Investment Yield' : 'Ø¹ÙˆØ§Ø¦Ø¯ Ø§Ù„Ø§Ø³ØªØ«Ù…Ø§Ø± Ø§Ù„Ø³Ù†ÙˆÙŠØ©';
 
     const shareLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:first-child span:first-child');
-    if (shareLabel) shareLabel.innerText = isEn ? 'Unit Share of Operating Expenses:' : 'حصة الوحدة من مصاريف التشغيل:';
+    if (shareLabel) shareLabel.innerText = isEn ? 'Unit Share of Operating Expenses:' : 'Ø­ØµØ© Ø§Ù„ÙˆØ­Ø¯Ø© Ù…Ù† Ù…ØµØ§Ø±ÙŠÙ Ø§Ù„ØªØ´ØºÙŠÙ„:';
 
     const varLabel = document.querySelector('#tabWalletHomeowner .card:first-child div[style*="dashed"] div:last-child span:first-child');
-    if (varLabel) varLabel.innerText = isEn ? 'Net Maintenance Variance Due:' : 'صافي فروق الصيانة المطلوبة:';
+    if (varLabel) varLabel.innerText = isEn ? 'Net Maintenance Variance Due:' : 'ØµØ§ÙÙŠ ÙØ±ÙˆÙ‚ Ø§Ù„ØµÙŠØ§Ù†Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©:';
 
     const metersTitle = document.querySelector('#utilityMetersCard .card-title');
-    if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> شحن العدادات الذكية (مسبقة الدفع)';
+    if (metersTitle) metersTitle.innerHTML = isEn ? '<i class="fa-solid fa-plug-circle-bolt"></i> Smart Prepaid Utility Meters' : '<i class="fa-solid fa-plug-circle-bolt"></i> Ø´Ø­Ù† Ø§Ù„Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø°ÙƒÙŠØ© (Ù…Ø³Ø¨Ù‚Ø© Ø§Ù„Ø¯ÙØ¹)';
 
     const elecLabel = document.querySelector('#utilityMetersCard .stat-box:first-child .stat-label');
-    if (elecLabel) elecLabel.innerHTML = isEn ? '<i class="fa-solid fa-bolt"></i> Elec. Meter' : '<i class="fa-solid fa-bolt"></i> عداد الكهرباء';
+    if (elecLabel) elecLabel.innerHTML = isEn ? '<i class="fa-solid fa-bolt"></i> Elec. Meter' : '<i class="fa-solid fa-bolt"></i> Ø¹Ø¯Ø§Ø¯ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡';
 
     const waterLabel = document.querySelector('#utilityMetersCard .stat-box:last-child .stat-label');
-    if (waterLabel) waterLabel.innerHTML = isEn ? '<i class="fa-solid fa-droplet"></i> Water Meter' : '<i class="fa-solid fa-droplet"></i> عداد المياه';
+    if (waterLabel) waterLabel.innerHTML = isEn ? '<i class="fa-solid fa-droplet"></i> Water Meter' : '<i class="fa-solid fa-droplet"></i> Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù…ÙŠØ§Ù‡';
 
     const btnOpenRecharge = document.getElementById('btnOpenMeterRechargeModal');
-    if (btnOpenRecharge) btnOpenRecharge.innerHTML = isEn ? '<i class="fa-solid fa-charging-station"></i> Instant Utility Recharge' : '<i class="fa-solid fa-charging-station"></i> شحن العدادات الفوري (كهرباء / مياه)';
+    if (btnOpenRecharge) btnOpenRecharge.innerHTML = isEn ? '<i class="fa-solid fa-charging-station"></i> Instant Utility Recharge' : '<i class="fa-solid fa-charging-station"></i> Ø´Ø­Ù† Ø§Ù„Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ÙÙˆØ±ÙŠ (ÙƒÙ‡Ø±Ø¨Ø§Ø¡ / Ù…ÙŠØ§Ù‡)';
 
     const bookingTitle = document.querySelector('#tabWalletHomeowner .card:last-child .card-title');
-    if (bookingTitle) bookingTitle.innerHTML = isEn ? '<i class="fa-solid fa-tennis-ball"></i> Sports & Playgrounds Booking' : '<i class="fa-solid fa-tennis-ball"></i> حجز الملاعب والأنشطة الترفيهية';
+    if (bookingTitle) bookingTitle.innerHTML = isEn ? '<i class="fa-solid fa-tennis-ball"></i> Sports & Playgrounds Booking' : '<i class="fa-solid fa-tennis-ball"></i> Ø­Ø¬Ø² Ø§Ù„Ù…Ù„Ø§Ø¹Ø¨ ÙˆØ§Ù„Ø£Ù†Ø´Ø·Ø© Ø§Ù„ØªØ±ÙÙŠÙ‡ÙŠØ©';
 
     const bookingDesc = document.querySelector('#tabWalletHomeowner .card:last-child p');
-    if (bookingDesc) bookingDesc.innerText = isEn ? 'Book padel tennis or football courts from your wallet balance' : 'احجز ملاعب البادل تنس أو ملاعب كرة القدم مباشرة من رصيد محفظتك.';
+    if (bookingDesc) bookingDesc.innerText = isEn ? 'Book padel tennis or football courts from your wallet balance' : 'Ø§Ø­Ø¬Ø² Ù…Ù„Ø§Ø¹Ø¨ Ø§Ù„Ø¨Ø§Ø¯Ù„ ØªÙ†Ø³ Ø£Ùˆ Ù…Ù„Ø§Ø¹Ø¨ ÙƒØ±Ø© Ø§Ù„Ù‚Ø¯Ù… Ù…Ø¨Ø§Ø´Ø±Ø© Ù…Ù† Ø±ØµÙŠØ¯ Ù…Ø­ÙØ¸ØªÙƒ.';
 
     const bookingWalletLabel = document.querySelector('#tabWalletHomeowner .card:last-child .owner-only-financial');
-    if (bookingWalletLabel) bookingWalletLabel.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Available Digital Wallet: <span id="bookingWalletBalanceText">2500</span> EGP' : '<i class="fa-solid fa-wallet"></i> رصيد محفظة الدفع المتاحة: <span id="bookingWalletBalanceText">2500</span> ج.م';
+    if (bookingWalletLabel) bookingWalletLabel.innerHTML = isEn ? '<i class="fa-solid fa-wallet"></i> Available Digital Wallet: <span id="bookingWalletBalanceText">2500</span> EGP' : '<i class="fa-solid fa-wallet"></i> Ø±ØµÙŠØ¯ Ù…Ø­ÙØ¸Ø© Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…ØªØ§Ø­Ø©: <span id="bookingWalletBalanceText">2500</span> Ø¬.Ù…';
 
     const bookingSelectLabel = document.querySelector('#tabWalletHomeowner .card:last-child .form-group:nth-of-type(1) .form-label');
-    if (bookingSelectLabel) bookingSelectLabel.innerText = isEn ? 'Select Activity / Court:' : 'اختر النشاط / الملعب:';
+    if (bookingSelectLabel) bookingSelectLabel.innerText = isEn ? 'Select Activity / Court:' : 'Ø§Ø®ØªØ± Ø§Ù„Ù†Ø´Ø§Ø· / Ø§Ù„Ù…Ù„Ø¹Ø¨:';
 
     const bookingDateLabel = document.querySelector('#tabWalletHomeowner .card:last-child .grid-2 .form-group:first-child .form-label');
-    if (bookingDateLabel) bookingDateLabel.innerText = isEn ? 'Date:' : 'التاريخ:';
+    if (bookingDateLabel) bookingDateLabel.innerText = isEn ? 'Date:' : 'Ø§Ù„ØªØ§Ø±ÙŠØ®:';
 
     const bookingTimeLabel = document.querySelector('#tabWalletHomeowner .card:last-child .grid-2 .form-group:last-child .form-label');
-    if (bookingTimeLabel) bookingTimeLabel.innerText = isEn ? 'Time:' : 'الوقت:';
+    if (bookingTimeLabel) bookingTimeLabel.innerText = isEn ? 'Time:' : 'Ø§Ù„ÙˆÙ‚Øª:';
 
     const btnBook = document.querySelector('#tabWalletHomeowner .card:last-child button');
-    if (btnBook) btnBook.innerHTML = isEn ? '<i class="fa-solid fa-calendar-check"></i> Confirm & Deduct Wallet' : '<i class="fa-solid fa-calendar-check"></i> تأكيد الحجز والخصم من المحفظة';
+    if (btnBook) btnBook.innerHTML = isEn ? '<i class="fa-solid fa-calendar-check"></i> Confirm & Deduct Wallet' : '<i class="fa-solid fa-calendar-check"></i> ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø¬Ø² ÙˆØ§Ù„Ø®ØµÙ… Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©';
 
     // 4. Settings Tab Elements
     const settingsTitle = document.querySelector('#tabSettingsHomeowner .card .card-title');
-    if (settingsTitle) settingsTitle.innerHTML = isEn ? '<i class="fa-solid fa-sliders"></i> App & Theme Settings' : '<i class="fa-solid fa-sliders"></i> إعدادات التطبيق والمظهر';
+    if (settingsTitle) settingsTitle.innerHTML = isEn ? '<i class="fa-solid fa-sliders"></i> App & Theme Settings' : '<i class="fa-solid fa-sliders"></i> Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ ÙˆØ§Ù„Ù…Ø¸Ù‡Ø±';
 
     const settingsDesc = document.querySelector('#tabSettingsHomeowner .card p');
-    if (settingsDesc) settingsDesc.innerText = isEn ? 'Customize user experience, preferred language and themes' : 'تخصيص تجربة الاستخدام، لغة التطبيق وتنبيهات الإشعارات الفورية.';
+    if (settingsDesc) settingsDesc.innerText = isEn ? 'Customize user experience, preferred language and themes' : 'ØªØ®ØµÙŠØµ ØªØ¬Ø±Ø¨Ø© Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…ØŒ Ù„ØºØ© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ ÙˆØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„ÙÙˆØ±ÙŠØ©.';
 
     const langToggleLabel = document.getElementById('lblLangSettings');
-    if (langToggleLabel) langToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-language"></i> System Language' : '<i class="fa-solid fa-language"></i> لغة النظام (Language)';
+    if (langToggleLabel) langToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-language"></i> System Language' : '<i class="fa-solid fa-language"></i> Ù„ØºØ© Ø§Ù„Ù†Ø¸Ø§Ù… (Language)';
 
     const langToggleDesc = document.getElementById('descLangSettings');
-    if (langToggleDesc) langToggleDesc.innerText = isEn ? 'Choose preferred application language' : 'اختر لغة واجهة التطبيق المفضلة';
+    if (langToggleDesc) langToggleDesc.innerText = isEn ? 'Choose preferred application language' : 'Ø§Ø®ØªØ± Ù„ØºØ© ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…ÙØ¶Ù„Ø©';
 
     const themeToggleLabel = document.getElementById('lblThemeSettings');
-    if (themeToggleLabel) themeToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-moon"></i> Dark Theme Mode' : '<i class="fa-solid fa-moon"></i> الوضع الداكن (Dark Mode)';
+    if (themeToggleLabel) themeToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-moon"></i> Dark Theme Mode' : '<i class="fa-solid fa-moon"></i> Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ† (Dark Mode)';
 
     const themeToggleDesc = document.getElementById('descThemeSettings');
-    if (themeToggleDesc) themeToggleDesc.innerText = isEn ? 'Toggle screen colors to night mode' : 'التحول لمظهر الألوان المظلم للأمان والراحة';
+    if (themeToggleDesc) themeToggleDesc.innerText = isEn ? 'Toggle screen colors to night mode' : 'Ø§Ù„ØªØ­ÙˆÙ„ Ù„Ù…Ø¸Ù‡Ø± Ø§Ù„Ø£Ù„ÙˆØ§Ù† Ø§Ù„Ù…Ø¸Ù„Ù… Ù„Ù„Ø£Ù…Ø§Ù† ÙˆØ§Ù„Ø±Ø§Ø­Ø©';
 
     const notifyToggleLabel = document.getElementById('lblNotifySettings');
-    if (notifyToggleLabel) notifyToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-bell"></i> Push Notifications' : '<i class="fa-solid fa-bell"></i> الإشعارات الفورية';
+    if (notifyToggleLabel) notifyToggleLabel.innerHTML = isEn ? '<i class="fa-solid fa-bell"></i> Push Notifications' : '<i class="fa-solid fa-bell"></i> Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„ÙÙˆØ±ÙŠØ©';
 
     const notifyToggleDesc = document.getElementById('descNotifySettings');
-    if (notifyToggleDesc) notifyToggleDesc.innerText = isEn ? 'Alerts for ticket status and bookings updates' : 'تنبيهات حالة بلاغات الصيانة ومواعيد الحجوزات';
+    if (notifyToggleDesc) notifyToggleDesc.innerText = isEn ? 'Alerts for ticket status and bookings updates' : 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø­Ø§Ù„Ø© Ø¨Ù„Ø§ØºØ§Øª Ø§Ù„ØµÙŠØ§Ù†Ø© ÙˆÙ…ÙˆØ§Ø¹ÙŠØ¯ Ø§Ù„Ø­Ø¬ÙˆØ²Ø§Øª';
 
     // 5. Translate Family members list elements
     const familyList = document.getElementById('ownerFamilyMembersList');
@@ -6319,27 +6140,27 @@ class UltimateFMApp {
         if (span) {
           let text = span.innerText;
           if (isEn) {
-            text = text.replace('سارة أحمد (الزوجة)', 'Sarah Ahmed (Wife)')
-                       .replace('عمر أحمد (الابن)', 'Omar Ahmed (Son)')
-                       .replace('(الزوجة)', '(Wife)')
-                       .replace('(الابن)', '(Son)')
-                       .replace('(أب)', '(Father)')
-                       .replace('(أم)', '(Mother)')
-                       .replace('(أخ)', '(Brother)')
-                       .replace('(أخت)', '(Sister)')
-                       .replace('(ابن)', '(Son)')
-                       .replace('(ابنة)', '(Daughter)');
+            text = text.replace('Ø³Ø§Ø±Ø© Ø£Ø­Ù…Ø¯ (Ø§Ù„Ø²ÙˆØ¬Ø©)', 'Sarah Ahmed (Wife)')
+                       .replace('Ø¹Ù…Ø± Ø£Ø­Ù…Ø¯ (Ø§Ù„Ø§Ø¨Ù†)', 'Omar Ahmed (Son)')
+                       .replace('(Ø§Ù„Ø²ÙˆØ¬Ø©)', '(Wife)')
+                       .replace('(Ø§Ù„Ø§Ø¨Ù†)', '(Son)')
+                       .replace('(Ø£Ø¨)', '(Father)')
+                       .replace('(Ø£Ù…)', '(Mother)')
+                       .replace('(Ø£Ø®)', '(Brother)')
+                       .replace('(Ø£Ø®Øª)', '(Sister)')
+                       .replace('(Ø§Ø¨Ù†)', '(Son)')
+                       .replace('(Ø§Ø¨Ù†Ø©)', '(Daughter)');
           } else {
-            text = text.replace('Sarah Ahmed (Wife)', 'سارة أحمد (الزوجة)')
-                       .replace('Omar Ahmed (Son)', 'عمر أحمد (الابن)')
-                       .replace('(Wife)', '(الزوجة)')
-                       .replace('(Son)', '(الابن)')
-                       .replace('(Father)', '(أب)')
-                       .replace('(Mother)', '(أم)')
-                       .replace('(Brother)', '(أخ)')
-                       .replace('(Sister)', '(أخت)')
-                       .replace('(Son)', '(الابن)')
-                       .replace('(Daughter)', '(ابنة)');
+            text = text.replace('Sarah Ahmed (Wife)', 'Ø³Ø§Ø±Ø© Ø£Ø­Ù…Ø¯ (Ø§Ù„Ø²ÙˆØ¬Ø©)')
+                       .replace('Omar Ahmed (Son)', 'Ø¹Ù…Ø± Ø£Ø­Ù…Ø¯ (Ø§Ù„Ø§Ø¨Ù†)')
+                       .replace('(Wife)', '(Ø§Ù„Ø²ÙˆØ¬Ø©)')
+                       .replace('(Son)', '(Ø§Ù„Ø§Ø¨Ù†)')
+                       .replace('(Father)', '(Ø£Ø¨)')
+                       .replace('(Mother)', '(Ø£Ù…)')
+                       .replace('(Brother)', '(Ø£Ø®)')
+                       .replace('(Sister)', '(Ø£Ø®Øª)')
+                       .replace('(Son)', '(Ø§Ù„Ø§Ø¨Ù†)')
+                       .replace('(Daughter)', '(Ø§Ø¨Ù†Ø©)');
           }
           span.innerText = text;
         }
@@ -6347,9 +6168,9 @@ class UltimateFMApp {
         if (p) {
           let pText = p.innerText;
           if (isEn) {
-            pText = pText.replace('صلاحية دخول البوابات والخدمات فقط', 'Gate access & services permit only');
+            pText = pText.replace('ØµÙ„Ø§Ø­ÙŠØ© Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª ÙˆØ§Ù„Ø®Ø¯Ù…Ø§Øª ÙÙ‚Ø·', 'Gate access & services permit only');
           } else {
-            pText = pText.replace('Gate access & services permit only', 'صلاحية دخول البوابات والخدمات فقط');
+            pText = pText.replace('Gate access & services permit only', 'ØµÙ„Ø§Ø­ÙŠØ© Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª ÙˆØ§Ù„Ø®Ø¯Ù…Ø§Øª ÙÙ‚Ø·');
           }
           p.innerText = pText;
         }
@@ -6357,9 +6178,9 @@ class UltimateFMApp {
         if (badge) {
           let badgeText = badge.innerText;
           if (isEn) {
-            badgeText = badgeText.replace('نشط', 'Active');
+            badgeText = badgeText.replace('Ù†Ø´Ø·', 'Active');
           } else {
-            badgeText = badgeText.replace('Active', 'نشط');
+            badgeText = badgeText.replace('Active', 'Ù†Ø´Ø·');
           }
           badge.innerText = badgeText;
         }
@@ -6370,7 +6191,7 @@ class UltimateFMApp {
     const familyBadge = document.getElementById('ownerFamilyCountBadge');
     if (familyBadge) {
       const count = familyList ? familyList.children.length : 2;
-      familyBadge.innerText = isEn ? `${count} members` : `${count} أفراد`;
+      familyBadge.innerText = isEn ? `${count} members` : `${count} Ø£ÙØ±Ø§Ø¯`;
     }
 
     // Translate LPR Active Plates list items
@@ -6382,7 +6203,7 @@ class UltimateFMApp {
           if (isEn) {
             badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Active on Gates';
           } else {
-            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> مفعل على البوابات';
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Ù…ÙØ¹Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª';
           }
         }
       });
@@ -6390,68 +6211,68 @@ class UltimateFMApp {
 
     // 9. Housekeeping translations
     const roleTitleHk = document.getElementById('roleTitleHk');
-    if (roleTitleHk) roleTitleHk.innerText = isEn ? 'Housekeeping' : 'هاوس كيبينج';
+    if (roleTitleHk) roleTitleHk.innerText = isEn ? 'Housekeeping' : 'Ù‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬';
 
     const roleDescHk = document.getElementById('roleDescHk');
-    if (roleDescHk) roleDescHk.innerText = isEn ? 'Cleaning requests & staff assignment' : 'طلبات النظافة وإسناد عمال النظافة';
+    if (roleDescHk) roleDescHk.innerText = isEn ? 'Cleaning requests & staff assignment' : 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù†Ø¸Ø§ÙØ© ÙˆØ¥Ø³Ù†Ø§Ø¯ Ø¹Ù…Ø§Ù„ Ø§Ù„Ù†Ø¸Ø§ÙØ©';
 
     const btnHomeownerHk = document.getElementById('btnHomeownerHk');
-    if (btnHomeownerHk) btnHomeownerHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+    if (btnHomeownerHk) btnHomeownerHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ©';
 
     const btnTenantHk = document.getElementById('btnTenantHk');
-    if (btnTenantHk) btnTenantHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+    if (btnTenantHk) btnTenantHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ©';
 
     const btnTenantHkPack = document.getElementById('btnTenantHkPack');
-    if (btnTenantHkPack) btnTenantHkPack.innerText = isEn ? 'Request Cleaning' : 'طلب خدمة نظافة';
+    if (btnTenantHkPack) btnTenantHkPack.innerText = isEn ? 'Request Cleaning' : 'Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ©';
 
     const btnCommercialHk = document.getElementById('btnCommercialHk');
-    if (btnCommercialHk) btnCommercialHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> طلب خدمة نظافة';
+    if (btnCommercialHk) btnCommercialHk.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Request Cleaning' : '<i class="fa-solid fa-broom"></i> Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ©';
 
     const managerHkTitle = document.getElementById('managerHkTitle');
-    if (managerHkTitle) managerHkTitle.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Public Area Cleaning Request' : '<i class="fa-solid fa-broom"></i> طلب نظافة للأماكن العامة';
+    if (managerHkTitle) managerHkTitle.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Public Area Cleaning Request' : '<i class="fa-solid fa-broom"></i> Ø·Ù„Ø¨ Ù†Ø¸Ø§ÙØ© Ù„Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø¹Ø§Ù…Ø©';
 
     const managerHkDesc = document.getElementById('managerHkDesc');
-    if (managerHkDesc) managerHkDesc.innerText = isEn ? 'Request cleaning for public zones (Main Pool, Lake Beach, Walkways, Admin).' : 'يمكنك هنا طلب تنظيف لقطاع عام بالقرية (مثل المسبح الرئيسي، الشاطئ، اللاندسكيب، الممرات).';
+    if (managerHkDesc) managerHkDesc.innerText = isEn ? 'Request cleaning for public zones (Main Pool, Lake Beach, Walkways, Admin).' : 'ÙŠÙ…ÙƒÙ†Ùƒ Ù‡Ù†Ø§ Ø·Ù„Ø¨ ØªÙ†Ø¸ÙŠÙ Ù„Ù‚Ø·Ø§Ø¹ Ø¹Ø§Ù… Ø¨Ø§Ù„Ù‚Ø±ÙŠØ© (Ù…Ø«Ù„ Ø§Ù„Ù…Ø³Ø¨Ø­ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØŒ Ø§Ù„Ø´Ø§Ø·Ø¦ØŒ Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ØŒ Ø§Ù„Ù…Ù…Ø±Ø§Øª).';
 
     const btnManagerHkSubmit = document.getElementById('btnManagerHkSubmit');
-    if (btnManagerHkSubmit) btnManagerHkSubmit.innerHTML = isEn ? '<i class="fa-solid fa-paper-plane"></i> Send Request' : '<i class="fa-solid fa-paper-plane"></i> إرسال الطلب';
+    if (btnManagerHkSubmit) btnManagerHkSubmit.innerHTML = isEn ? '<i class="fa-solid fa-paper-plane"></i> Send Request' : '<i class="fa-solid fa-paper-plane"></i> Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨';
 
     const hkSupervisorLabel = document.getElementById('hkSupervisorLabel');
-    if (hkSupervisorLabel) hkSupervisorLabel.innerText = isEn ? 'Housekeeping & Hotel Services Supervision' : 'إشراف الهاوس كيبينج والخدمات الفندقية';
+    if (hkSupervisorLabel) hkSupervisorLabel.innerText = isEn ? 'Housekeeping & Hotel Services Supervision' : 'Ø¥Ø´Ø±Ø§Ù Ø§Ù„Ù‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬ ÙˆØ§Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„ÙÙ†Ø¯Ù‚ÙŠØ©';
 
     const hkSupervisorName = document.getElementById('hkSupervisorName');
-    if (hkSupervisorName) hkSupervisorName.innerText = isEn ? 'Housekeeping Supervisor' : 'مشرف قسم النظافة (Housekeeping Supervisor)';
+    if (hkSupervisorName) hkSupervisorName.innerText = isEn ? 'Housekeeping Supervisor' : 'Ù…Ø´Ø±Ù Ù‚Ø³Ù… Ø§Ù„Ù†Ø¸Ø§ÙØ© (Housekeeping Supervisor)';
 
     const hkSupervisorDesc = document.getElementById('hkSupervisorDesc');
-    if (hkSupervisorDesc) hkSupervisorDesc.innerText = isEn ? 'Receive cleaning orders and assign workers' : 'استقبال طلبات النظافة وإسناد عمال النظافة';
+    if (hkSupervisorDesc) hkSupervisorDesc.innerText = isEn ? 'Receive cleaning orders and assign workers' : 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù†Ø¸Ø§ÙØ© ÙˆØ¥Ø³Ù†Ø§Ø¯ Ø¹Ù…Ø§Ù„ Ø§Ù„Ù†Ø¸Ø§ÙØ©';
 
     const hkStatusBadge = document.getElementById('hkStatusBadge');
-    if (hkStatusBadge) hkStatusBadge.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Department Active' : '<i class="fa-solid fa-broom"></i> القسم نشط';
+    if (hkStatusBadge) hkStatusBadge.innerHTML = isEn ? '<i class="fa-solid fa-broom"></i> Department Active' : '<i class="fa-solid fa-broom"></i> Ø§Ù„Ù‚Ø³Ù… Ù†Ø´Ø·';
 
     const hkRequestsTitle = document.getElementById('hkRequestsTitle');
-    if (hkRequestsTitle) hkRequestsTitle.innerHTML = isEn ? '<i class="fa-solid fa-inbox"></i> Incoming Cleaning Requests' : '<i class="fa-solid fa-inbox"></i> طلبات النظافة الواردة (Cleaning Requests)';
+    if (hkRequestsTitle) hkRequestsTitle.innerHTML = isEn ? '<i class="fa-solid fa-inbox"></i> Incoming Cleaning Requests' : '<i class="fa-solid fa-inbox"></i> Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù†Ø¸Ø§ÙØ© Ø§Ù„ÙˆØ§Ø±Ø¯Ø© (Cleaning Requests)';
 
     // 10. Odoo Card translations
     const odooSyncTitle = document.getElementById('odooSyncTitle');
-    if (odooSyncTitle) odooSyncTitle.innerHTML = isEn ? '<i class="fa-solid fa-cloud-arrow-up"></i> Odoo ERP Live Sync Center' : '<i class="fa-solid fa-cloud-arrow-up"></i> مركز مزامنة Odoo ERP المباشر';
+    if (odooSyncTitle) odooSyncTitle.innerHTML = isEn ? '<i class="fa-solid fa-cloud-arrow-up"></i> Odoo ERP Live Sync Center' : '<i class="fa-solid fa-cloud-arrow-up"></i> Ù…Ø±ÙƒØ² Ù…Ø²Ø§Ù…Ù†Ø© Odoo ERP Ø§Ù„Ù…Ø¨Ø§Ø´Ø±';
 
     const odooSyncDesc = document.getElementById('odooSyncDesc');
-    if (odooSyncDesc) odooSyncDesc.innerText = isEn ? 'Real-time synchronization with custom Odoo database to send tickets, retrieve owner names, and sync contacts.' : 'الربط اللحظي مع قاعدة بيانات Odoo المخصصة لإرسال بلاغات الصيانة، واستقبال أسماء الملاك، ومزامنة جهات الاتصال.';
+    if (odooSyncDesc) odooSyncDesc.innerText = isEn ? 'Real-time synchronization with custom Odoo database to send tickets, retrieve owner names, and sync contacts.' : 'Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ù„Ø­Ø¸ÙŠ Ù…Ø¹ Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª Odoo Ø§Ù„Ù…Ø®ØµØµØ© Ù„Ø¥Ø±Ø³Ø§Ù„ Ø¨Ù„Ø§ØºØ§Øª Ø§Ù„ØµÙŠØ§Ù†Ø©ØŒ ÙˆØ§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø£Ø³Ù…Ø§Ø¡ Ø§Ù„Ù…Ù„Ø§ÙƒØŒ ÙˆÙ…Ø²Ø§Ù…Ù†Ø© Ø¬Ù‡Ø§Øª Ø§Ù„Ø§ØªØµØ§Ù„.';
 
     const odooUrlLabel = document.getElementById('odooUrlLabel');
-    if (odooUrlLabel) odooUrlLabel.innerText = isEn ? 'Server URL:' : 'رابط السيرفر:';
+    if (odooUrlLabel) odooUrlLabel.innerText = isEn ? 'Server URL:' : 'Ø±Ø§Ø¨Ø· Ø§Ù„Ø³ÙŠØ±ÙØ±:';
 
     const odooDbLabel = document.getElementById('odooDbLabel');
-    if (odooDbLabel) odooDbLabel.innerText = isEn ? 'Database Name:' : 'اسم قاعدة البيانات:';
+    if (odooDbLabel) odooDbLabel.innerText = isEn ? 'Database Name:' : 'Ø§Ø³Ù… Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª:';
 
     const odooUserLabel = document.getElementById('odooUserLabel');
-    if (odooUserLabel) odooUserLabel.innerText = isEn ? 'User Email:' : 'البريد الإلكتروني:';
+    if (odooUserLabel) odooUserLabel.innerText = isEn ? 'User Email:' : 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ:';
 
     const odooOwnerNameLabel = document.getElementById('odooOwnerNameLabel');
-    if (odooOwnerNameLabel) odooOwnerNameLabel.innerText = isEn ? 'Fetched Name from Odoo:' : 'الاسم المسترجع من Odoo:';
+    if (odooOwnerNameLabel) odooOwnerNameLabel.innerText = isEn ? 'Fetched Name from Odoo:' : 'Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ±Ø¬Ø¹ Ù…Ù† Odoo:';
 
     const btnOdooTestConn = document.getElementById('btnOdooTestConn');
-    if (btnOdooTestConn) btnOdooTestConn.innerHTML = isEn ? '<i class="fa-solid fa-wifi"></i> Test & Activate Sync Now' : '<i class="fa-solid fa-wifi"></i> اختبار وتنشيط المزامنة الآن';
+    if (btnOdooTestConn) btnOdooTestConn.innerHTML = isEn ? '<i class="fa-solid fa-wifi"></i> Test & Activate Sync Now' : '<i class="fa-solid fa-wifi"></i> Ø§Ø®ØªØ¨Ø§Ø± ÙˆØªÙ†Ø´ÙŠØ· Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø¢Ù†';
   }
 
   requestHousekeeping(role = 'owner', customType = null, slot = null, notes = '') {
@@ -6462,30 +6283,30 @@ class UltimateFMApp {
     const isEn = this.currentLang === 'en';
     let location = '';
     let requesterName = '';
-    let type = customType || 'نظافة روتينية يومية';
+    let type = customType || 'Ù†Ø¸Ø§ÙØ© Ø±ÙˆØªÙŠÙ†ÙŠØ© ÙŠÙˆÙ…ÙŠØ©';
 
     if (role === 'owner') {
-      location = 'فيلا 104';
-      requesterName = isEn ? 'Owner (Osama Ahmed)' : 'المالك (أسامة أحمد)';
+      location = 'ÙÙŠÙ„Ø§ 104';
+      requesterName = isEn ? 'Owner (Osama Ahmed)' : 'Ø§Ù„Ù…Ø§Ù„Ùƒ (Ø£Ø³Ø§Ù…Ø© Ø£Ø­Ù…Ø¯)';
     } else if (role === 'tenant') {
-      location = 'شاليه 402';
-      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'المستأجر (أحمد زاهر)';
+      location = 'Ø´Ø§Ù„ÙŠÙ‡ 402';
+      requesterName = isEn ? 'Tenant (Ahmed Zaher)' : 'Ø§Ù„Ù…Ø³ØªØ£Ø¬Ø± (Ø£Ø­Ù…Ø¯ Ø²Ø§Ù‡Ø±)';
     } else if (role === 'commercial') {
-      location = 'محل 12 (Blue Wave)';
-      requesterName = isEn ? 'Commercial (Blue Wave)' : 'التجاري (Blue Wave)';
+      location = 'Ù…Ø­Ù„ 12 (Blue Wave)';
+      requesterName = isEn ? 'Commercial (Blue Wave)' : 'Ø§Ù„ØªØ¬Ø§Ø±ÙŠ (Blue Wave)';
     } else if (role === 'manager') {
       const select = document.getElementById('managerCleaningLocation');
-      location = select ? select.value : 'منطقة عامة';
-      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'المدير (أيمن السعيد)';
-      type = customType || 'نظافة مكان عام';
+      location = select ? select.value : 'Ù…Ù†Ø·Ù‚Ø© Ø¹Ø§Ù…Ø©';
+      requesterName = isEn ? 'Manager (Ayman El-Saeed)' : 'Ø§Ù„Ù…Ø¯ÙŠØ± (Ø£ÙŠÙ…Ù† Ø§Ù„Ø³Ø¹ÙŠØ¯)';
+      type = customType || 'Ù†Ø¸Ø§ÙØ© Ù…ÙƒØ§Ù† Ø¹Ø§Ù…';
     }
 
     const now = new Date();
     const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-    let fullDetails = `طلب خدمة نظافة وهاوس كيبينج\nنوع الخدمة المطلوب: ${type}\nالموقع: ${location}\nطالب الخدمة: ${requesterName}`;
-    if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
-    if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
+    let fullDetails = `Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ© ÙˆÙ‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬\nÙ†ÙˆØ¹ Ø§Ù„Ø®Ø¯Ù…Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨: ${type}\nØ§Ù„Ù…ÙˆÙ‚Ø¹: ${location}\nØ·Ø§Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©: ${requesterName}`;
+    if (slot) fullDetails += `\nØ§Ù„ØªÙˆÙ‚ÙŠØª Ø§Ù„Ù…ÙØ¶Ù„: ${slot}`;
+    if (notes) fullDetails += `\nÙ…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù…ÙŠÙ„: ${notes}`;
 
     const newReq = {
       id: `HK-${Math.floor(100 + Math.random() * 900)}`,
@@ -6494,7 +6315,7 @@ class UltimateFMApp {
       location: location,
       type: type,
       details: fullDetails,
-      status: 'بانتظار التخصيص',
+      status: 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ®ØµÙŠØµ',
       assignedWorker: '',
       time: timeStr
     };
@@ -6502,17 +6323,17 @@ class UltimateFMApp {
     this.housekeepingRequests.unshift(newReq);
     this.renderHousekeeping();
     this.renderTickets();
-    this.showToast(isEn ? '🧹 Housekeeping request submitted successfully!' : '🧹 تم تقديم طلب خدمة النظافة بنجاح!\nجاري المزامنة مع فريق (هاوس كيبينج) بـ Odoo...');
+    this.showToast(isEn ? 'ðŸ§¹ Housekeeping request submitted successfully!' : 'ðŸ§¹ ØªÙ… ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ø§Ù„Ù†Ø¸Ø§ÙØ© Ø¨Ù†Ø¬Ø§Ø­!\nØ¬Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ù…Ø¹ ÙØ±ÙŠÙ‚ (Ù‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬) Ø¨Ù€ Odoo...');
 
     // Sync housekeeping request as ticket to Odoo
     (async () => {
       try {
         const hkTicket = {
           id: newReq.id,
-          category: 'نظافة وهاوس كيبينج',
-          title: `خدمة نظافة: ${type} (${location})`,
+          category: 'Ù†Ø¸Ø§ÙØ© ÙˆÙ‡Ø§ÙˆØ³ ÙƒÙŠØ¨ÙŠÙ†Ø¬',
+          title: `Ø®Ø¯Ù…Ø© Ù†Ø¸Ø§ÙØ©: ${type} (${location})`,
           details: fullDetails,
-          status: 'قيد التخصيص للمشرف',
+          status: 'Ù‚ÙŠØ¯ Ø§Ù„ØªØ®ØµÙŠØµ Ù„Ù„Ù…Ø´Ø±Ù',
           bgClass: 'badge-warning',
           requester: role,
           priority: '2',
@@ -6531,13 +6352,13 @@ class UltimateFMApp {
     if (!req) return;
 
     const select = document.getElementById(`assignWorkerSelect_${id}`);
-    const worker = select ? select.value : 'عامل نظافة';
+    const worker = select ? select.value : 'Ø¹Ø§Ù…Ù„ Ù†Ø¸Ø§ÙØ©';
 
-    req.status = 'جاري العمل';
+    req.status = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„';
     req.assignedWorker = worker;
 
     this.renderHousekeeping();
-    this.showToast(isEn ? `✅ Worker ${worker} assigned successfully!` : `✅ تم تكليف عامل النظافة ${worker} بنجاح!`);
+    this.showToast(isEn ? `âœ… Worker ${worker} assigned successfully!` : `âœ… ØªÙ… ØªÙƒÙ„ÙŠÙ Ø¹Ø§Ù…Ù„ Ø§Ù„Ù†Ø¸Ø§ÙØ© ${worker} Ø¨Ù†Ø¬Ø§Ø­!`);
   }
 
   completeHousekeepingRequest(id) {
@@ -6545,9 +6366,9 @@ class UltimateFMApp {
     const req = this.housekeepingRequests.find(r => r.id === id);
     if (!req) return;
 
-    req.status = 'تم الانتهاء';
+    req.status = 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡';
     this.renderHousekeeping();
-    this.showToast(isEn ? '🧹 Cleaning task completed!' : '🧹 تم إتمام مهمة النظافة بنجاح!');
+    this.showToast(isEn ? 'ðŸ§¹ Cleaning task completed!' : 'ðŸ§¹ ØªÙ… Ø¥ØªÙ…Ø§Ù… Ù…Ù‡Ù…Ø© Ø§Ù„Ù†Ø¸Ø§ÙØ© Ø¨Ù†Ø¬Ø§Ø­!');
   }
 
   renderHousekeeping() {
@@ -6556,66 +6377,66 @@ class UltimateFMApp {
     if (!listContainer) return;
 
     const badge = document.getElementById('hkRequestsInboxBadge');
-    const pendingRequests = this.housekeepingRequests.filter(r => r.status === 'بانتظار التخصيص');
+    const pendingRequests = this.housekeepingRequests.filter(r => r.status === 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ®ØµÙŠØµ');
     if (badge) {
-      badge.innerText = isEn ? `${pendingRequests.length} pending` : `${pendingRequests.length} طلبات معلقة`;
+      badge.innerText = isEn ? `${pendingRequests.length} pending` : `${pendingRequests.length} Ø·Ù„Ø¨Ø§Øª Ù…Ø¹Ù„Ù‚Ø©`;
     }
 
     listContainer.innerHTML = '';
     if (this.housekeepingRequests.length === 0) {
-      listContainer.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No cleaning requests' : 'لا توجد طلبات نظافة حالية'}</div>`;
+      listContainer.innerHTML = `<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 15px;">${isEn ? 'No cleaning requests' : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù†Ø¸Ø§ÙØ© Ø­Ø§Ù„ÙŠØ©'}</div>`;
       return;
     }
 
     this.housekeepingRequests.forEach(req => {
       let actionHtml = '';
-      if (req.status === 'بانتظار التخصيص') {
+      if (req.status === 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ®ØµÙŠØµ') {
         actionHtml = `
           <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
             <select id="assignWorkerSelect_${req.id}" class="form-control" style="font-size: 0.72rem; padding: 4px; height: 28px; width: 60%;">
-              <option value="محمد علي">محمد علي</option>
-              <option value="أحمد حسن">أحمد حسن</option>
-              <option value="مصطفى سيد">مصطفى سيد</option>
+              <option value="Ù…Ø­Ù…Ø¯ Ø¹Ù„ÙŠ">Ù…Ø­Ù…Ø¯ Ø¹Ù„ÙŠ</option>
+              <option value="Ø£Ø­Ù…Ø¯ Ø­Ø³Ù†">Ø£Ø­Ù…Ø¯ Ø­Ø³Ù†</option>
+              <option value="Ù…ØµØ·ÙÙ‰ Ø³ÙŠØ¯">Ù…ØµØ·ÙÙ‰ Ø³ÙŠØ¯</option>
             </select>
             <button class="btn btn-primary" onclick="app.assignHousekeepingWorker('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; flex: 1; display: flex; align-items: center; justify-content: center;">
-              <i class="fa-solid fa-user-check"></i> ${isEn ? 'Assign' : 'إسناد وتكليف'}
+              <i class="fa-solid fa-user-check"></i> ${isEn ? 'Assign' : 'Ø¥Ø³Ù†Ø§Ø¯ ÙˆØªÙƒÙ„ÙŠÙ'}
             </button>
           </div>
         `;
-      } else if (req.status === 'جاري العمل') {
+      } else if (req.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„') {
         actionHtml = `
           <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.7rem; color: #00e5ff;"><i class="fa-solid fa-person-sweeping"></i> ${isEn ? 'Worker:' : 'العامل:'} ${req.assignedWorker}</span>
+            <span style="font-size: 0.7rem; color: #00e5ff;"><i class="fa-solid fa-person-sweeping"></i> ${isEn ? 'Worker:' : 'Ø§Ù„Ø¹Ø§Ù…Ù„:'} ${req.assignedWorker}</span>
             <button class="btn btn-success" onclick="app.completeHousekeepingRequest('${req.id}')" style="font-size: 0.7rem; padding: 4px 8px; height: 28px; white-space: nowrap; display: flex; align-items: center; justify-content: center;">
-              <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Complete' : 'إنهاء وإتمام'}
+              <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Complete' : 'Ø¥Ù†Ù‡Ø§Ø¡ ÙˆØ¥ØªÙ…Ø§Ù…'}
             </button>
           </div>
         `;
       } else {
         actionHtml = `
           <div style="margin-top: 6px; font-size: 0.7rem; color: #10b981;">
-            <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Completed by:' : 'تم الانتهاء بواسطة:'} <strong>${req.assignedWorker}</strong>
+            <i class="fa-solid fa-circle-check"></i> ${isEn ? 'Completed by:' : 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡ Ø¨ÙˆØ§Ø³Ø·Ø©:'} <strong>${req.assignedWorker}</strong>
           </div>
         `;
       }
 
-      const statusBadgeClass = req.status === 'تم الانتهاء' ? 'badge-success' : (req.status === 'جاري العمل' ? 'badge-cyan' : 'badge-warning');
+      const statusBadgeClass = req.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' ? 'badge-success' : (req.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„' ? 'badge-cyan' : 'badge-warning');
       const statusText = isEn 
-        ? (req.status === 'تم الانتهاء' ? 'Completed' : (req.status === 'جاري العمل' ? 'Cleaning...' : 'Pending'))
+        ? (req.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' ? 'Completed' : (req.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„' ? 'Cleaning...' : 'Pending'))
         : req.status;
 
       const typeText = isEn 
-        ? (req.type === 'نظافة داخلية' ? 'Internal Cleaning' : 'Common Area Cleaning')
+        ? (req.type === 'Ù†Ø¸Ø§ÙØ© Ø¯Ø§Ø®Ù„ÙŠØ©' ? 'Internal Cleaning' : 'Common Area Cleaning')
         : req.type;
 
       listContainer.innerHTML += `
-        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px; border-left: 4px solid ${req.status === 'تم الانتهاء' ? '#10b981' : (req.status === 'جاري العمل' ? '#00e5ff' : '#f59e0b')};">
+        <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px; border-left: 4px solid ${req.status === 'ØªÙ… Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡' ? '#10b981' : (req.status === 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¹Ù…Ù„' ? '#00e5ff' : '#f59e0b')};">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 style="font-size: 0.82rem; font-weight: 700;">${isEn ? 'Location:' : 'الموقع:'} ${req.location}</h4>
+            <h4 style="font-size: 0.82rem; font-weight: 700;">${isEn ? 'Location:' : 'Ø§Ù„Ù…ÙˆÙ‚Ø¹:'} ${req.location}</h4>
             <span class="badge ${statusBadgeClass}">${statusText}</span>
           </div>
           <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">
-            ${isEn ? 'Requester:' : 'الطالب:'} ${req.requesterName} • ${isEn ? 'Type:' : 'النوع:'} ${typeText} • ${isEn ? 'Time:' : 'الوقت:'} ${req.time}
+            ${isEn ? 'Requester:' : 'Ø§Ù„Ø·Ø§Ù„Ø¨:'} ${req.requesterName} â€¢ ${isEn ? 'Type:' : 'Ø§Ù„Ù†ÙˆØ¹:'} ${typeText} â€¢ ${isEn ? 'Time:' : 'Ø§Ù„ÙˆÙ‚Øª:'} ${req.time}
           </p>
           ${actionHtml}
         </div>
@@ -6674,49 +6495,579 @@ window.requestPermit = function(role, type) { if (window.app) window.app.request
 window.openPermitModal = function(role, type) { if (window.app) window.app.openPermitModal(role, type); };
 window.submitPermitModal = function() { if (window.app) window.app.submitPermitModal(); };
 window.approvePermit = function(id) { if (window.app) window.app.approvePermit(id); };
-window.openRateTicketModal = function(id) { if (window.app) window.app.openRateTicketModal(id); };
-window.setRatingStars = function(stars) { if (window.app) window.app.setRatingStars(stars); };
-window.submitTicketRating = function() { if (window.app) window.app.submitTicketRating(); };
-window.openEngineerWorkOrderModal = function() { if (window.app) window.app.openEngineerWorkOrderModal(); };
-window.submitEngineerWorkOrder = function() { if (window.app) window.app.submitEngineerWorkOrder(); };
-window.openInspectionModal = function(title, desc, idx) { if (window.app) window.app.openInspectionModal(title, desc, idx); };
-window.confirmInspectionSignOff = function() { if (window.app) window.app.confirmInspectionSignOff(); };
-window.openAssetScannerModal = function() { if (window.app) window.app.openAssetScannerModal(); };
-window.selectScannedAsset = function(key) { if (window.app) window.app.selectScannedAsset(key); };
-window.openAssetPassportModal = function(key) { if (window.app) window.app.openAssetPassportModal(key); };
-window.raiseWorkOrderForActiveAsset = function() { if (window.app) window.app.raiseWorkOrderForActiveAsset(); };
-window.openActiveAssetInspection = function() { if (window.app) window.app.openActiveAssetInspection(); };
-window.openNewPtwModal = function() { if (window.app) window.app.openNewPtwModal(); };
-window.submitNewPtwModal = function() { if (window.app) window.app.submitNewPtwModal(); };
-window.viewPtwDetails = function(id) { if (window.app) window.app.viewPtwDetails(id); };
-window.renderEngineerPtws = function() { if (window.app) window.app.renderEngineerPtws(); };
-window.renderDirectorPtwApprovals = function() { if (window.app) window.app.renderDirectorPtwApprovals(); };
-window.approveDirectorPtw = function(id) { if (window.app) window.app.approveDirectorPtw(id); };
-window.rejectDirectorPtw = function(id) { if (window.app) window.app.rejectDirectorPtw(id); };
-window.renderEngineerTickets = function() { if (window.app) window.app.renderEngineerTickets(); };
+// Dynamic Shared PTW State Storage (Synced between Engineer & Director)
+window._ptwPermits = [
+  {
+    id: 'PTW-HOT-9821',
+    cardId: 'ptwCard_9821',
+    type: 'hot_work',
+    typeBadge: 'ðŸ”¥ Ø£Ø¹Ù…Ø§Ù„ Ø­Ø±Ø§Ø±ÙŠØ© ÙˆÙ„Ø­Ø§Ù… (Hot Work)',
+    typeClass: 'badge-danger',
+    title: 'Ù„Ø­Ø§Ù… ÙˆØªØ¹Ø¯ÙŠÙ„ Ø®Ø· Ø³Ø­Ø¨ Ø·Ù„Ù…Ø¨Ø§Øª Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ© RO',
+    location: 'Ù…Ø­Ø·Ø© RO Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©',
+    contractor: 'Ø§Ù„Ù…Ù‚Ø§ÙˆÙ„ÙˆÙ† Ø§Ù„Ø¹Ø±Ø¨',
+    engineer: 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­',
+    safetyNotes: 'ØªÙ… ØªÙˆÙÙŠØ± Ø·ÙØ§ÙŠØ§Øª Ø§Ù„Ø­Ø±ÙŠÙ‚ØŒ ÙØ­Øµ Ù…Ù‡Ù…Ø§Øª Ø§Ù„ÙˆÙ‚Ø§ÙŠØ©ØŒ ÙˆØªØ¹ÙŠÙŠÙ† Ù…Ø±Ø§Ù‚Ø¨ Ø­Ø±ÙŠÙ‚ (Fire Watch).',
+    status: 'pending', // 'pending', 'approved', 'rejected'
+    time: 'Ø§Ù„ÙŠÙˆÙ… 09:30 Øµ'
+  },
+  {
+    id: 'PTW-LOTO-4412',
+    cardId: 'ptwCard_4412',
+    type: 'loto',
+    typeBadge: 'âš¡ Ø¹Ø²Ù„ Ø·Ø§Ù‚Ø© ÙˆÙ„ÙˆØ­Ø§Øª (LOTO)',
+    typeClass: 'badge-warning',
+    title: 'Ø¹Ø²Ù„ ÙˆØ¥Ø¹Ø§Ø¯Ø© ØªØ£Ù‡ÙŠÙ„ Ù„ÙˆØ­Ø© Ø§Ù„ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© MDB-02',
+    location: 'ØºØ±ÙØ© Ø§Ù„Ù…Ø­ÙˆÙ„Ø§Øª Ø²ÙˆÙ† 01',
+    contractor: 'Ø´Ù†Ø§ÙŠØ¯Ø± Ø¥Ù„ÙƒØªØ±ÙŠÙƒ / Ø§Ù„ØµÙŠØ§Ù†Ø© Ø§Ù„Ø°Ø§ØªÙŠØ©',
+    engineer: 'Ù…. Ø­Ø³Ø§Ù… Ø§Ù„Ù†Ø¬Ø§Ø±',
+    safetyNotes: 'ØªÙ… ØªØ±ÙƒÙŠØ¨ Ø£Ù‚ÙØ§Ù„ Ø§Ù„Ø¹Ø²Ù„ (Padlocks) ÙˆØ¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„ØªØ­Ø°ÙŠØ± ÙˆÙØ­Øµ Ø§Ù†Ø¹Ø¯Ø§Ù… Ø§Ù„Ø¬Ù‡Ø¯ ØªÙ…Ø§Ù…Ø§Ù‹.',
+    status: 'pending',
+    time: 'Ø§Ù„ÙŠÙˆÙ… 10:15 Øµ'
+  }
+];
 
-window.switchMicroTab = function(tabKey) {
+window.renderPtwPermitsUI = function() {
+  const directorInbox = document.getElementById('directorPtwInbox');
+  const engineerList = document.getElementById('engineerPtwList');
+  const pendingBadge = document.getElementById('ptwPendingBadge');
+  const engBadge = document.getElementById('engPtwCountBadge');
+
+  const pendingCount = window._ptwPermits.filter(p => p.status === 'pending').length;
+  if (pendingBadge) pendingBadge.innerText = `${pendingCount} Ø·Ù„Ø¨Ø§Øª Ù…Ø¹Ù„Ù‚Ø©`;
+  if (engBadge) engBadge.innerText = `${window._ptwPermits.length} ØªØµØ§Ø±ÙŠØ­`;
+
+  // 1. Render Director Inbox
+  if (directorInbox) {
+    directorInbox.innerHTML = '';
+    if (window._ptwPermits.length === 0) {
+      directorInbox.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 0.75rem; padding: 15px;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ Ø¹Ù…Ù„ Ø­Ø§Ù„ÙŠØ©</div>';
+    } else {
+      window._ptwPermits.forEach(p => {
+        let actionButtonsHtml = '';
+        let statusBadgeHtml = '';
+
+        if (p.status === 'pending') {
+          statusBadgeHtml = `<span class="badge badge-warning" style="font-size: 0.65rem;">Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯</span>`;
+          actionButtonsHtml = `
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <button class="btn btn-primary" onclick="approveDirectorPtw('${p.id}')" style="flex: 1; background: #059669; border: none; font-size: 0.75rem; font-weight: 700; padding: 8px; cursor: pointer;">
+                <i class="fa-solid fa-circle-check"></i> Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØ§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„ØªØµØ±ÙŠØ­
+              </button>
+              <button class="btn" onclick="rejectDirectorPtw('${p.id}')" style="flex: 1; background: rgba(225,29,72,0.1); border: 1px solid rgba(225,29,72,0.3); color: #e11d48; font-size: 0.75rem; font-weight: 700; padding: 8px; cursor: pointer;">
+                <i class="fa-solid fa-circle-xmark"></i> Ø±ÙØ¶ Ø§Ù„ØªØµØ±ÙŠØ­
+              </button>
+            </div>
+          `;
+        } else if (p.status === 'approved') {
+          statusBadgeHtml = `<span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-check"></i> Ù…Ø¹ØªÙ…Ø¯ HSE</span>`;
+          actionButtonsHtml = `
+            <div style="background: rgba(5, 150, 105, 0.08); border: 1px solid #059669; border-radius: 6px; padding: 6px 10px; font-size: 0.72rem; color: #059669; font-weight: 700;">
+              <i class="fa-solid fa-circle-check"></i> ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„ØªØµØ±ÙŠØ­ ÙˆØªÙØ¹ÙŠÙ„Ù‡ Ù…Ø¹ Ø£Ù…Ù† Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª.
+            </div>
+          `;
+        } else {
+          statusBadgeHtml = `<span class="badge badge-danger" style="font-size: 0.65rem;"><i class="fa-solid fa-xmark"></i> Ù…Ø±ÙÙˆØ¶</span>`;
+          actionButtonsHtml = `
+            <div style="background: rgba(225, 29, 72, 0.08); border: 1px solid #e11d48; border-radius: 6px; padding: 6px 10px; font-size: 0.72rem; color: #e11d48; font-weight: 700;">
+              <i class="fa-solid fa-circle-xmark"></i> ØªÙ… Ø±ÙØ¶ Ø§Ù„ØªØµØ±ÙŠØ­ ÙˆØ¥Ø¹Ø§Ø¯ØªÙ‡ Ù„Ù„Ù…Ù‡Ù†Ø¯Ø³ Ù„Ù„Ø§Ø³ØªÙŠÙØ§Ø¡.
+            </div>
+          `;
+        }
+
+        directorInbox.innerHTML += `
+          <div class="ticket-item" id="ptwCard_${p.id}" style="background: #ffffff; border: 1px solid rgba(32,39,79,0.15); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span class="badge ${p.typeClass}" style="font-size: 0.68rem;">${p.typeBadge}</span>
+                  <span style="font-weight: 800; font-size: 0.8rem; color: #20274f;">#${p.id}</span>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 700; color: #20274f; margin-top: 4px;">
+                  ${p.title}
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">
+                  Ø§Ù„Ù…ÙˆÙ‚Ø¹: <b>${p.location}</b> â€¢ Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ù…Ù‚Ø¯Ù… Ø§Ù„Ø·Ù„Ø¨: <b>${p.engineer}</b> â€¢ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ„: <b>${p.contractor}</b> (${p.time})
+                </div>
+              </div>
+              ${statusBadgeHtml}
+            </div>
+
+            <div style="background: rgba(32,39,79,0.04); border-radius: 6px; padding: 6px 8px; font-size: 0.68rem; color: #334155;">
+              <i class="fa-solid fa-list-check"></i> <b>Ø§Ø´ØªØ±Ø§Ø·Ø§Øª Ø§Ù„Ø³Ù„Ø§Ù…Ø©:</b> ${p.safetyNotes}
+            </div>
+
+            ${actionButtonsHtml}
+          </div>
+        `;
+      });
+    }
+  }
+
+  // 2. Render Engineer Screen List
+  if (engineerList) {
+    engineerList.innerHTML = '';
+    if (window._ptwPermits.length === 0) {
+      engineerList.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 0.75rem; padding: 10px;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØµØ§Ø±ÙŠØ­ ØµØ§Ø¯Ø±Ø©</div>';
+    } else {
+      window._ptwPermits.forEach(p => {
+        let statusBadge = '';
+        if (p.status === 'pending') {
+          statusBadge = `<span class="badge badge-warning" style="font-size: 0.65rem;"><i class="fa-solid fa-hourglass-half"></i> Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…ÙˆØ§ÙÙ‚Ø© Ù…Ø¯ÙŠØ± Ø§Ù„Ù‚Ø·Ø§Ø¹</span>`;
+        } else if (p.status === 'approved') {
+          statusBadge = `<span class="badge badge-success" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-check"></i> Ù…ØµØ±Ø­ Ø¨Ø§Ù„Ø¹Ù…Ù„ (Ù…Ø¹ØªÙ…Ø¯ HSE)</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-danger" style="font-size: 0.65rem;"><i class="fa-solid fa-circle-xmark"></i> Ù…Ø±ÙÙˆØ¶ Ù„Ù„Ø§Ø³ØªÙŠÙØ§Ø¡</span>`;
+        }
+
+        engineerList.innerHTML += `
+          <div class="ticket-item" style="background: #ffffff; border-right: 4px solid ${p.status === 'approved' ? '#059669' : (p.status === 'rejected' ? '#e11d48' : '#d97706')}; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 800; font-size: 0.75rem; color: #20274f;">#${p.id} â€¢ ${p.typeBadge}</span>
+              ${statusBadge}
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #334155;">${p.title}</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted);">
+              Ø§Ù„Ù…ÙˆÙ‚Ø¹: ${p.location} â€¢ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ„: ${p.contractor}
+            </div>
+          </div>
+        `;
+      });
+    }
+  }
+};
+
+window.submitEngineerPtwRequest = function() {
+  const typeSelect = document.getElementById('ptwTypeSelect');
+  const typeVal = typeSelect?.value || 'hot_work';
+  const typeText = typeSelect?.options[typeSelect.selectedIndex]?.text || 'ðŸ”¥ Ø£Ø¹Ù…Ø§Ù„ Ø­Ø±Ø§Ø±ÙŠØ© (Hot Work)';
+  const title = document.getElementById('ptwTitleInput')?.value || 'Ø·Ù„Ø¨ ØªØµØ±ÙŠØ­ Ø¹Ù…Ù„ Ø­Ø±Ø¬';
+  const location = document.getElementById('ptwLocationInput')?.value || 'Ù…Ø­Ø·Ø© Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµØ±Ù STP';
+  const contractor = document.getElementById('ptwContractorInput')?.value || 'ÙØ±ÙŠÙ‚ Ø§Ù„Ù…Ù‚Ø§ÙˆÙ„Ø§Øª Ø§Ù„Ù…ØªØ®ØµØµ';
+  const engName = document.getElementById('engineerNameText')?.innerText || 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­';
+
+  const typeClassMap = {
+    'hot_work': 'badge-danger',
+    'loto': 'badge-warning',
+    'confined_space': 'badge-cyan',
+    'heights': 'badge-info',
+    'excavation': 'badge-warning'
+  };
+
+  const codePrefixMap = {
+    'hot_work': 'PTW-HOT',
+    'loto': 'PTW-LOTO',
+    'confined_space': 'PTW-CONF',
+    'heights': 'PTW-HGHT',
+    'excavation': 'PTW-EXCAV'
+  };
+
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  const ptwId = `${codePrefixMap[typeVal] || 'PTW'}-${randomNum}`;
+
+  const newPermit = {
+    id: ptwId,
+    cardId: `ptwCard_${randomNum}`,
+    type: typeVal,
+    typeBadge: typeText,
+    typeClass: typeClassMap[typeVal] || 'badge-danger',
+    title: title,
+    location: location,
+    contractor: contractor,
+    engineer: engName,
+    safetyNotes: 'ØªÙ… Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù…Ù‡Ù…Ø§Øª Ø§Ù„ÙˆÙ‚Ø§ÙŠØ© PPE ÙˆØªØ£Ù…ÙŠÙ† Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø¹Ù…Ù„ ÙˆØ§Ù„ØªÙ†Ø³ÙŠÙ‚ Ù…Ø¹ ÙØ±ÙŠÙ‚ Ø§Ù„Ø³Ù„Ø§Ù…Ø©.',
+    status: 'pending',
+    time: 'Ø§Ù„Ø¢Ù†'
+  };
+
+  window._ptwPermits.unshift(newPermit);
+  window.renderPtwPermitsUI();
+
+  // Close modal
+  const modal = document.getElementById('modalEngineerPtwRequest');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast(`ðŸš€ ØªÙ… Ø¥ØµØ¯Ø§Ø± Ø·Ù„Ø¨ Ø§Ù„ØªØµØ±ÙŠØ­ [${ptwId}] ÙˆØªÙˆØ¬ÙŠÙ‡Ù‡ ÙÙˆØ±Ø§Ù‹ Ù„Ø´Ø§Ø´Ø© Ù…Ø¯ÙŠØ± Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„Ù‡Ù†Ø¯Ø³ÙŠ Ù„Ù„Ø§Ø¹ØªÙ…Ø§Ø¯!`);
+  }
+};
+
+window.approveDirectorPtw = function(ptwId) {
+  const permit = window._ptwPermits.find(p => p.id === ptwId);
+  if (permit) {
+    permit.status = 'approved';
+    window.renderPtwPermitsUI();
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`âœ… ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ ÙˆØªÙØ¹ÙŠÙ„ ØªØµØ±ÙŠØ­ Ø§Ù„Ø¹Ù…Ù„ [${ptwId}] Ø¨Ù†Ø¬Ø§Ø­ ÙˆØ¥Ø®Ø·Ø§Ø± Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…Ø´Ø±Ù ÙˆØ£Ù…Ù† Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª.`);
+    }
+  }
+};
+
+window.rejectDirectorPtw = function(ptwId) {
+  const permit = window._ptwPermits.find(p => p.id === ptwId);
+  if (permit) {
+    permit.status = 'rejected';
+    window.renderPtwPermitsUI();
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`âŒ ØªÙ… Ø±ÙØ¶ ØªØµØ±ÙŠØ­ Ø§Ù„Ø¹Ù…Ù„ [${ptwId}] ÙˆØ¥Ø¹Ø§Ø¯ØªÙ‡ Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ù„Ø§Ø³ØªÙŠÙØ§Ø¡ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª.`);
+    }
+  }
+};
+
+window.submitEngineerGeneralMaintenanceOrder = function() {
+  const cat = document.getElementById('engTicketCategorySelect')?.value || 'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ';
+  const loc = document.getElementById('engTicketLocationInput')?.value || 'Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© RO';
+  const priority = document.getElementById('engTicketPrioritySelect')?.value || '3';
+  const desc = document.getElementById('engTicketDescInput')?.value || 'Ø£Ù…Ø± ØµÙŠØ§Ù†Ø© Ø¹Ø§Ù…Ø© Ù„Ù„Ù…Ø±Ø§ÙÙ‚';
+  const photoInput = document.getElementById('engTicketPhotoInput');
+  const maintType = document.querySelector('input[name="engTicketMaintType"]:checked')?.value || 'corrective';
+
+  const engName = document.getElementById('engineerNameText')?.innerText || 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­';
+  const engTeam = window.app?.activeEngineerTeam?.teamName || 'MEP Team';
+  const maintenanceTeamId = window.app?.activeEngineerTeam?.teamId || 2;
+
+  const defaultPhotoMap = {
+    'ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ': 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=300&q=80',
+    'Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµØ±Ù': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
+    'Ù…ÙƒØ§ÙØ­Ø© Ø­Ø±ÙŠÙ‚': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
+    'ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆØ·Ø§Ù‚Ø©': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+    'Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ ÙˆØ±ÙŠ': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80',
+    'Ù…Ø¯Ù†ÙŠ ÙˆØ¥Ù†Ø´Ø§Ø¡Ø§Øª': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=300&q=80'
+  };
+
+  const processOrder = (photoBase64) => {
+    const randomCode = Math.floor(1000 + Math.random() * 9000);
+    const newTicket = {
+      id: `ENG-${randomCode}`,
+      title: `${cat} - ${loc}`,
+      category: cat,
+      priority: priority,
+      maintenanceType: maintType,
+      requester: 'engineer',
+      requesterName: engName,
+      unit: loc,
+      phone: '01229988776',
+      email: 'engineer.site@domain.com',
+      details: desc,
+      status: 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØªÙƒÙ„ÙŠÙ Ø§Ù„ÙÙ†ÙŠ',
+      statusHistory: [{ stage: 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØªÙƒÙ„ÙŠÙ Ø§Ù„ÙÙ†ÙŠ', time: 'Ø§Ù„Ø¢Ù†' }],
+      photoBefore: photoBase64 || defaultPhotoMap[cat] || defaultPhotoMap['ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ'],
+      maintenanceTeamId: maintenanceTeamId,
+      time: 'Ø§Ù„Ø¢Ù†',
+      createdAt: new Date().toISOString()
+    };
+
+    if (window.app) {
+      window.app.tickets.unshift(newTicket);
+      window.app.saveTicketsToStorage();
+      window.app.renderTickets();
+      if (typeof window.app.syncTicketToOdoo === 'function') {
+        window.app.syncTicketToOdoo(newTicket, '01229988776', engName);
+      }
+    }
+
+    // Close modal
+    const modal = document.getElementById('modalEngineerNewTicket');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(`ðŸš€ ØªÙ… Ø¥ØµØ¯Ø§Ø± Ø£Ù…Ø± Ø§Ù„ØµÙŠØ§Ù†Ø© [#${newTicket.id}] Ø¨Ù†Ø¬Ø§Ø­ ÙˆØªÙˆØ¬ÙŠÙ‡Ù‡ Ù„Ø´Ø§Ø´Ø© Ù…Ø¯ÙŠØ± Ø§Ù„ØµÙŠØ§Ù†Ø© ÙˆØ£ÙˆØ¯Ùˆ!`);
+    }
+  };
+
+  if (photoInput && photoInput.files && photoInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => processOrder(e.target.result);
+    reader.readAsDataURL(photoInput.files[0]);
+  } else {
+    processOrder(null);
+  }
+};
+
+window.openPlantInspectionModal = function(plantType) {
+  const modal = document.getElementById('modalPlantInspection');
+  const titleEl = document.getElementById('plantInspectModalTitle');
+  const subEl = document.getElementById('plantInspectModalSub');
+  const hiddenType = document.getElementById('plantInspectTypeHidden');
+  const fieldsContainer = document.getElementById('plantInspectDynamicFields');
+  
+  if (!modal || !fieldsContainer) return;
+  hiddenType.value = plantType;
+
+  const engName = document.getElementById('engineerNameText')?.innerText || 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­';
+  const engTeam = document.getElementById('engineerSpecialtySub')?.innerText || 'ÙØ±ÙŠÙ‚ Ø§Ù„ÙƒÙ‡Ø±ÙˆÙ…ÙŠÙƒØ§Ù†ÙŠÙƒ';
+  if (subEl) subEl.innerHTML = `Ø§Ù„Ù…Ù‡Ù†Ø¯Ø³ Ø§Ù„ÙØ§Ø­Øµ: <b>${engName}</b> â€¢ ${engTeam}`;
+
+  if (plantType === 'ro') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-droplet" style="color: #1b8f91;"></i> ÙØ­Øµ ÙˆØªØ³Ø¬ÙŠÙ„ Ù‚Ø±Ø§Ø¡Ø§Øª Ù…Ø­Ø·Ø© Ø§Ù„ØªØ­Ù„ÙŠØ© RO Plant';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ù‚Ø±Ø§Ø¡Ø© Ø¶ØºØ· Ø§Ù„Ø£ØºØ´ÙŠØ© ÙˆØ§Ù„Ù…Ø¶Ø®Ø§Øª (Operating Pressure)</label>
+        <input type="text" id="inspectField1" class="form-control" value="7.4 Bar" style="font-weight: 800; color: #1b8f91;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ù†Ø³Ø¨Ø© Ø§Ù„Ù…Ù„ÙˆØ­Ø© (TDS ppm)</label>
+          <input type="text" id="inspectField2" class="form-control" value="195 PPM" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ù…Ø¹Ø¯Ù„ Ø§Ù„Ø¥Ù†ØªØ§Ø¬ Ø§Ù„ÙŠÙˆÙ…ÙŠ</label>
+          <input type="text" id="inspectField3" class="form-control" value="4,350 Ù…Â³/ÙŠÙˆÙ…" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'stp') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-seedling" style="color: #059669;"></i> ÙØ­Øµ ÙˆØªØ³Ø¬ÙŠÙ„ Ù‚Ø±Ø§Ø¡Ø§Øª Ù…Ø­Ø·Ø© Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„ØµØ±Ù STP';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ù†Ø³Ø¨Ø© ÙƒÙØ§Ø¡Ø© Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ø«Ù„Ø§Ø«ÙŠØ© (Treatment Efficiency)</label>
+        <input type="text" id="inspectField1" class="form-control" value="99%" style="font-weight: 800; color: #059669;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ù†Ù‚Ø§Ø¡ Ù…ÙŠØ§Ù‡ Ø±ÙŠ Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨</label>
+          <input type="text" id="inspectField2" class="form-control" value="Ù…Ø·Ø§Ø¨Ù‚ Ù„Ù…ÙˆØ§ØµÙØ§Øª Ø§Ù„Ø±ÙŠ" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ù…Ø¹Ø¯Ù„ Ø§Ù„Ø¶Ø® Ù„Ø´Ø¨ÙƒØ§Øª Ø§Ù„Ø±ÙŠ</label>
+          <input type="text" id="inspectField3" class="form-control" value="1,850 Ù…Â³/ÙŠÙˆÙ…" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'fls') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-fire-extinguisher" style="color: #e11d48;"></i> ÙØ­Øµ ÙˆØ§Ø®ØªØ¨Ø§Ø± Ø´Ø¨ÙƒØ© Ø·Ù„Ù…Ø¨Ø§Øª Ø§Ù„Ø­Ø±ÙŠÙ‚ 12Bar';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ø¶ØºØ· Ø´Ø¨ÙƒØ© Ø§Ù„Ø­Ø±ÙŠÙ‚ ÙˆØ§Ù„Ø¨ÙˆØ³ØªØ± (Network Pressure)</label>
+        <input type="text" id="inspectField1" class="form-control" value="12.2 Bar" style="font-weight: 800; color: #e11d48;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø¬Ø§Ù‡Ø²ÙŠØ© Ø·Ù„Ù…Ø¨Ø© Ø§Ù„Ø¯ÙŠØ²Ù„/Ø§Ù„Ø¬ÙˆÙƒÙŠ</label>
+          <input type="text" id="inspectField2" class="form-control" value="Ø¬Ø§Ù‡Ø²ÙŠØ© 100% ØªÙ„Ù‚Ø§Ø¦ÙŠ" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ù…Ù†Ø³ÙˆØ¨ Ø®Ø²Ø§Ù† Ø§Ù„Ø­Ø±ÙŠÙ‚</label>
+          <input type="text" id="inspectField3" class="form-control" value="100% Ù…Ù…ØªÙ„Ø¦" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'electrical') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-bolt" style="color: #d97706;"></i> ÙØ­Øµ Ù…Ø­ÙˆÙ„ Ø§Ù„Ø¬Ù‡Ø¯ Ø§Ù„Ù…ØªÙˆØ³Ø· 04 ÙˆØ£ÙƒØ´Ø§Ùƒ Ø§Ù„Ø¨ÙŠÙ„Ø§Ø±Ø§Øª';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ù†Ø³Ø¨Ø© Ø§Ù„Ø­Ù…Ù„ Ø§Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ Ø§Ù„Ø­Ø§Ù„ÙŠØ© (Load Percentage)</label>
+        <input type="text" id="inspectField1" class="form-control" value="71%" style="font-weight: 800; color: #d97706;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø¯Ø±Ø¬Ø© Ø­Ø±Ø§Ø±Ø© Ø§Ù„Ø²ÙŠØª (Â°C)</label>
+          <input type="text" id="inspectField2" class="form-control" value="51Â°C Ø·Ø¨ÙŠØ¹ÙŠ" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø§Ø³ØªÙ‚Ø±Ø§Ø± Ø¬Ù‡Ø¯ Ø§Ù„ÙØ§Ø²Ø§Øª</label>
+          <input type="text" id="inspectField3" class="form-control" value="380V / 220V Ù…Ø³ØªÙ‚Ø±" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'landscape') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-seedling" style="color: #059669;"></i> ÙØ­Øµ Ø´Ø¨ÙƒØ§Øª Ø§Ù„Ø±ÙŠ Ø§Ù„Ø£ÙˆØªÙˆÙ…Ø§ØªÙŠÙƒÙŠØ© Ø¨Ø§Ù„Ù…Ø­ÙˆØ± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ø¶ØºØ· Ø®Ø·ÙˆØ· Ø§Ù„Ù†ÙˆØ§Ø²Ù„ ÙˆÙ…Ø­Ø§Ø¨Ø³ Ø§Ù„Ø³ÙˆÙ„ÙŠÙ†ÙˆÙŠØ¯</label>
+        <input type="text" id="inspectField1" class="form-control" value="4.5 Bar" style="font-weight: 800; color: #059669;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø­Ø§Ù„Ø© Ø·Ù„Ù…Ø¨Ø§Øª Ø§Ù„ØªØ³Ù…ÙŠØ¯</label>
+          <input type="text" id="inspectField2" class="form-control" value="ØªØ¹Ù…Ù„ Ø¨ÙƒÙØ§Ø¡Ø© 100%" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø±ÙŠ Ø§Ù„Ù…Ø¨Ø±Ù…Ø¬</label>
+          <input type="text" id="inspectField3" class="form-control" value="Ø¯ÙˆØ±Ø© Ù„ÙŠÙ„ÙŠØ© 6:00 Ù…" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  } else if (plantType === 'civil') {
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-cubes" style="color: #6366f1;"></i> ÙØ­Øµ Ø§Ù„Ù…Ù…Ø§Ø´ÙŠ Ø§Ù„Ø®Ø±Ø³Ø§Ù†ÙŠØ© ÙˆÙÙˆØ§ØµÙ„ Ø§Ù„ØªÙ…Ø¯Ø¯ ÙˆØ§Ù„ØªØ´Ø·ÙŠØ¨Ø§Øª';
+    fieldsContainer.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" style="font-weight: 700;">Ø­Ø§Ù„Ø© ÙÙˆØ§ØµÙ„ Ø§Ù„ØªÙ…Ø¯Ø¯ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¦ÙŠØ©</label>
+        <input type="text" id="inspectField1" class="form-control" value="Ø³Ù„ÙŠÙ…Ø© ÙˆÙ„Ø§ ÙŠÙˆØ¬Ø¯ Ù‡Ø¨ÙˆØ·" style="font-weight: 800; color: #6366f1;">
+      </div>
+      <div class="grid-2" style="gap: 8px;">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø£Ø±ØµÙØ© Ø§Ù„Ø¨Ø­ÙŠØ±Ø§Øª ÙˆØ§Ù„Ù…ØµØ¯Ø§Øª</label>
+          <input type="text" id="inspectField2" class="form-control" value="Ø¹Ø²Ù„ Ù…Ø§Ø¦ÙŠ Ø³Ù„ÙŠÙ… 100%" style="font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">Ø§Ù„Ø¨Ø±Ø¬ÙˆÙ„Ø§Øª ÙˆØ§Ù„Ù…Ø¸Ù„Ø§Øª Ø§Ù„Ø®Ø´Ø¨ÙŠØ©</label>
+          <input type="text" id="inspectField3" class="form-control" value="Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ù„Ù…ÙˆØ§ØµÙØ§Øª" style="font-weight: 700;">
+        </div>
+      </div>
+    `;
+  }
+
+  modal.classList.add('active');
+  modal.style.display = 'flex';
+};
+
+window.submitPlantInspection = function() {
+  const hiddenType = document.getElementById('plantInspectTypeHidden')?.value || 'ro';
+  const f1 = document.getElementById('inspectField1')?.value || '';
+  const f2 = document.getElementById('inspectField2')?.value || '';
+  const f3 = document.getElementById('inspectField3')?.value || '';
+  const engName = document.getElementById('engineerNameText')?.innerText || 'Ù…. Ù…Ø­Ù…ÙˆØ¯ Ø¹Ø¨Ø¯ Ø§Ù„ÙØªØ§Ø­';
+  
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+  if (hiddenType === 'ro') {
+    const valEl = document.getElementById('scadaRoVal');
+    const subEl = document.getElementById('scadaRoSub');
+    const inspEl = document.getElementById('scadaRoInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(TDS ${f2.replace(/[^\d]/g, '') || '195'})</span>`;
+    if (subEl) subEl.innerText = `Ø¥Ù†ØªØ§Ø¬ ${f3}`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #1b8f91;"></i> ÙØ­Øµ: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'stp') {
+    const valEl = document.getElementById('scadaStpVal');
+    const subEl = document.getElementById('scadaStpSub');
+    const inspEl = document.getElementById('scadaStpInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(ÙƒÙØ§Ø¡Ø© Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©)</span>`;
+    if (subEl) subEl.innerText = `Ø¶Ø® Ù…ÙŠØ§Ù‡ Ø§Ù„Ø±ÙŠ Ù„Ø´Ø¨ÙƒØ§Øª Ø§Ù„Ù„Ø§Ù†Ø¯Ø³ÙƒÙŠØ¨ (${f3})`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #059669;"></i> ÙØ­Øµ: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'fls') {
+    const valEl = document.getElementById('scadaFireVal');
+    const subEl = document.getElementById('scadaFireSub');
+    const inspEl = document.getElementById('scadaFireInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #10b981;">(Ø¬Ø§Ù‡Ø²ÙŠØ© 100%)</span>`;
+    if (subEl) subEl.innerText = `Ø¶ØºØ· Ø§Ù„Ø¨ÙˆØ³ØªØ± Ù…Ø³ØªÙ‚Ø± (${f2})`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #e11d48;"></i> ÙØ­Øµ: <b>${engName}</b> (${timeStr})`;
+  } else if (hiddenType === 'electrical') {
+    const valEl = document.getElementById('scadaTransVal');
+    const subEl = document.getElementById('scadaTransSub');
+    const inspEl = document.getElementById('scadaTransInspector');
+    if (valEl) valEl.innerHTML = `${f1} <span style="font-size: 0.7rem; color: #d97706;">(Ø§Ù„Ø­Ù…Ù„ Ø§Ù„Ø­Ø§Ù„ÙŠ)</span>`;
+    if (subEl) subEl.innerText = `Ø§Ù„Ø­Ø±Ø§Ø±Ø© ${f2}`;
+    if (inspEl) inspEl.innerHTML = `<i class="fa-solid fa-user-check" style="color: #d97706;"></i> ÙØ­Øµ: <b>${engName}</b> (${timeStr})`;
+  }
+
+  // Close modal
+  const modal = document.getElementById('modalPlantInspection');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast('âœ… ØªÙ… ØªÙˆØ«ÙŠÙ‚ ØªÙ‚Ø±ÙŠØ± Ø§Ù„ÙØ­Øµ Ø§Ù„ÙŠÙˆÙ…ÙŠ Ø¨Ù†Ø¬Ø§Ø­ ÙˆÙ…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ù‚Ø±Ø§Ø¡Ø§Øª ÙÙˆØ±Ø§Ù‹ Ù…Ø¹ Ø´Ø§Ø´Ø© Ù…Ø¯ÙŠØ± Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„Ù‡Ù†Ø¯Ø³ÙŠ!');
+  }
+};
+
+window.switchMicroTab = function(tabKey, scroll) {
   const btnCars = document.getElementById('btnMicroCars');
   const btnFamily = document.getElementById('btnMicroFamily');
   const contentCars = document.getElementById('microContentCars');
   const contentFamily = document.getElementById('microContentFamily');
 
   if (tabKey === 'cars') {
-    if (btnCars) btnCars.classList.add('active');
-    if (btnFamily) btnFamily.classList.remove('active');
+    if (btnCars) {
+      btnCars.classList.add('active');
+      btnCars.style.background = '#ffffff';
+      btnCars.style.color = '#20274f';
+    }
+    if (btnFamily) {
+      btnFamily.classList.remove('active');
+      btnFamily.style.background = 'transparent';
+      btnFamily.style.color = '#64748b';
+    }
     if (contentCars) contentCars.style.display = 'block';
     if (contentFamily) contentFamily.style.display = 'none';
   } else {
-    if (btnFamily) btnFamily.classList.add('active');
-    if (btnCars) btnCars.classList.remove('active');
+    if (btnFamily) {
+      btnFamily.classList.add('active');
+      btnFamily.style.background = '#ffffff';
+      btnFamily.style.color = '#20274f';
+    }
+    if (btnCars) {
+      btnCars.classList.remove('active');
+      btnCars.style.background = 'transparent';
+      btnCars.style.color = '#64748b';
+    }
     if (contentFamily) contentFamily.style.display = 'block';
     if (contentCars) contentCars.style.display = 'none';
+  }
+
+  if (scroll) {
+    const target = document.getElementById('microTabsCard') || document.getElementById('btnMicroCars');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (tabKey === 'cars') {
+      const inp = document.getElementById('lprPlateInput');
+      if (inp) setTimeout(function() { inp.focus(); }, 350);
+    }
+  }
+};
+
+window.requestGolfCart = function() {
+  const destSelect = document.getElementById('golfDestinationSelect');
+  const passSelect = document.getElementById('golfPassengersCount');
+  const dest = destSelect ? destSelect.value : 'Ø§Ù„Ø´Ø§Ø·Ø¦ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ';
+  const pass = passSelect ? passSelect.value : '3-4 Ø£ÙØ±Ø§Ø¯';
+
+  const tripBox = document.getElementById('activeGolfCartTripBox');
+  const tripDest = document.getElementById('golfTripDest');
+  if (tripDest) tripDest.innerText = `ÙÙŠÙ„Ø§ A146 âž” ${dest} (${pass})`;
+  if (tripBox) tripBox.style.display = 'block';
+
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast(`ðŸ›º ØªÙ… Ø§Ø³ØªØ¯Ø¹Ø§Ø¡ Ø¹Ø±Ø¨Ø© Ø§Ù„ØºÙˆÙ„Ù Ø±Ù‚Ù… #12 Ø¨Ù†Ø¬Ø§Ø­!\nØ§Ù„Ø³Ø§Ø¦Ù‚ [Ø¹Ù…Ø§Ø¯ Ù…Ù…Ø¯ÙˆØ­] ÙÙŠ Ø·Ø±ÙŠÙ‚Ù‡ Ù„ÙÙŠÙ„Ø§ A146 Ù…ØªØ¬Ù‡Ø§Ù‹ Ø¥Ù„Ù‰ [${dest}]. ÙˆØµÙˆÙ„ Ø®Ù„Ø§Ù„ 3 Ø¯Ù‚Ø§Ø¦Ù‚.`);
+  }
+};
+
+window.toggleEventRsvp = function() {
+  const btn = document.getElementById('btnEventRsvp');
+  const countText = document.getElementById('eventRsvpCountText');
+
+  if (!btn) return;
+  const isConfirmed = btn.getAttribute('data-confirmed') === 'true';
+
+  if (!isConfirmed) {
+    btn.setAttribute('data-confirmed', 'true');
+    btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> ØªÙ… ØªØ£ÙƒÙŠØ¯ Ù…Ù‚Ø¹Ø¯Ùƒ VIP`;
+    btn.style.background = '#10b981';
+    btn.style.boxShadow = '0 4px 10px rgba(16, 185, 129, 0.3)';
+    if (countText) countText.innerText = 'Ø£Ù†Øª Ùˆ 38+ Ù…Ù† Ø¬ÙŠØ±Ø§Ù†Ùƒ Ø£ÙƒØ¯ÙˆØ§ Ø§Ù„Ø­Ø¶ÙˆØ± âœ…';
+
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast('ðŸŽ‰ ØªÙ… ØªØ£ÙƒÙŠØ¯ Ù…Ù‚Ø§Ø¹Ø¯Ùƒ ÙÙŠ Ø­ÙÙ„ Ø³Ø¨Ø§Ù‚ Ø§Ù„Ù…Ø±Ø§ÙƒØ¨ Ø§Ù„Ø´Ø±Ø§Ø¹ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­!\nØªÙ… Ø¥Ø¯Ø±Ø§Ø¬ ØªØ°ÙƒØ±Ø© VIP Ø¨Ø±Ù‚Ù… Ø§Ù„ÙÙŠÙ„Ø§ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ùƒ.');
+    }
+  } else {
+    btn.setAttribute('data-confirmed', 'false');
+    btn.innerHTML = `<i class="fa-solid fa-ticket"></i> ØªØ£ÙƒÙŠØ¯ Ù…Ù‚Ø¹Ø¯ VIP`;
+    btn.style.background = '#1b8f91';
+    btn.style.boxShadow = '0 4px 10px rgba(27, 143, 145, 0.25)';
+    if (countText) countText.innerText = '38+ Ù…Ù† Ø¬ÙŠØ±Ø§Ù†Ùƒ Ø£ÙƒØ¯ÙˆØ§ Ø§Ù„Ø­Ø¶ÙˆØ±';
+
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast('â„¹ï¸ ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø­Ø¬Ø² Ø§Ù„Ù…Ù‚Ø¹Ø¯ ÙÙŠ Ø§Ù„ÙØ¹Ø§Ù„ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­.');
+    }
   }
 };
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => window.app.init());
+  document.addEventListener('DOMContentLoaded', () => {
+    window.app.init();
+    if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
+  });
 } else {
   window.app.init();
+  if (typeof window.renderPtwPermitsUI === 'function') window.renderPtwPermitsUI();
 }
-
