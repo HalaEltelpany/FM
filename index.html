@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -67,6 +67,16 @@
         p.classList.remove('active');
         p.style.setProperty('display', 'none', 'important');
       });
+      var phoneNav = document.getElementById('phoneNavbar');
+      if (phoneNav) {
+        if (role === 'homeowner' || role === 'owner' || role === 'family') {
+          phoneNav.classList.remove('hidden');
+          phoneNav.style.setProperty('display', 'flex', 'important');
+        } else {
+          phoneNav.classList.add('hidden');
+          phoneNav.style.setProperty('display', 'none', 'important');
+        }
+      }
       var targetEl = document.getElementById(targetId);
       if (targetEl) {
         targetEl.classList.add('active');
@@ -216,6 +226,7 @@
     function payForSparePart(id) { if (window.app) window.app.payForSparePart(id); }
     function handleApproveAndPay(id) { if (window.app) window.app.handleApproveAndPay(id); }
     function handleMeterRechargeSubmit() { if (window.app) window.app.handleMeterRechargeSubmit(); }
+    function openCommercialMeterModal() { if (window.app) window.app.openCommercialMeterModal(); }
     function toggleViewMode() { if (window.app) window.app.toggleViewMode(); }
     function registerLprPlate() { if (window.app) window.app.registerLprPlate(); }
     function submitFamilyMember() { if (window.app) window.app.submitFamilyMember(); }
@@ -644,25 +655,29 @@
                   </div>
 
                   <!-- VIP Entrance Code Banner (Direct from Odoo Promotion Team) -->
-                  <div id="eventVipPassBanner" style="display: none; margin-top: 10px; background: linear-gradient(135deg, #0b1320 0%, #1c2538 100%); border: 1.5px solid #d4af37; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 14px rgba(212,175,55,0.25);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                      <span style="font-size: 0.72rem; color: #d4af37; font-weight: 800;">
+                  <div id="eventVipPassBanner" style="display: none; margin-top: 10px; background: linear-gradient(135deg, #0b1320 0%, #1c2538 100%); border: 1.5px solid #d4af37; border-radius: 12px; padding: 12px 14px; box-shadow: 0 4px 14px rgba(212,175,55,0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                      <span style="font-size: 0.74rem; color: #d4af37; font-weight: 800; display: flex; align-items: center; gap: 5px;">
                         <i class="fa-solid fa-ticket"></i> تصريح دخول الحفل المعتمد (VIP Pass)
                       </span>
-                      <span class="badge badge-success" style="font-size: 0.62rem; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 6px;">
+                      <span class="badge badge-success" style="font-size: 0.62rem; background: #10b981; color: #fff; padding: 3px 8px; border-radius: 6px;">
                         مصرح بالدخول عند البوابة ✔️
                       </span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.06); padding: 8px 10px; border-radius: 8px;">
-                      <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.06); padding: 10px 12px; border-radius: 8px; gap: 12px;">
+                      <div style="flex: 1;">
                         <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 600;">كود الدخول الصادر من الإدارة (Odoo):</div>
                         <div id="eventVipPassCode" style="font-size: 1.15rem; font-weight: 900; color: #38bdf8; font-family: monospace; letter-spacing: 1px; margin-top: 2px;">
                           كود دخول الحفله #146866
                         </div>
+                        <div style="font-size: 0.65rem; color: #10b981; font-weight: 600; margin-top: 3px;">
+                          <i class="fa-solid fa-shield-halved"></i> إبراز الـ QR أو الكود لمسؤولي البوابة
+                        </div>
                       </div>
-                      <button type="button" class="btn btn-sm" onclick="app.showToast('🎫 كود الدخول الخاص بك:\n' + document.getElementById('eventVipPassCode').innerText + '\nيرجى إبراز هذا الكود أو رقم وحدتك (فيلا A104) لمنظمي البوابة.')" style="background: rgba(212,175,55,0.15); border: 1px solid #d4af37; color: #d4af37; font-size: 0.68rem; font-weight: 800; border-radius: 6px; padding: 6px 10px; margin: 0; cursor: pointer;">
-                        <i class="fa-solid fa-qrcode"></i> إبراز الكود
-                      </button>
+                      <div style="text-align: center; background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #d4af37; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onclick="if(window.app && window.app.showToast) window.app.showToast('🎫 كود وتصريح دخول الحفل:\n' + document.getElementById('eventVipPassCode').innerText + '\nفيلا A104 - مصرح بالدخول عند البوابة ✔️');" title="اضغط لعرض تفاصيل الدخول">
+                        <i class="fa-solid fa-qrcode" style="font-size: 1.8rem; color: #20274f; display: block; margin-bottom: 2px;"></i>
+                        <span style="font-size: 0.6rem; color: #1b8f91; font-weight: 800;">مسح الدخول</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1728,15 +1743,46 @@
               </div>
             </div>
             
-            <!-- Commercial Unit Header -->
-            <div class="card gold-border">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <span style="font-size: 0.75rem; color: var(--text-muted);">حساب مستأجر وحدة تجارية</span>
-                  <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--primary-gold);">مطعم وكافيه Blue Wave</h2>
-                  <p style="font-size: 0.75rem; color: var(--accent-cyan);">محل 12 • المول التجاري - المرحلة الأولى</p>
+            <!-- Commercial Luxury Hero Card (بنفس شكل وفخامة وألوان كارت المالك) -->
+            <div class="luxury-hero-card" style="margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="position: relative; cursor: pointer;" onclick="document.getElementById('commAvatarFileInput').click()" title="تغيير شعار النشاط التجاري">
+                    <img id="commHeaderAvatarImg" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=150&q=80" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                    <div style="position: absolute; bottom: -2px; right: -2px; background: #995789; color: #ffffff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 1.5px solid #ffffff;">
+                      <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <input type="file" id="commAvatarFileInput" name="commAvatarFileInput" accept="image/*" style="display: none;" onchange="app.handleCommAvatarUpload(event)">
+                  </div>
+
+                  <div>
+                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.8); font-weight: 600;">أهلاً بك 👋 (شريف محمد)</div>
+                    <h2 style="font-size: 1.05rem; font-weight: 800; color: #ffffff; margin: 2px 0 0 0;" id="commercialNameText">مطعم وكافيه Blue Wave</h2>
+                  </div>
                 </div>
-                <span class="badge badge-success"><i class="fa-solid fa-store"></i> نشاط تجاري</span>
+
+                <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); color: #ffffff; font-weight: 800; padding: 4px 10px; border-radius: 12px; font-size: 0.68rem; border: 1px solid rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 4px;">
+                  <i class="fa-solid fa-store" style="color: #48d1cc;"></i> مستأجر تجاري معتمد
+                </span>
+              </div>
+
+              <!-- Commercial Unit & Contact Info Bar -->
+              <div style="margin-top: 14px; background: rgba(0,0,0,0.25); backdrop-filter: blur(10px); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: #ffffff; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.12);">
+                <div style="font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-shop" style="color: #48d1cc; font-size: 0.9rem;"></i>
+                  <span id="commercialUnitText">محل 12</span>
+                  <span style="color: #fbcfe8; font-weight: 700; font-size: 0.72rem;">- المول التجاري (المرحلة الأولى)</span>
+                </div>
+                <div style="font-size: 0.72rem; color: rgba(255,255,255,0.9); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-phone" style="color: #48d1cc;"></i>
+                  <span id="commercialPhoneText">01112233445</span>
+                </div>
+              </div>
+
+              <!-- Mall Status & Opening Hours -->
+              <div style="margin-top: 10px; font-size: 0.68rem; color: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 5px 10px;">
+                <span><i class="fa-solid fa-door-open" style="color: #67e8f9;"></i> حالة المول والممشى: <b>مفتوح للزوار والرواد 🟢</b></span>
+                <span><i class="fa-solid fa-clock" style="color: #fde047;"></i> ساعات العمل: 10:00 ص - 02:00 ص</span>
               </div>
             </div>
 
@@ -1775,28 +1821,28 @@
               </button>
             </div>
 
-            <!-- Staff Work Permits & State Insurance -->
+            <!-- Temporary Work Permits & Commercial Labor (يروح على تيم الكومرشال) -->
             <div class="card">
               <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-id-card-clip"></i> تصاريح عمل الموظفين والتأمينات</span>
-                <span class="badge badge-info">12 موظف موثق</span>
+                <span class="card-title"><i class="fa-solid fa-id-card-clip"></i> تصاريح العمل المؤقت والعمالة التجارية</span>
+                <span class="badge badge-info">مربوط بـ Commercial Team</span>
               </div>
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
-                إصدار وتوثيق كروت تصاريح عمل العمالة وتوثيق رقم الملف التأميني للدولة.
+                إصدار تصاريح العمل المؤقتة للعمالة والمقاولين بالرقم القومي لمدة (شهر / شهرين / 3 أشهر) مع الإرسال لتيم التجاري.
               </p>
               
               <div class="list-group" style="margin-bottom: 10px;">
                 <div class="ticket-item">
                   <div>
-                    <h4 style="font-size: 0.85rem;">تصريح عمل: شيف رئيسي (أحمد السيد)</h4>
-                    <p style="font-size: 0.72rem; color: var(--text-muted);">تأمينات رقم: #INS-90412 • كود الدخول: active</p>
+                    <h4 style="font-size: 0.85rem;">تصريح عمل مؤقت: شيف رئيسي (أحمد السيد)</h4>
+                    <p style="font-size: 0.72rem; color: var(--text-muted);">الرقم القومي: 29510151203418 • الصلاحية: 3 أشهر • Odoo Commercial Team</p>
                   </div>
-                  <span class="badge badge-success">ساري</span>
+                  <span class="badge badge-success">ساري وموثق</span>
                 </div>
               </div>
 
-              <button class="btn btn-cyan" onclick="requestPermit('commercial', 'تصريح عمل موظف')">
-                <i class="fa-solid fa-user-plus"></i> إصدار تصريح عمل موظف جديد
+              <button class="btn btn-cyan" onclick="requestPermit('commercial', 'تصريح عمل مؤقت للعمالة')" style="font-size: 0.82rem; font-weight: 700; height: 40px;">
+                <i class="fa-solid fa-user-plus"></i> إصدار تصريح عمل مؤقت (شهر / شهرين / 3 أشهر)
               </button>
             </div>
 
@@ -2957,7 +3003,7 @@
   <!-- 4. Dynamic Plant & Facility Inspection Checklist Modal -->
   <div class="modal-overlay" id="modalPlantInspection">
     <div class="modal-card" style="border-top: 5px solid #1b8f91; max-width: 460px;">
-      <button class="modal-close" onclick="closeModal('modalPlantInspection')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close" onclick="closeModal('modalPlantInspection'); document.getElementById('modalPlantInspection').style.display='none';"><i class="fa-solid fa-xmark"></i></button>
       <h3 style="margin-bottom: 6px; color: #20274f;" id="plantInspectModalTitle">
         <i class="fa-solid fa-clipboard-check" style="color: #1b8f91;"></i> فحص وتسجيل قراءات المحطة
       </h3>
@@ -3197,7 +3243,7 @@
         </div>
       </div>
 
-      <button class="btn btn-primary" id="btnConfirmMeterRecharge">
+      <button class="btn btn-primary" id="btnConfirmMeterRecharge" onclick="handleMeterRechargeSubmit()">
         <i class="fa-solid fa-bolt"></i> تأكيد الشحن الفوري ونقل الرصيد للعداد
       </button>
     </div>
@@ -3800,12 +3846,17 @@
       <input type="hidden" id="permitTypeInput" value="تصريح دخول الوحدة">
 
       <div class="form-group">
-        <label for="permitVisitorNameInput" class="form-label" style="font-weight: 700; color: #20274f;">اسم الزائر / الضيف أو جهة التوريد:</label>
-        <input type="text" id="permitVisitorNameInput" class="form-control" placeholder="مثال: م. أحمد عبد الفتاح أو شركة ألبان..." style="font-size: 0.8rem; font-weight: 600;">
+        <label for="permitVisitorNameInput" class="form-label" style="font-weight: 700; color: #20274f;">اسم الزائر / العامل أو جهة التوريد:</label>
+        <input type="text" id="permitVisitorNameInput" class="form-control" placeholder="مثال: م. أحمد عبد الفتاح أو الفني محمود حسن..." style="font-size: 0.8rem; font-weight: 600;">
       </div>
 
       <div class="form-group">
-        <label for="permitVisitorPhoneInput" class="form-label" style="font-weight: 700; color: #20274f;">رقم هاتف الزائر / السائق:</label>
+        <label for="permitNationalIdInput" class="form-label" style="font-weight: 700; color: #20274f;">رقم البطاقة الشخصية / الرقم القومي (National ID):</label>
+        <input type="text" id="permitNationalIdInput" class="form-control" placeholder="14 رقم للرقم القومي أو رقم جواز السفر..." maxlength="14" style="font-size: 0.8rem; font-weight: 700; font-family: monospace; letter-spacing: 0.5px; border-color: #1b8f91;">
+      </div>
+
+      <div class="form-group">
+        <label for="permitVisitorPhoneInput" class="form-label" style="font-weight: 700; color: #20274f;">رقم هاتف العامل / السائق:</label>
         <input type="tel" id="permitVisitorPhoneInput" class="form-control" placeholder="010XXXXXXXX" style="font-size: 0.8rem;">
       </div>
 
@@ -3815,12 +3866,15 @@
       </div>
 
       <div class="form-group">
-        <label for="permitDaysSelect" class="form-label" style="font-weight: 700; color: #20274f;">مدة صلاحية التصريح:</label>
-        <select id="permitDaysSelect" class="form-control" style="font-size: 0.78rem; font-weight: 600;">
-          <option value="يوم واحد (24 ساعة)">يوم واحد (صالح 24 ساعة)</option>
+        <label for="permitDaysSelect" class="form-label" style="font-weight: 700; color: #20274f;">مدة صلاحية تصريح العمل / الزيارة:</label>
+        <select id="permitDaysSelect" class="form-control" style="font-size: 0.78rem; font-weight: 700; color: #1c2140;">
+          <option value="شهر كامل (30 يوم)">📅 شهر كامل (30 يوم)</option>
+          <option value="شهرين (60 يوم)">📅 شهرين (60 يوم)</option>
+          <option value="3 أشهر (90 يوم)">📅 3 أشهر (90 يوم)</option>
+          <option value="أسبوعين (14 يوم)">أسبوعين (14 يوم)</option>
+          <option value="أسبوع كامل (7 أيام)">أسبوع كامل (7 أيام)</option>
           <option value="3 أيام">3 أيام (عطلة نهاية الأسبوع)</option>
-          <option value="أسبوع كامل">أسبوع كامل (7 أيام)</option>
-          <option value="شهر كامل">شهر كامل (دخول متكرر)</option>
+          <option value="يوم واحد (24 ساعة)">يوم واحد (24 ساعة)</option>
         </select>
       </div>
 
@@ -4312,6 +4366,18 @@ class UltimateFMApp {
     document.querySelectorAll('.header-back-btn, [onclick="app.showRoleGrid()"], [onclick="showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
       btn.style.setProperty('display', 'inline-flex', 'important');
     });
+
+    // Show phone bottom navbar ONLY for Homeowner & Family (Resident Villa View)
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) {
+      if (['homeowner', 'family', 'owner'].includes(role)) {
+        phoneNav.classList.remove('hidden');
+        phoneNav.style.setProperty('display', 'flex', 'important');
+      } else {
+        phoneNav.classList.add('hidden');
+        phoneNav.style.setProperty('display', 'none', 'important');
+      }
+    }
 
     // Render lists on role switch
     this.renderHousekeeping();
@@ -5592,12 +5658,31 @@ class UltimateFMApp {
     this.closeModal('modalMeterRecharge');
 
     const meterTypeName = meterType === 'electricity' ? 'كهرباء' : 'مياه';
-    const meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
+    let meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
+    let unitTitle = 'فيلا A104 - المرحلة الأولى';
+    let customerPhone = '01223456789';
+    let customerName = 'حسن عيسى';
+    let requesterRole = 'homeowner';
+
+    if (this.currentRole === 'tenant') {
+      meterCode = meterType === 'electricity' ? '#EL-402' : '#WT-402';
+      unitTitle = 'شاليه C304 - المرحلة الثالثة';
+      customerPhone = '01009876543';
+      customerName = 'أحمد زاهر محمود';
+      requesterRole = 'tenant';
+    } else if (this.currentRole === 'commercial') {
+      meterCode = meterType === 'electricity' ? '#EL-COMM-12' : '#WT-COMM-12';
+      unitTitle = 'محل 12 - المول التجاري';
+      customerPhone = '01112233445';
+      customerName = 'شريف محمد (مطعم Blue Wave)';
+      requesterRole = 'commercial';
+    }
+
     const payRef = 'SYS-PAY-' + Math.floor(100000 + Math.random() * 900000);
 
     this.showToast(`⚡ تم شحن عداد ${meterTypeName} الذكي (${meterCode}) بمبلغ ${amountVal} ج.م!\nرقم المرجع المالي: #${payRef}\nجاري توثيق العملية بكشف الحساب المالي المركزي...`);
 
-    // Sync meter recharge transaction to Odoo
+    // Sync meter recharge transaction to Odoo (Team ID 12: Utilities)
     (async () => {
       try {
         const meterTicket = {
@@ -5605,14 +5690,14 @@ class UltimateFMApp {
           category: 'شحن عدادات سكنية ومرافق',
           team_id: 12,
           title: `شحن عداد ${meterTypeName}: ${meterCode}`,
-          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: فيلا A104 - المرحلة الأولى`,
+          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: ${unitTitle}`,
           status: 'تم الشحن وتحديث العداد',
           bgClass: 'badge-success',
-          requester: 'homeowner',
+          requester: requesterRole,
           priority: '1',
           createdAt: new Date().toISOString()
         };
-        await this.syncTicketToOdoo(meterTicket, '01223456789', 'حسن عيسى');
+        await this.syncTicketToOdoo(meterTicket, customerPhone, customerName);
         this.showToast(`✅ تم توثيق شحن العداد بمبلغ ${amountVal} ج.م بداخل كشف الحساب المالي المركزي برقم #${payRef}!`);
       } catch (err) {
         console.warn('[Odoo Meter Recharge Sync Error]:', err);
@@ -8171,11 +8256,12 @@ class UltimateFMApp {
     });
   }
 
-  openPermitModal(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+  openPermitModal(requester = 'homeowner', type = 'تصريح عمل مؤقت للعمالة') {
     const roleInput = document.getElementById('permitRequesterRole');
     const typeInput = document.getElementById('permitTypeInput');
     const titleEl = document.getElementById('permitModalTitle');
     const nameInput = document.getElementById('permitVisitorNameInput');
+    const nationalIdInput = document.getElementById('permitNationalIdInput');
     const phoneInput = document.getElementById('permitVisitorPhoneInput');
     const plateInput = document.getElementById('permitPlateNumInput');
 
@@ -8183,6 +8269,7 @@ class UltimateFMApp {
     if (typeInput) typeInput.value = type;
     if (titleEl) titleEl.innerText = `طلب ${type}`;
     if (nameInput) nameInput.value = '';
+    if (nationalIdInput) nationalIdInput.value = '';
     if (phoneInput) phoneInput.value = '';
     if (plateInput) plateInput.value = '';
 
@@ -8199,26 +8286,32 @@ class UltimateFMApp {
 
     try {
       const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
-      const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
+      const type = document.getElementById('permitTypeInput')?.value || 'تصريح عمل مؤقت للعمالة';
       const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
+      const nationalId = document.getElementById('permitNationalIdInput')?.value || '';
       const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
       const plate = document.getElementById('permitPlateNumInput')?.value || '';
-      const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+      const days = document.getElementById('permitDaysSelect')?.value || 'شهر كامل (30 يوم)';
 
       if (!visitorName.trim()) {
-        this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
+        this.showToast('⚠️ يرجى إدخال اسم العامل / المصرح له أولاً!');
         this._submittingPermit = false;
         return;
       }
 
-      const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
+      const isCommercial = role === 'commercial' || (type && (type.includes('عمل') || type.includes('تجاري') || type.includes('بضائع') || type.includes('منقولات')));
+      const targetTeamId = isCommercial ? 10 : 3; // Team 10: Commercial Team, Team 3: Security Team
+      const targetTeamName = isCommercial ? 'فريق إدارة الأنشطة التجارية (Commercial Team)' : 'فريق الأمن والبوابات (Security Team)';
+
+      const detailsStr = `المصرح له: ${visitorName}${nationalId ? ` • الرقم القومي: ${nationalId}` : ''}${visitorPhone ? ` • هاتف: ${visitorPhone}` : ''}${plate ? ` • اللوحة: ${plate}` : ''} • مدة التصريح: ${days} • جهة الطلب: ${isCommercial ? 'مطعم وكافيه Blue Wave (محل 12)' : 'وحدة سكنية'}`;
 
       const newPermit = {
         id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
         type: type,
-        category: 'تصريح دخول بوابات أمني',
-        title: `${type}: ${visitorName}`,
-        status: 'تحت المراجعة',
+        category: isCommercial ? 'تصريح عمل مؤقت للأنشطة التجارية' : 'تصريح دخول بوابات أمني',
+        team_id: targetTeamId,
+        title: `${type}: ${visitorName}${nationalId ? ` (${nationalId})` : ''}`,
+        status: 'تحت المراجعة والاعتماد',
         bgClass: 'badge-warning',
         requester: role,
         details: detailsStr,
@@ -8228,9 +8321,9 @@ class UltimateFMApp {
       this.permits.unshift(newPermit);
       this.renderTickets();
       this.closeModal('modalRequestPermit');
-      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
+      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}!\nالطلب مسجل لدى ${targetTeamName} في Odoo للمراجعة والاعتماد.`);
 
-      // Live Sync to Odoo Security Team
+      // Live Sync to Odoo (Commercial Team ID: 10 or Security Team ID: 3)
       this.syncTicketToOdoo(newPermit, visitorPhone, visitorName).catch(pErr => {
         console.warn('[Odoo Permit Sync Exception]:', pErr);
       });
@@ -8807,10 +8900,6 @@ class UltimateFMApp {
     }
   }
 
-  openCommercialMeterModal() {
-    this.openModal('modalMeterRecharge');
-  }
-
   setEmaarTicketFilter(filterState) {
     this._emaarTicketFilter = filterState || 'active';
     this.renderTickets();
@@ -9035,6 +9124,22 @@ class UltimateFMApp {
 
       // Sync avatar photo to Odoo res.partner (image_1920)
       this.syncOwnerAvatarToOdoo(base64);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handleCommAvatarUpload(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      const imgEl = document.getElementById('commHeaderAvatarImg');
+      if (imgEl) imgEl.src = base64;
+
+      safeStorage.setItem('comm_avatar_img', base64);
+      this.showToast('✅ تم رفع وتحديث شعار النشاط التجاري بنجاح!');
     };
     reader.readAsDataURL(file);
   }
@@ -9303,7 +9408,10 @@ class UltimateFMApp {
 
   closeModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.remove('active');
+    if (el) {
+      el.classList.remove('active');
+      el.style.display = 'none';
+    }
   }
 
   updateClock() {
@@ -9630,6 +9738,11 @@ class UltimateFMApp {
           btnRsvp.setAttribute('data-confirmed', 'true');
           btnRsvp.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تأكيد الحضور`;
           btnRsvp.style.background = '#10b981';
+        }
+        const savedCode = safeStorage.getItem('event_rsvp_confirmed_code');
+        if (savedCode && banner && codeEl) {
+          codeEl.innerText = savedCode;
+          banner.style.display = 'block';
         }
 
         const replies = await this.fetchTicketRepliesFromOdoo(odooTicketId);
@@ -9988,7 +10101,7 @@ class UltimateFMApp {
     //
 
     this.switchRole(role);
-    if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
+    if (['homeowner', 'family'].includes(role)) {
       this.switchHomeownerTab('home');
     }
     
@@ -10000,7 +10113,7 @@ class UltimateFMApp {
     // Show phone bottom navbar only if resident role
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
-      if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
+      if (['homeowner', 'family'].includes(role)) {
         phoneNav.classList.remove('hidden');
         phoneNav.style.setProperty('display', 'flex', 'important');
       } else {
@@ -11419,8 +11532,29 @@ class UltimateFMApp {
     if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
     if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
 
+    const hkIdNum = Math.floor(1000 + Math.random() * 9000);
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const newTicket = {
+      id: `HK-${hkIdNum}`,
+      title: `خدمة نظافة: ${type} (${location})`,
+      category: 'نظافة وهاوس كيبينج',
+      team_id: 5,
+      priority: '2',
+      details: fullDetails,
+      status: 'جديد',
+      bgClass: 'badge-warning',
+      requester: role === 'family' ? 'family' : (role === 'tenant' ? 'tenant' : (role === 'commercial' ? 'commercial' : 'homeowner')),
+      assignedTech: '',
+      photoBefore: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=300&q=80',
+      photoAfter: '',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr
+    };
+
     const newReq = {
-      id: `HK-${Math.floor(100 + Math.random() * 900)}`,
+      id: newTicket.id,
       requester: role,
       requesterName: requesterName,
       location: location,
@@ -11431,6 +11565,8 @@ class UltimateFMApp {
       time: timeStr
     };
 
+    this.tickets.unshift(newTicket);
+    this.saveTicketsToStorage();
     this.housekeepingRequests.unshift(newReq);
     this.renderHousekeeping();
     this.renderTickets();
@@ -11565,7 +11701,8 @@ window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role)
 window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
 window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
 window.openModal = function(id) { if (window.app) window.app.openModal(id); };
-window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
+window.closeModal = function(id) { const el = document.getElementById(id); if (el) { el.classList.remove('active'); el.style.display = 'none'; } if (window.app && typeof window.app.closeModal === 'function') window.app.closeModal(id); };
+window.openCommercialMeterModal = function() { if (window.app) window.app.openCommercialMeterModal(); };
 window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
 window.setLanguage = function(lang) { if (window.app) window.app.setLanguage(lang); };
 window.switchHomeownerTab = function(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); };
@@ -12166,8 +12303,17 @@ window.toggleEventRsvp = async function() {
       }
     }
 
+    // Immediately show VIP Pass banner with QR & entrance code
+    const banner = document.getElementById('eventVipPassBanner');
+    const codeEl = document.getElementById('eventVipPassCode');
+    if (banner && codeEl) {
+      codeEl.innerText = `كود دخول الحفله #${passCode}`;
+      banner.style.display = 'block';
+    }
+    safeStorage.setItem('event_rsvp_confirmed_code', `كود دخول الحفله #${passCode}`);
+
     if (window.app && typeof window.app.showToast === 'function') {
-      window.app.showToast(`🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\n\nبيانات التسجيل المعتمدة:\n• الاسم: ${ownerName}\n• الوحدة: ${unitNum}\n• الموبايل: ${phoneNum}\n• كود الدخول: #${passCode}\n\nتم إرسال بياناتك تلقائياً إلى فريق الفعاليات (Promotion Team) على بوابة الحفل لضمان دخول سلس ومرحّب بك ⭐.`);
+      window.app.showToast(`🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\n\nبيانات التسجيل المعتمدة:\n• الاسم: ${ownerName}\n• الوحدة: ${unitNum}\n• الموبايل: ${phoneNum}\n• كود الدخول: #${passCode}\n\nتم إصدار كود الدخول ورمز الـ QR المعتمد وتوجيه بياناتك لفريق الفعاليات (Promotion Team) بالبوابة ✔️.`);
     }
   } else {
     btn.setAttribute('data-confirmed', 'false');
@@ -12190,6 +12336,12 @@ window.toggleEventRsvp = async function() {
     if (window.app && typeof window.app.syncTicketToOdoo === 'function') {
       window.app.syncTicketToOdoo(cancelTicket, phoneNum, ownerName).catch(e => console.warn(e));
     }
+
+    // Hide VIP Pass banner upon cancellation
+    const banner = document.getElementById('eventVipPassBanner');
+    if (banner) banner.style.display = 'none';
+    safeStorage.removeItem('event_rsvp_confirmed_code');
+    safeStorage.removeItem('active_rsvp_ticket_id');
 
     if (window.app && typeof window.app.showToast === 'function') {
       window.app.showToast(`ℹ️ تم إلغاء تأكيد حضور الفعالية.\nتم تحديث القائمة لدى فريق الفعاليات (Promotion Team). نرجو رؤيتكم في فعاليات قادمة!`);

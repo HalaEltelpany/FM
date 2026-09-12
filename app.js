@@ -479,6 +479,18 @@ class UltimateFMApp {
       btn.style.setProperty('display', 'inline-flex', 'important');
     });
 
+    // Show phone bottom navbar ONLY for Homeowner & Family (Resident Villa View)
+    const phoneNav = document.getElementById('phoneNavbar');
+    if (phoneNav) {
+      if (['homeowner', 'family', 'owner'].includes(role)) {
+        phoneNav.classList.remove('hidden');
+        phoneNav.style.setProperty('display', 'flex', 'important');
+      } else {
+        phoneNav.classList.add('hidden');
+        phoneNav.style.setProperty('display', 'none', 'important');
+      }
+    }
+
     // Render lists on role switch
     this.renderHousekeeping();
     this.renderLandscaping();
@@ -1758,12 +1770,31 @@ class UltimateFMApp {
     this.closeModal('modalMeterRecharge');
 
     const meterTypeName = meterType === 'electricity' ? 'كهرباء' : 'مياه';
-    const meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
+    let meterCode = meterType === 'electricity' ? '#EL-104' : '#WT-104';
+    let unitTitle = 'فيلا A104 - المرحلة الأولى';
+    let customerPhone = '01223456789';
+    let customerName = 'حسن عيسى';
+    let requesterRole = 'homeowner';
+
+    if (this.currentRole === 'tenant') {
+      meterCode = meterType === 'electricity' ? '#EL-402' : '#WT-402';
+      unitTitle = 'شاليه C304 - المرحلة الثالثة';
+      customerPhone = '01009876543';
+      customerName = 'أحمد زاهر محمود';
+      requesterRole = 'tenant';
+    } else if (this.currentRole === 'commercial') {
+      meterCode = meterType === 'electricity' ? '#EL-COMM-12' : '#WT-COMM-12';
+      unitTitle = 'محل 12 - المول التجاري';
+      customerPhone = '01112233445';
+      customerName = 'شريف محمد (مطعم Blue Wave)';
+      requesterRole = 'commercial';
+    }
+
     const payRef = 'SYS-PAY-' + Math.floor(100000 + Math.random() * 900000);
 
     this.showToast(`⚡ تم شحن عداد ${meterTypeName} الذكي (${meterCode}) بمبلغ ${amountVal} ج.م!\nرقم المرجع المالي: #${payRef}\nجاري توثيق العملية بكشف الحساب المالي المركزي...`);
 
-    // Sync meter recharge transaction to Odoo
+    // Sync meter recharge transaction to Odoo (Team ID 12: Utilities)
     (async () => {
       try {
         const meterTicket = {
@@ -1771,14 +1802,14 @@ class UltimateFMApp {
           category: 'شحن عدادات سكنية ومرافق',
           team_id: 12,
           title: `شحن عداد ${meterTypeName}: ${meterCode}`,
-          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: فيلا A104 - المرحلة الأولى`,
+          details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: ${unitTitle}`,
           status: 'تم الشحن وتحديث العداد',
           bgClass: 'badge-success',
-          requester: 'homeowner',
+          requester: requesterRole,
           priority: '1',
           createdAt: new Date().toISOString()
         };
-        await this.syncTicketToOdoo(meterTicket, '01223456789', 'حسن عيسى');
+        await this.syncTicketToOdoo(meterTicket, customerPhone, customerName);
         this.showToast(`✅ تم توثيق شحن العداد بمبلغ ${amountVal} ج.م بداخل كشف الحساب المالي المركزي برقم #${payRef}!`);
       } catch (err) {
         console.warn('[Odoo Meter Recharge Sync Error]:', err);
@@ -4337,11 +4368,12 @@ class UltimateFMApp {
     });
   }
 
-  openPermitModal(requester = 'homeowner', type = 'تصريح دخول الوحدة') {
+  openPermitModal(requester = 'homeowner', type = 'تصريح عمل مؤقت للعمالة') {
     const roleInput = document.getElementById('permitRequesterRole');
     const typeInput = document.getElementById('permitTypeInput');
     const titleEl = document.getElementById('permitModalTitle');
     const nameInput = document.getElementById('permitVisitorNameInput');
+    const nationalIdInput = document.getElementById('permitNationalIdInput');
     const phoneInput = document.getElementById('permitVisitorPhoneInput');
     const plateInput = document.getElementById('permitPlateNumInput');
 
@@ -4349,6 +4381,7 @@ class UltimateFMApp {
     if (typeInput) typeInput.value = type;
     if (titleEl) titleEl.innerText = `طلب ${type}`;
     if (nameInput) nameInput.value = '';
+    if (nationalIdInput) nationalIdInput.value = '';
     if (phoneInput) phoneInput.value = '';
     if (plateInput) plateInput.value = '';
 
@@ -4365,26 +4398,32 @@ class UltimateFMApp {
 
     try {
       const role = document.getElementById('permitRequesterRole')?.value || 'homeowner';
-      const type = document.getElementById('permitTypeInput')?.value || 'تصريح دخول الوحدة';
+      const type = document.getElementById('permitTypeInput')?.value || 'تصريح عمل مؤقت للعمالة';
       const visitorName = document.getElementById('permitVisitorNameInput')?.value || '';
+      const nationalId = document.getElementById('permitNationalIdInput')?.value || '';
       const visitorPhone = document.getElementById('permitVisitorPhoneInput')?.value || '';
       const plate = document.getElementById('permitPlateNumInput')?.value || '';
-      const days = document.getElementById('permitDaysSelect')?.value || 'يوم واحد';
+      const days = document.getElementById('permitDaysSelect')?.value || 'شهر كامل (30 يوم)';
 
       if (!visitorName.trim()) {
-        this.showToast('⚠️ يرجى إدخال اسم الزائر أو الضيف أو جهة التوريد أولاً!');
+        this.showToast('⚠️ يرجى إدخال اسم العامل / المصرح له أولاً!');
         this._submittingPermit = false;
         return;
       }
 
-      const detailsStr = `الزائر: ${visitorName} ${visitorPhone ? `• هاتف: ${visitorPhone}` : ''} ${plate ? `• اللوحة: ${plate}` : ''} • الصلاحية: ${days}`;
+      const isCommercial = role === 'commercial' || (type && (type.includes('عمل') || type.includes('تجاري') || type.includes('بضائع') || type.includes('منقولات')));
+      const targetTeamId = isCommercial ? 10 : 3; // Team 10: Commercial Team, Team 3: Security Team
+      const targetTeamName = isCommercial ? 'فريق إدارة الأنشطة التجارية (Commercial Team)' : 'فريق الأمن والبوابات (Security Team)';
+
+      const detailsStr = `المصرح له: ${visitorName}${nationalId ? ` • الرقم القومي: ${nationalId}` : ''}${visitorPhone ? ` • هاتف: ${visitorPhone}` : ''}${plate ? ` • اللوحة: ${plate}` : ''} • مدة التصريح: ${days} • جهة الطلب: ${isCommercial ? 'مطعم وكافيه Blue Wave (محل 12)' : 'وحدة سكنية'}`;
 
       const newPermit = {
         id: 'PR-' + Math.floor(1000 + Math.random() * 9000),
         type: type,
-        category: 'تصريح دخول بوابات أمني',
-        title: `${type}: ${visitorName}`,
-        status: 'تحت المراجعة',
+        category: isCommercial ? 'تصريح عمل مؤقت للأنشطة التجارية' : 'تصريح دخول بوابات أمني',
+        team_id: targetTeamId,
+        title: `${type}: ${visitorName}${nationalId ? ` (${nationalId})` : ''}`,
+        status: 'تحت المراجعة والاعتماد',
         bgClass: 'badge-warning',
         requester: role,
         details: detailsStr,
@@ -4394,9 +4433,9 @@ class UltimateFMApp {
       this.permits.unshift(newPermit);
       this.renderTickets();
       this.closeModal('modalRequestPermit');
-      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}\nالطلب قيد المراجعة حالياً من قبل فريق أمن وبوابات القرية.`);
+      this.showToast(`✅ تم تقديم طلب التصريح بنجاح رقم #${newPermit.id}!\nالطلب مسجل لدى ${targetTeamName} في Odoo للمراجعة والاعتماد.`);
 
-      // Live Sync to Odoo Security Team
+      // Live Sync to Odoo (Commercial Team ID: 10 or Security Team ID: 3)
       this.syncTicketToOdoo(newPermit, visitorPhone, visitorName).catch(pErr => {
         console.warn('[Odoo Permit Sync Exception]:', pErr);
       });
@@ -4973,10 +5012,6 @@ class UltimateFMApp {
     }
   }
 
-  openCommercialMeterModal() {
-    this.openModal('modalMeterRecharge');
-  }
-
   setEmaarTicketFilter(filterState) {
     this._emaarTicketFilter = filterState || 'active';
     this.renderTickets();
@@ -5201,6 +5236,22 @@ class UltimateFMApp {
 
       // Sync avatar photo to Odoo res.partner (image_1920)
       this.syncOwnerAvatarToOdoo(base64);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handleCommAvatarUpload(event) {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      const imgEl = document.getElementById('commHeaderAvatarImg');
+      if (imgEl) imgEl.src = base64;
+
+      safeStorage.setItem('comm_avatar_img', base64);
+      this.showToast('✅ تم رفع وتحديث شعار النشاط التجاري بنجاح!');
     };
     reader.readAsDataURL(file);
   }
@@ -5469,7 +5520,10 @@ class UltimateFMApp {
 
   closeModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.remove('active');
+    if (el) {
+      el.classList.remove('active');
+      el.style.display = 'none';
+    }
   }
 
   updateClock() {
@@ -5796,6 +5850,11 @@ class UltimateFMApp {
           btnRsvp.setAttribute('data-confirmed', 'true');
           btnRsvp.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تأكيد الحضور`;
           btnRsvp.style.background = '#10b981';
+        }
+        const savedCode = safeStorage.getItem('event_rsvp_confirmed_code');
+        if (savedCode && banner && codeEl) {
+          codeEl.innerText = savedCode;
+          banner.style.display = 'block';
         }
 
         const replies = await this.fetchTicketRepliesFromOdoo(odooTicketId);
@@ -6154,7 +6213,7 @@ class UltimateFMApp {
     //
 
     this.switchRole(role);
-    if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
+    if (['homeowner', 'family'].includes(role)) {
       this.switchHomeownerTab('home');
     }
     
@@ -6166,7 +6225,7 @@ class UltimateFMApp {
     // Show phone bottom navbar only if resident role
     const phoneNav = document.getElementById('phoneNavbar');
     if (phoneNav) {
-      if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
+      if (['homeowner', 'family'].includes(role)) {
         phoneNav.classList.remove('hidden');
         phoneNav.style.setProperty('display', 'flex', 'important');
       } else {
@@ -7585,8 +7644,29 @@ class UltimateFMApp {
     if (slot) fullDetails += `\nالتوقيت المفضل: ${slot}`;
     if (notes) fullDetails += `\nملاحظات وتفاصيل العميل: ${notes}`;
 
+    const hkIdNum = Math.floor(1000 + Math.random() * 9000);
+    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const newTicket = {
+      id: `HK-${hkIdNum}`,
+      title: `خدمة نظافة: ${type} (${location})`,
+      category: 'نظافة وهاوس كيبينج',
+      team_id: 5,
+      priority: '2',
+      details: fullDetails,
+      status: 'جديد',
+      bgClass: 'badge-warning',
+      requester: role === 'family' ? 'family' : (role === 'tenant' ? 'tenant' : (role === 'commercial' ? 'commercial' : 'homeowner')),
+      assignedTech: '',
+      photoBefore: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=300&q=80',
+      photoAfter: '',
+      createdAt: now,
+      dateStr: dateStr,
+      timeStr: timeStr
+    };
+
     const newReq = {
-      id: `HK-${Math.floor(100 + Math.random() * 900)}`,
+      id: newTicket.id,
       requester: role,
       requesterName: requesterName,
       location: location,
@@ -7597,6 +7677,8 @@ class UltimateFMApp {
       time: timeStr
     };
 
+    this.tickets.unshift(newTicket);
+    this.saveTicketsToStorage();
     this.housekeepingRequests.unshift(newReq);
     this.renderHousekeeping();
     this.renderTickets();
@@ -7731,7 +7813,7 @@ window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role)
 window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
 window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
 window.openModal = function(id) { if (window.app) window.app.openModal(id); };
-window.closeModal = function(id) { if (window.app) window.app.closeModal(id); };
+window.closeModal = function(id) { const el = document.getElementById(id); if (el) { el.classList.remove('active'); el.style.display = 'none'; } if (window.app && typeof window.app.closeModal === 'function') window.app.closeModal(id); };
 window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
 window.setLanguage = function(lang) { if (window.app) window.app.setLanguage(lang); };
 window.switchHomeownerTab = function(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); };
@@ -8332,8 +8414,17 @@ window.toggleEventRsvp = async function() {
       }
     }
 
+    // Immediately show VIP Pass banner with QR & entrance code
+    const banner = document.getElementById('eventVipPassBanner');
+    const codeEl = document.getElementById('eventVipPassCode');
+    if (banner && codeEl) {
+      codeEl.innerText = `كود دخول الحفله #${passCode}`;
+      banner.style.display = 'block';
+    }
+    safeStorage.setItem('event_rsvp_confirmed_code', `كود دخول الحفله #${passCode}`);
+
     if (window.app && typeof window.app.showToast === 'function') {
-      window.app.showToast(`🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\n\nبيانات التسجيل المعتمدة:\n• الاسم: ${ownerName}\n• الوحدة: ${unitNum}\n• الموبايل: ${phoneNum}\n• كود الدخول: #${passCode}\n\nتم إرسال بياناتك تلقائياً إلى فريق الفعاليات (Promotion Team) على بوابة الحفل لضمان دخول سلس ومرحّب بك ⭐.`);
+      window.app.showToast(`🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\n\nبيانات التسجيل المعتمدة:\n• الاسم: ${ownerName}\n• الوحدة: ${unitNum}\n• الموبايل: ${phoneNum}\n• كود الدخول: #${passCode}\n\nتم إصدار كود الدخول ورمز الـ QR المعتمد وتوجيه بياناتك لفريق الفعاليات (Promotion Team) بالبوابة ✔️.`);
     }
   } else {
     btn.setAttribute('data-confirmed', 'false');
@@ -8356,6 +8447,12 @@ window.toggleEventRsvp = async function() {
     if (window.app && typeof window.app.syncTicketToOdoo === 'function') {
       window.app.syncTicketToOdoo(cancelTicket, phoneNum, ownerName).catch(e => console.warn(e));
     }
+
+    // Hide VIP Pass banner upon cancellation
+    const banner = document.getElementById('eventVipPassBanner');
+    if (banner) banner.style.display = 'none';
+    safeStorage.removeItem('event_rsvp_confirmed_code');
+    safeStorage.removeItem('active_rsvp_ticket_id');
 
     if (window.app && typeof window.app.showToast === 'function') {
       window.app.showToast(`ℹ️ تم إلغاء تأكيد حضور الفعالية.\nتم تحديث القائمة لدى فريق الفعاليات (Promotion Team). نرجو رؤيتكم في فعاليات قادمة!`);
