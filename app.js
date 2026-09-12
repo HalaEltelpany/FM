@@ -1166,6 +1166,9 @@ class UltimateFMApp {
   }
 
   resolveOdooTeamId(ticket) {
+    if (ticket.team_id) return parseInt(ticket.team_id);
+    if (ticket.teamId) return parseInt(ticket.teamId);
+
     const normalize = (s) => String(s || '').toLowerCase()
       .replace(/[أإآ]/g, 'ا')
       .replace(/ة/g, 'ه')
@@ -1195,15 +1198,27 @@ class UltimateFMApp {
     if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
       return 3;
     }
-    // 5. Accounting (ID 4)
+    // 5. Utilities Team (ID 12) - العدادات حصراً (شحن، كروت، قراءات، فحص واستبدال عدادات)
+    if (combinedNorm.includes('عداد') || combinedNorm.includes('كارت') || combinedNorm.includes('شحن عداد') || combinedNorm.includes('رصيد عداد') || combinedNorm.includes('شحن كارت') || combinedNorm.includes('قراءه عداد') || combinedNorm.includes('فحص عداد') || combinedNorm.includes('meter') || combinedNorm.includes('utility') || combinedNorm.includes('utilities')) {
+      return 12;
+    }
+    // 6. Accounting Team (ID 4) - فواتير الصيانة، الأقساط، المطالبات والوديعة (دون العدادات)
     if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('سداد') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
       return 4;
     }
-    // 6. Maintenance (ID 2)
-    if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
+    // 7. Commercial Team (ID 10) - الأنشطة والمحلات التجارية
+    if (ticket.requester === 'commercial' || combinedNorm.includes('تجاري') || combinedNorm.includes('محل') || combinedNorm.includes('كافيه') || combinedNorm.includes('مطعم') || combinedNorm.includes('مول') || combinedNorm.includes('commercial')) {
+      return 10;
+    }
+    // 8. Community Team (ID 9) - خدمة المجتمع، الفعاليات، الكلوب هاوس، والملاعب
+    if (combinedNorm.includes('مجتمع') || combinedNorm.includes('كلوب هاوس') || combinedNorm.includes('نادي') || combinedNorm.includes('ملعب') || combinedNorm.includes('فعالي') || combinedNorm.includes('اقتراح') || combinedNorm.includes('community') || combinedNorm.includes('clubhouse')) {
+      return 9;
+    }
+    // 9. Maintenance Team (ID 2) - الصيانة الفنية الهندسية الكهروميكانيكية
+    if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('طلمب') || combinedNorm.includes('مسبح') || combinedNorm.includes('maintenance')) {
       return 2;
     }
-    // 7. Customer Care (ID 1) - Default
+    // 10. Customer Care (ID 1) - الافتراضي للاستفسارات العامة
     return 1;
   }
 
@@ -1753,6 +1768,7 @@ class UltimateFMApp {
         const meterTicket = {
           id: 'MTR-' + Math.floor(1000 + Math.random() * 9000),
           category: 'شحن عدادات سكنية ومرافق',
+          team_id: 12,
           title: `شحن عداد ${meterTypeName}: ${meterCode}`,
           details: `عملية شحن عداد مرافق ذكي مسبق الدفع\nنوع العداد: ${meterTypeName} (${meterCode})\nالمبلغ المشحون: ${amountVal} ج.م\nرقم المرجع المالي: #${payRef}\nالوحدة: فيلا A104 - المرحلة الأولى`,
           status: 'تم الشحن وتحديث العداد',
@@ -4120,6 +4136,7 @@ class UltimateFMApp {
       id: `PC-${Math.floor(1000 + Math.random() * 9000)}`,
       title: `مكافحة آفات: ${type} (${location})`,
       category: 'مكافحة الآفات والرش الوقائي',
+      team_id: 8,
       priority: '2',
       details: fullDetails,
       status: 'جديد',
@@ -5364,6 +5381,7 @@ class UltimateFMApp {
       id: `LS-${Math.floor(1000 + Math.random() * 9000)}`,
       title: `خدمة لاندسكيب: ${type} (${location})`,
       category: 'صيانة الحدائق واللاندسكيب',
+      team_id: 7,
       priority: '2',
       details: fullDetails,
       status: 'جديد',
@@ -5552,6 +5570,7 @@ class UltimateFMApp {
     console.log(`[Odoo Sync] Syncing Security Emergency Complaint for ${name} (${phone}): ${details}`);
     const secTicket = {
       category: 'بلاغ أمني طارئ',
+      team_id: 3,
       title: `بلاغ أمني عاجل: ${details.substring(0, 35)}`,
       details: `بلاغ أمني عاجل من: ${name}\nرقم الموبايل: ${phone}\nتفاصيل البلاغ: ${details}`,
       priority: '3' // ⭐⭐⭐ Red Alert High Priority
@@ -5707,6 +5726,7 @@ class UltimateFMApp {
     const finTicket = {
       id: 'FIN-' + Math.floor(1000 + Math.random() * 9000),
       category: 'استفسار مالي وحسابات',
+      team_id: 4,
       title: `استفسار مالي: ${type}`,
       details: `مقدم الاستفسار: ${name}\nرقم الموبايل: ${phone}\nموضوع الاستفسار: ${type}\nالتفاصيل: ${details}`,
       status: 'قيد الفحص والرد من الحسابات',
@@ -7487,6 +7507,7 @@ class UltimateFMApp {
         const hkTicket = {
           id: newReq.id,
           category: 'نظافة وهاوس كيبينج',
+          team_id: 5,
           title: `خدمة نظافة: ${type} (${location})`,
           details: fullDetails,
           status: 'قيد التخصيص للمشرف',
@@ -8133,17 +8154,55 @@ window.requestGolfCart = function() {
   if (tripDest) tripDest.innerText = `فيلا A146 ➔ ${dest} (${pass})`;
   if (tripBox) tripBox.style.display = 'block';
 
+  const golfTicket = {
+    id: 'GOLF-' + Math.floor(1000 + Math.random() * 9000),
+    category: 'طلب عربة غولف أمنية وتوصيل داخلي',
+    team_id: 3,
+    title: `طلب عربة غولف: فيلا A146 إلى ${dest}`,
+    details: `طلب نقل وتوصيل داخلي بعربة غولف\nالوجهة: ${dest}\nعدد الركاب: ${pass}\nالموقع: فيلا A146`,
+    priority: '2',
+    requester: window.app ? window.app.currentRole : 'homeowner'
+  };
+
+  if (window.app && typeof window.app.syncTicketToOdoo === 'function') {
+    window.app.syncTicketToOdoo(golfTicket, '01223456789', 'حسن عيسى').catch(e => console.warn(e));
+  }
+
   if (window.app && typeof window.app.showToast === 'function') {
-    window.app.showToast(`🛺 تم استدعاء عربة الغولف رقم #12 بنجاح!\nالسائق [عماد ممدوح] في طريقه لفيلا A146 متجهاً إلى [${dest}]. وصول خلال 3 دقائق.`);
+    window.app.showToast(`🛺 تم استدعاء عربة الغولف رقم #12 بنجاح!\nالسائق [عماد ممدوح] في طريقه لفيلا A146 متجهاً إلى [${dest}]. وصول خلال 3 دقائق.\nتم إشعار غرفة عمليات الأمن (Security Team).`);
   }
 };
 
-window.toggleEventRsvp = function() {
+window.toggleEventRsvp = async function() {
   const btn = document.getElementById('btnEventRsvp');
   const countText = document.getElementById('eventRsvpCountText');
 
   if (!btn) return;
   const isConfirmed = btn.getAttribute('data-confirmed') === 'true';
+
+  let ownerName = 'أ. حسن عيسى';
+  let unitNum = 'فيلا A104 - المرحلة الأولى';
+  let phoneNum = '01223456789';
+
+  if (window.app) {
+    if (window.app.getHomeownerName) {
+      ownerName = window.app.getHomeownerName() || ownerName;
+    }
+    const customName = safeStorage.getItem('odoo_owner_name');
+    if (customName && customName.trim()) ownerName = customName;
+
+    if (window.app.currentRole === 'tenant') {
+      ownerName = 'أحمد زاهر محمود';
+      unitNum = 'شاليه C304 - المرحلة الثالثة';
+      phoneNum = '01009876543';
+    } else if (window.app.currentRole === 'commercial') {
+      ownerName = 'مطعم وكافيه Blue Wave (شريف محمد)';
+      unitNum = 'محل 12 - المول التجاري';
+      phoneNum = '01112233445';
+    }
+  }
+
+  const passCode = 'RSVP-' + Math.floor(1000 + Math.random() * 9000);
 
   if (!isConfirmed) {
     btn.setAttribute('data-confirmed', 'true');
@@ -8152,8 +8211,28 @@ window.toggleEventRsvp = function() {
     btn.style.boxShadow = '0 4px 10px rgba(16, 185, 129, 0.3)';
     if (countText) countText.innerText = 'أنت و 42+ من جيرانك أكدوا الحضور ✅';
 
+    // 1. Sync RSVP registration ticket directly to Promotion Team (Team ID: 11) in Odoo
+    const rsvpTicket = {
+      id: passCode,
+      category: 'فعاليات وترويج مجتمعي',
+      team_id: 11, // Promotion Team
+      title: `[حضور حفلة] سهرة كاريوكي الشاطئ - ${ownerName} (${unitNum.split(' - ')[0]})`,
+      details: `تأكيد تسجيل وحجز حضور لفعالية بالقرية:\n• اسم الفعالية: سهرة كاريوكي على الشاطئ (Beach Karaoke Night)\n• اسم المالك / الضيف: ${ownerName}\n• الوحدة: ${unitNum}\n• رقم الموبايل للتواصل: ${phoneNum}\n• حالة الدخول: مؤكد ومسجل بقائمة الحضور عند بوابة الحفل\n• كود التصريح المعتمد: #${passCode}\n• تاريخ التسجيل: ${new Date().toLocaleString('ar-EG')}`,
+      priority: '2',
+      requester: window.app ? window.app.currentRole : 'homeowner'
+    };
+
+    if (window.app && typeof window.app.syncTicketToOdoo === 'function') {
+      try {
+        await window.app.syncTicketToOdoo(rsvpTicket, phoneNum, ownerName);
+        safeStorage.setItem('active_rsvp_ticket_id', rsvpTicket.odooId || passCode);
+      } catch (e) {
+        console.warn('[RSVP Sync Warning]', e);
+      }
+    }
+
     if (window.app && typeof window.app.showToast === 'function') {
-      window.app.showToast('🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\nفي انتظار تشريفكم لقضاء أمسية ممتعة.');
+      window.app.showToast(`🎉 تم تأكيد حضورك في سهرة الكاريوكي بنجاح!\n\nبيانات التسجيل المعتمدة:\n• الاسم: ${ownerName}\n• الوحدة: ${unitNum}\n• الموبايل: ${phoneNum}\n• كود الدخول: #${passCode}\n\nتم إرسال بياناتك تلقائياً إلى فريق الفعاليات (Promotion Team) على بوابة الحفل لضمان دخول سلس ومرحّب بك ⭐.`);
     }
   } else {
     btn.setAttribute('data-confirmed', 'false');
@@ -8162,8 +8241,23 @@ window.toggleEventRsvp = function() {
     btn.style.boxShadow = '0 4px 10px rgba(27, 143, 145, 0.25)';
     if (countText) countText.innerText = '42+ من جيرانك أكدوا الحضور';
 
+    // Notify Promotion Team of Cancellation in Odoo
+    const cancelTicket = {
+      id: 'CNCL-' + Math.floor(1000 + Math.random() * 9000),
+      category: 'فعاليات وترويج مجتمعي',
+      team_id: 11, // Promotion Team
+      title: `[إلغاء حضور] سهرة كاريوكي الشاطئ - ${ownerName} (${unitNum.split(' - ')[0]})`,
+      details: `إلغاء تأكيد حضور الفعالية:\n• اسم الفعالية: سهرة كاريوكي على الشاطئ\n• اسم المالك: ${ownerName}\n• الوحدة: ${unitNum}\n• الحالة: اعتذر عن الحضور - تم شطب الاسم من قائمة البوابة لإفساح المجال لغيره.`,
+      priority: '1',
+      requester: window.app ? window.app.currentRole : 'homeowner'
+    };
+
+    if (window.app && typeof window.app.syncTicketToOdoo === 'function') {
+      window.app.syncTicketToOdoo(cancelTicket, phoneNum, ownerName).catch(e => console.warn(e));
+    }
+
     if (window.app && typeof window.app.showToast === 'function') {
-      window.app.showToast('ℹ️ تم إلغاء تأكيد الحضور في الفعالية.');
+      window.app.showToast(`ℹ️ تم إلغاء تأكيد حضور الفعالية.\nتم تحديث القائمة لدى فريق الفعاليات (Promotion Team). نرجو رؤيتكم في فعاليات قادمة!`);
     }
   }
 };
