@@ -5807,7 +5807,18 @@ class UltimateFMApp {
         return true;
       };
 
-      const homeownerTks = this.tickets.filter(tk => (tk.requester === 'homeowner' || tk.requester === 'owner' || !tk.requester) && isPureHomeownerMaintenance(tk));
+      const isPublicTicketForHomeowner = (t) => {
+        if (!t) return false;
+        if (t.isPublicAsset || t.isPublicTicket || t.requester === 'manager' || t.requester === 'public' || t.requester === 'engineer') return true;
+        const c = `${t.category || ''} ${t.title || ''} ${t.location || ''}`.toLowerCase();
+        if (c.includes('الموقع العام') || c.includes('موقع عام') || c.includes('أصول القرية') || c.includes('أصول الموقع') || c.includes('طلمبة حمام') || c.includes('محطة ro') || c.includes('محطة مياه') || c.includes('إنارة الموقع')) {
+          return (t.requester !== 'homeowner' && t.requester !== 'owner' && t.requester !== 'family' && t.requester !== 'tenant');
+        }
+        if (t.partsUsed && t.partsUsed.some(p => p.warehouse === 'assets' || p.isPublicExpense)) return true;
+        return false;
+      };
+
+      const homeownerTks = this.tickets.filter(tk => (tk.requester === 'homeowner' || tk.requester === 'owner' || !tk.requester) && isPureHomeownerMaintenance(tk) && !isPublicTicketForHomeowner(tk));
 
       const isCompletedStatus = (st) => {
         if (!st) return false;
@@ -7076,8 +7087,8 @@ class UltimateFMApp {
           const baseUrl = urlInput.replace(/\/+$/, '');
           const uid = 2;
 
-          let partnerId = (tk.requester === 'tenant') ? 7758 : 7755;
-          const unitStr = tk.location || (tk.requester === 'tenant' ? 'شاليه A112' : 'فيلا A104');
+          let partnerId = isPublicTicket ? 10 : ((tk.requester === 'tenant') ? 7758 : 7755);
+          const unitStr = isPublicTicket ? (tk.location || 'الموقع العام - أصول ومرافق القرية') : (tk.location || (tk.requester === 'tenant' ? 'شقة A112' : 'فيلا A104'));
           const taskFields = {
             name: `[أمر عمل ميداني - طلب قطعة غيار] ${partName} (${unitStr})`,
             project_id: 2, // Field Service
@@ -7212,6 +7223,18 @@ class UltimateFMApp {
       const elapsedMinutes = Math.max(1, Math.round((tk.fsElapsedSeconds || 1800) / 60));
       tk.resolutionTime = `${elapsedMinutes} دقيقة عمل ميداني`;
 
+      const isPublicTask = (
+        tk.isPublicAsset ||
+        tk.isPublicTicket ||
+        tk.requester === 'manager' ||
+        tk.requester === 'public' ||
+        tk.requester === 'engineer' ||
+        (tk.category && (tk.category.includes('أصول') || tk.category.includes('الموقع') || tk.category.includes('العام') || tk.category.includes('قرية') || tk.category.includes('كهروميكانيك') || tk.category.includes('عامة') || tk.category.includes('طلمبة') || tk.category.includes('حمامات السباحة'))) ||
+        (tk.title && (tk.title.includes('الموقع العام') || tk.title.includes('موقع عام') || tk.title.includes('أصول') || tk.title.includes('حمامات السباحة') || tk.title.includes('طلمبة') || tk.title.includes('محطة'))) ||
+        (tk.location && (tk.location.includes('الموقع العام') || tk.location.includes('موقع عام') || tk.location.includes('قرية') || tk.location.includes('أصول') || tk.location.includes('مسبح') || tk.location.includes('حمامات السباحة') || tk.location.includes('محطة'))) ||
+        (tk.partsUsed && tk.partsUsed.some(p => p.warehouse === 'assets' || p.isPublicExpense))
+      ) && tk.requester !== 'homeowner' && tk.requester !== 'owner' && tk.requester !== 'family' && tk.requester !== 'tenant';
+
       // Parts string
       const partsStr = (tk.partsUsed && tk.partsUsed.length > 0)
         ? tk.partsUsed.map(p => `${p.name} (عدد ${p.qty})`).join('، ')
@@ -7239,15 +7262,6 @@ class UltimateFMApp {
             id: Math.floor(Math.random() * 1000)
           };
           this.callOdoo(baseUrl, writeTask).catch(e => console.warn(e));
-
-          const isPublicTask = (
-            tk.requester === 'manager' ||
-            tk.requester === 'public' ||
-            tk.requester === 'engineer' ||
-            (tk.category && (tk.category.includes('عام') || tk.category.includes('مرافق') || tk.category.includes('تفتيش') || tk.category.includes('محطة') || tk.category.includes('كهروميكانيك'))) ||
-            (tk.title && (tk.title.includes('الموقع العام') || tk.title.includes('مرفق عام'))) ||
-            (tk.location && (tk.location.includes('الموقع العام') || tk.location.includes('مرفق عام')))
-          ) && tk.requester !== 'homeowner' && tk.requester !== 'owner' && tk.requester !== 'family' && tk.requester !== 'tenant';
 
           const signOffText = isPublicTask
             ? 'معتمد من إدارة الصيانة والمرافق العامة (م. أيمن السعيد) وموثق بالصور'
@@ -7282,7 +7296,7 @@ class UltimateFMApp {
 
         // Phase 1: Trigger Live Odoo stock.picking if parts were consumed
         if (tk.partsUsed && tk.partsUsed.length > 0) {
-          const partnerId = tk.requester === 'tenant' ? 7758 : 7755;
+          const partnerId = isPublicTask ? 10 : (tk.requester === 'tenant' ? 7758 : 7755);
           const pickingId = await this.createOdooStockPicking(partnerId, tk.partsUsed, `#WO-${taskId || tk.id}`);
           if (pickingId) {
             tk.odooPickingId = pickingId;
@@ -7298,7 +7312,17 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم إنهاء أمر الصيانة الميدانية واعتماد الإغلاق بنجاح!\nمدة العمل الفعلي: ${elapsedMinutes} دقيقة.\nأصبح التقييم متاحاً للمالك (أ. حسن عيسى) الآن ⭐.`);
+
+      if (isPublicTask) {
+        this.showToast(`🎉 تم إنهاء أمر صيانة الموقع العام واعتماد الإغلاق بنجاح!\nمدة العمل الفعلي: ${elapsedMinutes} دقيقة.\nتم إشعار مدير الصيانة (م. أحمد غنيم) باعتماد إنجاز مهمة الموقع بنجاح ✔️.`);
+      } else if (tk.requester === 'tenant') {
+        this.showToast(`🎉 تم إنهاء أمر الصيانة الميدانية واعتماد الإغلاق بنجاح!\nمدة العمل الفعلي: ${elapsedMinutes} دقيقة.\nأصبح التقييم متاحاً للمستأجر الآن ⭐.`);
+      } else if (tk.requester === 'commercial') {
+        this.showToast(`🎉 تم إنهاء أمر الصيانة الميدانية واعتماد الإغلاق بنجاح!\nمدة العمل الفعلي: ${elapsedMinutes} دقيقة.\nأصبح التقييم متاحاً للمستأجر التجاري الآن ⭐.`);
+      } else {
+        const ownerName = (this.getHomeownerName ? this.getHomeownerName() : '') || safeStorage.getItem('odoo_owner_name') || 'أ. حسن عيسى';
+        this.showToast(`🎉 تم إنهاء أمر الصيانة الميدانية واعتماد الإغلاق بنجاح!\nمدة العمل الفعلي: ${elapsedMinutes} دقيقة.\nأصبح التقييم متاحاً للمالك (${ownerName}) الآن ⭐.`);
+      }
     };
 
     if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -7373,7 +7397,22 @@ class UltimateFMApp {
 
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
+      const isPublicTask = (
+        tk.isPublicAsset ||
+        tk.isPublicTicket ||
+        tk.requester === 'manager' ||
+        tk.requester === 'public' ||
+        tk.requester === 'engineer' ||
+        (tk.category && (tk.category.includes('أصول') || tk.category.includes('الموقع') || tk.category.includes('العام') || tk.category.includes('قرية') || tk.category.includes('كهروميكانيك') || tk.category.includes('عامة') || tk.category.includes('طلمبة') || tk.category.includes('حمامات السباحة'))) ||
+        (tk.title && (tk.title.includes('الموقع العام') || tk.title.includes('موقع عام') || tk.title.includes('أصول') || tk.title.includes('حمامات السباحة') || tk.title.includes('طلمبة') || tk.title.includes('محطة'))) ||
+        (tk.location && (tk.location.includes('الموقع العام') || tk.location.includes('موقع عام') || tk.location.includes('قرية') || tk.location.includes('أصول') || tk.location.includes('مسبح') || tk.location.includes('حمامات السباحة') || tk.location.includes('محطة')))
+      ) && tk.requester !== 'homeowner' && tk.requester !== 'owner' && tk.requester !== 'family' && tk.requester !== 'tenant';
+
+      if (isPublicTask) {
+        this.showToast(`🎉 تم إغلاق أمر صيانة أصول الموقع العام #${tk.id} بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nتم إشعار مدير الصيانة (م. أحمد غنيم) باعتماد الإغلاق ✔️.`);
+      } else {
+        this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
+      }
       
       // Sync update to Odoo (Stage 4 = Solved)
       this.syncTicketUpdateToOdoo(tk);
