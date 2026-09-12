@@ -486,6 +486,7 @@ header.global-header {
   display: flex;
   flex-direction: column;
   padding-top: 36px; /* Space for status bar */
+  padding-bottom: 84px !important;
   overflow-y: auto;
   position: relative;
   background: var(--bg-main);
@@ -701,12 +702,24 @@ header.global-header {
   gap: 4px;
 }
 
-.badge-success { background: #10b981; color: #ffffff !important; border: 1px solid #059669; }
-.badge-warning { background: #f59e0b; color: #ffffff !important; border: 1px solid #d97706; }
-.badge-danger { background: #ef4444; color: #ffffff !important; border: 1px solid #dc2626; }
-.badge-info { background: #0284c7; color: #ffffff !important; border: 1px solid #0369a1; }
-.badge-cyan { background: #0284c7; color: #ffffff !important; border: 1px solid #0369a1; }
-.badge-primary { background: #8b5cf6; color: #ffffff !important; border: 1px solid #7c3aed; }
+/* Quiet Luxury Status Badges (Calm, prestigious, tinted aesthetic) */
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.2px;
+}
+.badge-success { background: rgba(16, 185, 129, 0.1) !important; color: #059669 !important; border: 1px solid rgba(16, 185, 129, 0.25) !important; }
+.badge-warning { background: rgba(217, 119, 6, 0.1) !important; color: #b45309 !important; border: 1px solid rgba(217, 119, 6, 0.25) !important; }
+.badge-danger { background: rgba(225, 29, 72, 0.1) !important; color: #be123c !important; border: 1px solid rgba(225, 29, 72, 0.25) !important; }
+.badge-info { background: rgba(27, 143, 145, 0.1) !important; color: #1b8f91 !important; border: 1px solid rgba(27, 143, 145, 0.25) !important; }
+.badge-cyan { background: rgba(27, 143, 145, 0.1) !important; color: #1b8f91 !important; border: 1px solid rgba(27, 143, 145, 0.25) !important; }
+.badge-primary { background: rgba(153, 87, 137, 0.1) !important; color: #995789 !important; border: 1px solid rgba(153, 87, 137, 0.25) !important; }
+.badge-navy { background: rgba(32, 39, 79, 0.08) !important; color: #20274f !important; border: 1px solid rgba(32, 39, 79, 0.18) !important; }
 
 /* Interactive Buttons */
 .btn {
@@ -750,6 +763,13 @@ header.global-header {
   color: #ffffff;
   border: none;
   box-shadow: 0 4px 15px rgba(153, 87, 137, 0.35);
+}
+
+.btn-sm {
+  width: auto !important;
+  padding: 5px 12px !important;
+  font-size: 0.74rem !important;
+  flex: none !important;
 }
 
 /* List Items / Ticket Items */
@@ -814,56 +834,100 @@ header.global-header {
   box-shadow: 0 2px 10px rgba(32, 39, 79, 0.04);
 }
 
-/* Floating Rounded iOS Dock Navbar */
+/* ========================================================
+   APPLE iPHONE ULTRA-LUXURY FLOATING GLASS DOCK NAVBAR
+   ======================================================== */
 .phone-navbar {
-  height: 60px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(27, 143, 145, 0.25);
+  height: 62px;
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 16px 36px rgba(32, 39, 79, 0.12), 0 2px 8px rgba(32, 39, 79, 0.04) !important;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 6px;
-  z-index: 900;
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  right: 12px;
-  border-radius: 36px;
-  box-shadow: 0 8px 24px rgba(32, 39, 79, 0.16);
+  justify-content: space-around !important;
+  align-items: center !important;
+  padding: 4px 6px !important;
+  z-index: 999 !important;
+  position: absolute !important;
+  bottom: 12px !important;
+  left: 12px !important;
+  right: 12px !important;
+  width: calc(100% - 24px) !important;
+  border-radius: 26px !important;
+  box-sizing: border-box !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.phone-navbar.hidden,
+#phoneNavbar.hidden,
+.phone-navbar[style*="display: none"],
+#phoneNavbar[style*="display: none"],
+#viewLogin.active ~ #phoneNavbar,
+#viewLogin.active ~ * #phoneNavbar,
+#viewRoleGrid.active ~ #phoneNavbar,
+#viewRoleGrid.active ~ * #phoneNavbar {
+  display: none !important;
 }
 
 @media (max-width: 480px) {
   .phone-navbar {
     position: fixed !important;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 12px !important;
-    right: 12px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: calc(100% - 20px) !important;
+    border-radius: 24px !important;
+    height: 60px !important;
   }
 }
 
 .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  color: #64748b;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: none;
-  border: none;
-  padding: 6px 8px;
-  border-radius: 20px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  color: #64748b !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.2px !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 6px 6px !important;
+  border-radius: 18px !important;
+  flex: 1 !important;
+  position: relative !important;
 }
 
 .nav-item i {
-  font-size: 1.15rem;
-  transition: transform 0.2s ease;
+  font-size: 1.15rem !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
+
+.nav-item .nav-indicator {
+  display: none !important;
+}
+
+.nav-item.active {
+  color: var(--brand-teal) !important;
+  background: rgba(27, 143, 145, 0.09) !important;
+  font-weight: 800 !important;
+}
+
+.nav-item.active i {
+  transform: translateY(-1px) scale(1.1) !important;
+  color: var(--brand-teal) !important;
+}
+
+.nav-item:hover {
+  color: var(--brand-teal) !important;
+  background: rgba(27, 143, 145, 0.05) !important;
+}
+
 
 /* ==========================================================================
    DYNAMIC LIVE WIDGETS & RADAR (ULTIMATE CODE DASHBOARD)
@@ -1456,17 +1520,24 @@ header.global-header {
 
 /* Bottom Navigation Bar */
 #phoneSimulator.dark-theme .phone-navbar {
-  background: #152033 !important;
-  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(24, 32, 54, 0.9) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
 }
-
-#phoneSimulator.dark-theme .phone-navbar .nav-item {
+#phoneSimulator.dark-theme .nav-item {
   color: #94a3b8 !important;
 }
-
-#phoneSimulator.dark-theme .phone-navbar .nav-item.active {
-  color: var(--primary-gold) !important;
+#phoneSimulator.dark-theme .nav-item.active {
+  color: #2dd4bf !important;
+  background: rgba(45, 212, 191, 0.14) !important;
 }
+#phoneSimulator.dark-theme .nav-item.active i {
+  color: #2dd4bf !important;
+}
+
+
 
 /* Custom slider styles for toggle switches */
 .switch-container input:checked + .slider-round {
@@ -1700,3 +1771,138 @@ header.global-header {
 
 
 
+
+/* Full Body Dark Theme Support (Mobile & Fullscreen) */
+body.dark-theme,
+html.dark-theme {
+  background-color: #0b1320 !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme #phoneSimulator {
+  background: #0b1320 !important;
+}
+
+body.dark-theme .card,
+body.dark-theme .view-panel,
+body.dark-theme .sticky-view-header,
+body.dark-theme .modal-card {
+  background: #131c2e !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark-theme .card-title,
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme span:not(.badge):not(.btn) {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .form-control,
+body.dark-theme select,
+body.dark-theme input,
+body.dark-theme textarea {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ========================================================
+   QUIET LUXURY EXECUTIVE STYLES FOR ALL 5 SPECIALIZED ROLES
+   Eliminates noisy boxes, harsh colors, and provides unified elegance
+   ======================================================== */
+.exec-hero-card {
+  background: linear-gradient(135deg, #1b8f91 0%, #20274f 100%);
+  border-radius: 20px;
+  padding: 16px 18px;
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(27, 143, 145, 0.25);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 14px;
+}
+.exec-hero-card::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -15%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.exec-metric-card {
+  background: #ffffff;
+  border: 1px solid rgba(32, 39, 79, 0.08);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 16px rgba(32, 39, 79, 0.04);
+  margin-bottom: 12px;
+}
+.exec-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(32, 39, 79, 0.05);
+}
+.exec-metric-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+.exec-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(27, 143, 145, 0.08);
+  color: #1b8f91;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.exec-btn-primary {
+  background: #1b8f91;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 10px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(27, 143, 145, 0.28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.exec-btn-primary:active {
+  transform: scale(0.98);
+}
+.exec-btn-secondary {
+  background: #ffffff;
+  color: #20274f !important;
+  border: 1px solid rgba(32, 39, 79, 0.16);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 9px 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(32, 39, 79, 0.04);
+}
+.exec-btn-secondary:hover {
+  background: #f8fafc;
+}
