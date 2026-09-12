@@ -474,7 +474,7 @@ class UltimateFMApp {
     }
 
     // ALWAYS keep back-to-grid buttons VISIBLE so the user can easily navigate between screens!
-    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
+    document.querySelectorAll('.header-back-btn, [onclick="app.showRoleGrid()"], [onclick="showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
       btn.style.setProperty('display', 'inline-flex', 'important');
     });
 
@@ -5790,7 +5790,7 @@ class UltimateFMApp {
     }
     
     // ALWAYS keep back-to-grid buttons VISIBLE so the user can easily switch screens!
-    document.querySelectorAll('[onclick="app.showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
+    document.querySelectorAll('.header-back-btn, [onclick="app.showRoleGrid()"], [onclick="showRoleGrid()"], [onclick="app.switchRole(\'grid\')"]').forEach(btn => {
       btn.style.setProperty('display', 'inline-flex', 'important');
     });
 
@@ -5808,8 +5808,6 @@ class UltimateFMApp {
 
     // Save active session
     safeStorage.setItem('active_session_role', role);
-
-    this.showToast(`🔑 تم فتح شاشة [${this.getRoleArabicName(role)}] بنجاح!`);
   }
 
   logout() {
