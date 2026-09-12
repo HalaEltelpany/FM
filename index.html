@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -45,24 +45,73 @@
     window._pendingRole = null;
 
     function quickLogin(role) {
-      if (window.app && typeof window.app.quickLogin === 'function') {
-        window.app.quickLogin(role);
-      } else {
-        window._pendingRole = role;
+      try {
+        if (window.app && typeof window.app.quickLogin === 'function') {
+          window.app.quickLogin(role);
+          return;
+        }
+      } catch (e) {
+        console.warn('[quickLogin via app failed, using direct DOM switch]:', e);
       }
+      // Bulletproof direct DOM fallback
+      var targetMap = {
+        'homeowner': 'viewHomeowner', 'owner': 'viewHomeowner', 'family': 'viewHomeowner',
+        'engineer': 'viewEngineer', 'engineering_director': 'viewEngineeringDirector',
+        'manager': 'viewManager', 'technician': 'viewTechnician', 'tenant': 'viewTenant',
+        'commercial': 'viewCommercial', 'admin': 'viewAdmin', 'security': 'viewSecurity',
+        'housekeeping': 'viewHousekeeping', 'landscaping': 'viewLandscaping',
+        'pest_control': 'viewPestControl'
+      };
+      var targetId = targetMap[role] || 'viewHomeowner';
+      document.querySelectorAll('.view-panel').forEach(function(p) {
+        p.classList.remove('active');
+        p.style.setProperty('display', 'none', 'important');
+      });
+      var targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.classList.add('active');
+        targetEl.style.setProperty('display', 'flex', 'important');
+        targetEl.style.setProperty('flex-direction', 'column', 'important');
+      }
+      document.querySelectorAll('.header-back-btn, [onclick*="showRoleGrid"], [onclick*="grid"]').forEach(function(btn) {
+        btn.style.setProperty('display', 'inline-flex', 'important');
+      });
     }
+
     function switchRole(role) {
-      if (window.app && typeof window.app.switchRole === 'function') {
-        window.app.switchRole(role);
-      } else {
-        window._pendingRole = role;
+      if (role === 'grid' || role === 'login') {
+        showRoleGrid();
+        return;
       }
+      quickLogin(role);
     }
+
     function showRoleGrid() {
-      if (window.app && typeof window.app.showRoleGrid === 'function') {
-        window.app.showRoleGrid();
+      try {
+        if (window.app && typeof window.app.showRoleGrid === 'function') {
+          window.app.showRoleGrid();
+          return;
+        }
+      } catch (e) {
+        console.warn('[showRoleGrid via app failed, using direct DOM switch]:', e);
+      }
+      document.querySelectorAll('.view-panel').forEach(function(p) {
+        p.classList.remove('active');
+        p.style.setProperty('display', 'none', 'important');
+      });
+      var gridPanel = document.getElementById('viewLogin') || document.getElementById('viewRoleGrid');
+      if (gridPanel) {
+        gridPanel.classList.add('active');
+        gridPanel.style.setProperty('display', 'flex', 'important');
+        gridPanel.style.setProperty('flex-direction', 'column', 'important');
+      }
+      var phoneNav = document.getElementById('phoneNavbar');
+      if (phoneNav) {
+        phoneNav.classList.add('hidden');
+        phoneNav.style.setProperty('display', 'none', 'important');
       }
     }
+
     function openModal(id) {
       const el = document.getElementById(id);
       if (el) el.style.display = 'flex';
@@ -1284,61 +1333,30 @@
               </div>
             </div>
 
-            <!-- Manager Shift KPI Performance Matrix (Clean Luxury Rows) -->
-            <div class="exec-metric-card">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 0.82rem; font-weight: 800; color: #20274f; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-chart-line" style="color: #1b8f91;"></i> مؤشرات أداء الشفت الميداني (KPIs)
-                </span>
-                <span class="badge badge-info" id="managerSlaTargetBadge" style="font-size: 0.62rem;">المستهدف: &lt; 15 دقيقة للتوزيع</span>
+            <!-- Manager Shift KPI Performance Matrix (Modern Compact 4-Grid) -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;">
+              <!-- KPI 1: Total -->
+              <div style="background: #ffffff; border: 1px solid rgba(32,39,79,0.08); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: 0 2px 6px rgba(32,39,79,0.02);">
+                <div style="font-size: 0.64rem; font-weight: 700; color: #64748b; margin-bottom: 2px;">إجمالي البلاغات</div>
+                <div style="font-size: 1.15rem; font-weight: 900; color: #20274f;" id="managerKpiTotal">0</div>
               </div>
 
-              <!-- Metric Row 1: Total -->
-              <div class="exec-metric-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="exec-icon-box"><i class="fa-solid fa-inbox"></i></div>
-                  <div>
-                    <div style="font-size: 0.78rem; font-weight: 800; color: #20274f;">إجمالي بلاغات الشفت</div>
-                    <div style="font-size: 0.66rem; color: #64748b;">الواردة من الملاك والمهندسين والمرافق</div>
-                  </div>
-                </div>
-                <div style="font-size: 1.05rem; font-weight: 900; color: #20274f;" id="managerKpiTotal">0</div>
+              <!-- KPI 2: Assigned -->
+              <div style="background: #ffffff; border: 1px solid rgba(5,150,105,0.15); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: 0 2px 6px rgba(5,150,105,0.03);">
+                <div style="font-size: 0.64rem; font-weight: 700; color: #059669; margin-bottom: 2px;">تم الإسناد</div>
+                <div style="font-size: 1.15rem; font-weight: 900; color: #059669;" id="managerKpiAssigned">0</div>
               </div>
 
-              <!-- Metric Row 2: Assigned -->
-              <div class="exec-metric-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="exec-icon-box"><i class="fa-solid fa-user-check"></i></div>
-                  <div>
-                    <div style="font-size: 0.78rem; font-weight: 800; color: #20274f;">تم التوزيع والتكليف للفنيين</div>
-                    <div style="font-size: 0.66rem; color: #64748b;">مهام جارية ومسندة لفرق العمل</div>
-                  </div>
-                </div>
-                <div style="font-size: 1.05rem; font-weight: 900; color: #059669;" id="managerKpiAssigned">0</div>
+              <!-- KPI 3: Pending -->
+              <div style="background: #ffffff; border: 1px solid rgba(217,119,6,0.15); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: 0 2px 6px rgba(217,119,6,0.03);">
+                <div style="font-size: 0.64rem; font-weight: 700; color: #d97706; margin-bottom: 2px;">بانتظار الفني</div>
+                <div style="font-size: 1.15rem; font-weight: 900; color: #d97706;" id="managerKpiPending">0</div>
               </div>
 
-              <!-- Metric Row 3: Pending -->
-              <div class="exec-metric-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="exec-icon-box"><i class="fa-solid fa-hourglass-half"></i></div>
-                  <div>
-                    <div style="font-size: 0.78rem; font-weight: 800; color: #20274f;">بانتظار التكليف والإسناد</div>
-                    <div style="font-size: 0.66rem; color: #64748b;">جاهزة للتوجيه إلى فني متاح</div>
-                  </div>
-                </div>
-                <div style="font-size: 1.05rem; font-weight: 900; color: #b45309;" id="managerKpiPending">0</div>
-              </div>
-
-              <!-- Metric Row 4: SLA Rate -->
-              <div class="exec-metric-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="exec-icon-box"><i class="fa-solid fa-bolt"></i></div>
-                  <div>
-                    <div style="font-size: 0.78rem; font-weight: 800; color: #20274f;">معدل سرعة التكليف (SLA)</div>
-                    <div style="font-size: 0.66rem; color: #64748b;">التوزيع خلال أقل من 15 دقيقة</div>
-                  </div>
-                </div>
-                <div style="font-size: 1.05rem; font-weight: 900; color: #1b8f91;" id="managerKpiSlaRate">98%</div>
+              <!-- KPI 4: SLA Rate -->
+              <div style="background: #ffffff; border: 1px solid rgba(27,143,145,0.15); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: 0 2px 6px rgba(27,143,145,0.03);">
+                <div style="font-size: 0.64rem; font-weight: 700; color: #1b8f91; margin-bottom: 2px;">سرعة SLA</div>
+                <div style="font-size: 1.15rem; font-weight: 900; color: #1b8f91;" id="managerKpiSlaRate">98%</div>
               </div>
             </div>
 
@@ -4325,7 +4343,7 @@ class UltimateFMApp {
     }
 
     // Render screen logout header inside active view
-    this.renderLogoutHeader();
+    try { this.renderLogoutHeader(); } catch (e) { console.warn(e); }
   }
 
   openCommercialMeterModal() {
@@ -4532,7 +4550,7 @@ class UltimateFMApp {
     }
 
     // Filter Engineer Tickets to show only team tickets
-    this.renderEngineerTickets();
+    if (typeof this.renderTickets === 'function') this.renderTickets();
   }
 
   handleEngineerSubmitToManager() {
@@ -4730,7 +4748,7 @@ class UltimateFMApp {
             "search_read",
             [[]],
             {
-              fields: ["id", "name", "description", "stage_id", "priority", "create_date", "partner_email", "partner_phone"],
+              fields: ["id", "name", "description", "stage_id", "priority", "create_date", "partner_email", "partner_phone", "team_id"],
               order: "id desc",
               limit: 50
             }
@@ -4763,6 +4781,15 @@ class UltimateFMApp {
         });
 
         readData.result.forEach(rec => {
+          const recTeamId = Array.isArray(rec.team_id) ? rec.team_id[0] : rec.team_id;
+          const recNameLower = (rec.name || '').toLowerCase();
+          // Exclude Pest Control, Landscaping, and Housekeeping tickets completely from maintenance queue
+          if (recTeamId === 8 || recTeamId === 7 || recTeamId === 5 ||
+              recNameLower.includes('مكافح') || recNameLower.includes('آفات') || recNameLower.includes('حشرات') ||
+              recNameLower.includes('لاند') || recNameLower.includes('حدائق') || recNameLower.includes('زراع') ||
+              recNameLower.includes('هاوس') || recNameLower.includes('نظاف')) {
+            return;
+          }
           const recOdooIdStr = String(rec.id);
           const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
           let bg = 'badge-warning';
@@ -4952,30 +4979,34 @@ class UltimateFMApp {
     const titleNorm = normalize(ticket.title);
     const detailsNorm = normalize(ticket.details || ticket.description);
     const typeNorm = normalize(ticket.type);
-    const combinedNorm = `${catNorm} ${titleNorm} ${detailsNorm} ${typeNorm}`;
+    const combinedNorm = (catNorm + ' ' + titleNorm + ' ' + detailsNorm + ' ' + typeNorm).toLowerCase();
 
     // Instant Map without redundant network requests:
-    // 1. Housekeeping (ID 5)
-    if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
-      return 5;
+    // 1. Pest Control (ID 8)
+    if (combinedNorm.includes('مكافح') || combinedNorm.includes('افات') || combinedNorm.includes('حشرات') || combinedNorm.includes('رش') || combinedNorm.includes('ضباب') || combinedNorm.includes('قوارض') || combinedNorm.includes('نمل') || combinedNorm.includes('صراصير') || combinedNorm.includes('pest')) {
+      return 8;
     }
     // 2. Landscaping (ID 7)
-    if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
+    if (combinedNorm.includes('لاند') || combinedNorm.includes('اسكيب') || combinedNorm.includes('حدائق') || combinedNorm.includes('حديق') || combinedNorm.includes('زراع') || combinedNorm.includes('اشجار') || combinedNorm.includes('نجيل') || combinedNorm.includes('شتلات') || combinedNorm.includes('landscaping') || combinedNorm.includes('landscape') || combinedNorm.includes('gardening')) {
       return 7;
     }
-    // 3. Security (ID 3)
+    // 3. Housekeeping (ID 5)
+    if (combinedNorm.includes('هاوس') || combinedNorm.includes('كيبينج') || combinedNorm.includes('نظاف') || combinedNorm.includes('تنظيف') || combinedNorm.includes('مخلفات') || combinedNorm.includes('قمامة') || combinedNorm.includes('housekeeping') || combinedNorm.includes('cleaning')) {
+      return 5;
+    }
+    // 4. Security (ID 3)
     if (combinedNorm.includes('امن') || combinedNorm.includes('تصريح') || combinedNorm.includes('بواب') || combinedNorm.includes('زائر') || combinedNorm.includes('security') || combinedNorm.includes('lpr')) {
       return 3;
     }
-    // 4. Accounting (ID 4)
-    if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
+    // 5. Accounting (ID 4)
+    if (combinedNorm.includes('حساب') || combinedNorm.includes('مالي') || combinedNorm.includes('وديع') || combinedNorm.includes('قسط') || combinedNorm.includes('فاتور') || combinedNorm.includes('سداد') || combinedNorm.includes('accounting') || combinedNorm.includes('finance')) {
       return 4;
     }
-    // 5. Maintenance (ID 2)
+    // 6. Maintenance (ID 2)
     if (combinedNorm.includes('صيان') || combinedNorm.includes('سباك') || combinedNorm.includes('كهرب') || combinedNorm.includes('تكييف') || combinedNorm.includes('نجار') || combinedNorm.includes('عطل') || combinedNorm.includes('تسريب') || combinedNorm.includes('مواسي') || combinedNorm.includes('maintenance')) {
       return 2;
     }
-    // 6. Customer Care (ID 1) - Default
+    // 7. Customer Care (ID 1) - Default
     return 1;
   }
 
@@ -5541,6 +5572,8 @@ class UltimateFMApp {
     })();
   }
 
+  renderEngineerTickets() { this.renderTickets(); }
+
   renderTickets() {
     const isEn = this.currentLang === 'en';
 
@@ -5859,13 +5892,25 @@ class UltimateFMApp {
       const allMgrTks = this.tickets.filter(tk => {
         const cat = String(tk.category || '').toLowerCase();
         const title = String(tk.title || '').toLowerCase();
-        // Exclude Financials, Security, Gate Permits, and Complaints (which belong strictly to Security Officer & Accounting)
-        if (cat.includes('حسابات') || cat.includes('مالي')) return false;
-        if (cat.includes('أمن') || cat.includes('امن') || cat.includes('بواب') || cat.includes('تصريح') || cat.includes('شكوى أمنية') || cat.includes('security')) return false;
-        if (title.includes('أمن') || title.includes('امن') || title.includes('بواب') || title.includes('تصريح') || title.includes('شكوى أمنية')) return false;
+        const details = String(tk.details || '').toLowerCase();
+        const combined = (cat + ' ' + title + ' ' + details).toLowerCase();
+
+        // 1. Exclude Financials & Security
+        if (combined.includes('حساب') || combined.includes('مالي') || combined.includes('فاتور') || combined.includes('سداد')) return false;
+        if (combined.includes('أمن') || combined.includes('امن') || combined.includes('بواب') || combined.includes('تصريح') || combined.includes('شكوى أمنية') || combined.includes('security')) return false;
+
+        // 2. Exclude Pest Control (strictly Pest supervisor)
+        if (combined.includes('مكافح') || combined.includes('افات') || combined.includes('آفات') || combined.includes('حشرات') || combined.includes('رش ضباب') || combined.includes('thermal fogging') || combined.includes('نمل') || combined.includes('بعوض') || combined.includes('pest')) return false;
+
+        // 3. Exclude Landscaping (strictly Landscaping supervisor)
+        if (combined.includes('لاند') || combined.includes('اسكيب') || combined.includes('حدائق') || combined.includes('حديق') || combined.includes('زراع') || combined.includes('شجيرات') || combined.includes('شتلات') || combined.includes('قص الأشجار') || combined.includes('تقليم') || combined.includes('landscape') || combined.includes('mowing')) return false;
+
+        // 4. Exclude Housekeeping
+        if (combined.includes('هاوس') || combined.includes('كيبينج') || combined.includes('نظاف') || combined.includes('تنظيف') || combined.includes('مخلفات') || combined.includes('قمامة') || combined.includes('cleaning') || combined.includes('housekeeping')) return false;
+
         return true;
       });
-      
+
       const pendingTks = allMgrTks.filter(tk => tk.status === 'جديد' || !tk.assignedTech);
       const assignedTks = allMgrTks.filter(tk => tk.assignedTech);
 
@@ -5921,152 +5966,135 @@ class UltimateFMApp {
 
       managerList.innerHTML = '';
       if (filteredTks.length === 0) {
-        managerList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 20px; background: rgba(32,39,79,0.02); border-radius: 8px;">لا توجد بلاغات تطابق هذا الفلتر حالياً</div>';
+        managerList.innerHTML = `
+          <div style="text-align: center; padding: 32px 16px; background: #ffffff; border-radius: 14px; border: 1px dashed rgba(32,39,79,0.12); margin-top: 4px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(27,143,145,0.08); color: #1b8f91; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 8px;">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div style="font-size: 0.82rem; font-weight: 800; color: #20274f; margin-bottom: 2px;">لا توجد بلاغات صيانة معلقة</div>
+            <div style="font-size: 0.7rem; color: #64748b;">كافة طلبات هذا القسم موزعة ومسندة وجاري متابعتها</div>
+          </div>
+        `;
       } else {
         filteredTks.forEach(tk => {
           const createDate = tk.createdAt ? new Date(tk.createdAt) : new Date();
           const elapsedMins = Math.max(1, Math.round((Date.now() - createDate) / 60000));
           
-          // Ticket Source Badge & Styling
-          let sourceBadgeHtml = '';
-          let borderAccent = '#1b8f91';
+          // Clean Minimal Source Tag
+          let sourceLabel = 'طلب مالك (فيلا 104)';
+          let sourceColor = '#1b8f91';
+          let sourceBg = 'rgba(27, 143, 145, 0.08)';
 
           if (tk.requester === 'engineer' || (tk.category && tk.category.includes('تفتيش'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-compass-drafting"></i> تفتيش مهندس الموقع</span>`;
-            borderAccent = '#f59e0b';
+            sourceLabel = 'تفتيش مهندس الموقع';
+            sourceColor = '#d97706';
+            sourceBg = 'rgba(217, 119, 6, 0.08)';
           } else if (tk.requester === 'manager' || tk.requester === 'public' || (tk.category && tk.category.includes('عامة'))) {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(32, 39, 79, 0.12); color: #20274f !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-tree-city"></i> بلاغ مرافق عامة</span>`;
-            borderAccent = '#20274f';
-          } else {
-            sourceBadgeHtml = `<span class="badge" style="background: rgba(27, 143, 145, 0.15); color: #1b8f91 !important; font-weight: 800; font-size: 0.65rem;"><i class="fa-solid fa-house-user"></i> طلب مالك (فيلا 104)</span>`;
-            borderAccent = '#1b8f91';
+            sourceLabel = 'مرافق وموقع عام';
+            sourceColor = '#475569';
+            sourceBg = 'rgba(71, 85, 105, 0.08)';
           }
 
-          // Manager SLA Speed Indicator
-          let slaBadgeHtml = '';
+          // SLA Badge (Sleek pill)
+          let slaHtml = '';
           if (tk.assignedTech) {
             const dMins = tk.dispatchMins || 1;
-            if (dMins <= 15) {
-              slaBadgeHtml = `<span class="badge badge-success" style="font-size: 0.62rem;"><i class="fa-solid fa-bolt"></i> إسناد فوري: ${dMins}د</span>`;
-            } else {
-              slaBadgeHtml = `<span class="badge badge-warning" style="font-size: 0.62rem;"><i class="fa-solid fa-clock"></i> إسناد خلال: ${dMins}د</span>`;
-            }
+            slaHtml = `<span style="font-size: 0.65rem; color: #059669; background: #ecfdf5; padding: 2px 8px; border-radius: 12px; font-weight: 700;"><i class="fa-solid fa-bolt"></i> أُسندت خلال ${dMins}د</span>`;
           } else {
             if (elapsedMins <= 15) {
-              slaBadgeHtml = `<span class="badge" style="background: #10b981; color: #ffffff !important; font-size: 0.62rem;"><i class="fa-solid fa-stopwatch"></i> بانتظار الإسناد: منذ ${elapsedMins}د (&lt; 15د)</span>`;
+              slaHtml = `<span style="font-size: 0.65rem; color: #d97706; background: #fffbeb; padding: 2px 8px; border-radius: 12px; font-weight: 700;"><i class="fa-solid fa-clock"></i> بانتظار الإسناد (${elapsedMins}د)</span>`;
             } else {
-              slaBadgeHtml = `<span class="badge badge-danger" style="font-size: 0.62rem;"><i class="fa-solid fa-triangle-exclamation"></i> تأخر في الإسناد: ${elapsedMins}د</span>`;
+              slaHtml = `<span style="font-size: 0.65rem; color: #dc2626; background: #fef2f2; padding: 2px 8px; border-radius: 12px; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> متأخرة (${elapsedMins}د)</span>`;
             }
           }
 
-          // Distinct Color Themes: New (Yellow), In Progress (Blue), Solved (Green), Cancelled (Red)
-          const isNewTicket = (tk.status === 'جديد' || tk.status === 'New');
-          const isCancelled = (tk.status === 'ملغي' || tk.status === 'Cancelled');
+          const isNewTicket = (tk.status === 'جديد' || tk.status === 'New' || !tk.assignedTech);
+          const isCancelled = (tk.status === 'ملغي' || tk.status === 'ملغاة' || tk.status === 'Cancelled');
           const isSolved = (tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
-          const isInProgress = !isNewTicket && !isCancelled && !isSolved;
 
-          let cardStyle = `flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 12px; padding: 14px; border-radius: 12px; box-shadow: var(--shadow-sm);`;
-          let statusBadgeClass = 'badge-info';
-
-          cardStyle += ` background: #ffffff; border: 1px solid rgba(32, 39, 79, 0.08); box-shadow: 0 2px 10px rgba(32, 39, 79, 0.03);`;
-          if (isNewTicket) {
-            statusBadgeClass = 'badge-warning';
-          } else if (isCancelled) {
-            statusBadgeClass = 'badge-danger';
-          } else if (isSolved) {
-            statusBadgeClass = 'badge-success';
-          } else {
-            statusBadgeClass = 'badge-info';
-          }
-
-          // Action: Dispatch / Assigned Info / Cancelled Info
+          // Clean action section
           let actionHtml = '';
           if (isCancelled) {
             actionHtml = `
-              <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 14px; border-radius: 12px; font-size: 0.75rem; color: #991b1b; margin-top: 10px;">
-                <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-                  <i class="fa-solid fa-ban"></i> تم إلغاء البلاغ بواسطة: م. أيمن السعيد (مدير الصيانة)
+              <div style="margin-top: 10px; padding: 8px 12px; background: #fef2f2; border-radius: 10px; border: 1px solid #fee2e2; display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: #991b1b;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-ban" style="color: #dc2626;"></i>
+                  <span><b>ملغاة:</b> ${tk.cancelReason || 'بناءً على طلب العميل أو التكرار'}</span>
                 </div>
-                <div><b>سبب الإلغاء:</b> ${tk.cancelReason || 'تذكرة مكررة'}</div>
-                ${tk.cancelNotes ? `<div style="font-size: 0.68rem; color: #b91c1c; margin-top: 2px;"><b>ملاحظات:</b> ${tk.cancelNotes}</div>` : ''}
               </div>
             `;
           } else if (isNewTicket) {
             actionHtml = `
-              <div style="background: #ffffff; border: 1px solid rgba(32, 39, 79, 0.1); padding: 12px 14px; border-radius: 14px; margin-top: 10px; box-shadow: 0 2px 8px rgba(32,39,79,0.03);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <div style="font-size: 0.75rem; font-weight: 800; color: #20274f; display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-user-gear" style="color: #1b8f91;"></i> اختيار الفني وتوجيه أمر العمل:
-                  </div>
-                  <button type="button" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.25); color: #dc2626; font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; flex-shrink: 0;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban" style="font-size: 0.62rem;"></i> إلغاء
-                  </button>
-                </div>
-                <select class="form-control" style="width: 100%; height: 38px; padding: 0 10px; font-size: 0.74rem; background: #ffffff; color: #20274f; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 8px; margin-bottom: 8px;" id="assignTechSelect_${tk.id}">
-                  <option value="كريم حسن">❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                  <option value="مينا جرجس">🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                  <option value="أحمد علي">⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                  <option value="سعيد محمود">🌿 سعيد محمود (فني لاندسكيب وري)</option>
+              <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(32,39,79,0.06); display: flex; gap: 8px; align-items: center;">
+                <select class="form-control" style="flex: 1; height: 38px; padding: 0 10px; font-size: 0.76rem; background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
+                  <option value="كريم حسن">❄️ كريم حسن (تكييف وكهروميكانيك)</option>
+                  <option value="مينا جرجس">🔧 مينا جرجس (شبكات وسباكة)</option>
+                  <option value="أحمد علي">⚡ أحمد علي (كهرباء وطاقة)</option>
+                  <option value="سعيد محمود">🌿 سعيد محمود (مرافق عامة وري)</option>
                 </select>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                  <button type="button" style="height: 36px; font-size: 0.74rem; font-weight: 800; background: #1b8f91; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,143,145,0.25); transition: opacity 0.2s;" onclick="app.dispatchToFieldService('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-bolt"></i> تحويل ميداني
-                  </button>
-                  <button type="button" style="height: 36px; font-size: 0.74rem; font-weight: 700; background: #ffffff; color: #20274f; border: 1px solid rgba(32,39,79,0.2); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-paper-plane"></i> إسناد عادي
-                  </button>
-                </div>
+                <button type="button" style="height: 38px; padding: 0 14px; font-size: 0.75rem; font-weight: 800; background: #1b8f91; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; box-shadow: 0 2px 6px rgba(27,143,145,0.25);" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
+                  <i class="fa-solid fa-paper-plane"></i> إسناد للفني
+                </button>
+                <button type="button" style="height: 38px; width: 38px; background: #f8fafc; border: 1px solid #fee2e2; color: #dc2626; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;" title="إلغاء البلاغ" onclick="app.openCancelTicketModal('${tk.id}')">
+                  <i class="fa-solid fa-ban" style="font-size: 0.75rem;"></i>
+                </button>
               </div>
             `;
           } else {
+            // Already Assigned
             actionHtml = `
-              <div style="background: #f8fafc; border: 1px solid rgba(32, 39, 79, 0.08); padding: 12px 14px; border-radius: 14px; margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(32, 39, 79, 0.06); gap: 8px;">
-                  <div style="font-weight: 800; color: #20274f; font-size: 0.76rem; display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
-                    <i class="fa-solid fa-circle-check" style="color: #10b981; flex-shrink: 0;"></i>
-                    <span style="white-space: nowrap; color: #64748b; font-weight: 600;">الفني المكلف:</span>
-                    <strong style="color: #1b8f91; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tk.assignedTech}</strong>
-                    <span style="font-size: 0.65rem; color: #64748b; font-weight: 600; white-space: nowrap; flex-shrink: 0; background: rgba(32,39,79,0.04); padding: 2px 6px; border-radius: 4px;">⏱️ ${tk.dispatchMins || 1} د</span>
+              <div style="margin-top: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 10px; border: 1px solid rgba(32,39,79,0.06); display: flex; align-items: center; justify-content: space-between; font-size: 0.74rem;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 26px; height: 26px; border-radius: 50%; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                    <i class="fa-solid fa-user-check"></i>
+                  </span>
+                  <div>
+                    <span style="color: #64748b; font-size: 0.68rem;">الفني المسؤول:</span>
+                    <strong style="color: #20274f; font-weight: 800; margin-right: 4px;">${tk.assignedTech}</strong>
                   </div>
-                  <button type="button" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.25); color: #dc2626; font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; flex-shrink: 0;" onclick="app.openCancelTicketModal('${tk.id}')">
-                    <i class="fa-solid fa-ban" style="font-size: 0.62rem;"></i> إلغاء
-                  </button>
                 </div>
-                <label style="font-size: 0.68rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: block;">تعديل التكليف أو توجيه ميداني:</label>
-                <select class="form-control" style="width: 100%; height: 38px; padding: 0 10px; font-size: 0.74rem; background: #ffffff; color: #20274f; border: 1px solid #cbd5e1; font-weight: 700; border-radius: 8px; margin-bottom: 8px;" id="assignTechSelect_${tk.id}">
-                  <option value="كريم حسن" ${tk.assignedTech === 'كريم حسن' ? 'selected' : ''}>❄️ كريم حسن (فني تكييف وكهروميكانيك)</option>
-                  <option value="مينا جرجس" ${tk.assignedTech === 'مينا جرجس' ? 'selected' : ''}>🔧 مينا جرجس (فني شبكات وسباكة)</option>
-                  <option value="أحمد علي" ${tk.assignedTech === 'أحمد علي' ? 'selected' : ''}>⚡ أحمد علي (فني كهرباء وطاقة)</option>
-                  <option value="سعيد محمود" ${tk.assignedTech === 'سعيد محمود' ? 'selected' : ''}>🌿 سعيد محمود (فني لاندسكيب وري)</option>
-                </select>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                  <button type="button" style="height: 36px; font-size: 0.74rem; font-weight: 800; background: #1b8f91; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,143,145,0.25);" onclick="app.dispatchToFieldService('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-bolt"></i> تحويل ميداني
-                  </button>
-                  <button type="button" style="height: 36px; font-size: 0.74rem; font-weight: 700; background: #ffffff; color: #20274f; border: 1px solid rgba(32,39,79,0.2); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
-                    <i class="fa-solid fa-arrows-rotate"></i> تحديث الفني
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span class="badge badge-info" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span>
+                  <button type="button" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 4px 6px; font-size: 0.72rem;" title="إلغاء التذكرة" onclick="app.openCancelTicketModal('${tk.id}')">
+                    <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
               </div>
             `;
           }
 
+          // Clean description: Only show if distinct from title and meaningful
+          let detailsSnippet = '';
+          if (tk.details && tk.details.trim().length > 0) {
+            const cleanTitle = (tk.title || '').trim().toLowerCase();
+            const cleanDetails = tk.details.trim().toLowerCase();
+            if (cleanDetails !== cleanTitle && !cleanDetails.includes(cleanTitle.substring(0, 15))) {
+              detailsSnippet = `<div style="font-size: 0.72rem; color: #475569; background: #f8fafc; padding: 6px 10px; border-radius: 8px; margin-top: 6px; line-height: 1.4;">${tk.details}</div>`;
+            }
+          }
+
           managerList.innerHTML += `
-            <div class="ticket-item" style="${cardStyle}">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #ffffff; border: 1px solid rgba(32,39,79,0.08); border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(32,39,79,0.03); display: flex; flex-direction: column;">
+              <!-- Top Row: Source, ID, SLA -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
-                  ${sourceBadgeHtml}
-                  ${isNewTicket ? `<span class="badge" style="background: #f59e0b; color: #ffffff !important; font-weight: 800; font-size: 0.62rem;"><i class="fa-solid fa-star"></i> جديد</span>` : ''}
+                  <span style="font-size: 0.68rem; font-weight: 800; color: ${sourceColor}; background: ${sourceBg}; padding: 2px 8px; border-radius: 6px;">
+                    ${sourceLabel}
+                  </span>
+                  <span style="font-size: 0.68rem; font-weight: 700; color: #94a3b8;">#${tk.id}</span>
                 </div>
-                ${slaBadgeHtml}
+                ${slaHtml}
               </div>
-              <h4 style="font-size: 0.92rem; font-weight: 800; color: #20274f; margin-top: 8px; margin-bottom: 4px;">${tk.title}</h4>
-              <div style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span>التخصص: <b style="color: #20274f;">${tk.category || 'عام'}</b></span>
-                <span>• كود البلاغ: <b style="color: #1b8f91;">#${tk.id}</b></span>
-                <span>• الحالة: <span class="badge ${statusBadgeClass}" style="font-size: 0.65rem; font-weight: 700;">${tk.status}</span></span>
+
+              <!-- Ticket Main Title & Category -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <h4 style="font-size: 0.88rem; font-weight: 800; color: #20274f; margin: 0; line-height: 1.4; flex: 1;">${tk.title}</h4>
+                <span style="font-size: 0.65rem; color: #64748b; background: rgba(32,39,79,0.04); padding: 2px 6px; border-radius: 4px; font-weight: 700; white-space: nowrap;">
+                  ${tk.category || 'صيانة عامة'}
+                </span>
               </div>
-              ${tk.details ? `<div style="font-size: 0.74rem; color: #334155; background: ${isNewTicket ? 'rgba(245,158,11,0.06)' : 'rgba(32,39,79,0.03)'}; padding: 8px 10px; border-radius: 8px; margin-top: 6px; border: 1px dashed rgba(32,39,79,0.12);"><b>الوصف:</b> ${tk.details}</div>` : ''}
+
+              ${detailsSnippet}
               ${actionHtml}
             </div>
           `;
@@ -6897,21 +6925,21 @@ class UltimateFMApp {
       const baseUrl = urlInput.replace(/\/+$/, '');
       const uid = 2;
 
-      let partnerId = 10; // حسن عيسى (فيلا A104 - المرحلة الأولى)
+      let partnerId = 7755; // حسن عيسى (شريك فيلا A104 في أودو)
       if (tk.requester === 'tenant') partnerId = 11;
       else if (tk.requester === 'commercial') partnerId = 12;
 
       const unitStr = tk.location || 'فيلا A104 - المرحلة الأولى';
       const taskFields = {
-        name: `[${unitStr}] ${tk.title || 'صيانة ميدانية'} (#${tk.id})`,
-        project_id: 2, // Project 2 = Field Service
-        stage_id: 18,  // Stage 18 = In Progress
-        partner_id: partnerId,
-        description: `<p><b>أمر صيانة ميدانية صادر عن بلاغ #${tk.id}</b></p>` +
-                     `<p>• <b>الموقع والوحدة:</b> ${unitStr}</p>` +
-                     `<p>• <b>العميل:</b> حسن عيسى (هاتف: 01223456789)</p>` +
-                     `<p>• <b>الفني المكلف:</b> ${techName}</p>` +
-                     `<p>• <b>تفاصيل العطل:</b> ${tk.details || tk.title}</p>`
+            name: `[أمر عمل ميداني - طلب قطعة غيار] ${partName} (${unitStr})`,
+            project_id: 2, // Field Service
+            stage_id: 18,  // In Progress
+            partner_id: partnerId,
+            description: `<p><b>إخطار صيانة لطلب قطعة الغيار بعد فحص الفني لموقع العطل الميداني:</b></p>` +
+                         `<p>• <b>القطعة المطلوبة:</b> ${partName} (السعر: ${partPrice} ج.م)</p>` +
+                         `<p>• <b>الوحدة:</b> ${unitStr}</p>` +
+                         `<p>• <b>فني المعاينة:</b> ${techName}</p>` +
+                         `<p>• <b>التذكرة الأصلية:</b> #${tk.id} - ${tk.title}</p>`
       };
 
       const taskPayload = {
@@ -7035,13 +7063,82 @@ class UltimateFMApp {
       date: new Date().toLocaleTimeString('ar-EG') 
     });
 
+    tk.needsPart = true;
+    tk.isFieldService = true;
+
+    // Trigger immediate Field Service Task creation in Odoo right now!
+    (async () => {
+      try {
+        if (!tk.fieldServiceTaskId && !tk.odooTaskId) {
+          const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+          const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+          const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+          const baseUrl = urlInput.replace(/\/+$/, '');
+          const uid = 2;
+
+          let partnerId = (tk.requester === 'tenant') ? 7758 : 7755;
+          const unitStr = tk.location || (tk.requester === 'tenant' ? 'شاليه A112' : 'فيلا A104');
+          const taskFields = {
+            name: `[أمر عمل ميداني - طلب قطعة غيار] ${partName} (${unitStr})`,
+            project_id: 2, // Field Service
+            stage_id: 18,  // In Progress
+            partner_id: partnerId,
+            description: `<p><b>إخطار صيانة لطلب قطعة الغيار بعد فحص الفني لموقع العطل الميداني:</b></p>` +
+                         `<p>• <b>القطعة المطلوبة:</b> ${partName} (السعر: ${partPrice} ج.م)</p>` +
+                         `<p>• <b>الوحدة:</b> ${unitStr}</p>` +
+                         `<p>• <b>فني المعاينة:</b> ${techName}</p>` +
+                         `<p>• <b>التذكرة الأصلية:</b> #${tk.id} - ${tk.title}</p>`
+          };
+
+          const taskPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [dbInput, uid, keyInput, "project.task", "create", [taskFields]]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+
+          const res = await this.callOdoo(baseUrl, taskPayload);
+          if (res && res.result) {
+            tk.fieldServiceTaskId = res.result;
+            tk.odooTaskId = res.result;
+            console.log('[Field Service] Live project.task created on spare part request ID:', res.result);
+
+            // Post chatter to helpdesk ticket
+            if (tk.odooId) {
+              const chatterPayload = {
+                jsonrpc: "2.0",
+                method: "call",
+                params: {
+                  service: "object",
+                  method: "execute_kw",
+                  args: [
+                    dbInput, uid, keyInput, "helpdesk.ticket", "message_post",
+                    [[parseInt(tk.odooId)]],
+                    { body: `<p>⚡ <b>أكد الفني بعد المعاينة الحاجة لقطعة غيار [${partName}]</b></p><p>تم تحويل البلاغ لأمر خدمة ميدانية بمشروع Field Service برقم (#WO-${res.result})</p>` }
+                  ]
+                },
+                id: Math.floor(Math.random() * 1000)
+              };
+              this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn(e));
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[Field Service Task Creation on Part Request Error]:', err);
+      }
+    })();
+
     this.saveTicketsToStorage();
     this.renderTickets();
     
     if (isPublicTicket) {
-      this.showToast(`✅ تم صرف [${partName}] عدد (${qty}) من مستودع الموقع.`);
+      this.showToast('✅ تم طلب وصرف قطعة الغيار من مستودع الموقع العام.\nتم ترحيل البلاغ لأمر عمل ميداني رسمي!');
     } else {
-      this.showToast(`✅ تم صرف [${partName}] عدد (${qty}) من المستودع.`);
+      this.showToast('✅ تم طلب وصرف قطعة الغيار من المستودع.\nتم تحويل البلاغ تلقائياً لأمر عمل صيانة ميدانية رسمي (Field Service)!');
     }
   }
 
@@ -7181,6 +7278,16 @@ class UltimateFMApp {
             id: Math.floor(Math.random() * 1000)
           };
           this.callOdoo(baseUrl, taskChatter).catch(e => console.warn(e));
+        }
+
+        // Phase 1: Trigger Live Odoo stock.picking if parts were consumed
+        if (tk.partsUsed && tk.partsUsed.length > 0) {
+          const partnerId = tk.requester === 'tenant' ? 7758 : 7755;
+          const pickingId = await this.createOdooStockPicking(partnerId, tk.partsUsed, `#WO-${taskId || tk.id}`);
+          if (pickingId) {
+            tk.odooPickingId = pickingId;
+            console.log('[Field Service] Linked Odoo Stock Picking ID:', pickingId);
+          }
         }
 
         // 2. Also close the Helpdesk ticket in Odoo (Stage 4 = Solved)
@@ -7468,6 +7575,148 @@ class UltimateFMApp {
       
       this.syncTicketUpdateToOdoo(tk);
     }
+  }
+
+
+  // ==========================================
+  // PHASE 1: LIVE ODOO INVENTORY & ACCOUNTING INTEGRATION
+  // ==========================================
+  async createOdooStockPicking(partnerId, partsList, originDoc = '') {
+    if (!partsList || partsList.length === 0) return null;
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    if (!urlInput || !dbInput || !userInput || !keyInput) return null;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2;
+
+    // Map common parts to product IDs in Odoo (or fallback to product 11)
+    const productMapping = {
+      'قاطع': 11,
+      'ثيرموستات': 10,
+      'مروحة': 12,
+      'فريون': 13,
+      'نجيل': 6,
+      'ري': 6,
+      'محبس': 11
+    };
+
+    const moveLines = partsList.map(p => {
+      let prodId = 11;
+      const lower = (p.name || '').toLowerCase();
+      for (const key in productMapping) {
+        if (lower.includes(key)) { prodId = productMapping[key]; break; }
+      }
+      return [0, 0, {
+        product_id: prodId,
+        product_uom_qty: parseFloat(p.qty) || 1.0,
+        product_uom: 1,
+        location_id: 5,
+        location_dest_id: 2,
+        description_picking: p.name || 'قطع غيار صيانة'
+      }];
+    });
+
+    const payload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: {
+        service: 'object',
+        method: 'execute_kw',
+        args: [
+          dbInput, uid, keyInput,
+          'stock.picking', 'create',
+          [{
+            picking_type_id: 2,
+            partner_id: partnerId || 7755,
+            origin: originDoc || '#WO-DISPATCH',
+            location_id: 5,
+            location_dest_id: 2,
+            move_ids: moveLines
+          }]
+        ]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    try {
+      const res = await this.callOdoo(baseUrl, payload, 8000);
+      if (res && res.result) {
+        console.log('[Odoo Inventory] Created stock.picking ID:', res.result);
+        return res.result;
+      }
+    } catch (e) {
+      console.warn('[Odoo Stock Picking Error]:', e);
+    }
+    return null;
+  }
+
+  async createOdooInvoice(partnerId, amount, description, ref = '') {
+    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    if (!urlInput || !dbInput || !userInput || !keyInput) return null;
+    const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2;
+
+    const payload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: {
+        service: 'object',
+        method: 'execute_kw',
+        args: [
+          dbInput, uid, keyInput,
+          'account.move', 'create',
+          [{
+            move_type: 'out_invoice',
+            partner_id: partnerId || 7755,
+            journal_id: 8,
+            ref: ref || 'سداد إلكتروني عبر تطبيق الموبايل',
+            invoice_line_ids: [
+              [0, 0, {
+                name: description || 'خدمات صيانة وتشغيل',
+                quantity: 1.0,
+                price_unit: parseFloat(amount) || 100.0
+              }]
+            ]
+          }]
+        ]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    try {
+      const res = await this.callOdoo(baseUrl, payload, 8000);
+      if (res && res.result) {
+        const invId = res.result;
+        console.log('[Odoo Accounting] Created customer invoice ID:', invId);
+
+        try {
+          const postPayload = {
+            jsonrpc: '2.0',
+            method: 'call',
+            params: {
+              service: 'object',
+              method: 'execute_kw',
+              args: [dbInput, uid, keyInput, 'account.move', 'action_post', [[invId]]]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          await this.callOdoo(baseUrl, postPayload, 8000);
+          console.log('[Odoo Accounting] Invoice posted successfully ID:', invId);
+        } catch (postErr) {
+          console.warn('[Odoo Post Invoice Notice]:', postErr);
+        }
+
+        return invId;
+      }
+    } catch (e) {
+      console.warn('[Odoo Invoice Error]:', e);
+    }
+    return null;
   }
 
   renderPestControl() {
@@ -8053,6 +8302,25 @@ class UltimateFMApp {
     this.renderTickets();
     this.syncTicketUpdateToOdoo(tk);
 
+    // Live Odoo Invoice Generation for Spare Part
+    (async () => {
+      try {
+        const partnerId = (tk.requester === 'tenant') ? 7758 : 7755;
+        const invId = await this.createOdooInvoice(
+          partnerId,
+          tk.partPrice || 150.0,
+          `سداد قيمة قطعة غيار [${tk.partName || 'محبس نحاس'}] - تذكرة #${tk.id}`,
+          `INV-PART-${tk.id}`
+        );
+        if (invId) {
+          tk.odooInvoiceId = invId;
+          console.log('[Odoo Accounting] Created spare part invoice ID:', invId);
+        }
+      } catch (invErr) {
+        console.warn('[Spare Part Invoice Error]:', invErr);
+      }
+    })();
+
     const methodArabic = method === 'saved' ? 'البطاقة المسجلة (تنتهي بـ 4012)' : 'البطاقة الجديدة';
     this.showToast(`✅ تم سداد قيمة قطعة الغيار [${tk.partName}] بمبلغ [${tk.partPrice} ج.م] بنجاح عبر ${methodArabic}!\nتم إشعار الفني [كريم حسن] لصرف القطعة وبدء التركيب فوراً.`);
   }
@@ -8181,58 +8449,17 @@ class UltimateFMApp {
   }
 
   async getOdooOwnerPartnerId(baseUrl, dbInput, uid, keyInput) {
-    // Strategy 1: Check partner_id on res.users for current logged-in user (uid)
-    try {
-      const userPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput, uid, keyInput,
-            "res.users",
-            "read",
-            [[uid]],
-            { fields: ["partner_id"] }
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-      const uRes = await this.callOdoo(baseUrl, userPayload);
-      if (uRes && uRes.result && uRes.result.length > 0 && uRes.result[0].partner_id) {
-        const pid = Array.isArray(uRes.result[0].partner_id) ? uRes.result[0].partner_id[0] : uRes.result[0].partner_id;
-        if (pid) return pid;
-      }
-    } catch (e) {}
+    // Priority 1: Match logged in resident role
+    if (this.currentRole === 'tenant') {
+      return 7758; // أحمد زاهر (شاليه A112)
+    }
+    const customName = safeStorage.getItem('odoo_owner_name') || '';
+    if (customName.includes('أحمد') || customName.includes('زاهر')) {
+      return 7758;
+    }
 
-    // Strategy 2: Search partner by email or name
-    try {
-      const userEmail = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-      const customName = safeStorage.getItem('odoo_owner_name') || 'حسن عيسى';
-      const searchPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput, uid, keyInput,
-            "res.partner",
-            "search_read",
-            ["|", ["email", "ilike", userEmail], ["name", "ilike", customName]],
-            { fields: ["id"], limit: 1 }
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-      const sRes = await this.callOdoo(baseUrl, searchPayload);
-      if (sRes && sRes.result && sRes.result.length > 0) {
-        return sRes.result[0].id;
-      }
-    } catch (e) {}
-
-    return 3;
+    // Default for Homeowner / Family: حسن عيسى (فيلا A104 - الشريك المعتمد في أودو)
+    return 7755;
   }
 
   async syncFamilyMemberToOdoo(name, relation, phone, email, idFrontBase64, idBackBase64) {
@@ -9565,9 +9792,9 @@ class UltimateFMApp {
   }
 
   executeLogin(role) {
-    if (this._isLoggingIn) return;
-    this._isLoggingIn = true;
-    setTimeout(() => { this._isLoggingIn = false; }, 400);
+    // click lock removed
+    //
+    //
 
     this.switchRole(role);
     if (['homeowner', 'family', 'tenant', 'commercial'].includes(role)) {
@@ -9760,7 +9987,7 @@ class UltimateFMApp {
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
     const uid = 2;
-    const partnerId = 3;
+    const partnerId = (this.currentRole === 'tenant') ? 7758 : 7755; // حسن عيسى كشريك رئيسي
 
     // Step 1: Write directly to Cars tab One2many model (x_res_partner_line_62022) with x_name = plate
     let carLineId = null;
@@ -11716,6 +11943,7 @@ if (document.readyState === 'loading') {
 }
 
 
-</script>
+
+  </script>
 </body>
 </html>
