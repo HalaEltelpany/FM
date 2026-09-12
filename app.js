@@ -154,7 +154,8 @@ class UltimateFMApp {
       try { this.loadTicketsFromStorage(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.syncTicketsFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.fetchOwnerChatterMessagesFromOdoo(); } catch (e) { console.warn('[Init warning]:', e); }
-      try { this.renderTickets(); } catch (e) { console.warn('[Init warning]:', e); }
+      try { this.renderTickets();
+    setTimeout(() => { if (this.checkEventRsvpStatusAndReplies) this.checkEventRsvpStatusAndReplies(); }, 500); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderManagerDirectives(); } catch (e) { console.warn('[Init warning]:', e); }
 
       // Start cleanly on the main role selection grid so all 10 screens are accessible, or execute pending click
@@ -5751,6 +5752,107 @@ class UltimateFMApp {
     }
   }
 
+  async checkEventRsvpStatusAndReplies() {
+    try {
+      const banner = document.getElementById('eventVipPassBanner');
+      const codeEl = document.getElementById('eventVipPassCode');
+      const btnRsvp = document.getElementById('btnEventRsvp');
+
+      const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+      const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+      const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+      const baseUrl = urlInput.replace(/\/+$/, '');
+      const uid = 2;
+
+      let odooTicketId = safeStorage.getItem('active_rsvp_ticket_id');
+      odooTicketId = odooTicketId ? parseInt(odooTicketId) : null;
+
+      // If not stored, query Odoo for latest RSVP ticket in Promotion Team (11)
+      if (!odooTicketId || isNaN(odooTicketId)) {
+        const searchPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              "helpdesk.ticket",
+              "search_read",
+              [[["team_id", "=", 11], ["name", "ilike", "كاريوكي"]], ["id", "name", "stage_id"]]
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const searchRes = await this.callOdoo(baseUrl, searchPayload);
+        if (searchRes && searchRes.result && searchRes.result.length > 0) {
+          odooTicketId = searchRes.result[0].id;
+          safeStorage.setItem('active_rsvp_ticket_id', odooTicketId);
+        }
+      }
+
+      if (odooTicketId) {
+        if (btnRsvp) {
+          btnRsvp.setAttribute('data-confirmed', 'true');
+          btnRsvp.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تأكيد الحضور`;
+          btnRsvp.style.background = '#10b981';
+        }
+
+        const replies = await this.fetchTicketRepliesFromOdoo(odooTicketId);
+        if (replies && replies.length > 0) {
+          const adminReply = replies.slice().reverse().find(r => {
+            const b = (r.body || '').replace(/<[^>]*>?/gm, '').trim();
+            return b && !b.toLowerCase().includes('ticket created') && !b.toLowerCase().includes('dear ');
+          });
+
+          if (adminReply) {
+            const cleanText = adminReply.body.replace(/<[^>]*>?/gm, '').trim();
+            if (banner && codeEl) {
+              codeEl.innerText = cleanText;
+              banner.style.display = 'block';
+            }
+            safeStorage.setItem('event_rsvp_confirmed_code', cleanText);
+
+            // 1. Also push to Homeowner Inbox (صندوق الرسائل) so they see Halah's reply there!
+            const replyMsgId = 'RSVP-MSG-' + (adminReply.id || '1216');
+            this._localChatterMessages = this._localChatterMessages || [];
+            if (!this._localChatterMessages.some(m => m.id === replyMsgId)) {
+              this._localChatterMessages.unshift({
+                id: replyMsgId,
+                author_id: [11, 'فريق الفعاليات والترويج (Promotion Team - Halah)'],
+                body: `<b>[كود تصريح الحفل المعتمد]</b><br/>${cleanText}<br/><small style="color: #10b981; font-weight: 700;">• تم اعتماد وتأكيد دخولك لسهرة الكاريوكي على الشاطئ بنجاح ✔️</small>`,
+                date: adminReply.date || new Date().toISOString(),
+                create_date: adminReply.date || new Date().toISOString()
+              });
+              safeStorage.setItem('owner_local_chat_messages', JSON.stringify(this._localChatterMessages));
+              this.renderOwnerChatterMessages(this._localChatterMessages);
+            }
+
+            // 2. Also ensure visible in Homeowner Tickets (قائمة التذاكر)
+            if (!this.tickets.some(t => String(t.odooId) === String(odooTicketId))) {
+              this.tickets.unshift({
+                id: `EVT-${odooTicketId}`,
+                odooId: odooTicketId,
+                category: 'فعاليات وترويج مجتمعي',
+                title: 'سهرة كاريوكي على الشاطئ (Beach Karaoke Night)',
+                details: `تصريح حضور الحفلة الرسمي بالقرية\nالرد المعتمد من الإدارة: ${cleanText}`,
+                status: 'تم اعتماد وتأكيد الحضور',
+                bgClass: 'badge-success',
+                requester: 'homeowner',
+                priority: '2',
+                createdAt: new Date()
+              });
+              this.saveTicketsToStorage();
+              this.renderTickets();
+            }
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('[Check RSVP Status Exception]', e);
+    }
+  }
+
   async fetchTicketRepliesFromOdoo(odooId) {
     if (!odooId || odooId === 'undefined' || odooId === 'null') return [];
     const targetResId = parseInt(odooId);
@@ -5791,8 +5893,7 @@ class UltimateFMApp {
             dbInput, uid, keyInput,
             "mail.message",
             "search_read",
-            [[["model", "=", "helpdesk.ticket"], ["res_id", "=", targetResId]]],
-            { fields: ["id", "body", "author_id", "date", "create_date"], order: "create_date asc" }
+            [[["model", "=", "helpdesk.ticket"], ["res_id", "=", targetResId]], ["id", "body", "author_id", "date", "create_date"]]
           ]
         },
         id: Math.floor(Math.random() * 1000)
