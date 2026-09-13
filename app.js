@@ -1276,7 +1276,7 @@ class UltimateFMApp {
       resolutionTime: ''
     };
 
-    const proceedWithTicket = (finalPhoto) => {
+    const proceedWithTicket = async (finalPhoto) => {
       newTicket.photoBefore = finalPhoto || defaultPhoto;
       this.tickets.unshift(newTicket);
       this.saveTicketsToStorage();
@@ -1289,8 +1289,12 @@ class UltimateFMApp {
 
       this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}!\nجاري الحفظ والمزامنة مع السجل المركزي...`);
 
-      // Live sync to Odoo Helpdesk
-      this.syncTicketToOdoo(newTicket, '01223456789', 'حسن عيسى');
+      // Live sync to Odoo Helpdesk (awaited for immediate odooId assignment)
+      try {
+        await this.syncTicketToOdoo(newTicket, '01223456789', 'حسن عيسى');
+      } catch (e) {
+        console.warn('[Odoo Initial Sync Warning]:', e);
+      }
     };
 
     if (photoInput && photoInput.files && photoInput.files[0]) {
@@ -1484,24 +1488,20 @@ class UltimateFMApp {
       .replace(/ى/g, 'ي')
       .trim();
 
-    // 1. Solved / Completed (Stage 4) - ONLY when finished/solved
-    if (s.includes('تم الانتهاء') || s.includes('تم الحل') || s.includes('تم الاغلاق') || s.includes('مكتمل') || s === 'solved' || s === 'completed' || s === 'closed') {
+    // 1. Solved / Completed (Stage 4 in Odoo Helpdesk)
+    if (s.includes('تم الانتهاء') || s.includes('تم الحل') || s.includes('تم الاغلاق') || s.includes('مكتمل') || s.includes('منتهي') || s.includes('solved') || s.includes('completed') || s.includes('closed') || s.includes('done')) {
       return 4;
     }
-    // 2. On Hold (Stage 3)
-    if (s.includes('قطع') || s.includes('غيار') || s.includes('معلق') || s.includes('انتظار') || s.includes('hold')) {
-      return 3;
-    }
-    // 3. Cancelled (Stage 5)
+    // 2. Cancelled (Stage 5 in Odoo Helpdesk)
     if (s.includes('ملغي') || s.includes('الغاء') || s.includes('cancel')) {
       return 5;
     }
-    // 4. In Progress (Stage 2) - Assignment & Work in Progress
-    if (s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('progress')) {
+    // 3. In Progress (Stage 2 in Odoo Helpdesk) - Immediately when assigned or work begins
+    if (s.includes('تنفيذ') || s.includes('اسناد') || s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('تركيب') || s.includes('progress') || s.includes('assigned')) {
       return 2;
     }
-    // 5. New (Stage 1)
-    if (s.includes('جديد') || s.includes('new')) {
+    // 4. New (Stage 1 in Odoo Helpdesk)
+    if (s.includes('جديد') || s.includes('new') || s.includes('انتظار')) {
       return 1;
     }
 
@@ -1530,6 +1530,7 @@ class UltimateFMApp {
         const authData = await this.callOdoo(baseUrl, authPayload);
         if (authData && authData.result) {
           const uid = authData.result;
+          const searchModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
           const searchPayload = {
             jsonrpc: "2.0",
             method: "call",
@@ -1538,10 +1539,12 @@ class UltimateFMApp {
               method: "execute_kw",
               args: [
                 dbInput, uid, keyInput,
-                "helpdesk.ticket",
+                searchModel,
                 "search_read",
-                [[["name", "ilike", ticket.id]]],
-                { fields: ["id", "name"], limit: 1 }
+                [
+                  [[ "name", "ilike", ticket.id ]],
+                  [ "id", "name", "stage_id" ]
+                ]
               ]
             },
             id: Math.floor(Math.random() * 1000)
@@ -1565,6 +1568,7 @@ class UltimateFMApp {
     }
 
     const uid = 2; // Direct cached admin UID for instant < 500ms update
+    ticket.odooModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
 
     try {
       const targetStageId = this.resolveOdooStageId(ticket.status);
@@ -3604,7 +3608,13 @@ class UltimateFMApp {
       this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
       // Sync update to Odoo (Stage 2 = In Progress)
-      this.syncTicketUpdateToOdoo(tk);
+      (async () => {
+        try {
+          await this.syncTicketUpdateToOdoo(tk);
+        } catch (e) {
+          console.warn('[Assign Odoo Sync Error]:', e);
+        }
+      })();
     }
   }
 
