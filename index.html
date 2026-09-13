@@ -4877,9 +4877,15 @@ class UltimateFMApp {
             return;
           }
           const recOdooIdStr = String(rec.id);
-          const stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
+          let stageName = Array.isArray(rec.stage_id) ? rec.stage_id[1] : 'جديد';
+          if (stageName === 'In Progress') stageName = 'قيد التنفيذ';
+          else if (stageName === 'Solved') stageName = 'تم الحل';
+          else if (stageName === 'New') stageName = 'جديد';
+          else if (stageName === 'Cancelled') stageName = 'ملغي';
+
           let bg = 'badge-warning';
-          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved')) bg = 'badge-success';
+          if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved') || stageName === 'تم الحل') bg = 'badge-success';
+          else if (stageName.includes('Progress') || stageName === 'قيد التنفيذ') bg = 'badge-info';
 
           // 1. If this Odoo ticket ID is already linked to a local ticket, update its status
           const existingByOdooId = this.tickets.find(t => String(t.odooId) === recOdooIdStr || String(t.id) === `TK-OD-${rec.id}`);
@@ -4889,11 +4895,15 @@ class UltimateFMApp {
             return;
           }
 
-          // 2. If a local ticket with matching title/name exists (recently created local copy without odooId linked yet), link & update it!
+          // 2. If a local ticket with matching title/name or code exists (recently created local copy without odooId linked yet), link & update it!
           const cleanName = (rec.name || '').trim().toLowerCase();
-          const existingMatchingLocal = this.tickets.find(t => !t.odooId && (t.title || '').trim().toLowerCase() === cleanName);
+          const existingMatchingLocal = this.tickets.find(t => !t.odooId && (
+            (t.title || '').trim().toLowerCase() === cleanName ||
+            (t.id && cleanName.includes(String(t.id).toLowerCase()))
+          ));
           if (existingMatchingLocal) {
             existingMatchingLocal.odooId = rec.id;
+            existingMatchingLocal.odooModel = 'helpdesk.ticket';
             existingMatchingLocal.status = stageName;
             existingMatchingLocal.bgClass = bg;
             return;
@@ -5356,7 +5366,7 @@ class UltimateFMApp {
     }
   }
 
-  resolveOdooStageId(status) {
+  resolveOdooStageId(status, model = 'helpdesk.ticket') {
     if (!status) return 1;
     const s = String(status).toLowerCase()
       .replace(/[أإآ]/g, 'ا')
@@ -5364,19 +5374,21 @@ class UltimateFMApp {
       .replace(/ى/g, 'ي')
       .trim();
 
-    // 1. Solved / Completed (Stage 4 in Odoo Helpdesk)
-    if (s.includes('تم الانتهاء') || s.includes('تم الحل') || s.includes('تم الاغلاق') || s.includes('مكتمل') || s.includes('منتهي') || s.includes('solved') || s.includes('completed') || s.includes('closed') || s.includes('done')) {
-      return 4;
+    const isMaintenance = model === 'maintenance.request';
+
+    // 1. Solved / Completed (Stage 4 in Odoo Helpdesk, Stage 3 Repaired in Maintenance)
+    if (s.includes('تم الانتهاء') || s.includes('تم الحل') || s.includes('تم الاغلاق') || s.includes('مكتمل') || s.includes('منتهي') || s.includes('solved') || s.includes('completed') || s.includes('closed') || s.includes('done') || s.includes('repaired')) {
+      return isMaintenance ? 3 : 4;
     }
-    // 2. Cancelled (Stage 5 in Odoo Helpdesk)
-    if (s.includes('ملغي') || s.includes('الغاء') || s.includes('cancel')) {
-      return 5;
+    // 2. Cancelled (Stage 5 in Odoo Helpdesk, Stage 4 Scrap in Maintenance)
+    if (s.includes('ملغي') || s.includes('الغاء') || s.includes('cancel') || s.includes('scrap')) {
+      return isMaintenance ? 4 : 5;
     }
-    // 3. In Progress (Stage 2 in Odoo Helpdesk) - Immediately when assigned or work begins
+    // 3. In Progress (Stage 2 in Odoo Helpdesk & Maintenance) - Immediately when assigned or work begins
     if (s.includes('تنفيذ') || s.includes('اسناد') || s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('تركيب') || s.includes('progress') || s.includes('assigned')) {
       return 2;
     }
-    // 4. New (Stage 1 in Odoo Helpdesk)
+    // 4. New (Stage 1 in Odoo Helpdesk & Maintenance)
     if (s.includes('جديد') || s.includes('new') || s.includes('انتظار')) {
       return 1;
     }
@@ -5393,61 +5405,51 @@ class UltimateFMApp {
     const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2; // Direct cached admin UID for instant < 500ms execution
+
+    ticket.odooModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
 
     // Search Odoo by local ticket code (#TK-XXXX) if odooId is missing, preventing duplicate creation!
-    if (!ticket.odooId || !ticket.odooModel) {
+    if (!ticket.odooId) {
       try {
-        const authPayload = {
+        const searchPayload = {
           jsonrpc: "2.0",
           method: "call",
-          params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              dbInput, uid, keyInput,
+              ticket.odooModel,
+              "search_read",
+              [[["name", "ilike", ticket.id]]],
+              {
+                fields: ["id", "name", "stage_id"],
+                limit: 1
+              }
+            ]
+          },
           id: Math.floor(Math.random() * 1000)
         };
-        const authData = await this.callOdoo(baseUrl, authPayload);
-        if (authData && authData.result) {
-          const uid = authData.result;
-          const searchModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
-          const searchPayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                searchModel,
-                "search_read",
-                [
-                  [[ "name", "ilike", ticket.id ]],
-                  [ "id", "name", "stage_id" ]
-                ]
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          const searchRes = await this.callOdoo(baseUrl, searchPayload);
-          if (searchRes && searchRes.result && searchRes.result.length > 0) {
-            ticket.odooId = searchRes.result[0].id;
-            ticket.odooModel = "helpdesk.ticket";
-            this.saveTicketsToStorage();
-            console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
-          }
+        const searchRes = await this.callOdoo(baseUrl, searchPayload, 6000);
+        if (searchRes && searchRes.result && searchRes.result.length > 0) {
+          ticket.odooId = searchRes.result[0].id;
+          this.saveTicketsToStorage();
+          console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
         }
       } catch (sErr) {
         console.warn('[Odoo Search Error]:', sErr);
       }
 
       if (!ticket.odooId) {
+        ticket._odooSynced = false;
         await this.syncTicketToOdoo(ticket);
       }
       if (!ticket.odooId) return;
     }
 
-    const uid = 2; // Direct cached admin UID for instant < 500ms update
-    ticket.odooModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
-
     try {
-      const targetStageId = this.resolveOdooStageId(ticket.status);
+      const targetStageId = this.resolveOdooStageId(ticket.status, ticket.odooModel);
       console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
       // 1. FAST DIRECT WRITE FIRST (Ensures Stage moves to In Progress / Solved instantly)
@@ -5479,6 +5481,8 @@ class UltimateFMApp {
       const writeData = await this.callOdoo(baseUrl, writePayload, 6000);
       if (writeData && writeData.result) {
         console.log(`[Odoo Stage Update Success] Stage updated to ${targetStageId}:`, writeData.result);
+        const stageLabel = targetStageId === 2 ? 'قيد التنفيذ (In Progress)' : ((targetStageId === 4 || targetStageId === 3) ? 'تم الحل (Solved)' : 'محدث');
+        this.showToast(`🔄 تم تحديث مرحلة البلاغ في أودو بنجاح (${stageLabel})`);
       } else if (writeData && writeData.error) {
         console.error('[Odoo Stage Update Error]:', writeData.error);
       }
@@ -5528,22 +5532,21 @@ class UltimateFMApp {
                   [{
                     name: `صورة_بعد_الإصلاح_تذكرة_${ticket.id}.jpg`,
                     datas: base64Content,
-                    res_model: "helpdesk.ticket",
+                    res_model: ticket.odooModel,
                     res_id: parseInt(ticket.odooId)
                   }]
                 ]
               },
               id: Math.floor(Math.random() * 1000)
             };
-            await this.callOdoo(baseUrl, attachPayload);
-            console.log('[Odoo Sync] After-repair photo attached to Odoo ticket #', ticket.odooId);
+            this.callOdoo(baseUrl, attachPayload, 6000).catch(e => console.warn('[Odoo Photo Post Failed]', e));
           }
-        } catch (attErr) {
-          console.warn('[Odoo Attachment After Exception]:', attErr);
+        } catch (photoErr) {
+          console.warn('[Odoo Photo After Error]:', photoErr);
         }
       }
     } catch (err) {
-      console.error('[Odoo Update Exception]:', err);
+      console.error('[Odoo Sync Update Error]:', err);
     }
   }
 
@@ -7043,6 +7046,8 @@ class UltimateFMApp {
       else if (tk.requester === 'commercial') partnerId = 12;
 
       const unitStr = tk.location || 'فيلا A104 - المرحلة الأولى';
+      const partName = tk.partName || tk.title || 'أعمال صيانة ميدانية';
+      const partPrice = tk.partPrice || 0;
       const taskFields = {
             name: `[أمر عمل ميداني - طلب قطعة غيار] ${partName} (${unitStr})`,
             project_id: 2, // Field Service
@@ -7461,7 +7466,10 @@ class UltimateFMApp {
       this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
       // Sync update to Odoo (Stage 2 = In Progress)
-      this.syncTicketUpdateToOdoo(tk).catch(e => console.warn('[Assign Odoo Sync Error]:', e));
+      this.syncTicketUpdateToOdoo(tk).then(() => {
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      }).catch(e => console.warn('[Assign Odoo Sync Error]:', e));
     }
   }
 
@@ -7517,7 +7525,10 @@ class UltimateFMApp {
       }
       
       // Sync update to Odoo (Stage 4 = Solved)
-      this.syncTicketUpdateToOdoo(tk);
+      this.syncTicketUpdateToOdoo(tk).then(() => {
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      }).catch(e => console.warn('[Complete Odoo Sync Error]:', e));
     };
 
     if (fileInput && fileInput.files && fileInput.files[0]) {
