@@ -5450,7 +5450,40 @@ class UltimateFMApp {
       const targetStageId = this.resolveOdooStageId(ticket.status);
       console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
 
-      // 1. Post to Chatter (message_post)
+      // 1. FAST DIRECT WRITE FIRST (Ensures Stage moves to In Progress / Solved instantly)
+      const writeFields = {
+        stage_id: targetStageId
+      };
+      if (ticket.assignedTech) {
+        writeFields.user_id = uid;
+      }
+
+      const writePayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput,
+            uid,
+            keyInput,
+            ticket.odooModel,
+            "write",
+            [[parseInt(ticket.odooId)], writeFields]
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      const writeData = await this.callOdoo(baseUrl, writePayload, 6000);
+      if (writeData && writeData.result) {
+        console.log(`[Odoo Stage Update Success] Stage updated to ${targetStageId}:`, writeData.result);
+      } else if (writeData && writeData.error) {
+        console.error('[Odoo Stage Update Error]:', writeData.error);
+      }
+
+      // 2. Post to Chatter (message_post) asynchronously in background
       let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
                        `<p>• <b>الحالة الحالية:</b> ${ticket.status}</p>` +
                        (ticket.assignedTech ? `<p>• <b>الفني المكلف:</b> ${ticket.assignedTech}</p>` : '') +
@@ -5475,81 +5508,7 @@ class UltimateFMApp {
         id: Math.floor(Math.random() * 1000)
       };
 
-      this.callOdoo(baseUrl, chatterPayload).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
-
-      // 2. Update Odoo Ticket Description and Stage ID (stage_id)
-      let fullName = 'حسن عيسى';
-      let phoneNum = '01223456789';
-      let emailAddress = 'fmhala6@gmail.com';
-      let unitNum = 'فيلا A104 - المرحلة الأولى';
-
-      const customName = safeStorage.getItem('odoo_owner_name');
-      if (customName && customName.trim()) {
-        fullName = customName;
-      }
-
-      if (ticket.requester === 'tenant') {
-        fullName = 'أحمد زاهر محمود';
-        phoneNum = '01009876543';
-        emailAddress = 'tenant.ahmed@domain.com';
-        unitNum = 'شاليه A112 - المرحلة الأولى';
-      } else if (ticket.requester === 'commercial') {
-        fullName = 'مطعم وكافيه Blue Wave (شريف محمد)';
-        phoneNum = '01112233445';
-        emailAddress = 'bluewave@domain.com';
-        unitNum = 'محل 12 - المول التجاري';
-      } else if (ticket.requester === 'manager') {
-        fullName = 'المهندس أيمن السعيد (مدير الصيانة)';
-        phoneNum = '01221122334';
-        emailAddress = 'ayman.saeed@domain.com';
-        unitNum = 'الأماكن العامة بالقرية';
-      }
-
-      let updatedDesc = `<p><b>بلاغ صيانة عاجل من تطبيق الموبايل</b></p>` +
-                        `<hr/>` +
-                        `<p><b>الاسم رباعي:</b> ${fullName}</p>` +
-                        `<p><b>رقم التليفون:</b> ${phoneNum}</p>` +
-                        `<p><b>البريد الإلكتروني:</b> ${emailAddress}</p>` +
-                        `<p><b>رقم الوحدة:</b> ${unitNum}</p>` +
-                        `<hr/>` +
-                        `<p><b>الفئة:</b> ${ticket.category || 'عام'}</p>` +
-                        `<p><b>الوصف بالتفصيل:</b> ${ticket.details || ticket.title || ''}</p>` +
-                        `<hr/>` +
-                        `<p><b>حالة التكليف الحالية:</b> ${ticket.status} ${ticket.assignedTech ? ('- الفني: ' + ticket.assignedTech) : ''}</p>`;
-
-      const writeFields = {
-        description: updatedDesc,
-        stage_id: targetStageId
-      };
-
-      if (ticket.assignedTech) {
-        writeFields.user_id = uid;
-      }
-
-      const writePayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput,
-            uid,
-            keyInput,
-            ticket.odooModel,
-            "write",
-            [[parseInt(ticket.odooId)], writeFields]
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-
-      const writeData = await this.callOdoo(baseUrl, writePayload);
-      if (writeData.error) {
-        console.error('[Odoo Update Write Error]:', writeData.error);
-      } else {
-        console.log(`[Odoo Update Write Success] Updated stage_id to ${targetStageId}:`, writeData.result);
-      }
+      this.callOdoo(baseUrl, chatterPayload, 4000).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
 
       // 3. Attach Photo After Repair to Odoo if available
       if (ticket.photoAfter && ticket.photoAfter.startsWith('data:image')) {
@@ -6162,12 +6121,30 @@ class UltimateFMApp {
           } else if (isNewTicket) {
             actionHtml = `
               <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(32,39,79,0.06); display: flex; gap: 8px; align-items: center;">
-                <select class="form-control" style="flex: 1; height: 38px; padding: 0 10px; font-size: 0.76rem; background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
-                  <option value="كريم حسن">❄️ كريم حسن (تكييف وكهروميكانيك)</option>
-                  <option value="مينا جرجس">🔧 مينا جرجس (شبكات وسباكة)</option>
-                  <option value="أحمد علي">⚡ أحمد علي (كهرباء وطاقة)</option>
-                  <option value="سعيد محمود">🌿 سعيد محمود (مرافق عامة وري)</option>
-                </select>
+                ${(() => {
+                  const techOptions = [
+                    { val: 'إبراهيم فؤاد', text: '🚪 إبراهيم فؤاد (نجارة وأبواب وديكور)', match: 'نجار' },
+                    { val: 'محمود الشناوي', text: '🧱 محمود الشناوي (أعمال مدنية وترميمات)', match: 'مدني' },
+                    { val: 'مينا جرجس', text: '🔧 مينا جرجس (شبكات وسباكة)', match: 'سباك' },
+                    { val: 'أحمد علي', text: '⚡ أحمد علي (كهرباء وطاقة)', match: 'كهرب' },
+                    { val: 'كريم حسن', text: '❄️ كريم حسن (تكييف وكهروميكانيك)', match: 'تكييف' },
+                    { val: 'سمير عبد الرحيم', text: '🏠 سمير عبد الرحيم (صيانة عامة وأجهزة)', match: 'عام' },
+                    { val: 'سعيد محمود', text: '🌿 سعيد محمود (مرافق عامة وتشغيل)', match: 'مرافق' }
+                  ];
+                  const catStr = (tk.category || '').toLowerCase();
+                  let selectedTech = 'كريم حسن';
+                  for (const t of techOptions) {
+                    if (catStr.includes(t.match)) {
+                      selectedTech = t.val;
+                      break;
+                    }
+                  }
+                  return `
+                    <select class="form-control" style="flex: 1; height: 38px; padding: 0 10px; font-size: 0.76rem; background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; font-weight: 700; border-radius: 8px;" id="assignTechSelect_${tk.id}">
+                      ${techOptions.map(t => `<option value="${t.val}" ${t.val === selectedTech ? 'selected' : ''}>${t.text}</option>`).join('')}
+                    </select>
+                  `;
+                })()}
                 <button type="button" style="height: 38px; padding: 0 14px; font-size: 0.75rem; font-weight: 800; background: #1b8f91; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; box-shadow: 0 2px 6px rgba(27,143,145,0.25);" onclick="app.assignTechnician('${tk.id}', 'assignTechSelect_${tk.id}')">
                   <i class="fa-solid fa-paper-plane"></i> إسناد للفني
                 </button>
@@ -6274,8 +6251,8 @@ class UltimateFMApp {
         return true;
       };
 
-      const allTechTks = this.tickets.filter(tk => (tk.assignedTech === 'كريم حسن' || (!tk.assignedTech && tk.requester === 'manager')) && isPureMaintenanceTask(tk));
-      const activeTechTks = allTechTks.filter(tk => ['تم التعيين للفني', 'جاري العمل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'قيد الفحص الميداني', 'جديد'].includes(tk.status));
+      const allTechTks = this.tickets.filter(tk => (tk.assignedTech || (!tk.assignedTech && tk.requester === 'manager')) && isPureMaintenanceTask(tk));
+      const activeTechTks = allTechTks.filter(tk => ['قيد التنفيذ', 'In Progress', 'تم التعيين للفني', 'جاري العمل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'قيد الفحص الميداني', 'جديد'].includes(tk.status));
       const completedTechTks = allTechTks.filter(tk => tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
 
       // 1. Update Daily Technician KPIs
@@ -7484,13 +7461,7 @@ class UltimateFMApp {
       this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
       
       // Sync update to Odoo (Stage 2 = In Progress)
-      (async () => {
-        try {
-          await this.syncTicketUpdateToOdoo(tk);
-        } catch (e) {
-          console.warn('[Assign Odoo Sync Error]:', e);
-        }
-      })();
+      this.syncTicketUpdateToOdoo(tk).catch(e => console.warn('[Assign Odoo Sync Error]:', e));
     }
   }
 
