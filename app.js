@@ -111,6 +111,12 @@ class UltimateFMApp {
       { id: 4, code: 'ELEC-SCHN-32A', name: 'قاطع تيار شنايدر ثلاثي 32A', warehouse: 'residential', category: 'كهرباء', qty: 20, price: 680, desc: 'لوحات توزيع كهرباء شنايدر أصلية' },
       { id: 5, code: 'HVAC-PCB-225', name: 'كارتة تكييف إلكترونية Carrier 2.25HP', warehouse: 'residential', category: 'كهروميكانيك', qty: 10, price: 3400, desc: 'كارتة تحكم رئيسية للوحدة الداخلية/الخارجية' },
       { id: 6, code: 'HVAC-GAS-R410A', name: 'أسطوانة شحنة فريون تكييف R410A', warehouse: 'residential', category: 'كهروميكانيك', qty: 15, price: 2100, desc: 'شحنة فريون تبريد صديق للبيئة للوحدات' },
+      { id: 18, code: 'CARP-LOCK-IT', name: 'كالون باب إيطالي أصلي سيلندر CISA', warehouse: 'residential', category: 'نجارة', qty: 15, price: 650, desc: 'كالون باب نحاس إيطالي أصلي عالي الأمان' },
+      { id: 19, code: 'CARP-HINGE-SS', name: 'طقم مفصلات أبواب ستانلس ستيل مقوى 4 بوصة', warehouse: 'residential', category: 'نجارة', qty: 30, price: 280, desc: 'مفصلات مقاومة للصدأ والرطوبة' },
+      { id: 20, code: 'CARP-HANDLE-CL', name: 'مقبض باب نحاسي فاخر كلاسيك', warehouse: 'residential', category: 'نجارة', qty: 20, price: 490, desc: 'مقبض باب داخلي/خارجي تشطيب عالي' },
+      { id: 21, code: 'CIVIL-SIKA-REP', name: 'شيكارة معجون ترميم وعزل أسمنتي Sika 25kg', warehouse: 'residential', category: 'أعمال مدنية', qty: 25, price: 380, desc: 'ترميم شروخ وعزل رطوبة الجدران والأسطح' },
+      { id: 22, code: 'CIVIL-CERAM-REP', name: 'كرتونة سيراميك فرز أول ديكوري بديل', warehouse: 'residential', category: 'أعمال مدنية', qty: 18, price: 420, desc: 'استبدال بلاط وسيراميك تالف' },
+      { id: 23, code: 'CIVIL-EPOXY-GROUT', name: 'مادة ملء فواصل وترويبة إيبوكسي Saveto', warehouse: 'residential', category: 'أعمال مدنية', qty: 40, price: 190, desc: 'ترويبة سيراميك وأحواض مقاومة للمياه' },
 
       // Warehouse 2: Assets & Village Operations (مستودع أصول ومرافق الموقع العام - تشغيل وصيانة مركزية)
       { id: 7, code: 'PART-PUMP-01', name: 'طلمبة مياه هايوارد 3 حصان Hayward 3HP', warehouse: 'assets', category: 'كهروميكانيك', qty: 6, price: 18500, desc: 'طلمبة سحب وتدوير مياه حمامات السباحة الكبرى بالموقع العام' },
@@ -1220,25 +1226,41 @@ class UltimateFMApp {
       resolutionTime: ''
     };
 
+    const submitBtn = document.getElementById('btnSubmitTicket');
+    const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التسجيل والمزامنة مع أودو...';
+    }
+
     const proceedWithTicket = async (finalPhoto) => {
       newTicket.photoBefore = finalPhoto || defaultPhoto;
       this.tickets.unshift(newTicket);
       this.saveTicketsToStorage();
       this.renderTickets();
-      this.closeModal('modalNewTicket');
 
-      const descInput = document.getElementById('ticketDescInput');
-      if (descInput) descInput.value = '';
-      if (photoInput) photoInput.value = '';
-
-      this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}!\nجاري الحفظ والمزامنة مع السجل المركزي...`);
-
-      // Live sync to Odoo Helpdesk (awaited for immediate odooId assignment)
+      // Live sync to Odoo Helpdesk - AWAITED before closing modal to guarantee odooId
       try {
         await this.syncTicketToOdoo(newTicket, '01223456789', 'حسن عيسى');
       } catch (e) {
         console.warn('[Odoo Initial Sync Warning]:', e);
       }
+
+      this.saveTicketsToStorage();
+      this.renderTickets();
+      this.closeModal('modalNewTicket');
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
+      }
+
+      const descInput = document.getElementById('ticketDescInput');
+      if (descInput) descInput.value = '';
+      if (photoInput) photoInput.value = '';
+
+      const odooNumStr = newTicket.odooId ? ` (رقم مركزي #${newTicket.odooId})` : '';
+      this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}${odooNumStr}!\nتم توثيق البلاغ على نظام أودو بنجاح.`);
     };
 
     if (photoInput && photoInput.files && photoInput.files[0]) {
@@ -1364,6 +1386,12 @@ class UltimateFMApp {
         ticket.odooModel = targetModel;
         this.saveTicketsToStorage();
 
+        // If ticket status was transitioned (e.g. assigned) while sync was in flight, update stage now
+        if (ticket.status && ticket.status !== 'جديد' && ticket.status !== 'New') {
+          console.log('[Odoo Sync] Ticket was transitioned to', ticket.status, 'during creation. Updating stage...');
+          await this.syncTicketUpdateToOdoo(ticket);
+        }
+
         // Step 3: Attach problem photo asynchronously in background without blocking UI
         if (ticket.photoBefore) {
           (async () => {
@@ -1467,41 +1495,45 @@ class UltimateFMApp {
 
     ticket.odooModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
 
-    // Search Odoo by local ticket code (#TK-XXXX) if odooId is missing, preventing duplicate creation!
+    // If odooId is missing, poll search_read with up to 5 retries (total 4 seconds)
     if (!ticket.odooId) {
-      try {
-        const searchPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              dbInput, uid, keyInput,
-              ticket.odooModel,
-              "search_read",
-              [[["name", "ilike", ticket.id]]],
-              {
-                fields: ["id", "name", "stage_id"],
-                limit: 1
-              }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const searchRes = await this.callOdoo(baseUrl, searchPayload, 6000);
-        if (searchRes && searchRes.result && searchRes.result.length > 0) {
-          ticket.odooId = searchRes.result[0].id;
-          this.saveTicketsToStorage();
-          console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        try {
+          console.log(`[Odoo Search] Polling attempt ${attempt}/5 for ticket ${ticket.id}...`);
+          const searchPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                ticket.odooModel,
+                "search_read",
+                [[["name", "ilike", ticket.id]]],
+                { fields: ["id", "name", "stage_id"], limit: 1 }
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          const searchRes = await this.callOdoo(baseUrl, searchPayload, 5000);
+          if (searchRes && searchRes.result && searchRes.result.length > 0) {
+            ticket.odooId = searchRes.result[0].id;
+            this.saveTicketsToStorage();
+            console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
+            break;
+          }
+        } catch (sErr) {
+          console.warn('[Odoo Search Error]:', sErr);
         }
-      } catch (sErr) {
-        console.warn('[Odoo Search Error]:', sErr);
+        if (!ticket.odooId && attempt < 5) {
+          await new Promise(r => setTimeout(r, 800));
+        }
       }
 
       if (!ticket.odooId) {
-        console.warn('[Odoo Update] Ticket odooId not resolved for update. Skipping to prevent duplicate.');
-        return;
+        console.warn('[Odoo Update] Ticket odooId not resolved after retries.');
+        return false;
       }
     }
 
@@ -3720,39 +3752,49 @@ class UltimateFMApp {
     }
   }
 
-  assignTechnician(ticketId, selectId) {
+  async assignTechnician(ticketId, selectId) {
     const techSelect = document.getElementById(selectId);
     if (!techSelect) return;
     const techName = techSelect.value;
 
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
-    if (tk) {
-      const now = new Date();
-      tk.dispatchedAt = now;
-      tk.status = 'قيد التنفيذ';
-      tk.bgClass = 'badge-info';
-      tk.assignedTech = techName;
+    if (!tk) return;
 
-      // Calculate Manager Response Time
-      const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
-      const dispatchMins = Math.max(1, Math.round((now - createTime) / 60000));
-      tk.dispatchMins = dispatchMins;
-
-      let managerRating = dispatchMins <= 15 ? '🟢 استجابة سريعة جداً (خلال 15د)' : (dispatchMins <= 30 ? '🟡 استجابة متوسطة' : '🔴 تأخير في التخصيص (تجاوز SLA)');
-
-      this.saveTicketsToStorage();
-      this.renderTickets();
-      this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
-      
-      // Sync update to Odoo (Stage 2 = In Progress)
-      this.syncTicketUpdateToOdoo(tk).then(() => {
-        this.saveTicketsToStorage();
-        this.renderTickets();
-      }).catch(e => console.warn('[Assign Odoo Sync Error]:', e));
+    // Visual feedback on the assign button
+    const assignBtn = document.querySelector(`button[onclick*="assignTechnician('${tk.id}'"]`) ||
+                      document.querySelector(`button[onclick*="assignTechnician('${ticketId}'"]`);
+    const origBtnHtml = assignBtn ? assignBtn.innerHTML : '';
+    if (assignBtn) {
+      assignBtn.disabled = true;
+      assignBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث بأودو...';
     }
+
+    const now = new Date();
+    tk.dispatchedAt = now;
+    tk.status = 'قيد التنفيذ';
+    tk.bgClass = 'badge-info';
+    tk.assignedTech = techName;
+
+    // Calculate Manager Response Time
+    const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
+    const dispatchMins = Math.max(1, Math.round((now - createTime) / 60000));
+    tk.dispatchMins = dispatchMins;
+
+    let managerRating = dispatchMins <= 15 ? '🟢 استجابة سريعة جداً (خلال 15د)' : (dispatchMins <= 30 ? '🟡 استجابة متوسطة' : '🔴 تأخير في التخصيص (تجاوز SLA)');
+
+    try {
+      // AWAIT live sync update to Odoo (Stage 2 = In Progress)
+      await this.syncTicketUpdateToOdoo(tk);
+    } catch (e) {
+      console.warn('[Assign Odoo Sync Error]:', e);
+    }
+
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة في أودو لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
   }
 
-  completeTicket(ticketId, fileInputId) {
+  async completeTicket(ticketId, fileInputId) {
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
@@ -3764,7 +3806,7 @@ class UltimateFMApp {
     const fileInput = fileInputId ? document.getElementById(fileInputId) : null;
     let afterPhoto = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300';
 
-    const proceed = (finalPhoto) => {
+    const proceed = async (finalPhoto) => {
       const now = new Date();
       tk.resolvedAt = now;
       const createTime = tk.createdAt ? new Date(tk.createdAt) : now;
@@ -3808,11 +3850,14 @@ class UltimateFMApp {
         this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
       }
       
-      // Sync update to Odoo (Stage 4 = Solved)
-      this.syncTicketUpdateToOdoo(tk).then(() => {
-        this.saveTicketsToStorage();
-        this.renderTickets();
-      }).catch(e => console.warn('[Complete Odoo Sync Error]:', e));
+      // AWAIT sync update to Odoo (Stage 4 = Solved in Helpdesk & Stage 19 = Done in Field Service)
+      try {
+        await this.syncTicketUpdateToOdoo(tk);
+      } catch (e) {
+        console.warn('[Complete Odoo Sync Error]:', e);
+      }
+      this.saveTicketsToStorage();
+      this.renderTickets();
     };
 
     if (fileInput && fileInput.files && fileInput.files[0]) {
