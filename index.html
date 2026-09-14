@@ -5389,10 +5389,19 @@ class UltimateFMApp {
     const model = ticket.odooModel || 'helpdesk.ticket';
     const targetStageId = this.resolveOdooStageId(ticket.status, model);
 
-    // 3. Fast Direct Write to update stage
+    // 3. Fast Direct Write to update stage and technician
+    const techUserMap = {
+      'كريم حسن': 6,
+      'إبراهيم فؤاد': 7,
+      'محمود الشناوي': 8,
+      'مينا جرجس': 9,
+      'أحمد علي': 10,
+      'سمير عبد الرحيم': 11,
+      'سعيد محمود': 12
+    };
     const writeFields = { stage_id: targetStageId };
     if (ticket.assignedTech) {
-      writeFields.user_id = uid;
+      writeFields.user_id = techUserMap[ticket.assignedTech] || 6;
     }
 
     const writePayload = {
