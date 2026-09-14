@@ -4956,12 +4956,25 @@ class UltimateFMApp {
     this.showToast('🧹 تم تصفير وتنظيف جميع السجلات والبلاغات بكافة الشاشات بنجاح!\nالتطبيق نظيف 100% وجاهز لاختبارك المباشر.');
   }
 
-  async callOdoo(baseUrl, payload, timeoutMs = 7000) {
+  getOdooCredentials() {
+    const url = document.getElementById('odooUrlInput')?.value || safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+    const db = document.getElementById('odooDbInput')?.value || safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+    const user = document.getElementById('odooUserInput')?.value || safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
+    const key = document.getElementById('odooKeyInput')?.value || safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+    return {
+      baseUrl: (url || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, ''),
+      db: db || 'edu-fm-uc',
+      user: user || 'fmhala6@gmail.com',
+      key: key || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0',
+      uid: 2
+    };
+  }
+
+  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
     const payloadStr = JSON.stringify(payload);
 
-    // 1. Direct Call (Works on Local/Web/Cordova/Electron or when CORS is permitted)
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -4978,41 +4991,8 @@ class UltimateFMApp {
         if (data) return data;
       }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed / CORS]:', directErr.message || directErr);
+      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
     }
-
-    // 2. CORS Proxy Fallbacks (Guarantees browser client-side execution from file:/// and all hosts)
-    const proxies = [
-      (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`,
-      (target) => `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
-      (target) => `https://proxy.cors.sh/${target}`
-    ];
-
-    for (const makeProxyUrl of proxies) {
-      try {
-        const pUrl = makeProxyUrl(directUrl);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-        const pResponse = await fetch(pUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payloadStr,
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (pResponse && pResponse.ok) {
-          const pData = await pResponse.json();
-          if (pData) {
-            console.log('[Odoo Proxy Call Success]:', pUrl);
-            return pData;
-          }
-        }
-      } catch (proxyErr) {
-        console.warn('[Odoo Proxy Call Attempt Failed]:', proxyErr.message || proxyErr);
-      }
-    }
-
     return null;
   }
 
@@ -5076,7 +5056,7 @@ class UltimateFMApp {
   handleNewTicketSubmit() {
     if (this._isTicketSubmitting) return;
     this._isTicketSubmitting = true;
-    setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
+    setTimeout(() => { this._isTicketSubmitting = false; }, 1500);
 
     const category = document.getElementById('ticketCategorySelect')?.value || 'سباكة';
     const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
@@ -5088,7 +5068,8 @@ class UltimateFMApp {
       'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
       'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
       'كهروميكانيك': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
-      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
+      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80',
+      'أعمال مدنية': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=300&q=80'
     };
     const defaultPhoto = fallbacks[category] || fallbacks['سباكة'];
 
@@ -5114,41 +5095,24 @@ class UltimateFMApp {
       resolutionTime: ''
     };
 
-    const submitBtn = document.getElementById('btnSubmitTicket');
-    const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التسجيل والمزامنة مع أودو...';
-    }
-
-    const proceedWithTicket = async (finalPhoto) => {
+    const proceedWithTicket = (finalPhoto) => {
       newTicket.photoBefore = finalPhoto || defaultPhoto;
       this.tickets.unshift(newTicket);
       this.saveTicketsToStorage();
       this.renderTickets();
-
-      // Live sync to Odoo Helpdesk - AWAITED before closing modal to guarantee odooId
-      try {
-        await this.syncTicketToOdoo(newTicket, '01223456789', 'حسن عيسى');
-      } catch (e) {
-        console.warn('[Odoo Initial Sync Warning]:', e);
-      }
-
-      this.saveTicketsToStorage();
-      this.renderTickets();
       this.closeModal('modalNewTicket');
-
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = origBtnHtml;
-      }
 
       const descInput = document.getElementById('ticketDescInput');
       if (descInput) descInput.value = '';
       if (photoInput) photoInput.value = '';
 
-      const odooNumStr = newTicket.odooId ? ` (رقم مركزي #${newTicket.odooId})` : '';
-      this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}${odooNumStr}!\nتم توثيق البلاغ على نظام أودو بنجاح.`);
+      this.showToast(`✅ تم تقديم بلاغ الصيانة بنجاح برقم #${newTicket.id}!\nجاري الحفظ والمزامنة مع أودو...`);
+
+      // Fast background live sync to Odoo
+      newTicket._createPromise = this.syncTicketToOdoo(newTicket, '01223456789', 'حسن عيسى').then(() => {
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      }).catch(e => console.warn('[Odoo Initial Sync Warning]:', e));
     };
 
     if (photoInput && photoInput.files && photoInput.files[0]) {
@@ -5359,7 +5323,7 @@ class UltimateFMApp {
       return isMaintenance ? 4 : 5;
     }
     // 3. In Progress (Stage 2 in Odoo Helpdesk & Maintenance) - Immediately when assigned or work begins
-    if (s.includes('تنفيذ') || s.includes('اسناد') || s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('تركيب') || s.includes('progress') || s.includes('assigned')) {
+    if (s.includes('تنفيذ') || s.includes('اسناد') || s.includes('تعيين') || s.includes('جاري') || s.includes('معاين') || s.includes('فني') || s.includes('موقع') || s.includes('دفع') || s.includes('تركيب') || s.includes('سداد') || s.includes('صرف') || s.includes('موافق') || s.includes('progress') || s.includes('assigned')) {
       return 2;
     }
     // 4. New (Stage 1 in Odoo Helpdesk & Maintenance)
@@ -5371,181 +5335,112 @@ class UltimateFMApp {
   }
 
   async syncTicketUpdateToOdoo(ticket) {
-    if (!ticket) return;
+    if (!ticket) return false;
+    const creds = this.getOdooCredentials();
+    const uid = creds.uid;
 
-    const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
-    const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
-    const userInput = safeStorage.getItem('odoo_user') || 'fmhala6@gmail.com';
-    const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
-    if (!urlInput || !dbInput || !userInput || !keyInput) return;
-    const baseUrl = urlInput.replace(/\/+$/, '');
-    const uid = 2; // Direct cached admin UID for instant < 500ms execution
-
-    ticket.odooModel = ticket.odooModel || (ticket.requester === 'engineer' || ticket.requester === 'manager' ? 'maintenance.request' : 'helpdesk.ticket');
-
-    // If odooId is missing, poll search_read with up to 5 retries (total 4 seconds)
-    if (!ticket.odooId) {
-      for (let attempt = 1; attempt <= 5; attempt++) {
-        try {
-          console.log(`[Odoo Search] Polling attempt ${attempt}/5 for ticket ${ticket.id}...`);
-          const searchPayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                ticket.odooModel,
-                "search_read",
-                [[["name", "ilike", ticket.id]]],
-                { fields: ["id", "name", "stage_id"], limit: 1 }
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          const searchRes = await this.callOdoo(baseUrl, searchPayload, 5000);
-          if (searchRes && searchRes.result && searchRes.result.length > 0) {
-            ticket.odooId = searchRes.result[0].id;
-            this.saveTicketsToStorage();
-            console.log('[Odoo Update] Found matching Odoo ticket by local code:', ticket.odooId);
-            break;
-          }
-        } catch (sErr) {
-          console.warn('[Odoo Search Error]:', sErr);
-        }
-        if (!ticket.odooId && attempt < 5) {
-          await new Promise(r => setTimeout(r, 800));
-        }
-      }
-
-      if (!ticket.odooId) {
-        console.warn('[Odoo Update] Ticket odooId not resolved after retries.');
-        return false;
+    // 1. Wait for creation promise if currently in flight
+    if (ticket._createPromise) {
+      try {
+        await ticket._createPromise;
+      } catch (e) {
+        console.warn('[Odoo Update] Awaiting create promise failed:', e);
       }
     }
 
-    try {
-      const targetStageId = this.resolveOdooStageId(ticket.status, ticket.odooModel);
-      console.log(`[Odoo Update] Updating model: ${ticket.odooModel}, ID: ${ticket.odooId}, Target Stage ID: ${targetStageId}`);
-
-      // 1. FAST DIRECT WRITE FIRST (Ensures Stage moves to In Progress / Solved instantly)
-      const writeFields = {
-        stage_id: targetStageId
-      };
-      if (ticket.assignedTech) {
-        writeFields.user_id = uid;
+    // 2. If odooId is still missing, single fast search_read
+    if (!ticket.odooId) {
+      try {
+        const searchPayload = {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            service: "object",
+            method: "execute_kw",
+            args: [
+              creds.db, uid, creds.key,
+              ticket.odooModel || "helpdesk.ticket",
+              "search_read",
+              [[["name", "ilike", ticket.id]]],
+              { fields: ["id", "name", "stage_id"], limit: 1 }
+            ]
+          },
+          id: Math.floor(Math.random() * 1000)
+        };
+        const searchRes = await this.callOdoo(creds.baseUrl, searchPayload, 3500);
+        if (searchRes && searchRes.result && searchRes.result.length > 0) {
+          ticket.odooId = searchRes.result[0].id;
+          ticket.odooModel = ticket.odooModel || 'helpdesk.ticket';
+          this.saveTicketsToStorage();
+        }
+      } catch (sErr) {
+        console.warn('[Odoo Search Error]:', sErr);
       }
+    }
 
-      const writePayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput,
-            uid,
-            keyInput,
-            ticket.odooModel,
-            "write",
-            [[parseInt(ticket.odooId)], writeFields]
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
+    if (!ticket.odooId) {
+      console.warn('[Odoo Update] Ticket odooId not found for', ticket.id);
+      return false;
+    }
 
-      const writeData = await this.callOdoo(baseUrl, writePayload, 6000);
-      if (writeData && writeData.result) {
-        console.log(`[Odoo Stage Update Success] Stage updated to ${targetStageId}:`, writeData.result);
+    const odooIdNum = parseInt(String(ticket.odooId).replace(/\D+/g, ''));
+    if (!odooIdNum) return false;
+
+    const model = ticket.odooModel || 'helpdesk.ticket';
+    const targetStageId = this.resolveOdooStageId(ticket.status, model);
+
+    // 3. Fast Direct Write to update stage
+    const writeFields = { stage_id: targetStageId };
+    if (ticket.assignedTech) {
+      writeFields.user_id = uid;
+    }
+
+    const writePayload = {
+      jsonrpc: "2.0",
+      method: "call",
+      params: {
+        service: "object",
+        method: "execute_kw",
+        args: [
+          creds.db, uid, creds.key,
+          model,
+          "write",
+          [[odooIdNum], writeFields]
+        ]
+      },
+      id: Math.floor(Math.random() * 1000)
+    };
+
+    try {
+      const writeRes = await this.callOdoo(creds.baseUrl, writePayload, 5000);
+      if (writeRes && writeRes.result) {
+        console.log(`[Odoo Success] Ticket #${odooIdNum} updated to Stage ${targetStageId}`);
         const stageLabel = targetStageId === 2 ? 'قيد التنفيذ (In Progress)' : ((targetStageId === 4 || targetStageId === 3) ? 'تم الحل (Solved)' : 'محدث');
         this.showToast(`🔄 تم تحديث مرحلة البلاغ في أودو بنجاح (${stageLabel})`);
 
-        // If solved (Stage 4 or 3), also close Field Service task (project.task -> stage 19 = Done)
+        // If solved (Stage 4 or 3), also close Field Service task if linked
         if ((targetStageId === 4 || targetStageId === 3) && (ticket.fieldServiceTaskId || ticket.odooTaskId)) {
-          const fTaskId = ticket.fieldServiceTaskId || ticket.odooTaskId;
-          const taskDonePayload = {
-            jsonrpc: "2.0",
-            method: "call",
-            params: {
-              service: "object",
-              method: "execute_kw",
-              args: [
-                dbInput, uid, keyInput,
-                "project.task",
-                "write",
-                [[parseInt(fTaskId)], { stage_id: 19 }]
-              ]
-            },
-            id: Math.floor(Math.random() * 1000)
-          };
-          this.callOdoo(baseUrl, taskDonePayload, 4000).catch(e => console.warn('[Field Service Task Close Failed]:', e));
-        }
-      } else if (writeData && writeData.error) {
-        console.error('[Odoo Stage Update Error]:', writeData.error);
-      }
-
-      // 2. Post to Chatter (message_post) asynchronously in background
-      let statusText = `<p><b>🔄 تحديث مرحلة البلاغ من تطبيق الموبايل:</b></p>` +
-                       `<p>• <b>الحالة الحالية:</b> ${ticket.status}</p>` +
-                       (ticket.assignedTech ? `<p>• <b>الفني المكلف:</b> ${ticket.assignedTech}</p>` : '') +
-                       (ticket.resolutionTime ? `<p>• <b>مؤشر تقييم SLA وإغلاق التذكرة:</b> ${ticket.resolutionTime}</p>` : '');
-
-      const chatterPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          service: "object",
-          method: "execute_kw",
-          args: [
-            dbInput,
-            uid,
-            keyInput,
-            ticket.odooModel,
-            "message_post",
-            [[parseInt(ticket.odooId)]],
-            { body: statusText }
-          ]
-        },
-        id: Math.floor(Math.random() * 1000)
-      };
-
-      this.callOdoo(baseUrl, chatterPayload, 4000).catch(e => console.warn('[Odoo Chatter Post Failed]', e));
-
-      // 3. Attach Photo After Repair to Odoo if available
-      if (ticket.photoAfter && ticket.photoAfter.startsWith('data:image')) {
-        try {
-          const base64Content = ticket.photoAfter.split(',')[1];
-          if (base64Content) {
-            const attachPayload = {
+          const fTaskId = parseInt(String(ticket.fieldServiceTaskId || ticket.odooTaskId).replace(/\D+/g, ''));
+          if (fTaskId) {
+            const taskDonePayload = {
               jsonrpc: "2.0",
               method: "call",
               params: {
                 service: "object",
                 method: "execute_kw",
-                args: [
-                  dbInput, uid, keyInput,
-                  "ir.attachment",
-                  "create",
-                  [{
-                    name: `صورة_بعد_الإصلاح_تذكرة_${ticket.id}.jpg`,
-                    datas: base64Content,
-                    res_model: ticket.odooModel,
-                    res_id: parseInt(ticket.odooId)
-                  }]
-                ]
+                args: [creds.db, uid, creds.key, "project.task", "write", [[fTaskId], { stage_id: 19 }]]
               },
               id: Math.floor(Math.random() * 1000)
             };
-            this.callOdoo(baseUrl, attachPayload, 6000).catch(e => console.warn('[Odoo Photo Post Failed]', e));
+            this.callOdoo(creds.baseUrl, taskDonePayload, 3000).catch(() => {});
           }
-        } catch (photoErr) {
-          console.warn('[Odoo Photo After Error]:', photoErr);
         }
+        return true;
       }
-    } catch (err) {
-      console.error('[Odoo Sync Update Error]:', err);
+    } catch (wErr) {
+      console.warn('[Odoo Write Error]:', wErr);
     }
+    return false;
   }
 
   handleMeterRechargeSubmit() {
@@ -7648,15 +7543,6 @@ class UltimateFMApp {
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
-    // Visual feedback on the assign button
-    const assignBtn = document.querySelector(`button[onclick*="assignTechnician('${tk.id}'"]`) ||
-                      document.querySelector(`button[onclick*="assignTechnician('${ticketId}'"]`);
-    const origBtnHtml = assignBtn ? assignBtn.innerHTML : '';
-    if (assignBtn) {
-      assignBtn.disabled = true;
-      assignBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث بأودو...';
-    }
-
     const now = new Date();
     tk.dispatchedAt = now;
     tk.status = 'قيد التنفيذ';
@@ -7670,16 +7556,18 @@ class UltimateFMApp {
 
     let managerRating = dispatchMins <= 15 ? '🟢 استجابة سريعة جداً (خلال 15د)' : (dispatchMins <= 30 ? '🟡 استجابة متوسطة' : '🔴 تأخير في التخصيص (تجاوز SLA)');
 
-    try {
-      // AWAIT live sync update to Odoo (Stage 2 = In Progress)
-      await this.syncTicketUpdateToOdoo(tk);
-    } catch (e) {
-      console.warn('[Assign Odoo Sync Error]:', e);
-    }
-
+    // Instantly update UI so user has zero lag
     this.saveTicketsToStorage();
     this.renderTickets();
-    this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة في أودو لمرحلة "قيد التنفيذ" (In Progress)!\nتقييم سرعة استجابة المدير: ${managerRating}`);
+    this.showToast(`✅ تم إسناد المهمة للفني (${techName}) ونقل التذكرة لمرحلة "قيد التنفيذ" (In Progress)!`);
+
+    // Live sync update to Odoo in background without blocking
+    this.syncTicketUpdateToOdoo(tk).then(() => {
+      this.saveTicketsToStorage();
+      this.renderTickets();
+    }).catch(e => {
+      console.warn('[Assign Odoo Sync Error]:', e);
+    });
   }
 
   async completeTicket(ticketId, fileInputId) {
@@ -7738,12 +7626,13 @@ class UltimateFMApp {
         this.showToast(`🎉 تم إغلاق تذكرة الصيانة #${tk.id} ونقلها لمرحلة "تم الحل" (Solved) بنجاح!\nمدة الإنجاز: ${totalMins} دقيقة.\nأصبح التقييم متاحاً للعميل الآن ⭐.`);
       }
       
-      // AWAIT sync update to Odoo (Stage 4 = Solved in Helpdesk & Stage 19 = Done in Field Service)
-      try {
-        await this.syncTicketUpdateToOdoo(tk);
-      } catch (e) {
+      // Live sync update to Odoo in background (Stage 4 = Solved in Helpdesk & Stage 19 = Done in Field Service)
+      this.syncTicketUpdateToOdoo(tk).then(() => {
+        this.saveTicketsToStorage();
+        this.renderTickets();
+      }).catch(e => {
         console.warn('[Complete Odoo Sync Error]:', e);
-      }
+      });
       this.saveTicketsToStorage();
       this.renderTickets();
     };
