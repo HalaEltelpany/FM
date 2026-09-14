@@ -3255,6 +3255,18 @@
       <div class="form-group">
         <label for="form_field_13" class="form-label" style="font-weight: 700; color: #20274f;">طريقة الدفع بكارت الفيزا / الماستركارد:</label>
         
+        <!-- Customer Digital Signature for Approval -->
+        <div style="margin-bottom: 12px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 0.72rem; font-weight: 700; color: #20274f;">
+              <i class="fa-solid fa-signature" style="color: #1b8f91;"></i> توقيع المالك بالموافقة على أمر العمل:
+            </span>
+            <button type="button" style="background: transparent; color: #dc2626; border: none; font-size: 0.65rem; cursor: pointer; font-weight: 700;" onclick="app.clearClientSpareSig()">مسح التوقيع</button>
+          </div>
+          <canvas id="clientSpareSigCanvas" width="340" height="65" style="width: 100%; height: 65px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: crosshair; touch-action: none;"></canvas>
+          <span style="font-size: 0.62rem; color: #64748b; display: block; margin-top: 2px;">وقع بإصبعك أو الماوس لاعتماد تركيب القطعة وإصدار الفاتورة الرسمية بأودو.</span>
+        </div>
+
         <!-- Saved Card Option (Best Practice) -->
         <div style="border: 1px solid var(--primary-gold); background: rgba(212, 175, 55, 0.04); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -4694,72 +4706,6 @@ class UltimateFMApp {
     if (dyn3) dyn3.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
   }
 
-  handleNewTicketSubmit() {
-    if (this._isTicketSubmitting) return;
-    this._isTicketSubmitting = true;
-    setTimeout(() => { this._isTicketSubmitting = false; }, 2500);
-
-    const category = document.getElementById('ticketCategorySelect')?.value || 'سباكة';
-    const priority = document.getElementById('ticketPrioritySelect')?.value || '2';
-    const desc = document.getElementById('ticketDescInput')?.value || 'طلب صيانة عاجلة';
-    const photoInput = document.getElementById('ticketPhotoInput');
-    
-    // Category fallback before-repair images
-    const fallbacks = {
-      'سباكة': 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=300&q=80',
-      'كهرباء': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
-      'كهروميكانيك': 'https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=300&q=80',
-      'نجارة': 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=300&q=80'
-    };
-    const defaultPhoto = fallbacks[category] || fallbacks['سباكة'];
-
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
-    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-    const newTicket = {
-      id: `TK-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: `${category}: ${desc.substring(0, 20)}...`,
-      category: category,
-      priority: priority,
-      details: desc,
-      status: 'جديد',
-      bgClass: 'badge-warning',
-      requester: this.currentRole,
-      assignedTech: '',
-      photoBefore: defaultPhoto,
-      photoAfter: '',
-      createdAt: now,
-      dateStr: dateStr,
-      timeStr: timeStr,
-      resolutionTime: ''
-    };
-
-    const proceed = () => {
-      this.tickets.unshift(newTicket);
-      this.saveTicketsToStorage();
-      this.renderTickets();
-      this.closeModal('modalNewTicket');
-      if (photoInput) photoInput.value = '';
-      
-      // Live Odoo Sync Trigger
-      this.syncTicketToOdoo(newTicket);
-      
-      this.showToast(`✅ تم إنشاء وتوجيه تذكرة الصيانة بنجاح رقم #${newTicket.id}\nتم إدراج البلاغ تلقائياً في قاعدة البيانات المركزية وإرساله لمدير الصيانة!`);
-    };
-
-    if (photoInput && photoInput.files && photoInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        newTicket.photoBefore = e.target.result;
-        proceed();
-      };
-      reader.readAsDataURL(photoInput.files[0]);
-    } else {
-      proceed();
-    }
-  }
-
   saveAndTestOdooSettings() {
     const url = document.getElementById('odooUrlInput')?.value || '';
     const db = document.getElementById('odooDbInput')?.value || '';
@@ -5442,10 +5388,9 @@ class UltimateFMApp {
       }
 
       if (!ticket.odooId) {
-        ticket._odooSynced = false;
-        await this.syncTicketToOdoo(ticket);
+        console.warn('[Odoo Update] Ticket odooId not resolved for update. Skipping to prevent duplicate.');
+        return;
       }
-      if (!ticket.odooId) return;
     }
 
     try {
@@ -5483,6 +5428,27 @@ class UltimateFMApp {
         console.log(`[Odoo Stage Update Success] Stage updated to ${targetStageId}:`, writeData.result);
         const stageLabel = targetStageId === 2 ? 'قيد التنفيذ (In Progress)' : ((targetStageId === 4 || targetStageId === 3) ? 'تم الحل (Solved)' : 'محدث');
         this.showToast(`🔄 تم تحديث مرحلة البلاغ في أودو بنجاح (${stageLabel})`);
+
+        // If solved (Stage 4 or 3), also close Field Service task (project.task -> stage 19 = Done)
+        if ((targetStageId === 4 || targetStageId === 3) && (ticket.fieldServiceTaskId || ticket.odooTaskId)) {
+          const fTaskId = ticket.fieldServiceTaskId || ticket.odooTaskId;
+          const taskDonePayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput,
+                "project.task",
+                "write",
+                [[parseInt(fTaskId)], { stage_id: 19 }]
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          this.callOdoo(baseUrl, taskDonePayload, 4000).catch(e => console.warn('[Field Service Task Close Failed]:', e));
+        }
       } else if (writeData && writeData.error) {
         console.error('[Odoo Stage Update Error]:', writeData.error);
       }
@@ -5727,7 +5693,7 @@ class UltimateFMApp {
       }
 
       let paymentHtml = '';
-      if (tk.status === 'انتظار دفع المالك') {
+      if (tk.status === 'انتظار موافقة وسداد العميل' || tk.status === 'انتظار دفع المالك') {
         paymentHtml = isEn ? `
           <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 10px; border-radius: 8px; font-size: 0.75rem; color: #ef4444; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
             <span>⚠️ <strong>Repair requires spare part:</strong> [${partName}] priced at <strong>${tk.partPrice} EGP</strong>.</span>
@@ -5745,7 +5711,7 @@ class UltimateFMApp {
             </button>
           </div>
         `;
-      } else if (tk.status === 'تم الدفع - جاري التركيب') {
+      } else if (tk.status === 'تم السداد - بانتظار صرف القطعة من المستودع' || tk.status === 'تم الدفع - جاري التركيب' || tk.status === 'تم صرف القطعة - جاري التركيب') {
         paymentHtml = isEn ? `
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px; border-radius: 8px; font-size: 0.72rem; color: #10b981; margin-top: 8px;">
             <i class="fa-solid fa-circle-check"></i> Paid <strong>${tk.partPrice} EGP</strong> successfully. The technician will bring and install the [${partName}].
@@ -6255,7 +6221,7 @@ class UltimateFMApp {
       };
 
       const allTechTks = this.tickets.filter(tk => (tk.assignedTech || (!tk.assignedTech && tk.requester === 'manager')) && isPureMaintenanceTask(tk));
-      const activeTechTks = allTechTks.filter(tk => ['قيد التنفيذ', 'In Progress', 'تم التعيين للفني', 'جاري العمل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'قيد الفحص الميداني', 'جديد'].includes(tk.status));
+      const activeTechTks = allTechTks.filter(tk => ['قيد التنفيذ', 'In Progress', 'تم التعيين للفني', 'جاري العمل', 'انتظار موافقة وسداد العميل', 'انتظار دفع المالك', 'تم السداد - بانتظار صرف القطعة من المستودع', 'تم الدفع - جاري التركيب', 'تم صرف القطعة - جاري التركيب', 'قيد الفحص الميداني', 'جديد'].includes(tk.status));
       const completedTechTks = allTechTks.filter(tk => tk.status === 'تم الانتهاء' || tk.status === 'تم الحل' || tk.status === 'Solved');
 
       // 1. Update Daily Technician KPIs
@@ -6387,119 +6353,116 @@ class UltimateFMApp {
                 ` : ''}
               </div>
             `;
-          } else if (tk.status === 'تم التعيين للفني' || tk.status === 'جاري العمل' || tk.status === 'جديد' || tk.status === 'قيد الفحص الميداني' || tk.status === 'جاري العمل الميداني' || tk.status === 'قيد التنفيذ' || tk.isFieldService) {
+          } else if (tk.status === 'تم التعيين للفني' || tk.status === 'جاري العمل' || tk.status === 'جديد' || tk.status === 'قيد الفحص الميداني' || tk.status === 'جاري العمل الميداني' || tk.status === 'قيد التنفيذ') {
+            const activePath = tk._techActionPath || 'no_part';
             innerTechHtml = `
-              <!-- Compact Timer & Status Bar -->
-              <div style="display: flex; align-items: center; justify-content: space-between; background: #0f172a; color: #38bdf8; padding: 6px 10px; border-radius: 8px; margin-top: 6px;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-stopwatch" style="font-size: 0.95rem; color: #38bdf8;"></i>
-                  <span style="font-size: 0.65rem; color: #94a3b8;">الوقت الميداني:</span>
-                  <span style="font-size: 0.95rem; font-family: monospace; font-weight: 800; color: #ffffff;" id="fsTimer_${tk.id}">${tk.fsElapsedFormatted || '00:00:00'}</span>
+              <!-- Status & Mode Switcher -->
+              <div style="margin-top: 8px; padding: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="font-size: 0.7rem; font-weight: 800; color: #334155; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                  <span><i class="fa-solid fa-wrench" style="color: #1b8f91;"></i> مسار تنفيذ البلاغ الميداني:</span>
+                  <span style="font-size: 0.62rem; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">قيد التنفيذ</span>
                 </div>
-                <button type="button" style="background: ${tk.fsTimerRunning ? '#f59e0b' : '#1b8f91'}; color: #ffffff; font-weight: 700; font-size: 0.68rem; padding: 4px 10px; margin: 0; border: none; border-radius: 6px; cursor: pointer;" onclick="app.toggleFieldServiceTimer('${tk.id}')">
-                  <i class="fa-solid ${tk.fsTimerRunning ? 'fa-pause' : 'fa-play'}"></i> ${tk.fsTimerRunning ? 'إيقاف' : 'بدء العمل'}
-                </button>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" style="flex: 1; height: 34px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; cursor: pointer; border: 1px solid ${activePath === 'no_part' ? '#10b981' : '#cbd5e1'}; background: ${activePath === 'no_part' ? '#ecfdf5' : '#ffffff'}; color: ${activePath === 'no_part' ? '#065f46' : '#64748b'};" onclick="app.setTechActionPath('${tk.id}', 'no_part')">
+                    <i class="fa-solid fa-circle-check"></i> ١. حل بدون قطعة غيار
+                  </button>
+                  <button type="button" style="flex: 1.1; height: 34px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; cursor: pointer; border: 1px solid ${activePath === 'need_part' ? '#0284c7' : '#cbd5e1'}; background: ${activePath === 'need_part' ? '#f0f9ff' : '#ffffff'}; color: ${activePath === 'need_part' ? '#0369a1' : '#64748b'};" onclick="app.setTechActionPath('${tk.id}', 'need_part')">
+                    <i class="fa-solid fa-boxes-stacked"></i> ٢. يحتاج قطعة غيار (Field Service)
+                  </button>
+                </div>
               </div>
 
-              <!-- Spare Parts (Clean & Minimal) -->
-              ${(() => {
-                const targetWarehouse = isPublicTicket ? 'assets' : (isTenantTicket ? 'commercial' : 'residential');
-                let techSpecialty = 'all';
-                const tkCat = (tk.category || tk.title || '').toLowerCase();
-                if (tkCat.includes('سباك') || tkCat.includes('مياه') || tkCat.includes('محبس') || (tk.assignedTech && tk.assignedTech.includes('جرجس'))) techSpecialty = 'سباكة';
-                else if (tkCat.includes('كهرب') || tkCat.includes('إنارة') || tkCat.includes('لوحات') || tkCat.includes('طاقة') || (tk.assignedTech && tk.assignedTech.includes('علي'))) techSpecialty = 'كهرباء';
-                else if (tkCat.includes('لاندسكيب') || tkCat.includes('ري') || tkCat.includes('حدائق') || (tk.assignedTech && tk.assignedTech.includes('سعيد'))) techSpecialty = 'لاندسكيب';
-                else if (tkCat.includes('تكييف') || tkCat.includes('تبريد') || tkCat.includes('كهروميكانيك') || tkCat.includes('طلمب') || tkCat.includes('حمام') || (tk.assignedTech && tk.assignedTech.includes('كريم'))) techSpecialty = 'كهروميكانيك';
-
-                let availableParts = (this.inventoryItems || []).filter(item => {
-                  const matchWh = item.warehouse === targetWarehouse;
-                  const matchSpec = (techSpecialty === 'all' || item.category === techSpecialty || (techSpecialty === 'كهروميكانيك' && (item.category === 'كهروميكانيك' || item.category === 'سباكة')));
-                  return matchWh && matchSpec;
-                });
-                if (availableParts.length === 0) availableParts = (this.inventoryItems || []).filter(item => item.warehouse === targetWarehouse);
-
-                return `
-                  <div style="background: #f8fafc; border: 1px solid rgba(32, 39, 79, 0.08); padding: 8px 10px; border-radius: 8px; margin-top: 6px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                      <span style="font-size: 0.7rem; font-weight: 800; color: #20274f;">
-                        <i class="fa-solid fa-boxes-stacked" style="color: #1b8f91;"></i> صرف قطع الغيار:
-                      </span>
-                      <span style="font-size: 0.62rem; color: #64748b;">${isPublicTicket ? 'مستودع الموقع العام' : (isTenantTicket ? 'مستودع التجاري' : 'مستودع الوحدات')}</span>
-                    </div>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                      <select class="form-control" id="fsPartSelect_${tk.id}" style="flex: 1; height: 34px; font-size: 0.72rem; padding: 0 8px; border: 1px solid #cbd5e1; font-weight: 600; background: #ffffff; color: #20274f; border-radius: 6px;">
-                        ${availableParts.map(p => {
-                          const label = isPublicTicket ? `${p.name} [متوفر: ${p.qty}]` : `${p.name} (${p.price} ج.م)`;
-                          return `<option value="${p.name}">${label}</option>`;
-                        }).join('')}
-                      </select>
-                      <input type="number" id="fsPartQty_${tk.id}" value="1" min="1" max="10" style="width: 44px; height: 34px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.75rem; text-align: center; font-weight: 800; color: #20274f; background: #ffffff;">
-                      <button type="button" style="height: 34px; padding: 0 10px; background: #1b8f91; color: #ffffff; font-weight: 700; font-size: 0.7rem; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;" onclick="app.addFieldServicePart('${tk.id}')">
-                        <i class="fa-solid fa-plus"></i> صرف
-                      </button>
-                    </div>
-                    ${(tk.partsUsed && tk.partsUsed.length > 0) ? `
-                      <div id="fsPartsList_${tk.id}" style="font-size: 0.66rem; color: #0f172a; margin-top: 5px; padding: 4px 8px; background: rgba(32, 39, 79, 0.04); border-radius: 5px;">
-                        ${tk.partsUsed.map(p => `• <b>${p.name}</b> (كمية: ${p.qty})`).join('، ')}
+              ${activePath === 'no_part' ? `
+                <!-- Path A: Resolved directly without spare part -->
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 10px; border-radius: 8px; margin-top: 6px;">
+                  <div style="font-size: 0.72rem; font-weight: 700; color: #065f46; margin-bottom: 6px;">
+                    <i class="fa-solid fa-circle-info"></i> تم فحص ومعاينة العطل في الموقع ويمكن إنهاؤه مباشرة دون استهلاك أي قطع غيار:
+                  </div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <label for="techPhotoAfter_${tk.id}" style="flex: 1; height: 38px; display: flex; align-items: center; justify-content: center; gap: 4px; background: #ffffff; border: 1px dashed #10b981; border-radius: 8px; color: #065f46; font-size: 0.7rem; font-weight: 700; cursor: pointer; margin: 0;">
+                      <i class="fa-solid fa-camera"></i> 
+                      <span id="techPhotoAfterLabel_${tk.id}">صورة بعد الإصلاح</span>
+                    </label>
+                    <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم التقاط الصورة';" />
+                    <button type="button" style="flex: 1.4; height: 38px; font-size: 0.76rem; font-weight: 800; background: #059669; border: none; border-radius: 8px; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; cursor: pointer; box-shadow: 0 2px 6px rgba(5,150,105,0.25);" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                      <i class="fa-solid fa-check-double"></i> إنهاء وحل البلاغ (Solved)
+                    </button>
+                  </div>
+                </div>
+              ` : `
+                <!-- Path B: Needs spare part -> Field Service -->
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 10px; border-radius: 8px; margin-top: 6px;">
+                  <div style="font-size: 0.72rem; font-weight: 700; color: #0369a1; margin-bottom: 6px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> حدد قطعة الغيار المطلوبة لفتح أمر صيانة ميدانية (Field Service) وطلب موافقة المالك:
+                  </div>
+                  ${(() => {
+                    const targetWarehouse = isPublicTicket ? 'assets' : (isTenantTicket ? 'commercial' : 'residential');
+                    let availableParts = (this.inventoryItems || []).filter(item => item.warehouse === targetWarehouse);
+                    if (availableParts.length === 0) availableParts = (this.inventoryItems || []);
+                    return `
+                      <div style="display: flex; gap: 6px; align-items: center;">
+                        <select class="form-control" id="fsPartSelect_${tk.id}" style="flex: 1; height: 36px; font-size: 0.74rem; padding: 0 8px; border: 1px solid #7dd3fc; font-weight: 700; background: #ffffff; color: #0369a1; border-radius: 6px;">
+                          ${availableParts.map(p => `<option value="${p.name}">${p.name} (${p.price} ج.م)</option>`).join('')}
+                        </select>
+                        <input type="number" id="fsPartQty_${tk.id}" value="1" min="1" max="10" style="width: 44px; height: 36px; border: 1px solid #7dd3fc; border-radius: 6px; font-size: 0.75rem; text-align: center; font-weight: 800; color: #0369a1; background: #ffffff;">
+                        <button type="button" style="height: 36px; padding: 0 12px; background: #0284c7; color: #ffffff; font-weight: 800; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 6px rgba(2,132,199,0.25);" onclick="app.requestSparePartFieldService('${tk.id}')">
+                          <i class="fa-solid fa-paper-plane"></i> تحويل لـ Field Service
+                        </button>
                       </div>
-                    ` : ''}
-                  </div>
-                `;
-              })()}
-
-              <!-- Signature only if Resident/Tenant -->
-              ${!isPublicTicket ? `
-                <div style="background: #f8fafc; border: 1px solid rgba(32, 39, 79, 0.1); padding: 8px 10px; border-radius: 8px; margin-top: 6px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <span style="font-size: 0.7rem; font-weight: 800; color: #20274f;">
-                      <i class="fa-solid fa-signature" style="color: #1b8f91;"></i> توقيع الاستلام (${isTenantTicket ? 'المستأجر' : 'المالك'}):
-                    </span>
-                    <button type="button" style="background: transparent; color: #dc2626; border: none; font-size: 0.62rem; cursor: pointer;" onclick="app.clearFieldServiceSig('${tk.id}')">مسح</button>
-                  </div>
-                  <canvas id="fsSigCanvas_${tk.id}" width="340" height="60" style="width: 100%; height: 60px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 6px; cursor: crosshair; touch-action: none;"></canvas>
+                    `;
+                  })()}
                 </div>
-              ` : ''}
-
-              <!-- Photo After Fix & Complete Action (Single Clean Row) -->
-              <div style="display: flex; gap: 6px; align-items: center; margin-top: 6px;">
-                <label for="techPhotoAfter_${tk.id}" style="flex: 1; height: 38px; display: flex; align-items: center; justify-content: center; gap: 4px; background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 8px; color: #475569; font-size: 0.7rem; font-weight: 700; cursor: pointer; margin: 0;">
-                  <i class="fa-solid fa-camera"></i> 
-                  <span id="techPhotoAfterLabel_${tk.id}">صورة بعد الإصلاح</span>
-                </label>
-                <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم التقاط الصورة';" />
-
-                <button type="button" style="flex: 1.4; height: 38px; font-size: 0.75rem; font-weight: 800; background: #1b8f91; border: none; border-radius: 8px; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; cursor: pointer; box-shadow: 0 2px 6px rgba(27,143,145,0.25);" onclick="app.completeFieldServiceOrder('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                  <i class="fa-solid fa-circle-check"></i> إنهاء وإغلاق المهمة
+              `}
+            `;
+          } else if (tk.status === 'انتظار موافقة وسداد العميل' || tk.status === 'انتظار دفع المالك') {
+            innerTechHtml = `
+              <div style="background: #fffbeb; border: 1px solid #fcd34d; padding: 10px 12px; border-radius: 8px; font-size: 0.74rem; color: #92400e; margin-top: 6px;">
+                <div style="font-weight: 800; margin-bottom: 2px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-hourglass-half" style="color: #f59e0b;"></i>
+                  <span>بانتظار توقيع واعتماد وسداد المالك لقيمة [${tk.partName || 'قطعة الغيار'}] (${tk.partPrice || 250} ج.م)</span>
+                </div>
+                <div style="font-size: 0.68rem; color: #78350f; margin-top: 4px;">
+                  ⚡ تم تحويل البلاغ بنجاح إلى أمر خدمة ميدانية Field Service (#WO-${tk.fieldServiceTaskId || tk.odooTaskId || 'جديد'}) بأودو، وتم إرسال الإشعار لتطبيق المالك للاعتماد والسداد.
+                </div>
+              </div>
+            `;
+          } else if (tk.status === 'تم السداد - بانتظار صرف القطعة من المستودع' || tk.status === 'تم الدفع - جاري التركيب') {
+            innerTechHtml = `
+              <div style="background: #ecfdf5; border: 1.5px solid #6ee7b7; padding: 10px 12px; border-radius: 8px; font-size: 0.74rem; color: #065f46; margin-top: 6px;">
+                <div style="font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+                  <span><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم توقيع وسداد القطعة [${tk.partName || 'قطعة الغيار'}] من العميل بنجاح!</span>
+                  <span style="font-size: 0.65rem; background: #d1fae5; padding: 2px 6px; border-radius: 4px; font-weight: 800;">فاتورة معتمدة #${tk.odooInvoiceId || 'INV'}</span>
+                </div>
+                <div style="font-size: 0.7rem; color: #047857; margin-bottom: 8px;">
+                  📍 الخطوة التالية: توجه لمستودع القرية لاستلام قطعة الغيار، ثم اضغط الزر أدناه لتأكيد الاستلام والتوجه للتركيب:
+                </div>
+                <button type="button" style="width: 100%; height: 38px; font-size: 0.78rem; font-weight: 800; background: #0284c7; border: none; border-radius: 8px; color: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(2,132,199,0.25);" onclick="app.confirmWarehousePickup('${tk.id}')">
+                  <i class="fa-solid fa-boxes-packing"></i> تأكيد استلام قطعة الغيار من المخزن
                 </button>
               </div>
             `;
-          } else if (tk.status === 'انتظار دفع المالك') {
+          } else if (tk.status === 'تم صرف القطعة - جاري التركيب') {
             innerTechHtml = `
-              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 8px 10px; border-radius: 8px; font-size: 0.72rem; color: #92400e; margin-top: 6px;">
-                <div style="font-weight: 800; margin-bottom: 2px;"><i class="fa-solid fa-hourglass-half"></i> بانتظار سداد المالك لقيمة القطعة (${tk.partPrice || 350} ج.م)</div>
-                <div>تم إرسال إشعار الدفع لتطبيق المالك (فيلا 104)، سيبدأ التركيب فور السداد.</div>
-              </div>
-            `;
-          } else if (tk.status === 'تم الدفع - جاري التركيب') {
-            innerTechHtml = `
-              <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 10px 12px; border-radius: 8px; font-size: 0.72rem; color: #166534; margin-top: 6px;">
-                <div style="font-weight: 800; margin-bottom: 4px;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> تم سداد قيمة القطعة [${tk.partName || 'محبس نحاس'}]!</div>
-                <div>يرجى استلام القطعة من المخزن وتركيبها، ثم إرفاق صورة بعد التركيب:</div>
-                <div style="margin: 8px 0 6px 0;">
-                  <label for="techPhotoAfter_${tk.id}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: #ffffff; border: 1.5px dashed #10b981; border-radius: 8px; color: #065f46; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
-                    <i class="fa-solid fa-camera" style="color: #10b981; font-size: 1rem;"></i> 
-                    <span id="techPhotoAfterLabel_${tk.id}">📷 اضغط هنا لرفع / تصوير العطل بعد التركيب</span>
+              <div style="background: #f0fdf4; border: 1.5px solid #86efac; padding: 10px 12px; border-radius: 8px; font-size: 0.74rem; color: #166534; margin-top: 6px;">
+                <div style="font-weight: 800; margin-bottom: 4px;">
+                  <i class="fa-solid fa-screwdriver-wrench" style="color: #16a34a;"></i> تم استلام [${tk.partName || 'قطعة الغيار'}] من المستودع وجاري التركيب بالوحدة!
+                </div>
+                <div style="font-size: 0.7rem; color: #15803d; margin-bottom: 8px;">
+                  بعد الانتهاء من التركيب واختبار التشغيل، التقط صورة الإصلاح واضغط إغلاق التذكرة لإقفالها على Helpdesk و Field Service معاً:
+                </div>
+                <div style="margin: 6px 0;">
+                  <label for="techPhotoAfter_${tk.id}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: #ffffff; border: 1.5px dashed #16a34a; border-radius: 8px; color: #166534; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
+                    <i class="fa-solid fa-camera" style="color: #16a34a; font-size: 0.95rem;"></i> 
+                    <span id="techPhotoAfterLabel_${tk.id}">📷 صورة بعد التركيب والإصلاح</span>
                   </label>
-                  <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم اختيار صورة بعد التركيب';">
+                  <input type="file" id="techPhotoAfter_${tk.id}" accept="image/*" style="display: none;" onchange="const l = document.getElementById('techPhotoAfterLabel_${tk.id}'); if (l) l.innerText = '✅ تم اختيار صورة بعد التركيب';" />
                 </div>
-                <button class="btn btn-success" style="width: 100%; height: 38px; font-size: 0.8rem; font-weight: 800; margin: 0; background: #059669; border-color: #059669; color: #ffffff;" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
-                  <i class="fa-solid fa-check"></i> إنهاء المهمة وإغلاق التذكرة
+                <button type="button" class="btn btn-success" style="width: 100%; height: 40px; font-size: 0.8rem; font-weight: 800; margin-top: 4px; background: #059669; border-color: #059669; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(5,150,105,0.3);" onclick="app.completeTicket('${tk.id}', 'techPhotoAfter_${tk.id}')">
+                  <i class="fa-solid fa-circle-check"></i> إنهاء وإغلاق البلاغ نهائياً (Helpdesk & Field Service)
                 </button>
               </div>
             `;
-          }
-
-          techList.innerHTML += `
+          }techList.innerHTML += `
             <div class="ticket-item" style="flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 10px; padding: 12px; border-radius: 10px; background: #ffffff; border: 1px solid rgba(32,39,79,0.08); border-left: 5px solid ${isDone ? '#10b981' : borderAccent}; box-shadow: var(--shadow-sm);">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -6830,9 +6793,13 @@ class UltimateFMApp {
         { name: 'محمد الشناوي', title: 'فني شبكات إنارة ومحولات', status: 'متاح الآن 🟢', available: true },
         { name: 'خالد مصطفى', title: 'فني مولدات طوارئ وبيلارات', status: 'متاح الآن 🟢', available: true }
       ],
+      'أعمال مدنية': [
+        { name: 'محمود الشناوي', title: 'فني أعمال مدنية وترميمات ومحارة', status: 'متاح الآن 🟢', available: true },
+        { name: 'عمر فاروق', title: 'فني بلاط ودهانات وتشطيبات', status: 'متاح الآن 🟢', available: true }
+      ],
       'نجارة': [
-        { name: 'عبد الرحمن سمير', title: 'فني نجارة وديكور وأقفال', status: 'متاح الآن 🟢', available: true },
-        { name: 'حسام حسني', title: 'فني ألمونيتال وأبواب زجاجية', status: 'متاح الآن 🟢', available: true }
+        { name: 'إبراهيم فؤاد', title: 'فني أول نجارة وأبواب وديكور', status: 'متاح الآن 🟢', available: true },
+        { name: 'عبد الرحمن سمير', title: 'فني نجارة وديكور وأقفال', status: 'متاح الآن 🟢', available: true }
       ],
       'صيانة عامة': [
         { name: 'كريم حسن', title: 'فني تشغيل ومرافق عامة', status: 'متاح الآن 🟢', available: true },
@@ -7260,6 +7227,206 @@ class UltimateFMApp {
     }
   }
 
+  setTechActionPath(ticketId, path) {
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (tk) {
+      tk._techActionPath = path;
+      this.renderTickets();
+    }
+  }
+
+  async requestSparePartFieldService(ticketId) {
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    const select = document.getElementById(`fsPartSelect_${tk.id}`);
+    const qtyInput = document.getElementById(`fsPartQty_${tk.id}`);
+    const partName = select ? select.value : 'محبس نحاس 3/4 بوصة';
+    const qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+    const invItem = (this.inventoryItems || []).find(i => i.name === partName);
+    const partPrice = invItem ? (invItem.price * qty) : 250;
+    const techName = tk.assignedTech || 'كريم حسن';
+
+    tk.partName = partName;
+    tk.partPrice = partPrice;
+    tk.partQty = qty;
+    tk.needsPart = true;
+    tk.isFieldService = true;
+    tk.status = 'انتظار موافقة وسداد العميل';
+    tk.bgClass = 'badge-warning';
+
+    this.saveTicketsToStorage();
+    this.renderTickets();
+    this.showToast(`🚀 تم تسجيل الحاجة لقطعة غيار [${partName}] بقيمة (${partPrice} ج.م)!\nجاري إنشاء أمر الخدمة الميدانية (Field Service) في أودو وإرسال إشعار السداد للمالك...`);
+
+    // Create project.task in Odoo Project 2 (Field Service), Stage 18 (In Progress)
+    try {
+      const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+      const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+      const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+      const baseUrl = urlInput.replace(/\/+$/, '');
+      const uid = 2;
+
+      let partnerId = (tk.requester === 'tenant') ? 7758 : 7755;
+      const unitStr = tk.location || (tk.requester === 'tenant' ? 'شقة A112' : 'فيلا A104');
+
+      const taskFields = {
+        name: `[أمر صيانة ميدانية - قطعة غيار] ${partName} (${unitStr})`,
+        project_id: 2,
+        stage_id: 18,
+        partner_id: partnerId,
+        description: `<p><b>طلب صيانة ميدانية لتركيب قطعة غيار:</b></p>` +
+                     `<p>• <b>القطعة المطلوبة:</b> ${partName} (الكمية: ${qty} - القيمة: ${partPrice} ج.م)</p>` +
+                     `<p>• <b>الوحدة:</b> ${unitStr}</p>` +
+                     `<p>• <b>الفني المعاين:</b> ${techName}</p>` +
+                     `<p>• <b>التذكرة الأصلية:</b> #${tk.id} - ${tk.title}</p>`
+      };
+
+      const taskPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [dbInput, uid, keyInput, "project.task", "create", [taskFields]]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+
+      const res = await this.callOdoo(baseUrl, taskPayload, 8000);
+      if (res && res.result) {
+        tk.fieldServiceTaskId = res.result;
+        tk.odooTaskId = res.result;
+        this.saveTicketsToStorage();
+        console.log('[Field Service] Live project.task created ID:', res.result);
+
+        // Post chatter on helpdesk ticket
+        if (tk.odooId) {
+          const chatterPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                dbInput, uid, keyInput, "helpdesk.ticket", "message_post",
+                [[parseInt(tk.odooId)]],
+                { body: `<p>⚡ <b>أكد الفني (${techName}) بعد المعاينة الحاجة لقطعة غيار [${partName}] بقيمة (${partPrice} ج.م)</b></p><p>تم تحويل البلاغ لأمر خدمة ميدانية بمشروع Field Service برقم (#WO-${res.result}) وبانتظار موافقة وسداد العميل.</p>` }
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          this.callOdoo(baseUrl, chatterPayload, 4000).catch(e => console.warn(e));
+        }
+
+        this.showToast(`✅ تم تحويل البلاغ بنجاح لأمر صيانة ميدانية (#WO-${res.result}) في نظام Field Service بأودو!`);
+      }
+    } catch (err) {
+      console.warn('[Field Service Task Creation Error]:', err);
+    }
+  }
+
+  confirmWarehousePickup(ticketId) {
+    const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
+    if (!tk) return;
+
+    // Deduct quantity from inventory
+    const invItem = (this.inventoryItems || []).find(i => i.name === tk.partName);
+    if (invItem) {
+      invItem.qty = Math.max(0, invItem.qty - (tk.partQty || 1));
+    }
+
+    tk.partsUsed = tk.partsUsed || [];
+    tk.partsUsed.push({
+      name: tk.partName || 'قطعة غيار',
+      qty: tk.partQty || 1,
+      price: tk.partPrice || 0,
+      warehouse: 'residential',
+      date: new Date().toLocaleTimeString('ar-EG')
+    });
+
+    tk.status = 'تم صرف القطعة - جاري التركيب';
+    tk.bgClass = 'badge-info';
+    this.saveTicketsToStorage();
+    this.renderTickets();
+
+    this.showToast(`📦 تم توثيق استلام قطعة الغيار [${tk.partName || 'القطعة'}] من المخزن بنجاح!\nالفني في طريقه لتركيب القطعة واختبارها لدى العميل.`);
+
+    // Chatter update on Field Service task in Odoo
+    const taskId = tk.fieldServiceTaskId || tk.odooTaskId;
+    if (taskId) {
+      const urlInput = safeStorage.getItem('odoo_url') || 'https://edu-fm-uc.odoo.com';
+      const dbInput = safeStorage.getItem('odoo_db') || 'edu-fm-uc';
+      const keyInput = safeStorage.getItem('odoo_key') || '06d7d7d208a8c2fa351c2a5cfa305e987ffb72f0';
+      const baseUrl = urlInput.replace(/\/+$/, '');
+      const uid = 2;
+
+      const chatterPayload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            dbInput, uid, keyInput, "project.task", "message_post",
+            [[parseInt(taskId)]],
+            { body: `<p>📦 <b>قام الفني (${tk.assignedTech || 'كريم حسن'}) باستلام قطعة الغيار [${tk.partName || 'القطعة'}] من مستودع القرية وجاري التوجه لوحدة العميل للتركيب.</b></p>` }
+          ]
+        },
+        id: Math.floor(Math.random() * 1000)
+      };
+      this.callOdoo(baseUrl, chatterPayload, 4000).catch(e => console.warn(e));
+    }
+  }
+
+  clearClientSpareSig() {
+    const canvas = document.getElementById('clientSpareSigCanvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.showToast('🧹 تم مسح التوقيع، يمكنك التوقيع مجدداً.');
+    }
+  }
+
+  initClientSpareSigCanvas() {
+    const canvas = document.getElementById('clientSpareSigCanvas');
+    if (!canvas || canvas._initialized) return;
+    canvas._initialized = true;
+
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#1b8f91';
+    ctx.lineWidth = 2.5;
+    let isDrawing = false;
+
+    const start = (e) => {
+      isDrawing = true;
+      ctx.beginPath();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+      ctx.moveTo(x, y);
+    };
+
+    const move = (e) => {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    };
+
+    const stop = () => { isDrawing = false; };
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    canvas.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start);
+    canvas.addEventListener('touchmove', move);
+    canvas.addEventListener('touchend', stop);
+  }
+
   clearFieldServiceSig(ticketId) {
     const canvas = document.getElementById(`fsSigCanvas_${ticketId}`);
     if (canvas) {
@@ -7477,7 +7644,12 @@ class UltimateFMApp {
     const tk = this.tickets.find(t => String(t.id) === String(ticketId) || String(t.odooId) === String(ticketId));
     if (!tk) return;
 
-    const fileInput = document.getElementById(fileInputId);
+    if (window._fsTimers && window._fsTimers[tk.id]) {
+      clearInterval(window._fsTimers[tk.id]);
+    }
+    tk.fsTimerRunning = false;
+
+    const fileInput = fileInputId ? document.getElementById(fileInputId) : null;
     let afterPhoto = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300';
 
     const proceed = (finalPhoto) => {
@@ -8430,6 +8602,7 @@ class UltimateFMApp {
     if (group) group.style.display = 'none';
 
     this.openModal('modalSparePartsPayment');
+    setTimeout(() => this.initClientSpareSigCanvas(), 120);
   }
 
   confirmSparePartPayment() {
@@ -8447,19 +8620,20 @@ class UltimateFMApp {
     const tk = this.tickets.find(t => t.id === ticketId);
     if (!tk) return;
 
-    if (this.ownerWalletBalance < tk.partPrice) {
-      this.showToast('❌ رصيد محفظتك الرقمية غير كافٍ لسداد قطعة الغيار! يرجى إعادة شحن محفظتك أولاً.');
-      return;
+    if (method === 'wallet') {
+      if (this.ownerWalletBalance < tk.partPrice) {
+        this.showToast('❌ رصيد محفظتك الرقمية غير كافٍ لسداد قطعة الغيار! يرجى إعادة شحن محفظتك أولاً.');
+        return;
+      }
+      this.ownerWalletBalance -= tk.partPrice;
+      this.updateWalletUI();
     }
 
-    // Deduct from wallet
-    this.ownerWalletBalance -= tk.partPrice;
-    this.updateWalletUI();
-
     // Update ticket state
-    tk.status = 'تم الدفع - جاري التركيب';
+    tk.status = 'تم السداد - بانتظار صرف القطعة من المستودع';
     tk.bgClass = 'badge-info';
 
+    this.saveTicketsToStorage();
     this.renderTickets();
     this.syncTicketUpdateToOdoo(tk);
 
@@ -8475,6 +8649,8 @@ class UltimateFMApp {
         );
         if (invId) {
           tk.odooInvoiceId = invId;
+          this.saveTicketsToStorage();
+          this.renderTickets();
           console.log('[Odoo Accounting] Created spare part invoice ID:', invId);
         }
       } catch (invErr) {
@@ -11722,6 +11898,11 @@ window.addFieldServicePart = function(id) { if (window.app) window.app.addFieldS
 window.clearFieldServiceSig = function(id) { if (window.app) window.app.clearFieldServiceSig(id); };
 window.completeFieldServiceOrder = function(id, fileId) { if (window.app) window.app.completeFieldServiceOrder(id, fileId); };
 window.technicianRequestPart = function(id, fileId) { if (window.app) window.app.technicianRequestPart(id, fileId); };
+window.setTechActionPath = function(id, path) { if (window.app) window.app.setTechActionPath(id, path); };
+window.requestSparePartFieldService = function(id) { if (window.app) window.app.requestSparePartFieldService(id); };
+window.confirmWarehousePickup = function(id) { if (window.app) window.app.confirmWarehousePickup(id); };
+window.clearClientSpareSig = function() { if (window.app) window.app.clearClientSpareSig(); };
+window.initClientSpareSigCanvas = function() { if (window.app) window.app.initClientSpareSigCanvas(); };
 window.completeTicket = function(id, fileId) { if (window.app) window.app.completeTicket(id, fileId); };
 window.openSparePartPaymentModal = function(id) { if (window.app) window.app.openSparePartPaymentModal(id); };
 window.confirmSparePartPayment = function() { if (window.app) window.app.confirmSparePartPayment(); };
