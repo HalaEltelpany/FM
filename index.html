@@ -5177,7 +5177,14 @@ class UltimateFMApp {
       }
 
       // Step 2: Instant Partner & Team Resolution (Zero Extra Network Lag)
-      let partnerId = 3;
+      let partnerId = 7755; // حسن عيسى (مالك الوحدة فيلا A104)
+      if (ticket.requester === 'tenant') {
+        partnerId = 7758; // أحمد زاهر محمود (المستأجر - شاليه A112)
+      } else if (ticket.requester === 'commercial') {
+        partnerId = 7759; // مطعم وكافيه Sea Breeze (المحل التجاري)
+      } else if (ticket.requester === 'manager' || ticket.requester === 'engineer') {
+        partnerId = 3; // إدارة المرافق العامة
+      }
       const resolvedTeamId = this.resolveOdooTeamId(ticket);
 
       // Clean description: ONLY the user's detailed problem description
