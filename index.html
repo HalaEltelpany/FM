@@ -5441,33 +5441,39 @@ class UltimateFMApp {
       }
     }
 
-    // 2. If odooId is still missing, single fast search_read
+    // 2. If odooId is still missing, search Odoo by ticket ID in name (both models)
     if (!ticket.odooId && String(ticket.id).startsWith('TK-OD-')) {
       ticket.odooId = parseInt(String(ticket.id).replace('TK-OD-', ''));
     }
     if (!ticket.odooId) {
       try {
-        const searchPayload = {
-          jsonrpc: "2.0",
-          method: "call",
-          params: {
-            service: "object",
-            method: "execute_kw",
-            args: [
-              creds.db, uid, creds.key,
-              ticket.odooModel || "helpdesk.ticket",
-              "search_read",
-              [[["name", "ilike", ticket.id]]],
-              { fields: ["id", "name", "stage_id"], limit: 1 }
-            ]
-          },
-          id: Math.floor(Math.random() * 1000)
-        };
-        const searchRes = await this.callOdoo(creds.baseUrl, searchPayload, 3500);
-        if (searchRes && searchRes.result && searchRes.result.length > 0) {
-          ticket.odooId = searchRes.result[0].id;
-          ticket.odooModel = ticket.odooModel || 'helpdesk.ticket';
-          this.saveTicketsToStorage();
+        const searchModels = [ticket.odooModel || 'helpdesk.ticket', 'helpdesk.ticket', 'maintenance.request'];
+        const uniqueModels = [...new Set(searchModels)];
+        for (const searchModel of uniqueModels) {
+          const searchPayload = {
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              service: "object",
+              method: "execute_kw",
+              args: [
+                creds.db, uid, creds.key,
+                searchModel,
+                "search_read",
+                [[["name", "ilike", String(ticket.id)]]],
+                { fields: ["id", "name", "stage_id"], limit: 1 }
+              ]
+            },
+            id: Math.floor(Math.random() * 1000)
+          };
+          const searchRes = await this.callOdoo(creds.baseUrl, searchPayload, 8000);
+          if (searchRes && searchRes.result && searchRes.result.length > 0) {
+            ticket.odooId = searchRes.result[0].id;
+            ticket.odooModel = searchModel;
+            console.log(`[Odoo Update] Found ticket in [${searchModel}] ID:`, ticket.odooId);
+            this.saveTicketsToStorage();
+            break;
+          }
         }
       } catch (sErr) {
         console.warn('[Odoo Search Error]:', sErr);
@@ -5475,9 +5481,10 @@ class UltimateFMApp {
     }
 
     if (!ticket.odooId) {
-      console.warn('[Odoo Update] Ticket odooId not found for', ticket.id);
+      console.warn('[Odoo Update] Ticket odooId not found for', ticket.id, '- cannot update Odoo stage');
       return false;
     }
+
 
     const odooIdNum = parseInt(String(ticket.odooId).replace(/\D+/g, ''));
     if (!odooIdNum) return false;
