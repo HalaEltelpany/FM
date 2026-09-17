@@ -1133,31 +1133,58 @@ class UltimateFMApp {
     };
   }
 
-  async callOdoo(baseUrl, payload, timeoutMs = 5000) {
+  async callOdoo(baseUrl, payload, timeoutMs = 8000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
+    const proxyUrl = 'http://localhost:3100/odoo-proxy';
     const payloadStr = JSON.stringify(payload);
 
+    // 1. Try local CORS proxy first (OdooProxy.exe on port 3100)
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      const response = await fetch(directUrl, {
+      const response = await fetch(proxyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payloadStr,
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-
       if (response && response.ok) {
         const data = await response.json();
-        if (data) return data;
+        if (data) {
+          console.log('[Odoo Proxy] ✅ Call via local proxy succeeded');
+          return data;
+        }
+      }
+    } catch (proxyErr) {
+      console.warn('[Odoo Proxy] Local proxy not available, trying direct:', proxyErr.message || proxyErr);
+    }
+
+    // 2. Fallback: try direct call (works if Odoo adds CORS headers in future)
+    try {
+      const controller2 = new AbortController();
+      const timeoutId2 = setTimeout(() => controller2.abort(), timeoutMs);
+      const response2 = await fetch(directUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payloadStr,
+        signal: controller2.signal
+      });
+      clearTimeout(timeoutId2);
+      if (response2 && response2.ok) {
+        const data2 = await response2.json();
+        if (data2) {
+          console.log('[Odoo Direct] ✅ Direct call succeeded');
+          return data2;
+        }
       }
     } catch (directErr) {
       console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
     }
     return null;
   }
+
 
   resolveOdooTeamId(ticket) {
     if (ticket.team_id) return parseInt(ticket.team_id);
