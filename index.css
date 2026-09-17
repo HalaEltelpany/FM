@@ -1,4 +1,4 @@
-﻿/* 
+/* 
   Ultimate FM - CSS Design System & Styles
   Coastal Cities & Commercial Malls Facility Management System
 */
@@ -1202,7 +1202,7 @@ header.global-header {
 }
 
 .modal-overlay.active {
-  display: flex;
+  display: flex !important;
 }
 
 .modal-card {

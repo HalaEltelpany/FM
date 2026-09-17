@@ -1,4 +1,4 @@
-﻿/* 
+/* 
   Ultimate FM - Application JavaScript Logic
   Coastal Cities & Commercial Malls Facility Management System
 */
@@ -163,6 +163,15 @@ class UltimateFMApp {
       try { this.renderTickets();
     setTimeout(() => { if (this.checkEventRsvpStatusAndReplies) this.checkEventRsvpStatusAndReplies(); }, 500); } catch (e) { console.warn('[Init warning]:', e); }
       try { this.renderManagerDirectives(); } catch (e) { console.warn('[Init warning]:', e); }
+
+      // Background 12-second Two-Way Live Sync with Odoo
+      if (!this._odooSyncInterval) {
+        this._odooSyncInterval = setInterval(() => {
+          if (typeof this.syncTicketsFromOdoo === 'function') {
+            this.syncTicketsFromOdoo();
+          }
+        }, 12000);
+      }
 
       // Start cleanly on the main role selection grid so all 10 screens are accessible, or execute pending click
       try {
@@ -401,6 +410,14 @@ class UltimateFMApp {
     this.currentRole = 'login';
     safeStorage.removeItem('active_session_role');
 
+    // Clean up any open modals and reset submit lock
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.style.display = 'none';
+    });
+    this._isTicketSubmitting = false;
+
     // Remove any dynamic logout header
     document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
 
@@ -436,7 +453,15 @@ class UltimateFMApp {
     }
 
     this.currentRole = role;
-    
+
+    // Clean up any open modals and reset submit lock so buttons never freeze
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.style.display = 'none';
+    });
+    this._isTicketSubmitting = false;
+
     // Remove any dynamic logout header
     document.querySelectorAll('.dynamic-logout-header').forEach(el => el.remove());
 
@@ -560,6 +585,14 @@ class UltimateFMApp {
 
     // Render screen logout header inside active view
     try { this.renderLogoutHeader(); } catch (e) { console.warn(e); }
+
+    // Always render tickets and trigger two-way sync with Odoo for this role
+    try {
+      this.renderTickets();
+      if (typeof this.syncTicketsFromOdoo === 'function') {
+        this.syncTicketsFromOdoo();
+      }
+    } catch (e) { console.warn(e); }
   }
 
   openCommercialMeterModal() {
@@ -874,18 +907,19 @@ class UltimateFMApp {
 
     if (!urlInput || !dbInput || !userInput || !keyInput) return;
     const baseUrl = urlInput.replace(/\/+$/, '');
+    const uid = 2; // Direct cached admin UID for instant < 400ms two-way sync
+
+    const userToTechMap = {
+      6: 'كريم حسن',
+      7: 'إبراهيم فؤاد',
+      8: 'محمود الشناوي',
+      9: 'مينا جرجس',
+      10: 'أحمد علي',
+      11: 'سمير عبد الرحيم',
+      12: 'سعيد محمود'
+    };
 
     try {
-      const authPayload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: { service: "common", method: "authenticate", args: [dbInput, userInput, keyInput, {}] },
-        id: Math.floor(Math.random() * 1000)
-      };
-      const authData = await this.callOdoo(baseUrl, authPayload);
-      if (!authData || !authData.result) return;
-      const uid = authData.result;
-
       const readPayload = {
         jsonrpc: "2.0",
         method: "call",
@@ -898,7 +932,7 @@ class UltimateFMApp {
             "search_read",
             [[]],
             {
-              fields: ["id", "name", "description", "stage_id", "priority", "create_date", "partner_email", "partner_phone", "team_id"],
+              fields: ["id", "name", "description", "stage_id", "priority", "create_date", "partner_email", "partner_phone", "team_id", "user_id"],
               order: "id desc",
               limit: 50
             }
@@ -947,19 +981,32 @@ class UltimateFMApp {
           else if (stageName === 'New') stageName = 'جديد';
           else if (stageName === 'Cancelled') stageName = 'ملغي';
 
+          let techName = '';
+          if (rec.user_id && Array.isArray(rec.user_id)) {
+            techName = userToTechMap[rec.user_id[0]] || rec.user_id[1] || '';
+          }
+
+          if (stageName === 'جديد' && techName) {
+            stageName = 'قيد التنفيذ';
+          }
+
           let bg = 'badge-warning';
           if (stageName.includes('Done') || stageName.includes('مكتمل') || stageName.includes('منتهي') || stageName.includes('Solved') || stageName === 'تم الحل') bg = 'badge-success';
           else if (stageName.includes('Progress') || stageName === 'قيد التنفيذ') bg = 'badge-info';
 
-          // 1. If this Odoo ticket ID is already linked to a local ticket, update its status
-          const existingByOdooId = this.tickets.find(t => String(t.odooId) === recOdooIdStr || String(t.id) === `TK-OD-${rec.id}`);
+          // 1. If this Odoo ticket ID is already linked to a local ticket, update its status & technician
+          const existingByOdooId = this.tickets.find(t => String(t.odooId) === recOdooIdStr || String(t.id) === `TK-OD-${rec.id}` || (t.id && recNameLower.includes(String(t.id).toLowerCase())));
           if (existingByOdooId) {
+            existingByOdooId.odooId = rec.id;
             existingByOdooId.status = stageName;
             existingByOdooId.bgClass = bg;
+            if (techName) {
+              existingByOdooId.assignedTech = techName;
+            }
             return;
           }
 
-          // 2. If a local ticket with matching title/name or code exists (recently created local copy without odooId linked yet), link & update it!
+          // 2. If a local ticket with matching title/name or code exists, link & update it!
           const cleanName = (rec.name || '').trim().toLowerCase();
           const existingMatchingLocal = this.tickets.find(t => !t.odooId && (
             (t.title || '').trim().toLowerCase() === cleanName ||
@@ -970,6 +1017,9 @@ class UltimateFMApp {
             existingMatchingLocal.odooModel = 'helpdesk.ticket';
             existingMatchingLocal.status = stageName;
             existingMatchingLocal.bgClass = bg;
+            if (techName) {
+              existingMatchingLocal.assignedTech = techName;
+            }
             return;
           }
 
@@ -996,6 +1046,7 @@ class UltimateFMApp {
             status: stageName,
             bgClass: bg,
             requester: 'homeowner',
+            assignedTech: techName,
             createdAt: rawDate,
             dateStr: dateStr,
             timeStr: timeStr,
@@ -1468,6 +1519,9 @@ class UltimateFMApp {
     }
 
     // 2. If odooId is still missing, single fast search_read
+    if (!ticket.odooId && String(ticket.id).startsWith('TK-OD-')) {
+      ticket.odooId = parseInt(String(ticket.id).replace('TK-OD-', ''));
+    }
     if (!ticket.odooId) {
       try {
         const searchPayload = {
@@ -1817,8 +1871,9 @@ class UltimateFMApp {
 
       // Emaar 4-step Progress Tracker Calculation
       let step = 1;
-      if (['تم التعيين للفني', 'تم إسناد الفني', 'قيد الفحص الميداني', 'جاري العمل', 'جاري المراجعة', 'In Progress'].includes(tk.status)) step = 2;
-      else if (['انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'On Hold', 'بانتظار قطع الغيار'].includes(tk.status)) step = 3;
+      const inProgressStatuses = ['قيد التنفيذ', 'تم التعيين للفني', 'تم إسناد الفني', 'تم إسناد للفني', 'إسناد للفني', 'قيد الفحص الميداني', 'جاري العمل', 'جاري المراجعة', 'In Progress'];
+      if (inProgressStatuses.includes(tk.status) || Boolean(tk.assignedTech)) step = 2;
+      else if (['انتظار موافقة وسداد العميل', 'انتظار دفع المالك', 'تم الدفع - جاري التركيب', 'On Hold', 'بانتظار قطع الغيار', 'تم صرف القطعة - جاري التركيب'].includes(tk.status)) step = 3;
       else if (['تم الانتهاء', 'تم الحل', 'تم الإغلاق', 'Done', 'Solved', 'تم السداد', 'مكتمل'].includes(tk.status)) step = 4;
 
       const progressPercent = step === 1 ? 25 : (step === 2 ? 50 : (step === 3 ? 75 : 100));
@@ -5408,7 +5463,11 @@ class UltimateFMApp {
 
   openModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.add('active');
+    if (el) {
+      el.classList.add('active');
+      el.style.setProperty('display', 'flex', 'important');
+      el.style.display = 'flex';
+    }
     if (modalId === 'modalSignature') {
       setTimeout(() => this.initCanvas(), 100);
     }
@@ -5628,6 +5687,7 @@ class UltimateFMApp {
     const el = document.getElementById(modalId);
     if (el) {
       el.classList.remove('active');
+      el.style.setProperty('display', 'none', 'important');
       el.style.display = 'none';
     }
   }
@@ -7918,8 +7978,24 @@ var app = window.app;
 window.quickLogin = function(role) { if (window.app) window.app.quickLogin(role); };
 window.switchRole = function(role) { if (window.app) window.app.switchRole(role); };
 window.showRoleGrid = function() { if (window.app) window.app.showRoleGrid(); };
-window.openModal = function(id) { if (window.app) window.app.openModal(id); };
-window.closeModal = function(id) { const el = document.getElementById(id); if (el) { el.classList.remove('active'); el.style.display = 'none'; } if (window.app && typeof window.app.closeModal === 'function') window.app.closeModal(id); };
+window.openModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    el.style.setProperty('display', 'flex', 'important');
+    el.style.display = 'flex';
+  }
+  if (window.app && typeof window.app.openModal === 'function') window.app.openModal(id);
+};
+window.closeModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('active');
+    el.style.setProperty('display', 'none', 'important');
+    el.style.display = 'none';
+  }
+  if (window.app && typeof window.app.closeModal === 'function') window.app.closeModal(id);
+};
 window.handleLogin = function() { if (window.app) window.app.handleLogin(); };
 window.setLanguage = function(lang) { if (window.app) window.app.setLanguage(lang); };
 window.switchHomeownerTab = function(tabId) { if (window.app) window.app.switchHomeownerTab(tabId); };
