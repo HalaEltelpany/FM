@@ -5032,14 +5032,15 @@ class UltimateFMApp {
   async callOdoo(baseUrl, payload, timeoutMs = 8000) {
     const cleanBase = (baseUrl || 'https://edu-fm-uc.odoo.com').replace(/\/+$/, '');
     const directUrl = `${cleanBase}/jsonrpc`;
-    const proxyUrl = 'http://localhost:3100/odoo-proxy';
+    const cloudflareProxy = 'https://odoo-proxy.fmhala6.workers.dev/';
+    const localProxy = 'http://localhost:3100/odoo-proxy';
     const payloadStr = JSON.stringify(payload);
 
-    // 1. Try local CORS proxy first (OdooProxy.exe on port 3100)
+    // 1. Try Cloudflare Worker (works on HTTPS/GitHub Pages - always first)
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      const response = await fetch(proxyUrl, {
+      const response = await fetch(cloudflareProxy, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payloadStr,
@@ -5049,19 +5050,19 @@ class UltimateFMApp {
       if (response && response.ok) {
         const data = await response.json();
         if (data) {
-          console.log('[Odoo Proxy] ✅ Call via local proxy succeeded');
+          console.log('[Odoo] ✅ Cloudflare Worker succeeded');
           return data;
         }
       }
-    } catch (proxyErr) {
-      console.warn('[Odoo Proxy] Local proxy not available, trying direct:', proxyErr.message || proxyErr);
+    } catch (cfErr) {
+      console.warn('[Odoo] Cloudflare Worker failed, trying local proxy:', cfErr.message || cfErr);
     }
 
-    // 2. Fallback: try direct call (works if Odoo adds CORS headers in future)
+    // 2. Fallback: local proxy (localhost:3100 via OdooProxy.exe - works on file:// / http)
     try {
       const controller2 = new AbortController();
-      const timeoutId2 = setTimeout(() => controller2.abort(), timeoutMs);
-      const response2 = await fetch(directUrl, {
+      const timeoutId2 = setTimeout(() => controller2.abort(), 3000);
+      const response2 = await fetch(localProxy, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payloadStr,
@@ -5071,15 +5072,38 @@ class UltimateFMApp {
       if (response2 && response2.ok) {
         const data2 = await response2.json();
         if (data2) {
-          console.log('[Odoo Direct] ✅ Direct call succeeded');
+          console.log('[Odoo] ✅ Local proxy succeeded');
           return data2;
         }
       }
+    } catch (localErr) {
+      console.warn('[Odoo] Local proxy not available:', localErr.message || localErr);
+    }
+
+    // 3. Last resort: direct call
+    try {
+      const controller3 = new AbortController();
+      const timeoutId3 = setTimeout(() => controller3.abort(), timeoutMs);
+      const response3 = await fetch(directUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payloadStr,
+        signal: controller3.signal
+      });
+      clearTimeout(timeoutId3);
+      if (response3 && response3.ok) {
+        const data3 = await response3.json();
+        if (data3) {
+          console.log('[Odoo] ✅ Direct call succeeded');
+          return data3;
+        }
+      }
     } catch (directErr) {
-      console.warn('[Odoo Direct Call Failed]:', directErr.message || directErr);
+      console.warn('[Odoo] Direct call failed:', directErr.message || directErr);
     }
     return null;
   }
+
 
 
   resolveOdooTeamId(ticket) {
